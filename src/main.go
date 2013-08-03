@@ -6,10 +6,64 @@ import "github.com/codegangsta/cli"
 func main() {
 	app := cli.NewApp()
 	app.Name = "exercism"
-	app.Usage = "fight the loneliness!"
-	app.Action = func(c *cli.Context) {
-		println("Hello friend!")
+	app.Usage = "A command line tool to interact with http://exercism.io"
+	app.Commands = []cli.Command{
+		{
+			Name:      "demo",
+			ShortName: "d",
+			Usage:     "Fetch first assignment for each language from exercism.io",
+			Action: func(c *cli.Context) {
+				println("Not yet implemented")
+			},
+		},
+		{
+			Name:      "fetch",
+			ShortName: "f",
+			Usage:     "Fetch current assignment from exercism.io",
+			Action: func(c *cli.Context) {
+				println("Not yet implemented")
+			},
+		},
+		{
+			Name:      "login",
+			ShortName: "l",
+			Usage:     "Save exercism.io api credentials",
+			Action: func(c *cli.Context) {
+				println("Not yet implemented")
+			},
+		},
+		{
+			Name:      "logout",
+			ShortName: "o",
+			Usage:     "Clear exercism.io api credentials",
+			Action: func(c *cli.Context) {
+				println("Not yet implemented")
+			},
+		},
+		{
+			Name:      "peek",
+			ShortName: "p",
+			Usage:     "Fetch upcoming assignment from exercism.io",
+			Action: func(c *cli.Context) {
+				println("Not yet implemented")
+			},
+		},
+		{
+			Name:      "submit",
+			ShortName: "s",
+			Usage:     "Submit code to exercism.io on your current assignment",
+			Action: func(c *cli.Context) {
+				println("Not yet implemented")
+			},
+		},
+		{
+			Name:      "whoami",
+			ShortName: "w",
+			Usage:     "Get the github username that you are logged in as",
+			Action: func(c *cli.Context) {
+				println("Not yet implemented")
+			},
+		},
 	}
-
 	app.Run(os.Args)
 }
