@@ -1,0 +1,3 @@
+[submodule "src/github.com/codegangsta/cli"]
+	path = src/github.com/codegangsta/cli
+	url = https://github.com/codegangsta/cli
