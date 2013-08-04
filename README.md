@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/msgehard/go-exercism.png?branch=master)](https://travis-ci.org/msgehard/go-exercism)
+
 Goals
 ===========
 
