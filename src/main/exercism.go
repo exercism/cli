@@ -1,7 +1,10 @@
 package main
 
-import "os"
-import "github.com/codegangsta/cli"
+import (
+	"exercism"
+	"github.com/codegangsta/cli"
+	"os"
+)
 
 func main() {
 	app := cli.NewApp()
@@ -29,7 +32,7 @@ func main() {
 			ShortName: "l",
 			Usage:     "Save exercism.io api credentials",
 			Action: func(c *cli.Context) {
-				println("Not yet implemented")
+				exercism.Login()
 			},
 		},
 		{
