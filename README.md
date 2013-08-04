@@ -6,6 +6,11 @@ Provide non-Ruby developers an easy to work with [exercism.io](http://exercism.i
 This tool is under heavy development. If you want something more stable to access exercism.io, please
 see the [ruby gem](https://github.com/kytrinyx/exercism).
 
+Building
+========
+1. Run ```./bin/build```
+1. The binary will be built into the out directory.
+
 Development
 ===========
 
