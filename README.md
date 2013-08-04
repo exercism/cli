@@ -3,7 +3,7 @@
 Goals
 ===========
 
-Provide non-Ruby developers an easy to work with [exercism.io](http://exercism.io).
+Provide non-Ruby developers an easy way to work with [exercism.io](http://exercism.io).
 
 This tool is under heavy development. If you want something more stable to access exercism.io, please
 see the [ruby gem](https://github.com/kytrinyx/exercism).
