@@ -35,7 +35,7 @@ func main() {
 			Usage:     "Save exercism.io api credentials",
 			Action: func(c *cli.Context) {
 				config := askForConfigInfo()
-				exercism.Login(homeDir(), config)
+				exercism.ConfigToFile(homeDir(), config)
 			},
 		},
 		{
@@ -67,7 +67,12 @@ func main() {
 			ShortName: "w",
 			Usage:     "Get the github username that you are logged in as",
 			Action: func(c *cli.Context) {
-				println("Not yet implemented")
+				config, err := exercism.ConfigFromFile(homeDir())
+				if err != nil {
+					fmt.Println("Are you sure you are logged in? Please login again.")
+				} else {
+					fmt.Println(config.GithubUsername)
+				}
 			},
 		},
 	}
@@ -87,9 +92,9 @@ func askForConfigInfo() (c exercism.Config) {
 	var un, key, dir string
 
 	currentDir, err := os.Getwd()
-		if err != nil {
-			panic(err)
-		}
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Print("Your GitHub username: ")
 	_, err = fmt.Scanln(&un)
@@ -102,7 +107,6 @@ func askForConfigInfo() (c exercism.Config) {
 	if err != nil {
 		panic(err)
 	}
-
 
 	fmt.Println("What is your exercism exercises project path?")
 	fmt.Printf("Press Enter to select the default (%s):\n", currentDir)
