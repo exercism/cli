@@ -2,8 +2,10 @@ package main
 
 import (
 	"exercism"
+	"fmt"
 	"github.com/codegangsta/cli"
 	"os"
+	"os/user"
 )
 
 func main() {
@@ -32,7 +34,8 @@ func main() {
 			ShortName: "l",
 			Usage:     "Save exercism.io api credentials",
 			Action: func(c *cli.Context) {
-				exercism.Login()
+				config := askForConfigInfo()
+				exercism.Login(homeDir(), config)
 			},
 		},
 		{
@@ -40,7 +43,7 @@ func main() {
 			ShortName: "o",
 			Usage:     "Clear exercism.io api credentials",
 			Action: func(c *cli.Context) {
-				println("Not yet implemented")
+				exercism.Logout(homeDir())
 			},
 		},
 		{
@@ -69,4 +72,49 @@ func main() {
 		},
 	}
 	app.Run(os.Args)
+}
+
+func homeDir() string {
+	user, err := user.Current()
+	if err != nil {
+		panic(err)
+	}
+
+	return user.HomeDir
+}
+
+func askForConfigInfo() (c exercism.Config) {
+	var un, key, dir string
+
+	currentDir, err := os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+
+	fmt.Print("Your GitHub username: ")
+	_, err = fmt.Scanln(&un)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Print("Your exercism.io API key: ")
+	_, err = fmt.Scanln(&key)
+	if err != nil {
+		panic(err)
+	}
+
+
+	fmt.Println("What is your exercism exercises project path?")
+	fmt.Printf("Press Enter to select the default (%s):\n", currentDir)
+	fmt.Print("> ")
+	_, err = fmt.Scanln(&dir)
+	if err != nil && err.Error() != "unexpected newline" {
+		panic(err)
+	}
+
+	if dir == "" {
+		dir = currentDir
+	}
+
+	return exercism.Config{un, key, dir}
 }
