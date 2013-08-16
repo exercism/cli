@@ -8,6 +8,12 @@ import (
 	"net/http"
 )
 
+var FetchEndpoints = map[string]string{
+	"current": "/api/v1/user/assignments/current",
+	"next":    "/api/v1/user/assignments/next",
+	"demo":    "/api/v1/assignments/demo",
+}
+
 type fetchResponse struct {
 	Assignments []Assignment
 }
@@ -19,9 +25,8 @@ type submitResponse struct {
 	SubmissionPath string `json:"submission_path"`
 }
 
-func FetchAssignments(host string, apiKey string) (as []Assignment, err error) {
-	path := "api/v1/user/assignments/current"
-	url := fmt.Sprintf("%s/%s?key=%s", host, path, apiKey)
+func FetchAssignments(host string, path string, apiKey string) (as []Assignment, err error) {
+	url := fmt.Sprintf("%s%s?key=%s", host, path, apiKey)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return

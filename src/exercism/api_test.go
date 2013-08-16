@@ -72,7 +72,7 @@ var submitHandler = func(rw http.ResponseWriter, r *http.Request) {
 func TestFetchWithKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(fetchHandler))
 
-	assignments, err := FetchAssignments(server.URL, "myApiKey")
+	assignments, err := FetchAssignments(server.URL, "/api/v1/user/assignments/current", "myApiKey")
 	assert.NoError(t, err)
 
 	assert.Equal(t, len(assignments), 1)
@@ -89,7 +89,7 @@ func TestFetchWithKey(t *testing.T) {
 func TestFetchWithIncorrectKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(fetchHandler))
 
-	assignments, err := FetchAssignments(server.URL, "myWrongApiKey")
+	assignments, err := FetchAssignments(server.URL, "/api/v1/user/assignments/current", "myWrongApiKey")
 
 	assert.Error(t, err)
 	assert.Equal(t, len(assignments), 0)
