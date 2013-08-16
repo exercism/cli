@@ -49,7 +49,11 @@ func main() {
 			ShortName: "l",
 			Usage:     "Save exercism.io api credentials",
 			Action: func(c *cli.Context) {
-				exercism.ConfigToFile(homeDir(), askForConfigInfo())
+				usr, err := user.Current()
+				if err != nil {
+					panic(nil)
+				}
+				exercism.ConfigToFile(*usr, homeDir(), askForConfigInfo())
 			},
 		},
 		{
