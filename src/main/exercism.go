@@ -26,7 +26,22 @@ func main() {
 			ShortName: "f",
 			Usage:     "Fetch current assignment from exercism.io",
 			Action: func(c *cli.Context) {
-				println("Not yet implemented")
+				config, err := exercism.ConfigFromFile(homeDir())
+				if err != nil {
+					fmt.Println("Are you sure you are logged in? Please login again.")
+					return
+				}
+				assignments, err := exercism.FetchAssignments("http://exercism.io", config.ApiKey)
+				if err != nil {
+					panic(err)
+				}
+
+				for _, a := range assignments {
+					err := exercism.SaveAssignment(config.ExercismDirectory, a)
+					if err != nil {
+						panic(err)
+					}
+				}
 			},
 		},
 		{
@@ -69,9 +84,10 @@ func main() {
 				config, err := exercism.ConfigFromFile(homeDir())
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
-				} else {
-					fmt.Println(config.GithubUsername)
+					return
 				}
+
+				fmt.Println(config.GithubUsername)
 			},
 		},
 	}
