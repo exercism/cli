@@ -4,6 +4,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
+	"os/user"
 	"testing"
 )
 
@@ -21,7 +22,8 @@ func TestLogoutDeletesConfigFile(t *testing.T) {
 
 	c := Config{}
 
-	ConfigToFile(tmpDir, c)
+	user := user.User{HomeDir: "/Users/foo"}
+	ConfigToFile(user, tmpDir, c)
 
 	Logout(tmpDir)
 

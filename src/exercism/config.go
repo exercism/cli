@@ -3,6 +3,8 @@ package exercism
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os/user"
+	"strings"
 )
 
 const FILENAME = ".exercism"
@@ -17,7 +19,13 @@ func ConfigFromFile(dir string) (c Config, err error) {
 	return
 }
 
-func ConfigToFile(dir string, c Config) (err error) {
+func ConfigToFile(u user.User, dir string, c Config) (err error) {
+	expandedPath, err := replaceTilde(u, c.ExercismDirectory)
+	if err != nil {
+		return
+	}
+
+	c.ExercismDirectory = expandedPath
 	bytes, err := json.Marshal(c)
 	if err != nil {
 		return
@@ -39,4 +47,10 @@ type Config struct {
 
 func configFilename(dir string) string {
 	return dir + "/" + FILENAME
+}
+
+func replaceTilde(u user.User, oldPath string) (newPath string, err error) {
+	dir := u.HomeDir
+	newPath = strings.Replace(oldPath, "~/", dir+"/", 1)
+	return
 }
