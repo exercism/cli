@@ -16,12 +16,12 @@ do
 #   $(dirname $0)/go test -v --race $package
 	$(dirname $0)/go test -i $package
     $(dirname $0)/go test -v $package
-    result+=$?
+    let "result+=$?" 
 done
 
 echo -e "\n Running build script to confirm main compiles"
 $(dirname $0)/build
-result+=$?
+let "result+=$?"
 
 if [ $result -eq 0 ]; then
 	echo -e "\nSUITE SUCCESS"
