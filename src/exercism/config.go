@@ -43,6 +43,7 @@ type Config struct {
 	GithubUsername    string `json:"githubUsername"`
 	ApiKey            string `json:"apiKey"`
 	ExercismDirectory string `json:"exercismDirectory"`
+	Hostname          string `json:"hostname"`
 }
 
 func configFilename(dir string) string {

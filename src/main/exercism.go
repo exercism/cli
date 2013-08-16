@@ -12,6 +12,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "exercism"
 	app.Usage = "A command line tool to interact with http://exercism.io"
+	app.Version = "1.0.0.beta"
 	app.Commands = []cli.Command{
 		{
 			Name:      "demo",
@@ -23,7 +24,7 @@ func main() {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
 				}
-				assignments, err := exercism.FetchAssignments("http://exercism.io",
+				assignments, err := exercism.FetchAssignments(config.Hostname,
 					exercism.FetchEndpoints["demo"], config.ApiKey)
 				if err != nil {
 					fmt.Println(err)
@@ -48,7 +49,7 @@ func main() {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
 				}
-				assignments, err := exercism.FetchAssignments("http://exercism.io",
+				assignments, err := exercism.FetchAssignments(config.Hostname,
 					exercism.FetchEndpoints["current"], config.ApiKey)
 				if err != nil {
 					fmt.Println(err)
@@ -93,7 +94,7 @@ func main() {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
 				}
-				assignments, err := exercism.FetchAssignments("http://exercism.io",
+				assignments, err := exercism.FetchAssignments(config.Hostname,
 					exercism.FetchEndpoints["next"], config.ApiKey)
 				if err != nil {
 					fmt.Println(err)
@@ -113,7 +114,33 @@ func main() {
 			ShortName: "s",
 			Usage:     "Submit code to exercism.io on your current assignment",
 			Action: func(c *cli.Context) {
-				println("Not yet implemented")
+				config, err := exercism.ConfigFromFile(homeDir())
+				if err != nil {
+					fmt.Println("Are you sure you are logged in? Please login again.")
+					return
+				}
+
+				if len(c.Args()) == 0 {
+					fmt.Println("Please enter a file name")
+					return
+				}
+
+				filename := c.Args()[0]
+
+				if exercism.IsTest(filename) {
+					fmt.Println("It looks like this is a test, please enter an example file name.")
+					return
+				}
+
+				submissionPath, err := exercism.SubmitAssignment(config.Hostname, config.ApiKey, filename)
+				if err != nil {
+					fmt.Printf("There was an issue with your submission: %s\n", err)
+					return
+				}
+
+				fmt.Printf("For feedback on your submission visit %s%s.",
+					config.Hostname, submissionPath)
+
 			},
 		},
 		{
@@ -175,5 +202,5 @@ func askForConfigInfo() (c exercism.Config) {
 		dir = currentDir
 	}
 
-	return exercism.Config{un, key, dir}
+	return exercism.Config{un, key, dir, "http://exercism.io"}
 }
