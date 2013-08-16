@@ -25,7 +25,7 @@ var assignmentsJson = `
 var handler = func(rw http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	apiKey := r.Form.Get("key")
-	if r.URL.Path != "/user/assignments/current" {
+	if r.URL.Path != "/api/v1/user/assignments/current" {
 		fmt.Println("Not found")
 		rw.WriteHeader(http.StatusNotFound)
 		return
@@ -42,10 +42,16 @@ var handler = func(rw http.ResponseWriter, r *http.Request) {
 func TestFetchWithKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(handler))
 
-	assignments, err := Fetch(server.URL, "myApiKey")
+	assignments, err := FetchAssignments(server.URL, "myApiKey")
 	assert.NoError(t, err)
 
 	assert.Equal(t, len(assignments), 1)
+
+	assert.Equal(t, assignments[0].Track, "ruby")
+	assert.Equal(t, assignments[0].Slug, "bob")
+	assert.Equal(t, assignments[0].Readme, "Readme text")
+	assert.Equal(t, assignments[0].TestFile, "bob_test.rb")
+	assert.Equal(t, assignments[0].Tests, "Tests Text")
 
 	server.Close()
 }
@@ -53,9 +59,9 @@ func TestFetchWithKey(t *testing.T) {
 func TestFetchWithIncorrectKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(handler))
 
-	assignments, err := Fetch(server.URL, "myWrongApiKey")
+	assignments, err := FetchAssignments(server.URL, "myWrongApiKey")
 
-	assert.Error(t, err, "Unauthorized")
+	assert.Error(t, err)
 	assert.Equal(t, len(assignments), 0)
 
 	server.Close()

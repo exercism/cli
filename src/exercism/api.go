@@ -12,8 +12,8 @@ type FetchResponse struct {
 	Assignments []Assignment
 }
 
-func Fetch(host string, apiKey string) (as []Assignment, err error) {
-	path := "user/assignments/current"
+func FetchAssignments(host string, apiKey string) (as []Assignment, err error) {
+	path := "api/v1/user/assignments/current"
 	url := fmt.Sprintf("%s/%s?key=%s", host, path, apiKey)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -22,11 +22,12 @@ func Fetch(host string, apiKey string) (as []Assignment, err error) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
+		err = errors.New(fmt.Sprintf("Error fetching assignments: [%s]", err.Error()))
 		return
 	}
 
-	if resp.StatusCode == http.StatusForbidden {
-		err = errors.New("Unauthorized")
+	if resp.StatusCode != http.StatusOK {
+		err = errors.New(fmt.Sprintf("Error fecthing assignments. HTTP Status Code: %d", resp.StatusCode))
 		return
 	}
 
@@ -34,6 +35,7 @@ func Fetch(host string, apiKey string) (as []Assignment, err error) {
 	resp.Body.Close()
 
 	if err != nil {
+		err = errors.New(fmt.Sprintf("Error fetching assignments: [%s]", err.Error()))
 		return
 	}
 
@@ -41,6 +43,7 @@ func Fetch(host string, apiKey string) (as []Assignment, err error) {
 
 	err = json.Unmarshal(body, &fr)
 	if err != nil {
+		err = errors.New(fmt.Sprintf("Error parsing API response: [%s]", err.Error()))
 		return
 	}
 
