@@ -8,8 +8,15 @@ import (
 	"net/http"
 )
 
-type FetchResponse struct {
+type fetchResponse struct {
 	Assignments []Assignment
+}
+
+type submitResponse struct {
+	Status         string
+	Language       string
+	Exercise       string
+	SubmissionPath string `json:"submission_path"`
 }
 
 func FetchAssignments(host string, apiKey string) (as []Assignment, err error) {
@@ -39,7 +46,7 @@ func FetchAssignments(host string, apiKey string) (as []Assignment, err error) {
 		return
 	}
 
-	var fr FetchResponse
+	var fr fetchResponse
 
 	err = json.Unmarshal(body, &fr)
 	if err != nil {
@@ -48,4 +55,43 @@ func FetchAssignments(host string, apiKey string) (as []Assignment, err error) {
 	}
 
 	return fr.Assignments, err
+}
+
+func SubmitAssignment(host, apiKey string, a Assignment) (r *submitResponse, err error) {
+	path := "api/v1/user/assignments"
+
+	url := fmt.Sprintf("%s/%s?key=%s", host, path, apiKey)
+	req, err := http.NewRequest("POST", url, nil)
+	if err != nil {
+		return
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		err = errors.New(fmt.Sprintf("Error posting assignment: [%s]", err.Error()))
+		return
+	}
+
+	if resp.StatusCode != 200 {
+		err = errors.New(fmt.Sprintf("Error posting assignment. Status: %s", resp.StatusCode))
+		return
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
+
+	if err != nil {
+		err = errors.New(fmt.Sprintf("Error posting assignment: [%s]", err.Error()))
+		return
+	}
+
+	var sr submitResponse
+
+	err = json.Unmarshal(body, &sr)
+	if err != nil {
+		err = errors.New(fmt.Sprintf("Error parsing API response: [%s]", err.Error()))
+		return
+	}
+
+	return &sr, nil
 }
