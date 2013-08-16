@@ -18,7 +18,23 @@ func main() {
 			ShortName: "d",
 			Usage:     "Fetch first assignment for each language from exercism.io",
 			Action: func(c *cli.Context) {
-				println("Not yet implemented")
+				config, err := exercism.ConfigFromFile(homeDir())
+				if err != nil {
+					fmt.Println("Are you sure you are logged in? Please login again.")
+					return
+				}
+				assignments, err := exercism.FetchAssignments("http://exercism.io",
+					exercism.FetchEndpoints["demo"], config.ApiKey)
+				if err != nil {
+					panic(err)
+				}
+
+				for _, a := range assignments {
+					err := exercism.SaveAssignment(config.ExercismDirectory, a)
+					if err != nil {
+						panic(err)
+					}
+				}
 			},
 		},
 		{
@@ -31,7 +47,8 @@ func main() {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
 				}
-				assignments, err := exercism.FetchAssignments("http://exercism.io", config.ApiKey)
+				assignments, err := exercism.FetchAssignments("http://exercism.io",
+					exercism.FetchEndpoints["current"], config.ApiKey)
 				if err != nil {
 					panic(err)
 				}
@@ -69,7 +86,23 @@ func main() {
 			ShortName: "p",
 			Usage:     "Fetch upcoming assignment from exercism.io",
 			Action: func(c *cli.Context) {
-				println("Not yet implemented")
+				config, err := exercism.ConfigFromFile(homeDir())
+				if err != nil {
+					fmt.Println("Are you sure you are logged in? Please login again.")
+					return
+				}
+				assignments, err := exercism.FetchAssignments("http://exercism.io",
+					exercism.FetchEndpoints["next"], config.ApiKey)
+				if err != nil {
+					panic(err)
+				}
+
+				for _, a := range assignments {
+					err := exercism.SaveAssignment(config.ExercismDirectory, a)
+					if err != nil {
+						panic(err)
+					}
+				}
 			},
 		},
 		{
