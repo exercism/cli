@@ -26,13 +26,14 @@ func main() {
 				assignments, err := exercism.FetchAssignments("http://exercism.io",
 					exercism.FetchEndpoints["demo"], config.ApiKey)
 				if err != nil {
-					panic(err)
+					fmt.Println(err)
+					return
 				}
 
 				for _, a := range assignments {
 					err := exercism.SaveAssignment(config.ExercismDirectory, a)
 					if err != nil {
-						panic(err)
+						fmt.Println(err)
 					}
 				}
 			},
@@ -50,13 +51,14 @@ func main() {
 				assignments, err := exercism.FetchAssignments("http://exercism.io",
 					exercism.FetchEndpoints["current"], config.ApiKey)
 				if err != nil {
-					panic(err)
+					fmt.Println(err)
+					return
 				}
 
 				for _, a := range assignments {
 					err := exercism.SaveAssignment(config.ExercismDirectory, a)
 					if err != nil {
-						panic(err)
+						fmt.Println(err)
 					}
 				}
 			},
@@ -94,13 +96,14 @@ func main() {
 				assignments, err := exercism.FetchAssignments("http://exercism.io",
 					exercism.FetchEndpoints["next"], config.ApiKey)
 				if err != nil {
-					panic(err)
+					fmt.Println(err)
+					return
 				}
 
 				for _, a := range assignments {
 					err := exercism.SaveAssignment(config.ExercismDirectory, a)
 					if err != nil {
-						panic(err)
+						fmt.Println(err)
 					}
 				}
 			},
