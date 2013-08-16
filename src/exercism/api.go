@@ -1,11 +1,14 @@
 package exercism
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
 )
 
 var FetchEndpoints = map[string]string{
@@ -23,6 +26,16 @@ type submitResponse struct {
 	Language       string
 	Exercise       string
 	SubmissionPath string `json:"submission_path"`
+}
+
+type submitError struct {
+	Error string
+}
+
+type submitRequest struct {
+	Key  string `json:"key"`
+	Code string `json:"code"`
+	Path string `json:"path"`
 }
 
 func FetchAssignments(host string, path string, apiKey string) (as []Assignment, err error) {
@@ -62,11 +75,31 @@ func FetchAssignments(host string, path string, apiKey string) (as []Assignment,
 	return fr.Assignments, err
 }
 
-func SubmitAssignment(host, apiKey string, a Assignment) (r *submitResponse, err error) {
+func SubmitAssignment(host, apiKey, filePath string) (r *submitResponse, err error) {
 	path := "api/v1/user/assignments"
 
-	url := fmt.Sprintf("%s/%s?key=%s", host, path, apiKey)
-	req, err := http.NewRequest("POST", url, nil)
+	url := fmt.Sprintf("%s/%s", host, path)
+
+	workingDirectory, err := os.Getwd()
+	if err != nil {
+		return
+	}
+
+	fullFilePath := filepath.Join(workingDirectory, filepath.Clean(filePath))
+	code, err := ioutil.ReadFile(fullFilePath)
+
+	if err != nil {
+		return
+	}
+
+	submission := submitRequest{Key: apiKey, Code: string(code), Path: filePath}
+	submissionJson, err := json.Marshal(submission)
+
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewReader(submissionJson))
 	if err != nil {
 		return
 	}
@@ -77,26 +110,25 @@ func SubmitAssignment(host, apiKey string, a Assignment) (r *submitResponse, err
 		return
 	}
 
-	if resp.StatusCode != 200 {
-		err = errors.New(fmt.Sprintf("Error posting assignment. Status: %s", resp.StatusCode))
-		return
-	}
-
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Error posting assignment: [%s]", err.Error()))
 		return
 	}
 
-	var sr submitResponse
+	if resp.StatusCode != http.StatusCreated {
+		postError := submitError{}
+		_ = json.Unmarshal(body, &postError)
+		err = errors.New(fmt.Sprintf("Status: %d, Error: %s", resp.StatusCode, postError.Error))
+		return
+	}
 
-	err = json.Unmarshal(body, &sr)
+	err = json.Unmarshal(body, &r)
 	if err != nil {
 		err = errors.New(fmt.Sprintf("Error parsing API response: [%s]", err.Error()))
 		return
 	}
 
-	return &sr, nil
+	return
 }
