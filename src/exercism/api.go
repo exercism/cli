@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 )
 
+const VERSION = "0.2.5"
+
 var FetchEndpoints = map[string]string{
 	"current": "/api/v1/user/assignments/current",
 	"next":    "/api/v1/user/assignments/next",
@@ -103,6 +105,8 @@ func SubmitAssignment(host, apiKey, filePath string) (r *submitResponse, err err
 	if err != nil {
 		return
 	}
+
+	req.Header.Set("User-Agent", fmt.Sprintf("github.com/kytrinyx/exercism CLI v%s", VERSION))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
