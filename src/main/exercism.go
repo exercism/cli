@@ -12,7 +12,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "exercism"
 	app.Usage = "A command line tool to interact with http://exercism.io"
-	app.Version = "1.0.0.beta"
+	app.Version = exercism.VERSION
 	app.Commands = []cli.Command{
 		{
 			Name:      "demo",
@@ -132,14 +132,14 @@ func main() {
 					return
 				}
 
-				submissionPath, err := exercism.SubmitAssignment(config.Hostname, config.ApiKey, filename)
+				response, err := exercism.SubmitAssignment(config.Hostname, config.ApiKey, filename)
 				if err != nil {
 					fmt.Printf("There was an issue with your submission: %s\n", err)
 					return
 				}
 
-				fmt.Printf("For feedback on your submission visit %s%s.",
-					config.Hostname, submissionPath)
+				fmt.Printf("For feedback on your submission visit %s%s.\n",
+					config.Hostname, response.SubmissionPath)
 
 			},
 		},

@@ -78,6 +78,14 @@ var submitHandler = func(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userAgentMatches := r.Header.Get("User-Agent") == fmt.Sprintf("github.com/kytrinyx/exercism CLI v%s", VERSION)
+
+	if !userAgentMatches {
+		fmt.Printf("User agent mismatch: %s\n", r.Header.Get("User-Agent"))
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	body, err := ioutil.ReadAll(r.Body)
 	r.Body.Close()
 
