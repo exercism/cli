@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const FILENAME = ".exercism"
+const FILENAME = ".exercism.go"
 
 func ConfigFromFile(dir string) (c Config, err error) {
 	bytes, err := ioutil.ReadFile(configFilename(dir))
