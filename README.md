@@ -10,7 +10,7 @@ see the [ruby gem](https://github.com/kytrinyx/exercism).
 
 Development
 ===========
-1. Install Go ```brew install go``` or the command appropriate for your platform.
+1. Install Go ```brew install go --cross-compile-common``` or the command appropriate for your platform.
 1. Fork and clone.
 1. Run ```git submodule update --init --recursive```
 1. Write a test.
@@ -20,5 +20,5 @@ Development
 
 Building
 ========
-1. Run ```./bin/build```
-1. The binary will be built into the out directory.
+1. Run ```bin/build``` and the binary for your platform will be built into the out directory.
+1. Run ```bin/build-all``` and the binaries for OSX, Linux and Windows will be built into the release directory.
