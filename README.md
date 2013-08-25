@@ -12,7 +12,7 @@ Development
 ===========
 1. Install Go ```brew install go``` or the command appropriate for your platform.
 1. Fork and clone.
-1. Run ```git submodule update --init --recusive```
+1. Run ```git submodule update --init --recursive```
 1. Write a test.
 1. Run ``` bin/test ``` and watch test fail.
 1. Make test pass.
