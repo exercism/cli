@@ -3,9 +3,13 @@
 Goals
 ===========
 
-Provide non-Ruby developers an easy way to work with [exercism.io](http://exercism.io).
+Provide developers an easy way to work with [exercism.io](http://exercism.io) that doesn't require a 
+Ruby environment.
 
-This tool is under heavy development. If you want something more stable to access exercism.io, please
+This tool is in beta testing. All of the major functionality has been implemented. Please help
+us work out the kinks by using it to access the site. 
+
+If you want something more stable to access exercism.io, please
 see the [ruby gem](https://github.com/kytrinyx/exercism).
 
 Development
