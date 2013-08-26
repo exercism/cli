@@ -11,6 +11,9 @@ var isTestTests = []struct {
 	{"bob_test.rb", true},
 	{"bob.spec.js", true},
 	{"bob_test.exs", true},
+	{"bob_test.clj", true},
+	{"bob_test.py", true},
+	{"bob_test.go", true},
 	{"bob.rb", false},
 }
 
