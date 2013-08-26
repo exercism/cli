@@ -32,7 +32,6 @@ func SaveAssignment(dir string, a Assignment) (err error) {
 	err = ioutil.WriteFile(fmt.Sprintf("%s/%s", assignmentPath, a.TestFile), []byte(a.Tests), 0644)
 	if err != nil {
 		err = errors.New(fmt.Sprintf("Error writing file %s: [%s]", a.TestFile, err.Error()))
-		return
 	}
 
 	return
