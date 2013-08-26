@@ -6,7 +6,19 @@ var testExtensions = map[string]string{
 	"ruby":   "_test.rb",
 	"js":     ".spec.js",
 	"elixir": "_test.exs",
+	"clojure": "_test.clj",
+	"python": "_test.py",
+	"go": "_test.go",
 }
+
+/*
+ :ruby => '_test.rb',
+        :js => '.spec.js',
+        :elixir => '_test.exs',
+        :clojure => '_test.clj',
+        :python => '_test.py',
+        :go => '_test.go',
+*/
 
 func IsTest(filename string) bool {
 	for _, ext := range testExtensions {
