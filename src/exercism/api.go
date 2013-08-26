@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 )
 
-const VERSION = "0.2.6.beta"
+const VERSION = "0.0.27.beta"
 
 var FetchEndpoints = map[string]string{
 	"current": "/api/v1/user/assignments/current",
