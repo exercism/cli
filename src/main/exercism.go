@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/codegangsta/cli"
 	"os"
-	"os/user"
 )
 
 func main() {
@@ -19,7 +18,7 @@ func main() {
 			ShortName: "d",
 			Usage:     "Fetch first assignment for each language from exercism.io",
 			Action: func(c *cli.Context) {
-				config, err := exercism.ConfigFromFile(homeDir())
+				config, err := exercism.ConfigFromFile(exercism.HomeDir())
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -44,7 +43,7 @@ func main() {
 			ShortName: "f",
 			Usage:     "Fetch current assignment from exercism.io",
 			Action: func(c *cli.Context) {
-				config, err := exercism.ConfigFromFile(homeDir())
+				config, err := exercism.ConfigFromFile(exercism.HomeDir())
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -69,11 +68,7 @@ func main() {
 			ShortName: "l",
 			Usage:     "Save exercism.io api credentials",
 			Action: func(c *cli.Context) {
-				usr, err := user.Current()
-				if err != nil {
-					panic(nil)
-				}
-				exercism.ConfigToFile(*usr, homeDir(), askForConfigInfo())
+				exercism.ConfigToFile(exercism.HomeDir(), askForConfigInfo())
 			},
 		},
 		{
@@ -81,7 +76,7 @@ func main() {
 			ShortName: "o",
 			Usage:     "Clear exercism.io api credentials",
 			Action: func(c *cli.Context) {
-				exercism.Logout(homeDir())
+				exercism.Logout(exercism.HomeDir())
 			},
 		},
 		{
@@ -89,7 +84,7 @@ func main() {
 			ShortName: "p",
 			Usage:     "Fetch upcoming assignment from exercism.io",
 			Action: func(c *cli.Context) {
-				config, err := exercism.ConfigFromFile(homeDir())
+				config, err := exercism.ConfigFromFile(exercism.HomeDir())
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -114,7 +109,7 @@ func main() {
 			ShortName: "s",
 			Usage:     "Submit code to exercism.io on your current assignment",
 			Action: func(c *cli.Context) {
-				config, err := exercism.ConfigFromFile(homeDir())
+				config, err := exercism.ConfigFromFile(exercism.HomeDir())
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -148,7 +143,7 @@ func main() {
 			ShortName: "w",
 			Usage:     "Get the github username that you are logged in as",
 			Action: func(c *cli.Context) {
-				config, err := exercism.ConfigFromFile(homeDir())
+				config, err := exercism.ConfigFromFile(exercism.HomeDir())
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -159,15 +154,6 @@ func main() {
 		},
 	}
 	app.Run(os.Args)
-}
-
-func homeDir() string {
-	user, err := user.Current()
-	if err != nil {
-		panic(err)
-	}
-
-	return user.HomeDir
 }
 
 func askForConfigInfo() (c exercism.Config) {
@@ -202,5 +188,5 @@ func askForConfigInfo() (c exercism.Config) {
 		dir = currentDir
 	}
 
-	return exercism.Config{un, key, dir, "http://exercism.io"}
+	return exercism.Config{un, key, exercism.ReplaceTilde(dir), "http://exercism.io"}
 }
