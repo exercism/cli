@@ -43,7 +43,9 @@ type submitRequest struct {
 func FetchAssignments(host string, path string, apiKey string) (as []Assignment, err error) {
 	url := fmt.Sprintf("%s%s?key=%s", host, path, apiKey)
 	req, err := http.NewRequest("GET", url, nil)
-	if err != nil { return }
+	if err != nil {
+		return
+	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -81,19 +83,27 @@ func SubmitAssignment(host, apiKey, filePath string) (r *submitResponse, err err
 	url := fmt.Sprintf("%s/%s", host, path)
 
 	workingDirectory, err := os.Getwd()
-	if err != nil { return }
+	if err != nil {
+		return
+	}
 
 	fullFilePath := filepath.Join(workingDirectory, filepath.Clean(filePath))
 	code, err := ioutil.ReadFile(fullFilePath)
 
-	if err != nil { return }
+	if err != nil {
+		return
+	}
 
 	submission := submitRequest{Key: apiKey, Code: string(code), Path: filePath}
 	submissionJson, err := json.Marshal(submission)
-	if err != nil { return }
+	if err != nil {
+		return
+	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewReader(submissionJson))
-	if err != nil { return }
+	if err != nil {
+		return
+	}
 
 	req.Header.Set("User-Agent", fmt.Sprintf("github.com/kytrinyx/exercism CLI v%s", VERSION))
 
@@ -105,7 +115,9 @@ func SubmitAssignment(host, apiKey, filePath string) (r *submitResponse, err err
 
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
-	if err != nil { return }
+	if err != nil {
+		return
+	}
 
 	if resp.StatusCode != http.StatusCreated {
 		postError := submitError{}
