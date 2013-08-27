@@ -2,6 +2,7 @@ package exercism
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 )
 
@@ -30,7 +31,12 @@ func ConfigToFile(dir string, c Config) (err error) {
 		return
 	}
 
-	err = ioutil.WriteFile(configFilename(dir), bytes, 0644)
+	filename := configFilename(dir)
+	err = ioutil.WriteFile(filename, bytes, 0644)
+	if err != nil {
+		return
+	}
+	fmt.Printf("Your credentials have been written to %s\n", filename)
 	return
 }
 
