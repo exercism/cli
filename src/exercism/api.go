@@ -54,7 +54,7 @@ func FetchAssignments(host string, path string, apiKey string) (as []Assignment,
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		err = errors.New(fmt.Sprintf("Error fecthing assignments. HTTP Status Code: %d", resp.StatusCode))
+		err = errors.New(fmt.Sprintf("Error fetching assignments. HTTP Status Code: %d", resp.StatusCode))
 		return
 	}
 
