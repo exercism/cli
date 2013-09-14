@@ -9,6 +9,7 @@ var testExtensions = map[string]string{
 	"clojure": "_test.clj",
 	"python":  "_test.py",
 	"go":      "_test.go",
+	"haskell": "_test.hs",
 }
 
 func IsTest(filename string) bool {
