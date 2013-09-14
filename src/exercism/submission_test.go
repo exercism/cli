@@ -14,6 +14,7 @@ var isTestTests = []struct {
 	{"bob_test.clj", true},
 	{"bob_test.py", true},
 	{"bob_test.go", true},
+	{"bob_test.hs", true},
 	{"bob.rb", false},
 }
 
