@@ -14,7 +14,8 @@ see the [ruby gem](https://github.com/kytrinyx/exercism).
 
 Development
 ===========
-1. Install Go ```brew install go --cross-compile-common``` or the command appropriate for your platform.
+1. Install Go ```brew install go --cross-compile-common``` or the command appropriate for your platform. If that throws an 
+error, try ```brew install go --crosscompile-commone --with-llvm```.
 1. Fork and clone.
 1. Run ```git submodule update --init --recursive```
 1. Write a test.
