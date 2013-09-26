@@ -20,8 +20,17 @@ func main() {
 			Action: func(c *cli.Context) {
 				config, err := exercism.ConfigFromFile(exercism.HomeDir())
 				if err != nil {
-					fmt.Println("Are you sure you are logged in? Please login again.")
-					return
+					demoDir, err2 := exercism.DemoDirectory()
+					if err2 != nil {
+						err = err2
+						fmt.Println(err)
+						return
+					}
+					config = exercism.Config{
+						Hostname: "http://exercism.io",
+						ApiKey: "",
+						ExercismDirectory: demoDir,
+					}
 				}
 				assignments, err := exercism.FetchAssignments(config.Hostname,
 					exercism.FetchEndpoints["demo"], config.ApiKey)
