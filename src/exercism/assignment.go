@@ -34,5 +34,7 @@ func SaveAssignment(dir string, a Assignment) (err error) {
 		err = errors.New(fmt.Sprintf("Error writing file %s: [%s]", a.TestFile, err.Error()))
 	}
 
+	fmt.Println(a.Track, "-", a.Slug)
+
 	return
 }
