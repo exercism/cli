@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
-	"path/filepath"
 )
 
 const VERSION = "1.0.0"
@@ -77,22 +75,10 @@ func FetchAssignments(host string, path string, apiKey string) (as []Assignment,
 	return fr.Assignments, err
 }
 
-func SubmitAssignment(host, apiKey, filePath string) (r *submitResponse, err error) {
+func SubmitAssignment(host, apiKey, filePath string, code []byte) (r *submitResponse, err error) {
 	path := "api/v1/user/assignments"
 
 	url := fmt.Sprintf("%s/%s", host, path)
-
-	workingDirectory, err := os.Getwd()
-	if err != nil {
-		return
-	}
-
-	fullFilePath := filepath.Join(workingDirectory, filepath.Clean(filePath))
-	code, err := ioutil.ReadFile(fullFilePath)
-
-	if err != nil {
-		return
-	}
 
 	submission := submitRequest{Key: apiKey, Code: string(code), Path: filePath}
 	submissionJson, err := json.Marshal(submission)
