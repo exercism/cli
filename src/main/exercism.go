@@ -4,7 +4,10 @@ import (
 	"exercism"
 	"fmt"
 	"github.com/codegangsta/cli"
+	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 func main() {
@@ -122,14 +125,33 @@ func main() {
 
 				filename := c.Args()[0]
 
+				// Make filename relative to config.ExercismDirectory.
+				absPath, err := absolutePath(filename)
+				if err != nil {
+					fmt.Printf("Couldn't find %v: %v\n", filename, err)
+					return
+				}
+				exDir := config.ExercismDirectory + string(filepath.Separator)
+				if !strings.HasPrefix(absPath, exDir) {
+					fmt.Printf("%v is not under your exercism project path (%v)\n", absPath, exDir)
+					return
+				}
+				filename = absPath[len(exDir):]
+
 				if exercism.IsTest(filename) {
 					fmt.Println("It looks like this is a test, please enter an example file name.")
 					return
 				}
 
-				response, err := exercism.SubmitAssignment(config.Hostname, config.ApiKey, filename)
+				code, err := ioutil.ReadFile(absPath)
 				if err != nil {
-					fmt.Printf("There was an issue with your submission: %s\n", err)
+					fmt.Printf("Error reading %v: %v\n", absPath, err)
+					return
+				}
+
+				response, err := exercism.SubmitAssignment(config.Hostname, config.ApiKey, filename, code)
+				if err != nil {
+					fmt.Printf("There was an issue with your submission: %v\n", err)
 					return
 				}
 
@@ -183,10 +205,22 @@ func askForConfigInfo() (c exercism.Config) {
 	if err != nil && err.Error() != "unexpected newline" {
 		panic(err)
 	}
+	dir, err = absolutePath(dir)
+	if err != nil {
+		panic(err)
+	}
 
 	if dir == "" {
 		dir = currentDir
 	}
 
 	return exercism.Config{un, key, exercism.ReplaceTilde(dir), "http://exercism.io"}
+}
+
+func absolutePath(path string) (string, error) {
+	path, err := filepath.Abs(path)
+	if err != nil {
+		return "", err
+	}
+	return filepath.EvalSymlinks(path)
 }
