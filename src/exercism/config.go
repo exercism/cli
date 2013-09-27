@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 )
 
 const FILENAME = ".exercism.go"
@@ -37,6 +38,15 @@ func ConfigToFile(dir string, c Config) (err error) {
 		return
 	}
 	fmt.Printf("Your credentials have been written to %s\n", filename)
+	return
+}
+
+func DemoDirectory() (dir string, err error) {
+	dir, err = os.Getwd()
+	if err != nil {
+		return
+	}
+	dir = dir + "/exercism-demo"
 	return
 }
 
