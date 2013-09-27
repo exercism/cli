@@ -6,12 +6,6 @@ Goals
 Provide developers an easy way to work with [exercism.io](http://exercism.io) that doesn't require a 
 Ruby environment.
 
-This tool is in beta testing. All of the major functionality has been implemented. Please help
-us work out the kinks by using it to access the site. 
-
-If you want something more stable to access exercism.io, please
-see the [ruby gem](https://github.com/kytrinyx/exercism).
-
 Development
 ===========
 1. Install Go ```brew install go --cross-compile-common``` or the command appropriate for your platform. If that throws an 
