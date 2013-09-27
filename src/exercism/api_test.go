@@ -121,7 +121,7 @@ var submitHandler = func(rw http.ResponseWriter, r *http.Request) {
 	filePath := submission.Path
 
 	codeMatches := string(code) == "My source code\n"
-	filePathMatches := filePath == "../fixtures/submit/ruby/bob/bob.rb"
+	filePathMatches := filePath == "ruby/bob/bob.rb"
 
 	if !filePathMatches {
 		fmt.Printf("FilePathMismatch: File Path: %s\n", filePath)
@@ -153,7 +153,8 @@ func TestSubmitWithKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(submitHandler))
 	defer server.Close()
 
-	response, err := SubmitAssignment(server.URL, "myApiKey", "../fixtures/submit/ruby/bob/bob.rb")
+	var code = []byte("My source code\n")
+	response, err := SubmitAssignment(server.URL, "myApiKey", "ruby/bob/bob.rb", code)
 	assert.NoError(t, err)
 
 	assert.Equal(t, response.Status, "saved")
@@ -166,7 +167,8 @@ func TestSubmitWithIncorrectKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(submitHandler))
 	defer server.Close()
 
-	response, err := SubmitAssignment(server.URL, "myWrongApiKey", "ruby/bob/bob.rb")
+	var code = []byte("My source code\n")
+	response, err := SubmitAssignment(server.URL, "myWrongApiKey", "ruby/bob/bob.rb", code)
 
 	assert.Error(t, err)
 	assert.Nil(t, response)
