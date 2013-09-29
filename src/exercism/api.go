@@ -38,8 +38,8 @@ type submitRequest struct {
 	Path string `json:"path"`
 }
 
-func FetchAssignments(host string, path string, apiKey string) (as []Assignment, err error) {
-	url := fmt.Sprintf("%s%s?key=%s", host, path, apiKey)
+func FetchAssignments(config Config, path string) (as []Assignment, err error) {
+	url := fmt.Sprintf("%s%s?key=%s", config.Hostname, path, config.ApiKey)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return
@@ -75,12 +75,12 @@ func FetchAssignments(host string, path string, apiKey string) (as []Assignment,
 	return fr.Assignments, err
 }
 
-func SubmitAssignment(host, apiKey, filePath string, code []byte) (r *submitResponse, err error) {
+func SubmitAssignment(config Config, filePath string, code []byte) (r *submitResponse, err error) {
 	path := "api/v1/user/assignments"
 
-	url := fmt.Sprintf("%s/%s", host, path)
+	url := fmt.Sprintf("%s/%s", config.Hostname, path)
 
-	submission := submitRequest{Key: apiKey, Code: string(code), Path: filePath}
+	submission := submitRequest{Key: config.ApiKey, Code: string(code), Path: filePath}
 	submissionJson, err := json.Marshal(submission)
 	if err != nil {
 		return
