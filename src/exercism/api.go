@@ -46,7 +46,7 @@ func FetchAssignments(config Config, path string) (as []Assignment, err error) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		err = fmt.Errorf("Error fetching assignments: [%s]", err.Error())
+		err = fmt.Errorf("Error fetching assignments: [%s]", err)
 		return
 	}
 
@@ -59,7 +59,7 @@ func FetchAssignments(config Config, path string) (as []Assignment, err error) {
 	resp.Body.Close()
 
 	if err != nil {
-		err = fmt.Errorf("Error fetching assignments: [%s]", err.Error())
+		err = fmt.Errorf("Error fetching assignments: [%s]", err)
 		return
 	}
 
@@ -67,7 +67,7 @@ func FetchAssignments(config Config, path string) (as []Assignment, err error) {
 
 	err = json.Unmarshal(body, &fr)
 	if err != nil {
-		err = fmt.Errorf("Error parsing API response: [%s]", err.Error())
+		err = fmt.Errorf("Error parsing API response: [%s]", err)
 		return
 	}
 
@@ -94,7 +94,7 @@ func SubmitAssignment(config Config, filePath string, code []byte) (r *submitRes
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		err = fmt.Errorf("Error posting assignment: [%s]", err.Error())
+		err = fmt.Errorf("Error posting assignment: [%s]", err)
 		return
 	}
 
@@ -113,7 +113,7 @@ func SubmitAssignment(config Config, filePath string, code []byte) (r *submitRes
 
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		err = fmt.Errorf("Error parsing API response: [%s]", err.Error())
+		err = fmt.Errorf("Error parsing API response: [%s]", err)
 	}
 
 	return
