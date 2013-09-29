@@ -26,30 +26,26 @@ func ConfigFromFile(dir string) (c Config, err error) {
 	return
 }
 
-func ConfigToFile(dir string, c Config) (err error) {
+func ConfigToFile(dir string, c Config) error {
 	bytes, err := json.Marshal(c)
 	if err != nil {
-		return
+		return err
 	}
 
 	filename := configFilename(dir)
 	err = ioutil.WriteFile(filename, bytes, 0644)
 	if err != nil {
-		return
+		return err
 	}
 	fmt.Printf("Your credentials have been written to %s\n", filename)
-	return
+	return nil
 }
 
-func DemoDirectory() (dir string, err error) {
-	dir, err = os.Getwd()
-	if err != nil {
-		return
-	}
-	dir = dir + "/exercism-demo"
-	return
+func DemoDirectory() (string, error) {
+	dir, err := os.Getwd()
+	return fmt.Sprintf("%s/exercism-demo", dir), err
 }
 
 func configFilename(dir string) string {
-	return dir + "/" + FILENAME
+	return fmt.Sprintf("%s/%s", dir, FILENAME)
 }
