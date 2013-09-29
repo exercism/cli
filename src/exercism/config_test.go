@@ -37,5 +37,6 @@ func TestDemoDir(t *testing.T) {
 	path = filepath.Join(path, "exercism-demo")
 
 	demoDir, err := DemoDirectory()
+	assert.NoError(t, err)
 	assert.Equal(t, demoDir, path)
 }
