@@ -1,7 +1,6 @@
 package exercism
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -19,19 +18,19 @@ func SaveAssignment(dir string, a Assignment) (err error) {
 	assignmentPath := fmt.Sprintf("%s/%s/%s", dir, a.Track, a.Slug)
 	err = os.MkdirAll(assignmentPath, 0744)
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Error creating assignment directory: [%s]", err.Error()))
+		err = fmt.Errorf("Error creating assignment directory: [%s]", err.Error())
 		return
 	}
 
 	err = ioutil.WriteFile(fmt.Sprintf("%s/%s", assignmentPath, "README.md"), []byte(a.Readme), 0644)
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Error writing README.md file: [%s]", err.Error()))
+		err = fmt.Errorf("Error writing README.md file: [%s]", err.Error())
 		return
 	}
 
 	err = ioutil.WriteFile(fmt.Sprintf("%s/%s", assignmentPath, a.TestFile), []byte(a.Tests), 0644)
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Error writing file %s: [%s]", a.TestFile, err.Error()))
+		err = fmt.Errorf("Error writing file %s: [%s]", a.TestFile, err.Error())
 	}
 
 	fmt.Println(a.Track, "-", a.Slug)

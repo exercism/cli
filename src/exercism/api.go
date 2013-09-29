@@ -3,7 +3,6 @@ package exercism
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -47,12 +46,12 @@ func FetchAssignments(config Config, path string) (as []Assignment, err error) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Error fetching assignments: [%s]", err.Error()))
+		err = fmt.Errorf("Error fetching assignments: [%s]", err.Error())
 		return
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		err = errors.New(fmt.Sprintf("Error fetching assignments. HTTP Status Code: %d", resp.StatusCode))
+		err = fmt.Errorf("Error fetching assignments. HTTP Status Code: %d", resp.StatusCode)
 		return
 	}
 
@@ -60,7 +59,7 @@ func FetchAssignments(config Config, path string) (as []Assignment, err error) {
 	resp.Body.Close()
 
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Error fetching assignments: [%s]", err.Error()))
+		err = fmt.Errorf("Error fetching assignments: [%s]", err.Error())
 		return
 	}
 
@@ -68,7 +67,7 @@ func FetchAssignments(config Config, path string) (as []Assignment, err error) {
 
 	err = json.Unmarshal(body, &fr)
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Error parsing API response: [%s]", err.Error()))
+		err = fmt.Errorf("Error parsing API response: [%s]", err.Error())
 		return
 	}
 
@@ -95,7 +94,7 @@ func SubmitAssignment(config Config, filePath string, code []byte) (r *submitRes
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Error posting assignment: [%s]", err.Error()))
+		err = fmt.Errorf("Error posting assignment: [%s]", err.Error())
 		return
 	}
 
@@ -108,13 +107,13 @@ func SubmitAssignment(config Config, filePath string, code []byte) (r *submitRes
 	if resp.StatusCode != http.StatusCreated {
 		postError := submitError{}
 		_ = json.Unmarshal(body, &postError)
-		err = errors.New(fmt.Sprintf("Status: %d, Error: %s", resp.StatusCode, postError.Error))
+		err = fmt.Errorf("Status: %d, Error: %s", resp.StatusCode, postError.Error)
 		return
 	}
 
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Error parsing API response: [%s]", err.Error()))
+		err = fmt.Errorf("Error parsing API response: [%s]", err.Error())
 	}
 
 	return
