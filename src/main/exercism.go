@@ -29,13 +29,13 @@ func main() {
 						return
 					}
 					config = exercism.Config{
-						Hostname: "http://exercism.io",
-						ApiKey: "",
+						Hostname:          "http://exercism.io",
+						ApiKey:            "",
 						ExercismDirectory: demoDir,
 					}
 				}
-				assignments, err := exercism.FetchAssignments(config.Hostname,
-					exercism.FetchEndpoints["demo"], config.ApiKey)
+				assignments, err := exercism.FetchAssignments(config,
+					exercism.FetchEndpoints["demo"])
 				if err != nil {
 					fmt.Println(err)
 					return
@@ -59,8 +59,8 @@ func main() {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
 				}
-				assignments, err := exercism.FetchAssignments(config.Hostname,
-					exercism.FetchEndpoints["current"], config.ApiKey)
+				assignments, err := exercism.FetchAssignments(config,
+					exercism.FetchEndpoints["current"])
 				if err != nil {
 					fmt.Println(err)
 					return
@@ -100,8 +100,8 @@ func main() {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
 				}
-				assignments, err := exercism.FetchAssignments(config.Hostname,
-					exercism.FetchEndpoints["next"], config.ApiKey)
+				assignments, err := exercism.FetchAssignments(config,
+					exercism.FetchEndpoints["next"])
 				if err != nil {
 					fmt.Println(err)
 					return
@@ -157,7 +157,7 @@ func main() {
 					return
 				}
 
-				response, err := exercism.SubmitAssignment(config.Hostname, config.ApiKey, filename, code)
+				response, err := exercism.SubmitAssignment(config, filename, code)
 				if err != nil {
 					fmt.Printf("There was an issue with your submission: %v\n", err)
 					return
