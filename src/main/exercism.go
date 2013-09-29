@@ -23,9 +23,8 @@ func main() {
 			Action: func(c *cli.Context) {
 				config, err := exercism.ConfigFromFile(exercism.HomeDir())
 				if err != nil {
-					demoDir, err2 := exercism.DemoDirectory()
-					if err2 != nil {
-						err = err2
+					demoDir, err := exercism.DemoDirectory()
+					if err != nil {
 						fmt.Println(err)
 						return
 					}
