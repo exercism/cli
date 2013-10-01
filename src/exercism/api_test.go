@@ -115,7 +115,7 @@ var submitHandler = func(rw http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal(body, &submission)
 	if err != nil {
-		fmt.Printf("Unmarshalling error: %s, Body: %s\n", err, body)
+		fmt.Printf("Unmarshalling error: %v, Body: %s\n", err, body)
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}

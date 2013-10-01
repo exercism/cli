@@ -24,13 +24,13 @@ func SaveAssignment(dir string, a Assignment) (err error) {
 
 	err = ioutil.WriteFile(fmt.Sprintf("%s/%s", assignmentPath, "README.md"), []byte(a.Readme), 0644)
 	if err != nil {
-		err = fmt.Errorf("Error writing README.md file: [%s]", err)
+		err = fmt.Errorf("Error writing README.md file: [%v]", err)
 		return
 	}
 
 	err = ioutil.WriteFile(fmt.Sprintf("%s/%s", assignmentPath, a.TestFile), []byte(a.Tests), 0644)
 	if err != nil {
-		err = fmt.Errorf("Error writing file %s: [%s]", a.TestFile, err)
+		err = fmt.Errorf("Error writing file %s: [%v]", a.TestFile, err)
 	}
 
 	fmt.Println(a.Track, "-", a.Slug)
