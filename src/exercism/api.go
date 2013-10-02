@@ -16,19 +16,12 @@ var FetchEndpoints = map[string]string{
 	"demo":    "/api/v1/assignments/demo",
 }
 
-type fetchResponse struct {
-	Assignments []Assignment
-}
-
 type submitResponse struct {
 	Status         string
 	Language       string
 	Exercise       string
 	SubmissionPath string `json:"submission_path"`
-}
-
-type submitError struct {
-	Error string
+	Error          error
 }
 
 type submitRequest struct {
@@ -63,7 +56,9 @@ func FetchAssignments(config Config, path string) (as []Assignment, err error) {
 		return
 	}
 
-	var fr fetchResponse
+	var fr struct {
+		Assignments []Assignment
+	}
 
 	err = json.Unmarshal(body, &fr)
 	if err != nil {
@@ -74,7 +69,7 @@ func FetchAssignments(config Config, path string) (as []Assignment, err error) {
 	return fr.Assignments, err
 }
 
-func SubmitAssignment(config Config, filePath string, code []byte) (r *submitResponse, err error) {
+func SubmitAssignment(config Config, filePath string, code []byte) (r submitResponse, err error) {
 	path := "api/v1/user/assignments"
 
 	url := fmt.Sprintf("%s/%s", config.Hostname, path)
@@ -105,9 +100,11 @@ func SubmitAssignment(config Config, filePath string, code []byte) (r *submitRes
 	}
 
 	if resp.StatusCode != http.StatusCreated {
-		postError := submitError{}
-		_ = json.Unmarshal(body, &postError)
-		err = fmt.Errorf("Status: %d, Error: %v", resp.StatusCode, postError)
+		err = json.Unmarshal(body, &r)
+		if err != nil {
+			return
+		}
+		err = fmt.Errorf("Status: %d, Error: %v", resp.StatusCode, r)
 		return
 	}
 
