@@ -187,8 +187,7 @@ func TestSubmitWithIncorrectKey(t *testing.T) {
 	}
 
 	var code = []byte("My source code\n")
-	response, err := SubmitAssignment(config, "ruby/bob/bob.rb", code)
+	_, err := SubmitAssignment(config, "ruby/bob/bob.rb", code)
 
 	assert.Error(t, err)
-	assert.Nil(t, response)
 }
