@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 set -e
 
@@ -6,4 +6,3 @@ SCRIPT_HOME=$( cd "$( dirname "$0" )" && pwd )
 
 base=$SCRIPT_HOME/..
 
-exec env GOPATH=$base $@
