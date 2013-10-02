@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -e -x
 
 echo "Creating release dir..."
 mkdir -p release
@@ -10,14 +10,15 @@ EXECUTABLE_NAME="exercism"
 PLATFORMS="darwin/386 darwin/amd64 linux/386 linux/amd64 windows/386 windows/amd64"
 
 function build-architecture {
-  GOOS=${1%/*}
-  GOARCH=${1#*/}
-  echo "Creating $GOOS $GOARCH binary..."
+GOOS=${1%/*}
+GOARCH=${1#*/}
+echo "Creating $GOOS $GOARCH binary..."
 
-  GOOS=$GOOS GOARCH=$GOARCH "$(dirname $0)/build"
-  cd out
+GOOS=$GOOS GOARCH=$GOARCH "$(dirname $0)/build"
+cd out
+ls
 
-  if [ $GOOS == windows ]; then
+if [ $GOOS == windows ]; then
     mv $EXECUTABLE_NAME $EXECUTABLE_NAME.exe
     tar cvzf ../release/$EXECUTABLE_NAME-$GOOS-$GOARCH.tgz $EXECUTABLE_NAME.exe
   else

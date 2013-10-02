@@ -6,14 +6,27 @@ Goals
 Provide developers an easy way to work with [exercism.io](http://exercism.io) that doesn't require a 
 Ruby environment.
 
+Installing Go
+=============
+
+### On Mac OS X
+
+You may get away with ```brew install go --cross-compile-common``` unless you have the latest XCode, which does not ship with gcc.
+
+If have the latest XCode, try ```brew install go --cross-compile-common --without-cgo```.
+
+If that throws an error, try ```brew install go --crosscompile-commone --with-llvm```.
+
 Development
 ===========
-1. Install Go ```brew install go --cross-compile-common``` or the command appropriate for your platform. If that throws an 
-error, try ```brew install go --crosscompile-commone --with-llvm```.
-1. Fork and clone.
-1. Run ```git submodule update --init --recursive```
+1. Fork and clone into your `$GOPATH/src`
+1. `go get github.com/codegangsta/cli`
+1. `go get github.com/stretchr/testify/assert`
+1. `go get -u github.com/levicook/glitch`
+1. `go install github.com/levicook/glitch`
+1. Open a separate terminal window to your project directory and run the command `glitch`
 1. Write a test.
-1. Run ``` bin/test ``` and watch test fail.
+1. Watch test fail.
 1. Make test pass.
 1. Submit a pull request.
 

@@ -1,4 +1,4 @@
-package exercism
+package main
 
 import (
 	"bytes"
