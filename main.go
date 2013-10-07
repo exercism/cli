@@ -16,6 +16,29 @@ func main() {
 	app.Version = VERSION
 	app.Commands = []cli.Command{
 		{
+			Name:      "current",
+			ShortName: "c",
+			Usage:     "Show the current assignments",
+			Action: func(c *cli.Context) {
+				config, err := ConfigFromFile(HomeDir())
+				if err != nil {
+					fmt.Println("Are you sure you are logged in? Please login again.")
+					return
+				}
+				currentAssignments, err := FetchAssignments(config, FetchEndpoints["current"])
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+
+				fmt.Println("Current Assignments")
+
+				for _, a := range currentAssignments {
+					fmt.Printf("%v: %v\n", strings.Title(a.Track), a.Slug)
+				}
+			},
+		},
+		{
 			Name:      "demo",
 			ShortName: "d",
 			Usage:     "Fetch first assignment for each language from exercism.io",
