@@ -69,6 +69,48 @@ func FetchAssignments(config Config, path string) (as []Assignment, err error) {
 	return fr.Assignments, err
 }
 
+func UnsubmitAssignment(config Config) (r string, err error) {
+	path := "api/v1/user/assignments"
+
+	url := fmt.Sprintf("%s/%s?key=%s", config.Hostname, path, config.ApiKey)
+
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		return
+	}
+
+	req.Header.Set("User-Agent", fmt.Sprintf("github.com/kytrinyx/exercism CLI v%s", VERSION))
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		err = fmt.Errorf("Error destroying submission: [%v]", err)
+		return
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
+	if err != nil {
+		return
+	}
+
+	if resp.StatusCode != http.StatusNoContent {
+
+		var ur struct {
+			Error string
+		}
+
+		err = json.Unmarshal(body, &ur)
+		if err != nil {
+			return
+		}
+
+		err = fmt.Errorf("Status: %d, Error: %v", resp.StatusCode, ur.Error)
+		return ur.Error, err
+	}
+
+	return
+}
+
 func SubmitAssignment(config Config, filePath string, code []byte) (r submitResponse, err error) {
 	path := "api/v1/user/assignments"
 

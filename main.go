@@ -191,6 +191,30 @@ func main() {
 			},
 		},
 		{
+			Name:      "unsubmit",
+			ShortName: "u",
+			Usage:     "Delete the last submission",
+			Action: func(c *cli.Context) {
+				config, err := ConfigFromFile(HomeDir())
+				if err != nil {
+					fmt.Println("Are you sure you are logged in? Please login again.")
+					return
+				}
+
+				response, err := UnsubmitAssignment(config)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+
+				if response != "" {
+					return
+				}
+
+				fmt.Println("The last submission was successfully deleted.")
+			},
+		},
+		{
 			Name:      "whoami",
 			ShortName: "w",
 			Usage:     "Get the github username that you are logged in as",
