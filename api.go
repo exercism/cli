@@ -17,6 +17,7 @@ var FetchEndpoints = map[string]string{
 }
 
 type submitResponse struct {
+	Id             string
 	Status         string
 	Language       string
 	Exercise       string
