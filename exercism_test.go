@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"github.com/msgehard/go-exercism/configuration"
 )
 
 func asserFileDoesNotExist(t *testing.T, filename string) {
@@ -19,11 +20,11 @@ func TestLogoutDeletesConfigFile(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "")
 	assert.NoError(t, err)
 
-	c := Config{}
+	c := configuration.Config{}
 
-	ConfigToFile(tmpDir, c)
+	configuration.ToFile(tmpDir, c)
 
 	Logout(tmpDir)
 
-	asserFileDoesNotExist(t, configFilename(tmpDir))
+	asserFileDoesNotExist(t, configuration.Filename(tmpDir))
 }

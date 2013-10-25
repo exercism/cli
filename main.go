@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"github.com/msgehard/go-exercism/configuration"
 )
 
 func main() {
@@ -20,7 +21,7 @@ func main() {
 			ShortName: "c",
 			Usage:     "Show the current assignments",
 			Action: func(c *cli.Context) {
-				config, err := ConfigFromFile(HomeDir())
+				config, err := configuration.FromFile(configuration.HomeDir())
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -43,21 +44,15 @@ func main() {
 			ShortName: "d",
 			Usage:     "Fetch first assignment for each language from exercism.io",
 			Action: func(c *cli.Context) {
-				config, err := ConfigFromFile(HomeDir())
+				config, err := configuration.FromFile(configuration.HomeDir())
 				if err != nil {
-					demoDir, err := DemoDirectory()
+					config, err = configuration.Demo()
 					if err != nil {
 						fmt.Println(err)
 						return
 					}
-					config = Config{
-						Hostname:          "http://exercism.io",
-						ApiKey:            "",
-						ExercismDirectory: demoDir,
-					}
 				}
-				assignments, err := FetchAssignments(config,
-					FetchEndpoints["demo"])
+				assignments, err := FetchAssignments(config, FetchEndpoints["demo"])
 				if err != nil {
 					fmt.Println(err)
 					return
@@ -76,7 +71,7 @@ func main() {
 			ShortName: "f",
 			Usage:     "Fetch current assignment from exercism.io",
 			Action: func(c *cli.Context) {
-				config, err := ConfigFromFile(HomeDir())
+				config, err := configuration.FromFile(configuration.HomeDir())
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -101,7 +96,7 @@ func main() {
 			ShortName: "l",
 			Usage:     "Save exercism.io api credentials",
 			Action: func(c *cli.Context) {
-				ConfigToFile(HomeDir(), askForConfigInfo())
+				configuration.ToFile(configuration.HomeDir(), askForConfigInfo())
 			},
 		},
 		{
@@ -109,7 +104,7 @@ func main() {
 			ShortName: "o",
 			Usage:     "Clear exercism.io api credentials",
 			Action: func(c *cli.Context) {
-				Logout(HomeDir())
+				Logout(configuration.HomeDir())
 			},
 		},
 		{
@@ -117,7 +112,7 @@ func main() {
 			ShortName: "p",
 			Usage:     "Fetch upcoming assignment from exercism.io",
 			Action: func(c *cli.Context) {
-				config, err := ConfigFromFile(HomeDir())
+				config, err := configuration.FromFile(configuration.HomeDir())
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -142,7 +137,7 @@ func main() {
 			ShortName: "s",
 			Usage:     "Submit code to exercism.io on your current assignment",
 			Action: func(c *cli.Context) {
-				config, err := ConfigFromFile(HomeDir())
+				config, err := configuration.FromFile(configuration.HomeDir())
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -195,7 +190,7 @@ func main() {
 			ShortName: "u",
 			Usage:     "Delete the last submission",
 			Action: func(c *cli.Context) {
-				config, err := ConfigFromFile(HomeDir())
+				config, err := configuration.FromFile(configuration.HomeDir())
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -219,7 +214,7 @@ func main() {
 			ShortName: "w",
 			Usage:     "Get the github username that you are logged in as",
 			Action: func(c *cli.Context) {
-				config, err := ConfigFromFile(HomeDir())
+				config, err := configuration.FromFile(configuration.HomeDir())
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -232,7 +227,7 @@ func main() {
 	app.Run(os.Args)
 }
 
-func askForConfigInfo() (c Config) {
+func askForConfigInfo() (c configuration.Config) {
 	var un, key, dir string
 
 	currentDir, err := os.Getwd()
@@ -268,7 +263,7 @@ func askForConfigInfo() (c Config) {
 		dir = currentDir
 	}
 
-	return Config{un, key, ReplaceTilde(dir), "http://exercism.io"}
+	return configuration.Config{GithubUsername: un, ApiKey: key, ExercismDirectory: configuration.ReplaceTilde(dir), Hostname: "http://exercism.io"}
 }
 
 func absolutePath(path string) (string, error) {
