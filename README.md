@@ -20,9 +20,7 @@ If that throws an error, try ```brew install go --crosscompile-commone --with-ll
 Development
 ===========
 1. Fork and clone into your `$GOPATH/src`
-1. `go get github.com/codegangsta/cli`
-1. `go get github.com/stretchr/testify/assert`
-1. `go get -u github.com/levicook/glitch`
+1. `go get`
 1. `go install github.com/levicook/glitch`
 1. Open a separate terminal window to your project directory and run the command `glitch`
 1. Write a test.
