@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"github.com/msgehard/go-exercism/configuration"
 )
 
 const VERSION = "1.0.1"
@@ -31,7 +32,7 @@ type submitRequest struct {
 	Path string `json:"path"`
 }
 
-func FetchAssignments(config Config, path string) (as []Assignment, err error) {
+func FetchAssignments(config configuration.Config, path string) (as []Assignment, err error) {
 	url := fmt.Sprintf("%s%s?key=%s", config.Hostname, path, config.ApiKey)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -70,7 +71,7 @@ func FetchAssignments(config Config, path string) (as []Assignment, err error) {
 	return fr.Assignments, err
 }
 
-func UnsubmitAssignment(config Config) (r string, err error) {
+func UnsubmitAssignment(config configuration.Config) (r string, err error) {
 	path := "api/v1/user/assignments"
 
 	url := fmt.Sprintf("%s/%s?key=%s", config.Hostname, path, config.ApiKey)
@@ -112,7 +113,7 @@ func UnsubmitAssignment(config Config) (r string, err error) {
 	return
 }
 
-func SubmitAssignment(config Config, filePath string, code []byte) (r submitResponse, err error) {
+func SubmitAssignment(config configuration.Config, filePath string, code []byte) (r submitResponse, err error) {
 	path := "api/v1/user/assignments"
 
 	url := fmt.Sprintf("%s/%s", config.Hostname, path)

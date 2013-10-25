@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"github.com/msgehard/go-exercism/configuration"
 )
 
 var assignmentsJson = `
@@ -45,7 +46,7 @@ var fetchHandler = func(rw http.ResponseWriter, r *http.Request) {
 func TestFetchWithKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(fetchHandler))
 
-	config := Config{
+	config := configuration.Config{
 		Hostname: server.URL,
 		ApiKey:   "myApiKey",
 	}
@@ -67,7 +68,7 @@ func TestFetchWithKey(t *testing.T) {
 func TestFetchWithIncorrectKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(fetchHandler))
 
-	config := Config{
+	config := configuration.Config{
 		Hostname: server.URL,
 		ApiKey:   "myWrongApiKey",
 	}
@@ -164,7 +165,7 @@ func TestSubmitWithKey(t *testing.T) {
 	defer server.Close()
 
 	var code = []byte("My source code\n")
-	config := Config{
+	config := configuration.Config{
 		Hostname: server.URL,
 		ApiKey:   "myApiKey",
 	}
@@ -181,7 +182,7 @@ func TestSubmitWithIncorrectKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(submitHandler))
 	defer server.Close()
 
-	config := Config{
+	config := configuration.Config{
 		Hostname: server.URL,
 		ApiKey:   "myWrongApiKey",
 	}
