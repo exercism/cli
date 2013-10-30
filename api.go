@@ -9,7 +9,7 @@ import (
 	"github.com/msgehard/go-exercism/configuration"
 )
 
-const VERSION = "1.1.0"
+const VERSION = "1.1.1"
 
 var FetchEndpoints = map[string]string{
 	"current": "/api/v1/user/assignments/current",
