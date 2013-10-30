@@ -23,7 +23,7 @@ type submitResponse struct {
 	Language       string
 	Exercise       string
 	SubmissionPath string `json:"submission_path"`
-	Error          error
+	Error          string
 }
 
 type submitRequest struct {
