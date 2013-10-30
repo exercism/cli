@@ -89,6 +89,8 @@ func main() {
 						fmt.Println(err)
 					}
 				}
+
+				fmt.Printf("Exercises written to %s\n", config.ExercismDirectory)
 			},
 		},
 		{
