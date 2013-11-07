@@ -8,7 +8,6 @@ import (
 	"testing"
 )
 
-
 func TestDemoDir(t *testing.T) {
 	path, err := ioutil.TempDir("", "")
 	assert.NoError(t, err)

@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/exercism/cli/configuration"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
 	"testing"
-	"github.com/exercism/cli/configuration"
 )
 
 func asserFileDoesNotExist(t *testing.T, filename string) {

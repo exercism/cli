@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"github.com/exercism/cli/configuration"
+	"os"
 )
 
 func Logout(dir string) {

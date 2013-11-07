@@ -23,4 +23,3 @@ func TestReadingWritingConfig(t *testing.T) {
 
 	assert.Equal(t, writtenConfig, loadedConfig)
 }
-
