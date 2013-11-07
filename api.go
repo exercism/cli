@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/exercism/cli/configuration"
 	"io/ioutil"
 	"net/http"
-	"github.com/exercism/cli/configuration"
 )
 
 const VERSION = "1.1.1"

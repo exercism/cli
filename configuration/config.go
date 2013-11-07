@@ -6,4 +6,3 @@ type Config struct {
 	ExercismDirectory string `json:"exercismDirectory"`
 	Hostname          string `json:"hostname"`
 }
-

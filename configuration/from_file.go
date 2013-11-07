@@ -1,8 +1,8 @@
 package configuration
 
 import (
-	"io/ioutil"
 	"encoding/json"
+	"io/ioutil"
 )
 
 func FromFile(dir string) (c Config, err error) {
@@ -14,4 +14,3 @@ func FromFile(dir string) (c Config, err error) {
 	err = json.Unmarshal(bytes, &c)
 	return
 }
-
