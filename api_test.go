@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"github.com/msgehard/go-exercism/configuration"
+	"github.com/exercism/cli/configuration"
 )
 
 var assignmentsJson = `

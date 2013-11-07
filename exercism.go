@@ -2,7 +2,7 @@ package main
 
 import (
 	"os"
-	"github.com/msgehard/go-exercism/configuration"
+	"github.com/exercism/cli/configuration"
 )
 
 func Logout(dir string) {

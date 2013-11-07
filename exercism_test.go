@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
-	"github.com/msgehard/go-exercism/configuration"
+	"github.com/exercism/cli/configuration"
 )
 
 func asserFileDoesNotExist(t *testing.T, filename string) {
