@@ -7,11 +7,9 @@ import (
 )
 
 type Assignment struct {
-	Track    string
-	Slug     string
-	Readme   string
-	TestFile string `json:"test_file"`
-	Tests    string
+	Track string
+	Slug  string
+	Files map[string]string
 }
 
 func SaveAssignment(dir string, a Assignment) (err error) {
@@ -22,15 +20,13 @@ func SaveAssignment(dir string, a Assignment) (err error) {
 		return
 	}
 
-	err = ioutil.WriteFile(fmt.Sprintf("%s/%s", assignmentPath, "README.md"), []byte(a.Readme), 0644)
-	if err != nil {
-		err = fmt.Errorf("Error writing README.md file: [%v]", err)
-		return
-	}
-
-	err = ioutil.WriteFile(fmt.Sprintf("%s/%s", assignmentPath, a.TestFile), []byte(a.Tests), 0644)
-	if err != nil {
-		err = fmt.Errorf("Error writing file %s: [%v]", a.TestFile, err)
+	for name, text := range a.Files {
+		filePath := fmt.Sprintf("%s/%s", assignmentPath, name)
+		err = ioutil.WriteFile(filePath, []byte(text), 0644)
+		if err != nil {
+			err = fmt.Errorf("Error writing %v file: [%v]", name, err)
+			return
+		}
 	}
 
 	fmt.Println(a.Track, "-", a.Slug)
