@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"github.com/msgehard/go-exercism/configuration"
+	"github.com/exercism/cli/configuration"
 )
 
 const VERSION = "1.1.1"

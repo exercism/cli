@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"github.com/msgehard/go-exercism/configuration"
+	"github.com/exercism/cli/configuration"
 )
 
 func main() {
