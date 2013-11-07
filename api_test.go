@@ -17,9 +17,10 @@ var assignmentsJson = `
         {
             "track": "ruby",
             "slug": "bob",
-            "readme": "Readme text",
-            "test_file": "bob_test.rb",
-            "tests": "Tests Text"
+						"files": {
+							"README.md": "Readme text",
+							"bob_test.rb": "Tests text"
+						}
         }
     ]
 }
@@ -58,9 +59,11 @@ func TestFetchWithKey(t *testing.T) {
 
 	assert.Equal(t, assignments[0].Track, "ruby")
 	assert.Equal(t, assignments[0].Slug, "bob")
-	assert.Equal(t, assignments[0].Readme, "Readme text")
-	assert.Equal(t, assignments[0].TestFile, "bob_test.rb")
-	assert.Equal(t, assignments[0].Tests, "Tests Text")
+	assert.Equal(t, assignments[0].Files, map[string]string{
+		"README.md":   "Readme text",
+		"bob_test.rb": "Tests text",
+	},
+	)
 
 	server.Close()
 }
