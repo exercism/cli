@@ -226,7 +226,11 @@ func main() {
 			},
 		},
 	}
-	app.Run(os.Args)
+	err := app.Run(os.Args)
+	if err != nil {
+		fmt.Errorf("%v", err)
+		os.Exit(1)
+	}
 }
 
 func askForConfigInfo() (c configuration.Config) {
