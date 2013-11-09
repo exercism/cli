@@ -14,8 +14,9 @@ func TestSavingAssignment(t *testing.T) {
 		Track: "ruby",
 		Slug:  "bob",
 		Files: map[string]string{
-			"bob_test.rb": "Tests text",
-			"README.md":   "Readme text",
+			"bob_test.rb":      "Tests text",
+			"README.md":        "Readme text",
+			"/path/to/file.rb": "File text",
 		},
 	}
 
@@ -29,4 +30,8 @@ func TestSavingAssignment(t *testing.T) {
 	tests, err := ioutil.ReadFile(tmpDir + "/ruby/bob/bob_test.rb")
 	assert.NoError(t, err)
 	assert.Equal(t, string(tests), "Tests text")
+
+	fileInDir, err := ioutil.ReadFile(tmpDir + "/ruby/bob/path/to/file.rb")
+	assert.NoError(t, err)
+	assert.Equal(t, string(fileInDir), "File text")
 }
