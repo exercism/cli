@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 type Assignment struct {
@@ -13,18 +14,19 @@ type Assignment struct {
 }
 
 func SaveAssignment(dir string, a Assignment) (err error) {
-	assignmentPath := fmt.Sprintf("%s/%s/%s", dir, a.Track, a.Slug)
-	err = os.MkdirAll(assignmentPath, 0744)
-	if err != nil {
-		err = fmt.Errorf("Error creating assignment directory: [%s]", err)
-		return
-	}
+	root := fmt.Sprintf("%s/%s/%s", dir, a.Track, a.Slug)
 
 	for name, text := range a.Files {
-		filePath := fmt.Sprintf("%s/%s", assignmentPath, name)
-		err = ioutil.WriteFile(filePath, []byte(text), 0644)
+		file := fmt.Sprintf("%s/%s", root, name)
+		dir := filepath.Dir(file)
+		err = os.MkdirAll(dir, 0755)
 		if err != nil {
-			err = fmt.Errorf("Error writing %v file: [%v]", name, err)
+			err = fmt.Errorf("Error making directory %v: [%v]", dir, err)
+			return
+		}
+		err = ioutil.WriteFile(file, []byte(text), 0644)
+		if err != nil {
+			err = fmt.Errorf("Error writing file %v: [%v]", name, err)
 			return
 		}
 	}
