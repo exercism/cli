@@ -261,6 +261,10 @@ func askForConfigInfo() (c configuration.Config) {
 		panic(err)
 	}
 
+	if dir == "" {
+		dir = currentDir
+	}
+
 	dir = configuration.ReplaceTilde(dir)
 
 	err = os.MkdirAll(dir, 0755)
@@ -272,10 +276,6 @@ func askForConfigInfo() (c configuration.Config) {
 	dir, err = absolutePath(dir)
 	if err != nil {
 		panic(err)
-	}
-
-	if dir == "" {
-		dir = currentDir
 	}
 
 	return configuration.Config{GithubUsername: un, ApiKey: key, ExercismDirectory: dir, Hostname: "http://exercism.io"}
