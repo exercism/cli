@@ -260,6 +260,15 @@ func askForConfigInfo() (c configuration.Config) {
 	if err != nil && err.Error() != "unexpected newline" {
 		panic(err)
 	}
+
+	dir = configuration.ReplaceTilde(dir)
+
+	err = os.MkdirAll(dir, 0755)
+	if err != nil {
+		err = fmt.Errorf("Error making directory %v: [%v]", dir, err)
+		return
+	}
+
 	dir, err = absolutePath(dir)
 	if err != nil {
 		panic(err)
@@ -269,7 +278,7 @@ func askForConfigInfo() (c configuration.Config) {
 		dir = currentDir
 	}
 
-	return configuration.Config{GithubUsername: un, ApiKey: key, ExercismDirectory: configuration.ReplaceTilde(dir), Hostname: "http://exercism.io"}
+	return configuration.Config{GithubUsername: un, ApiKey: key, ExercismDirectory: dir, Hostname: "http://exercism.io"}
 }
 
 func absolutePath(path string) (string, error) {
