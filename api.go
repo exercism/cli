@@ -12,9 +12,10 @@ import (
 const VERSION = "1.2.3"
 
 var FetchEndpoints = map[string]string{
-	"current": "/api/v1/user/assignments/current",
-	"next":    "/api/v1/user/assignments/next",
-	"demo":    "/api/v1/assignments/demo",
+	"current":  "/api/v1/user/assignments/current",
+	"next":     "/api/v1/user/assignments/next",
+	"demo":     "/api/v1/assignments/demo",
+	"exercise": "/api/v1/assignments",
 }
 
 type submitResponse struct {

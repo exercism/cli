@@ -69,15 +69,29 @@ func main() {
 		{
 			Name:      "fetch",
 			ShortName: "f",
-			Usage:     "Fetch current assignment from exercism.io",
+			Usage:     "Fetch assignments from exercism.io",
 			Action: func(c *cli.Context) {
-				config, err := configuration.FromFile(configuration.HomeDir())
-				if err != nil {
-					fmt.Println("Are you sure you are logged in? Please login again.")
+				if len(c.Args()) != 0 && len(c.Args()) != 2 {
+					fmt.Println("Usage: exercism fetch\n   or: exercism fetch LANGUAGE EXERCISE")
 					return
 				}
-				assignments, err := FetchAssignments(config,
-					FetchEndpoints["current"])
+
+				config, err := configuration.FromFile(configuration.HomeDir())
+
+				if err != nil {
+					if len(c.Args()) == 0 {
+						fmt.Println("Are you sure you are logged in? Please login again.")
+						return
+					} else {
+						config, err = configuration.Demo()
+						if err != nil {
+							fmt.Println(err)
+							return
+						}
+					}
+				}
+
+				assignments, err := FetchAssignments(config, FetchEndpoint(c.Args()))
 				if err != nil {
 					fmt.Println(err)
 					return
