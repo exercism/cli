@@ -14,9 +14,9 @@ func TestSavingAssignment(t *testing.T) {
 		Track: "ruby",
 		Slug:  "bob",
 		Files: map[string]string{
-			"bob_test.rb":      "Tests text",
-			"README.md":        "Readme text",
-			"/path/to/file.rb": "File text",
+			"bob_test.rb":     "Tests text",
+			"README.md":       "Readme text",
+			"path/to/file.rb": "File text",
 		},
 	}
 
