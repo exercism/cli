@@ -24,10 +24,14 @@ func SaveAssignment(dir string, a Assignment) (err error) {
 			err = fmt.Errorf("Error making directory %v: [%v]", dir, err)
 			return
 		}
-		err = ioutil.WriteFile(file, []byte(text), 0644)
-		if err != nil {
-			err = fmt.Errorf("Error writing file %v: [%v]", name, err)
-			return
+		if _, err = os.Stat(file); err != nil {
+			if os.IsNotExist(err) {
+				err = ioutil.WriteFile(file, []byte(text), 0644)
+				if err != nil {
+					err = fmt.Errorf("Error writing file %v: [%v]", name, err)
+					return
+				}
+			}
 		}
 	}
 
