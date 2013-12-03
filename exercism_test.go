@@ -24,7 +24,7 @@ func TestLogoutDeletesConfigFile(t *testing.T) {
 
 	configuration.ToFile(tmpDir, c)
 
-	Logout(tmpDir)
+	logout(tmpDir)
 
 	asserFileDoesNotExist(t, configuration.Filename(tmpDir))
 }
