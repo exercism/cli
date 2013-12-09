@@ -130,7 +130,7 @@ func SubmitAssignment(config configuration.Config, filePath string, code []byte)
 		return
 	}
 
-	req.Header.Set("User-Agent", fmt.Sprintf("github.com/kytrinyx/exercism CLI v%s", VERSION))
+	req.Header.Set("User-Agent", fmt.Sprintf("github.com/exercism/cli v%s", VERSION))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
