@@ -131,6 +131,7 @@ func SubmitAssignment(config configuration.Config, filePath string, code []byte)
 	}
 
 	req.Header.Set("User-Agent", fmt.Sprintf("github.com/exercism/cli v%s", VERSION))
+	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
