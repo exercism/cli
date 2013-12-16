@@ -82,7 +82,7 @@ func UnsubmitAssignment(config configuration.Config) (r string, err error) {
 		return
 	}
 
-	req.Header.Set("User-Agent", fmt.Sprintf("github.com/kytrinyx/exercism CLI v%s", VERSION))
+	req.Header.Set("User-Agent", "github.com/kytrinyx/exercism CLI v" + VERSION)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -113,7 +113,6 @@ func UnsubmitAssignment(config configuration.Config) (r string, err error) {
 
 	return
 }
-
 func SubmitAssignment(config configuration.Config, filePath string, code []byte) (r submitResponse, err error) {
 	path := "api/v1/user/assignments"
 
@@ -130,7 +129,7 @@ func SubmitAssignment(config configuration.Config, filePath string, code []byte)
 		return
 	}
 
-	req.Header.Set("User-Agent", fmt.Sprintf("github.com/exercism/cli v%s", VERSION))
+	req.Header.Set("User-Agent", "github.com/exercism/cli v" + VERSION)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
