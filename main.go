@@ -196,7 +196,7 @@ func main() {
 					return
 				}
 
-				fmt.Printf("For feedback on your submission visit %s%s%s.\n",
+				fmt.Printf("For feedback on your submission visit %s%s%s\n",
 					config.Hostname, "/submissions/", response.Id)
 
 			},
