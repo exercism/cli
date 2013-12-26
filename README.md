@@ -45,6 +45,6 @@ This error is due to a breaking change between the 0.x version of the `codegangs
 To fix it update the `codegangsta/cli` dependency:
 
 ```plain
-$ go get -u github.com/codegansta/cli
+$ go get -u github.com/codegangsta/cli
 ```
 
