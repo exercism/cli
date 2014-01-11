@@ -15,7 +15,7 @@ You may get away with ```brew install go --cross-compile-common``` unless you ha
 
 If have the latest XCode, try ```brew install go --cross-compile-common --without-cgo```.
 
-If that throws an error, try ```brew install go --crosscompile-commone --with-llvm```.
+If that throws an error, try ```brew install go --cross-compile-common --with-llvm```.
 
 Development
 ===========
