@@ -149,6 +149,33 @@ func main() {
 			},
 		},
 		{
+			Name:      "restore",
+			ShortName: "r",
+			Usage:     "Restore completed and current assignments from exercism.io",
+			Action: func(c *cli.Context) {
+				config, err := configuration.FromFile(configuration.HomeDir())
+				if err != nil {
+					fmt.Println("Are you sure you are logged in? Please login again.")
+					return
+				}
+
+				assignments, err := FetchAssignments(config, FetchEndpoints["restore"])
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+
+				for _, a := range assignments {
+					err := SaveAssignment(config.ExercismDirectory, a)
+					if err != nil {
+						fmt.Println(err)
+					}
+				}
+
+				fmt.Printf("Exercises written to %s\n", config.ExercismDirectory)
+			},
+		},
+		{
 			Name:      "submit",
 			ShortName: "s",
 			Usage:     "Submit code to exercism.io on your current assignment",

@@ -14,6 +14,7 @@ const VERSION = "1.3.2"
 var FetchEndpoints = map[string]string{
 	"current":  "/api/v1/user/assignments/current",
 	"next":     "/api/v1/user/assignments/next",
+	"restore":  "/api/v1/user/assignments/restore",
 	"demo":     "/api/v1/assignments/demo",
 	"exercise": "/api/v1/assignments",
 }
