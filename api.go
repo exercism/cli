@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-const VERSION = "1.3.2"
+const VERSION = "1.4.0"
 
 var FetchEndpoints = map[string]string{
 	"current":  "/api/v1/user/assignments/current",
