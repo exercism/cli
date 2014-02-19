@@ -152,6 +152,10 @@ func main() {
 			Name:      "restore",
 			ShortName: "r",
 			Usage:     "Restore completed and current assignments from exercism.io",
+			Description: "Restore will pull the latest revisions of exercises that have already been " +
+				"submitted. It will *not* overwrite existing files.  If you have made changes " +
+				"to a file and have not submitted it, and you're trying to restore the last " +
+				"submitted version, first move that file out of the way, then call restore.",
 			Action: func(c *cli.Context) {
 				config, err := configuration.FromFile(configuration.HomeDir())
 				if err != nil {
