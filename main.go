@@ -15,13 +15,16 @@ func main() {
 	app.Name = "exercism"
 	app.Usage = "A command line tool to interact with http://exercism.io"
 	app.Version = VERSION
+	app.Flags = []cli.Flag{
+		cli.StringFlag{"config, c", configuration.Filename(configuration.HomeDir()), "path to config file"},
+	}
 	app.Commands = []cli.Command{
 		{
 			Name:      "current",
 			ShortName: "c",
 			Usage:     "Show the current assignments",
 			Action: func(c *cli.Context) {
-				config, err := configuration.FromFile(configuration.HomeDir())
+				config, err := configuration.FromFile(c.GlobalString("config"))
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -44,7 +47,7 @@ func main() {
 			ShortName: "d",
 			Usage:     "Fetch first assignment for each language from exercism.io",
 			Action: func(c *cli.Context) {
-				config, err := configuration.FromFile(configuration.HomeDir())
+				config, err := configuration.FromFile(c.GlobalString("config"))
 				if err != nil {
 					config, err = configuration.Demo()
 					if err != nil {
@@ -76,8 +79,7 @@ func main() {
 					return
 				}
 
-				config, err := configuration.FromFile(configuration.HomeDir())
-
+				config, err := configuration.FromFile(c.GlobalString("config"))
 				if err != nil {
 					if len(c.Args()) == 0 {
 						fmt.Println("Are you sure you are logged in? Please login again.")
@@ -112,7 +114,7 @@ func main() {
 			ShortName: "l",
 			Usage:     "Save exercism.io api credentials",
 			Action: func(c *cli.Context) {
-				configuration.ToFile(configuration.HomeDir(), askForConfigInfo())
+				configuration.ToFile(c.GlobalString("config"), askForConfigInfo());
 			},
 		},
 		{
@@ -120,7 +122,7 @@ func main() {
 			ShortName: "o",
 			Usage:     "Clear exercism.io api credentials",
 			Action: func(c *cli.Context) {
-				logout(configuration.HomeDir())
+				logout(c.GlobalString("config"))
 			},
 		},
 		{
@@ -128,7 +130,7 @@ func main() {
 			ShortName: "p",
 			Usage:     "Fetch upcoming assignment from exercism.io",
 			Action: func(c *cli.Context) {
-				config, err := configuration.FromFile(configuration.HomeDir())
+				config, err := configuration.FromFile(c.GlobalString("config"))
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -157,7 +159,7 @@ func main() {
 				"to a file and have not submitted it, and you're trying to restore the last " +
 				"submitted version, first move that file out of the way, then call restore.",
 			Action: func(c *cli.Context) {
-				config, err := configuration.FromFile(configuration.HomeDir())
+				config, err := configuration.FromFile(c.GlobalString("config"))
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -184,7 +186,7 @@ func main() {
 			ShortName: "s",
 			Usage:     "Submit code to exercism.io on your current assignment",
 			Action: func(c *cli.Context) {
-				config, err := configuration.FromFile(configuration.HomeDir())
+				config, err := configuration.FromFile(c.GlobalString("config"))
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -237,7 +239,7 @@ func main() {
 			ShortName: "u",
 			Usage:     "Delete the last submission",
 			Action: func(c *cli.Context) {
-				config, err := configuration.FromFile(configuration.HomeDir())
+				config, err := configuration.FromFile(c.GlobalString("config"))
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return
@@ -261,7 +263,7 @@ func main() {
 			ShortName: "w",
 			Usage:     "Get the github username that you are logged in as",
 			Action: func(c *cli.Context) {
-				config, err := configuration.FromFile(configuration.HomeDir())
+				config, err := configuration.FromFile(c.GlobalString("config"))
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					return

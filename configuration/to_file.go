@@ -6,17 +6,16 @@ import (
 	"io/ioutil"
 )
 
-func ToFile(dir string, c Config) error {
+func ToFile(path string, c Config) error {
 	bytes, err := json.Marshal(c)
 	if err != nil {
 		return err
 	}
 
-	filename := Filename(dir)
-	err = ioutil.WriteFile(filename, bytes, 0644)
+	err = ioutil.WriteFile(path, bytes, 0644)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Your credentials have been written to %s\n", filename)
+	fmt.Printf("Your credentials have been written to %s\n", path)
 	return nil
 }
