@@ -10,6 +10,7 @@ import (
 )
 
 const VERSION = "1.4.0"
+const USER_AGENT = "github.com/exercism/cli v" + VERSION
 
 var FetchEndpoints = map[string]string{
 	"current":  "/api/v1/user/assignments/current",
@@ -83,7 +84,7 @@ func UnsubmitAssignment(config configuration.Config) (r string, err error) {
 		return
 	}
 
-	req.Header.Set("User-Agent", "github.com/kytrinyx/exercism CLI v" + VERSION)
+	req.Header.Set("User-Agent", USER_AGENT)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -130,7 +131,7 @@ func SubmitAssignment(config configuration.Config, filePath string, code []byte)
 		return
 	}
 
-	req.Header.Set("User-Agent", "github.com/exercism/cli v" + VERSION)
+	req.Header.Set("User-Agent", USER_AGENT)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
