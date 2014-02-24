@@ -8,6 +8,7 @@ import (
 
 func TestReadingWritingConfig(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "")
+	filename := Filename(tmpDir)
 	assert.NoError(t, err)
 
 	writtenConfig := Config{
@@ -16,9 +17,9 @@ func TestReadingWritingConfig(t *testing.T) {
 		ExercismDirectory: "/exercism/directory",
 	}
 
-	ToFile(tmpDir, writtenConfig)
+	ToFile(filename, writtenConfig)
 
-	loadedConfig, err := FromFile(tmpDir)
+	loadedConfig, err := FromFile(filename)
 	assert.NoError(t, err)
 
 	assert.Equal(t, writtenConfig, loadedConfig)

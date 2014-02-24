@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 )
 
-func logout(dir string) {
-	os.Remove(configuration.Filename(dir))
+func logout(path string) {
+	os.Remove(path)
 }
 
 func absolutePath(path string) (string, error) {

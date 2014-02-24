@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 )
 
-func FromFile(dir string) (c Config, err error) {
-	bytes, err := ioutil.ReadFile(Filename(dir))
+func FromFile(path string) (c Config, err error) {
+	bytes, err := ioutil.ReadFile(path)
 	if err != nil {
 		return
 	}
