@@ -35,7 +35,7 @@ var fetchHandler = func(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if apiKey != "myApiKey" {
-		rw.WriteHeader(http.StatusForbidden)
+		rw.WriteHeader(http.StatusUnauthorized)
 		fmt.Fprintf(rw, `{"error": "Unable to identify user"}`)
 		return
 	}
@@ -80,6 +80,7 @@ func TestFetchWithIncorrectKey(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Equal(t, len(assignments), 0)
+	assert.Contains(t, fmt.Sprintf("%s", err), "Unable to identify user")
 
 	server.Close()
 }
