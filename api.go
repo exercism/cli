@@ -48,16 +48,23 @@ func FetchAssignments(config configuration.Config, path string) (as []Assignment
 		return
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		err = fmt.Errorf("Error fetching assignments. HTTP Status Code: %d", resp.StatusCode)
-		return
-	}
-
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 
 	if err != nil {
 		err = fmt.Errorf("Error fetching assignments: [%v]", err)
+		return
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		var apiError struct { Error string `json:"error"` }
+		err = json.Unmarshal(body, &apiError)
+		if err != nil {
+			err = fmt.Errorf("Error parsing API response: [%v]", err)
+			return
+		}
+
+		err = fmt.Errorf("Error fetching assignments. HTTP Status Code: %d\n%s", resp.StatusCode, apiError.Error)
 		return
 	}
 
