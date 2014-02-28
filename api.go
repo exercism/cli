@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-const VERSION = "1.4.0"
+const VERSION = "1.5.0"
 const USER_AGENT = "github.com/exercism/cli v" + VERSION
 
 var FetchEndpoints = map[string]string{
