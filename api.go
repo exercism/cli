@@ -57,7 +57,9 @@ func FetchAssignments(config configuration.Config, path string) (as []Assignment
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		var apiError struct { Error string `json:"error"` }
+		var apiError struct {
+			Error string `json:"error"`
+		}
 		err = json.Unmarshal(body, &apiError)
 		if err != nil {
 			err = fmt.Errorf("Error parsing API response: [%v]", err)

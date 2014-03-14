@@ -51,7 +51,7 @@ func main() {
 
 				for _, a := range currentAssignments {
 					if argc == 1 {
-						if strings.ToLower(language) == strings.ToLower(a.Track)  {
+						if strings.ToLower(language) == strings.ToLower(a.Track) {
 							fmt.Printf("%v: %v\n", strings.Title(a.Track), a.Slug)
 						}
 					} else {
@@ -132,7 +132,7 @@ func main() {
 			ShortName: "l",
 			Usage:     "Save exercism.io api credentials",
 			Action: func(c *cli.Context) {
-				configuration.ToFile(c.GlobalString("config"), askForConfigInfo());
+				configuration.ToFile(c.GlobalString("config"), askForConfigInfo())
 			},
 		},
 		{
