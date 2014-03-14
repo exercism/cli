@@ -8,9 +8,10 @@ import (
 )
 
 type Assignment struct {
-	Track string
-	Slug  string
-	Files map[string]string
+	Track   string
+	Slug    string
+	Files   map[string]string
+	IsFresh bool `json:"fresh"`
 }
 
 func SaveAssignment(dir string, a Assignment) (err error) {
@@ -35,7 +36,11 @@ func SaveAssignment(dir string, a Assignment) (err error) {
 		}
 	}
 
-	fmt.Println(a.Track, "-", a.Slug)
+	fresh := " "
+	if a.IsFresh {
+		fresh = "*"
+	}
+	fmt.Println(fresh, a.Track, "-", a.Slug)
 
 	return
 }
