@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/exercism/cli/configuration"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func logout(path string) {
@@ -21,6 +23,9 @@ func absolutePath(path string) (string, error) {
 
 func askForConfigInfo() (c configuration.Config) {
 	var un, key, dir string
+	delim := "\r\n"
+
+	bio := bufio.NewReader(os.Stdin)
 
 	currentDir, err := os.Getwd()
 	if err != nil {
@@ -28,13 +33,13 @@ func askForConfigInfo() (c configuration.Config) {
 	}
 
 	fmt.Print("Your GitHub username: ")
-	_, err = fmt.Scanln(&un)
+	un, err = bio.ReadString('\n')
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Print("Your exercism.io API key: ")
-	_, err = fmt.Scanln(&key)
+	key, err = bio.ReadString('\n')
 	if err != nil {
 		panic(err)
 	}
@@ -42,10 +47,14 @@ func askForConfigInfo() (c configuration.Config) {
 	fmt.Println("What is your exercism exercises project path?")
 	fmt.Printf("Press Enter to select the default (%s):\n", currentDir)
 	fmt.Print("> ")
-	_, err = fmt.Scanln(&dir)
+	dir, err = bio.ReadString('\n')
 	if err != nil && err.Error() != "unexpected newline" {
 		panic(err)
 	}
+
+	key = strings.TrimRight(key, delim)
+	un = strings.TrimRight(un, delim)
+	dir = strings.TrimRight(dir, delim)
 
 	if dir == "" {
 		dir = currentDir
