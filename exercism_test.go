@@ -47,7 +47,10 @@ func TestAskForConfigInfoAllowsSpaces(t *testing.T) {
 
 	os.Stdin = file
 
-	c := askForConfigInfo()
+	c, err := askForConfigInfo()
+	if err != nil {
+		t.Errorf("Error asking for configuration info [%v]", err)
+	}
 	os.Stdin = oldStdin
 	absoluteDirName, _ := absolutePath(dirName)
 	_, err = os.Stat(absoluteDirName)
