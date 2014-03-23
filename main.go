@@ -132,7 +132,12 @@ func main() {
 			ShortName: "l",
 			Usage:     "Save exercism.io api credentials",
 			Action: func(c *cli.Context) {
-				configuration.ToFile(c.GlobalString("config"), askForConfigInfo())
+				config, err := askForConfigInfo()
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+				configuration.ToFile(c.GlobalString("config"), config)
 			},
 		},
 		{
