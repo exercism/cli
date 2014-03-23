@@ -21,7 +21,7 @@ func absolutePath(path string) (string, error) {
 	return filepath.EvalSymlinks(path)
 }
 
-func askForConfigInfo() (c configuration.Config) {
+func askForConfigInfo() (c configuration.Config, err error) {
 	var un, key, dir string
 	delim := "\r\n"
 
@@ -29,27 +29,27 @@ func askForConfigInfo() (c configuration.Config) {
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	fmt.Print("Your GitHub username: ")
 	un, err = bio.ReadString('\n')
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	fmt.Print("Your exercism.io API key: ")
 	key, err = bio.ReadString('\n')
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	fmt.Println("What is your exercism exercises project path?")
 	fmt.Printf("Press Enter to select the default (%s):\n", currentDir)
 	fmt.Print("> ")
 	dir, err = bio.ReadString('\n')
-	if err != nil && err.Error() != "unexpected newline" {
-		panic(err)
+	if err != nil {
+		return
 	}
 
 	key = strings.TrimRight(key, delim)
@@ -70,8 +70,9 @@ func askForConfigInfo() (c configuration.Config) {
 
 	dir, err = absolutePath(dir)
 	if err != nil {
-		panic(err)
+		return
 	}
 
-	return configuration.Config{GithubUsername: un, ApiKey: key, ExercismDirectory: dir, Hostname: "http://exercism.io"}
+	c = configuration.Config{GithubUsername: un, ApiKey: key, ExercismDirectory: dir, Hostname: "http://exercism.io"}
+	return
 }
