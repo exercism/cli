@@ -42,10 +42,12 @@ func TestAskForConfigInfoAllowsSpaces(t *testing.T) {
 	fakeStdin.WriteString(fmt.Sprintf("%s\r\n%s\r\n%s\r\n", userName, apiKey, dirName))
 	assert.NoError(t, err)
 
-	file, err := os.Open(fakeStdin.Name())
-	defer file.Close()
+	_, err = fakeStdin.Seek(0, os.SEEK_SET)
+	assert.NoError(t, err)
 
-	os.Stdin = file
+	defer fakeStdin.Close()
+
+	os.Stdin = fakeStdin
 
 	c, err := askForConfigInfo()
 	if err != nil {
