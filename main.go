@@ -118,6 +118,18 @@ func main() {
 					return
 				}
 
+				if len(assignments) == 0 {
+					noAssignmentMessage := "No assignments found"
+					if argCount == 2 {
+						fmt.Printf("%s for %s - %s\n", noAssignmentMessage, c.Args()[0], c.Args()[1])
+					} else if argCount == 1 {
+						fmt.Printf("%s for %s\n", noAssignmentMessage, c.Args()[0])
+					} else {
+						fmt.Printf("%s\n", noAssignmentMessage)
+					}
+					return
+				}
+
 				for _, a := range assignments {
 					err := SaveAssignment(config.ExercismDirectory, a)
 					if err != nil {
