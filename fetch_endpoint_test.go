@@ -16,3 +16,9 @@ func TestFetchExerciseEndpoint(t *testing.T) {
 	actual := FetchEndpoint([]string{"language", "slug"})
 	assert.Equal(t, expected, actual)
 }
+
+func TestFetchExerciseEndpointByLanguage(t *testing.T) {
+	expected := "/api/v1/assignments/language"
+	actual := FetchEndpoint([]string{"language"})
+	assert.Equal(t, expected, actual)
+}
