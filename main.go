@@ -138,6 +138,7 @@ func main() {
 					return
 				}
 				configuration.ToFile(c.GlobalString("config"), config)
+				fmt.Printf("Your exercism directory can be found at %s\n", config.ExercismDirectory)
 			},
 		},
 		{
