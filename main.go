@@ -92,14 +92,15 @@ func main() {
 			ShortName: "f",
 			Usage:     "Fetch assignments from exercism.io",
 			Action: func(c *cli.Context) {
-				if len(c.Args()) != 0 && len(c.Args()) != 2 {
-					fmt.Println("Usage: exercism fetch\n   or: exercism fetch LANGUAGE EXERCISE")
+				argCount := len(c.Args())
+				if argCount < 0 || argCount > 2 {
+					fmt.Println("Usage: exercism fetch\n   or: exercism fetch LANGUAGE\n   or: exercism fetch LANGUAGE EXERCISE")
 					return
 				}
 
 				config, err := configuration.FromFile(c.GlobalString("config"))
 				if err != nil {
-					if len(c.Args()) == 0 {
+					if argCount == 0 || argCount == 1 {
 						fmt.Println("Are you sure you are logged in? Please login again.")
 						return
 					} else {
@@ -114,6 +115,18 @@ func main() {
 				assignments, err := FetchAssignments(config, FetchEndpoint(c.Args()))
 				if err != nil {
 					fmt.Println(err)
+					return
+				}
+
+				if len(assignments) == 0 {
+					noAssignmentMessage := "No assignments found"
+					if argCount == 2 {
+						fmt.Printf("%s for %s - %s\n", noAssignmentMessage, c.Args()[0], c.Args()[1])
+					} else if argCount == 1 {
+						fmt.Printf("%s for %s\n", noAssignmentMessage, c.Args()[0])
+					} else {
+						fmt.Printf("%s\n", noAssignmentMessage)
+					}
 					return
 				}
 
