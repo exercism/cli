@@ -163,31 +163,6 @@ func main() {
 			},
 		},
 		{
-			Name:      "peek",
-			ShortName: "p",
-			Usage:     "Fetch upcoming assignment from exercism.io",
-			Action: func(c *cli.Context) {
-				config, err := configuration.FromFile(c.GlobalString("config"))
-				if err != nil {
-					fmt.Println("Are you sure you are logged in? Please login again.")
-					return
-				}
-				assignments, err := FetchAssignments(config,
-					FetchEndpoints["next"])
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-
-				for _, a := range assignments {
-					err := SaveAssignment(config.ExercismDirectory, a)
-					if err != nil {
-						fmt.Println(err)
-					}
-				}
-			},
-		},
-		{
 			Name:      "restore",
 			ShortName: "r",
 			Usage:     "Restore completed and current assignments from exercism.io",
