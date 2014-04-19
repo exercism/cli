@@ -20,7 +20,7 @@ If that throws an error, try ```brew install go --cross-compile-common --with-ll
 Development
 ===========
 1. `cd $GOPATH`
-1. git clone git@github.com:exercism/cli.git src/github.com/exercism/cli
+1. git clone https://github.com/exercism/cli src/github.com/exercism/cli
 1. cd src/github.com/exercism/cli
 1. go get
 1. go get github.com/levicook/glitch
