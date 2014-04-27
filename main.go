@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
-	"github.com/exercism/cli/configuration"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/codegangsta/cli"
+	"github.com/exercism/cli/configuration"
 )
 
 func main() {

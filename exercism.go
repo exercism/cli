@@ -3,10 +3,11 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/exercism/cli/configuration"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/exercism/cli/configuration"
 )
 
 func logout(path string) {
