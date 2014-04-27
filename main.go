@@ -86,6 +86,9 @@ func main() {
 						fmt.Println(err)
 					}
 				}
+
+				msg := "\nThe demo exercises have been written to %s, in subdirectories by language.\n\nTo try an exercise, change directory to a language/exercise, read the README and run the tests.\n\n"
+				fmt.Printf(msg, config.ExercismDirectory)
 			},
 		},
 		{
