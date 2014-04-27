@@ -3,12 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/exercism/cli/configuration"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/exercism/cli/configuration"
+	"github.com/stretchr/testify/assert"
 )
 
 var assignmentsJson = `
