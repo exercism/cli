@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func asserFileDoesNotExist(t *testing.T, filename string) {
+func assertFileDoesNotExist(t *testing.T, filename string) {
 	_, err := os.Stat(filename)
 
 	if err == nil {
@@ -28,7 +28,7 @@ func TestLogoutDeletesConfigFile(t *testing.T) {
 
 	logout(tmpDir)
 
-	asserFileDoesNotExist(t, configuration.Filename(tmpDir))
+	assertFileDoesNotExist(t, configuration.Filename(tmpDir))
 }
 
 func TestAskForConfigInfoAllowsSpaces(t *testing.T) {
