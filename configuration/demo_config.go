@@ -1,8 +1,8 @@
 package configuration
 
 import (
-	"fmt"
 	"os"
+	"path/filepath"
 )
 
 func Demo() (c Config, err error) {
@@ -23,6 +23,6 @@ func demoDirectory() (dir string, err error) {
 	if err != nil {
 		return
 	}
-	dir = fmt.Sprintf("%s/exercism-demo", dir)
+	dir = filepath.Join(dir, "exercism-demo")
 	return
 }
