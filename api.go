@@ -10,7 +10,7 @@ import (
 	"github.com/exercism/cli/configuration"
 )
 
-const VERSION = "1.6.0"
+const VERSION = "1.6.1"
 const USER_AGENT = "github.com/exercism/cli v" + VERSION
 
 var FetchEndpoints = map[string]string{
