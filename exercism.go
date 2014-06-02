@@ -39,7 +39,7 @@ func askForConfigInfo() (c configuration.Config, err error) {
 		return
 	}
 
-	fmt.Print("Your exercism.io API key: ")
+	fmt.Print("Your Exercism API key (found at http://exercism.io/account): ")
 	key, err = bio.ReadString('\n')
 	if err != nil {
 		return
