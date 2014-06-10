@@ -10,6 +10,16 @@ import (
 	"github.com/exercism/cli/configuration"
 )
 
+func login(path string) (config configuration.Config, err error) {
+	config, err = askForConfigInfo()
+	if err != nil {
+		return
+	}
+	configuration.ToFile(path, config)
+	fmt.Printf("Your exercism directory can be found at %s\n", config.ExercismDirectory)
+	return
+}
+
 func logout(path string) {
 	os.Remove(path)
 }
