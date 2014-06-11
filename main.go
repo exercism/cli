@@ -32,10 +32,15 @@ func main() {
 					return
 				}
 
-				config, err := configuration.FromFile(c.GlobalString("config"))
+				configPath  := c.GlobalString("config")
+				config, err := configuration.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
-					return
+					config, err = login(configPath)
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
 				}
 				currentAssignments, err := FetchAssignments(config, FetchEndpoints["current"])
 				if err != nil {
@@ -102,11 +107,16 @@ func main() {
 					return
 				}
 
-				config, err := configuration.FromFile(c.GlobalString("config"))
+				configPath  := c.GlobalString("config")
+				config, err := configuration.FromFile(configPath)
 				if err != nil {
 					if argCount == 0 || argCount == 1 {
 						fmt.Println("Are you sure you are logged in? Please login again.")
-						return
+						config, err = login(configPath)
+						if err != nil {
+							fmt.Println(err)
+							return
+						}
 					} else {
 						config, err = configuration.Demo()
 						if err != nil {
@@ -149,13 +159,10 @@ func main() {
 			ShortName: "l",
 			Usage:     "Save exercism.io api credentials",
 			Action: func(c *cli.Context) {
-				config, err := askForConfigInfo()
+				_, err := login(c.GlobalString("config"))
 				if err != nil {
 					fmt.Println(err)
-					return
 				}
-				configuration.ToFile(c.GlobalString("config"), config)
-				fmt.Printf("Your exercism directory can be found at %s\n", config.ExercismDirectory)
 			},
 		},
 		{
@@ -175,10 +182,15 @@ func main() {
 				"to a file and have not submitted it, and you're trying to restore the last " +
 				"submitted version, first move that file out of the way, then call restore.",
 			Action: func(c *cli.Context) {
-				config, err := configuration.FromFile(c.GlobalString("config"))
+				configPath  := c.GlobalString("config")
+				config, err := configuration.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
-					return
+					config, err = login(configPath)
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
 				}
 
 				assignments, err := FetchAssignments(config, FetchEndpoints["restore"])
@@ -202,10 +214,15 @@ func main() {
 			ShortName: "s",
 			Usage:     "Submit code to exercism.io on your current assignment",
 			Action: func(c *cli.Context) {
-				config, err := configuration.FromFile(c.GlobalString("config"))
+				configPath  := c.GlobalString("config")
+				config, err := configuration.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
-					return
+					config, err = login(configPath)
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
 				}
 
 				if len(c.Args()) == 0 {
@@ -255,10 +272,15 @@ func main() {
 			ShortName: "u",
 			Usage:     "Delete the last submission",
 			Action: func(c *cli.Context) {
-				config, err := configuration.FromFile(c.GlobalString("config"))
+				configPath  := c.GlobalString("config")
+				config, err := configuration.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
-					return
+					config, err = login(configPath)
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
 				}
 
 				response, err := UnsubmitAssignment(config)
@@ -279,10 +301,15 @@ func main() {
 			ShortName: "w",
 			Usage:     "Get the github username that you are logged in as",
 			Action: func(c *cli.Context) {
-				config, err := configuration.FromFile(c.GlobalString("config"))
+				configPath  := c.GlobalString("config")
+				config, err := configuration.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
-					return
+					config, err = login(configPath)
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
 				}
 
 				fmt.Println(config.GithubUsername)
