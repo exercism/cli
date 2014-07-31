@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/exercism/cli/configuration"
+	"github.com/exercism/cli/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,13 +22,13 @@ func TestLogoutDeletesConfigFile(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "")
 	assert.NoError(t, err)
 
-	c := configuration.Config{}
+	c := config.Config{}
 
-	configuration.ToFile(tmpDir, c)
+	config.ToFile(tmpDir, c)
 
 	logout(tmpDir)
 
-	assertFileDoesNotExist(t, configuration.Filename(tmpDir))
+	assertFileDoesNotExist(t, config.Filename(tmpDir))
 }
 
 func TestAskForConfigInfoAllowsSpaces(t *testing.T) {

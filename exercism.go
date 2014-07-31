@@ -7,15 +7,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/exercism/cli/configuration"
+	"github.com/exercism/cli/config"
 )
 
-func login(path string) (c configuration.Config, err error) {
+func login(path string) (c config.Config, err error) {
 	c, err = askForConfigInfo()
 	if err != nil {
 		return
 	}
-	configuration.ToFile(path, c)
+	config.ToFile(path, c)
 	fmt.Printf("Your exercism directory can be found at %s\n", c.ExercismDirectory)
 	return
 }
@@ -32,7 +32,7 @@ func absolutePath(path string) (string, error) {
 	return filepath.EvalSymlinks(path)
 }
 
-func askForConfigInfo() (c configuration.Config, err error) {
+func askForConfigInfo() (c config.Config, err error) {
 	var un, key, dir string
 	delim := "\r\n"
 
@@ -71,7 +71,7 @@ func askForConfigInfo() (c configuration.Config, err error) {
 		dir = currentDir
 	}
 
-	dir = configuration.ReplaceTilde(dir)
+	dir = config.ReplaceTilde(dir)
 
 	err = os.MkdirAll(dir, 0755)
 	if err != nil {
@@ -84,6 +84,6 @@ func askForConfigInfo() (c configuration.Config, err error) {
 		return
 	}
 
-	c = configuration.Config{GithubUsername: un, ApiKey: key, ExercismDirectory: dir, Hostname: "http://exercism.io"}
+	c = config.Config{GithubUsername: un, ApiKey: key, ExercismDirectory: dir, Hostname: "http://exercism.io"}
 	return
 }
