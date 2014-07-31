@@ -1,4 +1,4 @@
-package configuration
+package config
 
 type Config struct {
 	GithubUsername    string `json:"githubUsername"`

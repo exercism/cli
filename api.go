@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/exercism/cli/configuration"
+	"github.com/exercism/cli/config"
 )
 
 const VERSION = "1.6.2"
@@ -36,7 +36,7 @@ type submitRequest struct {
 	Path string `json:"path"`
 }
 
-func FetchAssignments(c configuration.Config, path string) (as []Assignment, err error) {
+func FetchAssignments(c config.Config, path string) (as []Assignment, err error) {
 	url := fmt.Sprintf("%s%s?key=%s", c.Hostname, path, c.ApiKey)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -84,7 +84,7 @@ func FetchAssignments(c configuration.Config, path string) (as []Assignment, err
 	return fr.Assignments, err
 }
 
-func UnsubmitAssignment(c configuration.Config) (r string, err error) {
+func UnsubmitAssignment(c config.Config) (r string, err error) {
 	path := "api/v1/user/assignments"
 
 	url := fmt.Sprintf("%s/%s?key=%s", c.Hostname, path, c.ApiKey)
@@ -125,7 +125,7 @@ func UnsubmitAssignment(c configuration.Config) (r string, err error) {
 
 	return
 }
-func SubmitAssignment(c configuration.Config, filePath string, code []byte) (r submitResponse, err error) {
+func SubmitAssignment(c config.Config, filePath string, code []byte) (r submitResponse, err error) {
 	path := "api/v1/user/assignments"
 
 	url := fmt.Sprintf("%s/%s", c.Hostname, path)

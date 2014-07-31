@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/codegangsta/cli"
-	"github.com/exercism/cli/configuration"
+	"github.com/exercism/cli/config"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 	app.Usage = "A command line tool to interact with http://exercism.io"
 	app.Version = VERSION
 	app.Flags = []cli.Flag{
-		cli.StringFlag{"config, c", configuration.Filename(configuration.HomeDir()), "path to config file"},
+		cli.StringFlag{"config, c", config.Filename(config.HomeDir()), "path to config file"},
 	}
 	app.Commands = []cli.Command{
 		{
@@ -33,7 +33,7 @@ func main() {
 				}
 
 				configPath := ctx.GlobalString("config")
-				c, err := configuration.FromFile(configPath)
+				c, err := config.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					c, err = login(configPath)
@@ -72,9 +72,9 @@ func main() {
 			Usage:     "Fetch first assignment for each language from exercism.io",
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
-				c, err := configuration.FromFile(configPath)
+				c, err := config.FromFile(configPath)
 				if err != nil {
-					c, err = configuration.Demo()
+					c, err = config.Demo()
 					if err != nil {
 						fmt.Println(err)
 						return
@@ -109,7 +109,7 @@ func main() {
 				}
 
 				configPath := ctx.GlobalString("config")
-				c, err := configuration.FromFile(configPath)
+				c, err := config.FromFile(configPath)
 				if err != nil {
 					if argCount == 0 || argCount == 1 {
 						fmt.Println("Are you sure you are logged in? Please login again.")
@@ -119,7 +119,7 @@ func main() {
 							return
 						}
 					} else {
-						c, err = configuration.Demo()
+						c, err = config.Demo()
 						if err != nil {
 							fmt.Println(err)
 							return
@@ -184,7 +184,7 @@ func main() {
 				"submitted version, first move that file out of the way, then call restore.",
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
-				c, err := configuration.FromFile(configPath)
+				c, err := config.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					c, err = login(configPath)
@@ -216,7 +216,7 @@ func main() {
 			Usage:     "Submit code to exercism.io on your current assignment",
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
-				c, err := configuration.FromFile(configPath)
+				c, err := config.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					c, err = login(configPath)
@@ -274,7 +274,7 @@ func main() {
 			Usage:     "Delete the last submission",
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
-				c, err := configuration.FromFile(configPath)
+				c, err := config.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					c, err = login(configPath)
@@ -303,7 +303,7 @@ func main() {
 			Usage:     "Get the github username that you are logged in as",
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
-				c, err := configuration.FromFile(configPath)
+				c, err := config.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					c, err = login(configPath)
