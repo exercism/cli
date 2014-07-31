@@ -10,7 +10,11 @@ import (
 	"strings"
 )
 
-const FILENAME = ".exercism.go"
+const (
+	File        = ".exercism.go"
+	Host        = "http://exercism.io"
+	DemoDirname = "exercism-demo"
+)
 
 type Config struct {
 	GithubUsername    string `json:"githubUsername"`
@@ -61,15 +65,16 @@ func FromFile(path string) (c Config, err error) {
 }
 
 func Filename(dir string) string {
-	return fmt.Sprintf("%s/%s", dir, FILENAME)
+	return fmt.Sprintf("%s/%s", dir, File)
 }
+
 func Demo() (c Config, err error) {
 	demoDir, err := demoDirectory()
 	if err != nil {
 		return
 	}
 	c = Config{
-		Hostname:          "http://exercism.io",
+		Hostname:          Host,
 		ApiKey:            "",
 		ExercismDirectory: demoDir,
 	}
@@ -81,6 +86,6 @@ func demoDirectory() (dir string, err error) {
 	if err != nil {
 		return
 	}
-	dir = filepath.Join(dir, "exercism-demo")
+	dir = filepath.Join(dir, DemoDirname)
 	return
 }
