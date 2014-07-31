@@ -10,13 +10,13 @@ import (
 	"github.com/exercism/cli/configuration"
 )
 
-func login(path string) (config configuration.Config, err error) {
-	config, err = askForConfigInfo()
+func login(path string) (c configuration.Config, err error) {
+	c, err = askForConfigInfo()
 	if err != nil {
 		return
 	}
-	configuration.ToFile(path, config)
-	fmt.Printf("Your exercism directory can be found at %s\n", config.ExercismDirectory)
+	configuration.ToFile(path, c)
+	fmt.Printf("Your exercism directory can be found at %s\n", c.ExercismDirectory)
 	return
 }
 

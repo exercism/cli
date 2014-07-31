@@ -36,8 +36,8 @@ type submitRequest struct {
 	Path string `json:"path"`
 }
 
-func FetchAssignments(config configuration.Config, path string) (as []Assignment, err error) {
-	url := fmt.Sprintf("%s%s?key=%s", config.Hostname, path, config.ApiKey)
+func FetchAssignments(c configuration.Config, path string) (as []Assignment, err error) {
+	url := fmt.Sprintf("%s%s?key=%s", c.Hostname, path, c.ApiKey)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return
@@ -84,10 +84,10 @@ func FetchAssignments(config configuration.Config, path string) (as []Assignment
 	return fr.Assignments, err
 }
 
-func UnsubmitAssignment(config configuration.Config) (r string, err error) {
+func UnsubmitAssignment(c configuration.Config) (r string, err error) {
 	path := "api/v1/user/assignments"
 
-	url := fmt.Sprintf("%s/%s?key=%s", config.Hostname, path, config.ApiKey)
+	url := fmt.Sprintf("%s/%s?key=%s", c.Hostname, path, c.ApiKey)
 
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
@@ -125,12 +125,12 @@ func UnsubmitAssignment(config configuration.Config) (r string, err error) {
 
 	return
 }
-func SubmitAssignment(config configuration.Config, filePath string, code []byte) (r submitResponse, err error) {
+func SubmitAssignment(c configuration.Config, filePath string, code []byte) (r submitResponse, err error) {
 	path := "api/v1/user/assignments"
 
-	url := fmt.Sprintf("%s/%s", config.Hostname, path)
+	url := fmt.Sprintf("%s/%s", c.Hostname, path)
 
-	submission := submitRequest{Key: config.ApiKey, Code: string(code), Path: filePath}
+	submission := submitRequest{Key: c.ApiKey, Code: string(code), Path: filePath}
 	submissionJson, err := json.Marshal(submission)
 	if err != nil {
 		return
