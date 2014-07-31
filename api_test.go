@@ -48,12 +48,12 @@ var fetchHandler = func(rw http.ResponseWriter, r *http.Request) {
 func TestFetchWithKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(fetchHandler))
 
-	config := configuration.Config{
+	c := configuration.Config{
 		Hostname: server.URL,
 		ApiKey:   "myApiKey",
 	}
 
-	assignments, err := FetchAssignments(config, "/api/v1/user/assignments/current")
+	assignments, err := FetchAssignments(c, "/api/v1/user/assignments/current")
 	assert.NoError(t, err)
 
 	assert.Equal(t, len(assignments), 1)
@@ -72,12 +72,12 @@ func TestFetchWithKey(t *testing.T) {
 func TestFetchWithIncorrectKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(fetchHandler))
 
-	config := configuration.Config{
+	c := configuration.Config{
 		Hostname: server.URL,
 		ApiKey:   "myWrongApiKey",
 	}
 
-	assignments, err := FetchAssignments(config, "/api/v1/user/assignments/current")
+	assignments, err := FetchAssignments(c, "/api/v1/user/assignments/current")
 
 	assert.Error(t, err)
 	assert.Equal(t, len(assignments), 0)
@@ -170,11 +170,11 @@ func TestSubmitWithKey(t *testing.T) {
 	defer server.Close()
 
 	var code = []byte("My source code\n")
-	config := configuration.Config{
+	c := configuration.Config{
 		Hostname: server.URL,
 		ApiKey:   "myApiKey",
 	}
-	response, err := SubmitAssignment(config, "ruby/bob/bob.rb", code)
+	response, err := SubmitAssignment(c, "ruby/bob/bob.rb", code)
 	assert.NoError(t, err)
 
 	assert.Equal(t, response.Status, "saved")
@@ -187,13 +187,13 @@ func TestSubmitWithIncorrectKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(submitHandler))
 	defer server.Close()
 
-	config := configuration.Config{
+	c := configuration.Config{
 		Hostname: server.URL,
 		ApiKey:   "myWrongApiKey",
 	}
 
 	var code = []byte("My source code\n")
-	_, err := SubmitAssignment(config, "ruby/bob/bob.rb", code)
+	_, err := SubmitAssignment(c, "ruby/bob/bob.rb", code)
 
 	assert.Error(t, err)
 }
