@@ -35,7 +35,7 @@ var fetchHandler = func(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusNotFound)
 		return
 	}
-	if apiKey != "myApiKey" {
+	if apiKey != "myAPIKey" {
 		rw.WriteHeader(http.StatusUnauthorized)
 		fmt.Fprintf(rw, `{"error": "Unable to identify user"}`)
 		return
@@ -50,7 +50,7 @@ func TestFetchWithKey(t *testing.T) {
 
 	c := config.Config{
 		Hostname: server.URL,
-		ApiKey:   "myApiKey",
+		APIKey:   "myAPIKey",
 	}
 
 	assignments, err := FetchAssignments(c, "/api/v1/user/assignments/current")
@@ -74,7 +74,7 @@ func TestFetchWithIncorrectKey(t *testing.T) {
 
 	c := config.Config{
 		Hostname: server.URL,
-		ApiKey:   "myWrongApiKey",
+		APIKey:   "myWrongAPIKey",
 	}
 
 	assignments, err := FetchAssignments(c, "/api/v1/user/assignments/current")
@@ -126,7 +126,7 @@ var submitHandler = func(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if submission.Key != "myApiKey" {
+	if submission.Key != "myAPIKey" {
 		rw.WriteHeader(http.StatusForbidden)
 		rw.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(rw, `{"error": "Unable to identify user"}`)
@@ -172,7 +172,7 @@ func TestSubmitWithKey(t *testing.T) {
 	var code = []byte("My source code\n")
 	c := config.Config{
 		Hostname: server.URL,
-		ApiKey:   "myApiKey",
+		APIKey:   "myAPIKey",
 	}
 	response, err := SubmitAssignment(c, "ruby/bob/bob.rb", code)
 	assert.NoError(t, err)
@@ -189,7 +189,7 @@ func TestSubmitWithIncorrectKey(t *testing.T) {
 
 	c := config.Config{
 		Hostname: server.URL,
-		ApiKey:   "myWrongApiKey",
+		APIKey:   "myWrongAPIKey",
 	}
 
 	var code = []byte("My source code\n")

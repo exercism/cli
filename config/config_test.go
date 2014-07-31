@@ -36,7 +36,7 @@ func TestReadingWritingConfig(t *testing.T) {
 
 	writtenConfig := Config{
 		GithubUsername:    "user",
-		ApiKey:            "MyKey",
+		APIKey:            "MyKey",
 		ExercismDirectory: "/exercism/directory",
 	}
 

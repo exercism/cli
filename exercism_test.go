@@ -65,5 +65,5 @@ func TestAskForConfigInfoAllowsSpaces(t *testing.T) {
 
 	assert.Equal(t, c.ExercismDirectory, absoluteDirName)
 	assert.Equal(t, c.GithubUsername, userName)
-	assert.Equal(t, c.ApiKey, apiKey)
+	assert.Equal(t, c.APIKey, apiKey)
 }
