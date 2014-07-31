@@ -84,6 +84,6 @@ func askForConfigInfo() (c config.Config, err error) {
 		return
 	}
 
-	c = config.Config{GithubUsername: un, ApiKey: key, ExercismDirectory: dir, Hostname: "http://exercism.io"}
+	c = config.Config{GithubUsername: un, APIKey: key, ExercismDirectory: dir, Hostname: "http://exercism.io"}
 	return
 }

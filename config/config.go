@@ -18,7 +18,7 @@ const (
 
 type Config struct {
 	GithubUsername    string `json:"githubUsername"`
-	ApiKey            string `json:"apiKey"`
+	APIKey            string `json:"apiKey"`
 	ExercismDirectory string `json:"exercismDirectory"`
 	Hostname          string `json:"hostname"`
 }
@@ -75,7 +75,7 @@ func Demo() (c Config, err error) {
 	}
 	c = Config{
 		Hostname:          Host,
-		ApiKey:            "",
+		APIKey:            "",
 		ExercismDirectory: demoDir,
 	}
 	return
