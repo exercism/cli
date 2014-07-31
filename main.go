@@ -24,15 +24,15 @@ func main() {
 			Name:      "current",
 			ShortName: "c",
 			Usage:     "Show the current assignments",
-			Action: func(c *cli.Context) {
+			Action: func(ctx *cli.Context) {
 				var language string
-				argc := len(c.Args())
+				argc := len(ctx.Args())
 				if argc != 0 && argc != 1 {
 					fmt.Println("Usage: exercism current\n   or: exercism current LANGUAGE")
 					return
 				}
 
-				configPath  := c.GlobalString("config")
+				configPath := ctx.GlobalString("config")
 				config, err := configuration.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
@@ -49,7 +49,7 @@ func main() {
 				}
 
 				if argc == 1 {
-					language = c.Args()[0]
+					language = ctx.Args()[0]
 					fmt.Println("Current Assignments for", strings.Title(language))
 				} else {
 					fmt.Println("Current Assignments")
@@ -70,8 +70,9 @@ func main() {
 			Name:      "demo",
 			ShortName: "d",
 			Usage:     "Fetch first assignment for each language from exercism.io",
-			Action: func(c *cli.Context) {
-				config, err := configuration.FromFile(c.GlobalString("config"))
+			Action: func(ctx *cli.Context) {
+				configPath := ctx.GlobalString("config")
+				config, err := configuration.FromFile(configPath)
 				if err != nil {
 					config, err = configuration.Demo()
 					if err != nil {
@@ -100,14 +101,14 @@ func main() {
 			Name:      "fetch",
 			ShortName: "f",
 			Usage:     "Fetch assignments from exercism.io",
-			Action: func(c *cli.Context) {
-				argCount := len(c.Args())
+			Action: func(ctx *cli.Context) {
+				argCount := len(ctx.Args())
 				if argCount < 0 || argCount > 2 {
 					fmt.Println("Usage: exercism fetch\n   or: exercism fetch LANGUAGE\n   or: exercism fetch LANGUAGE EXERCISE")
 					return
 				}
 
-				configPath  := c.GlobalString("config")
+				configPath := ctx.GlobalString("config")
 				config, err := configuration.FromFile(configPath)
 				if err != nil {
 					if argCount == 0 || argCount == 1 {
@@ -126,7 +127,7 @@ func main() {
 					}
 				}
 
-				assignments, err := FetchAssignments(config, FetchEndpoint(c.Args()))
+				assignments, err := FetchAssignments(config, FetchEndpoint(ctx.Args()))
 				if err != nil {
 					fmt.Println(err)
 					return
@@ -135,9 +136,9 @@ func main() {
 				if len(assignments) == 0 {
 					noAssignmentMessage := "No assignments found"
 					if argCount == 2 {
-						fmt.Printf("%s for %s - %s\n", noAssignmentMessage, c.Args()[0], c.Args()[1])
+						fmt.Printf("%s for %s - %s\n", noAssignmentMessage, ctx.Args()[0], ctx.Args()[1])
 					} else if argCount == 1 {
-						fmt.Printf("%s for %s\n", noAssignmentMessage, c.Args()[0])
+						fmt.Printf("%s for %s\n", noAssignmentMessage, ctx.Args()[0])
 					} else {
 						fmt.Printf("%s\n", noAssignmentMessage)
 					}
@@ -158,8 +159,8 @@ func main() {
 			Name:      "login",
 			ShortName: "l",
 			Usage:     "Save exercism.io api credentials",
-			Action: func(c *cli.Context) {
-				_, err := login(c.GlobalString("config"))
+			Action: func(ctx *cli.Context) {
+				_, err := login(ctx.GlobalString("config"))
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -169,8 +170,8 @@ func main() {
 			Name:      "logout",
 			ShortName: "o",
 			Usage:     "Clear exercism.io api credentials",
-			Action: func(c *cli.Context) {
-				logout(c.GlobalString("config"))
+			Action: func(ctx *cli.Context) {
+				logout(ctx.GlobalString("config"))
 			},
 		},
 		{
@@ -181,8 +182,8 @@ func main() {
 				"submitted. It will *not* overwrite existing files.  If you have made changes " +
 				"to a file and have not submitted it, and you're trying to restore the last " +
 				"submitted version, first move that file out of the way, then call restore.",
-			Action: func(c *cli.Context) {
-				configPath  := c.GlobalString("config")
+			Action: func(ctx *cli.Context) {
+				configPath := ctx.GlobalString("config")
 				config, err := configuration.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
@@ -213,8 +214,8 @@ func main() {
 			Name:      "submit",
 			ShortName: "s",
 			Usage:     "Submit code to exercism.io on your current assignment",
-			Action: func(c *cli.Context) {
-				configPath  := c.GlobalString("config")
+			Action: func(ctx *cli.Context) {
+				configPath := ctx.GlobalString("config")
 				config, err := configuration.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
@@ -225,12 +226,12 @@ func main() {
 					}
 				}
 
-				if len(c.Args()) == 0 {
+				if len(ctx.Args()) == 0 {
 					fmt.Println("Please enter a file name")
 					return
 				}
 
-				filename := c.Args()[0]
+				filename := ctx.Args()[0]
 
 				// Make filename relative to config.ExercismDirectory.
 				absPath, err := absolutePath(filename)
@@ -271,8 +272,8 @@ func main() {
 			Name:      "unsubmit",
 			ShortName: "u",
 			Usage:     "Delete the last submission",
-			Action: func(c *cli.Context) {
-				configPath  := c.GlobalString("config")
+			Action: func(ctx *cli.Context) {
+				configPath := ctx.GlobalString("config")
 				config, err := configuration.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
@@ -300,8 +301,8 @@ func main() {
 			Name:      "whoami",
 			ShortName: "w",
 			Usage:     "Get the github username that you are logged in as",
-			Action: func(c *cli.Context) {
-				configPath  := c.GlobalString("config")
+			Action: func(ctx *cli.Context) {
+				configPath := ctx.GlobalString("config")
 				config, err := configuration.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
