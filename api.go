@@ -10,8 +10,16 @@ import (
 	"github.com/exercism/cli/config"
 )
 
-const Version = "1.6.2"
-const UserAgent = "github.com/exercism/cli v" + Version
+const (
+	// Version is the current release of the command-line app.
+	// We try to follow Semantic Versioning (http://semver.org),
+	// but with the http://exercism.io app being a prototype, a
+	// lot of things get out of hand.
+	Version = "1.6.2"
+	// UserAgent is sent along as a header to HTTP requests that the
+	// CLI makes. This helps with debugging.
+	UserAgent = "github.com/exercism/cli v" + Version
+)
 
 var FetchEndpoints = map[string]string{
 	"current":  "/api/v1/user/assignments/current",
