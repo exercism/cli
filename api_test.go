@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var assignmentsJson = `
+var assignmentsJSON = `
 {
     "assignments": [
         {
@@ -42,7 +42,7 @@ var fetchHandler = func(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	rw.Header().Set("Content-Type", "application/json")
-	fmt.Fprintf(rw, assignmentsJson)
+	fmt.Fprintf(rw, assignmentsJSON)
 }
 
 func TestFetchWithKey(t *testing.T) {
@@ -154,7 +154,7 @@ var submitHandler = func(rw http.ResponseWriter, r *http.Request) {
 	rw.WriteHeader(http.StatusCreated)
 	rw.Header().Set("Content-Type", "application/json")
 
-	submitJson := `
+	submitJSON := `
 {
 	"status":"saved",
 	"language":"ruby",
@@ -162,7 +162,7 @@ var submitHandler = func(rw http.ResponseWriter, r *http.Request) {
 	"submission_path":"/username/ruby/bob"
 }
 `
-	fmt.Fprintf(rw, submitJson)
+	fmt.Fprintf(rw, submitJSON)
 }
 
 func TestSubmitWithKey(t *testing.T) {

@@ -30,12 +30,12 @@ var FetchEndpoints = map[string]string{
 }
 
 type submitResponse struct {
-	Id             string
-	Status         string
-	Language       string
-	Exercise       string
+	ID             string `json:"id"`
+	Status         string `json:"status"`
+	Language       string `json:"language"`
+	Exercise       string `json:"exercise"`
 	SubmissionPath string `json:"submission_path"`
-	Error          string
+	Error          string `json:"error"`
 }
 
 type submitRequest struct {
@@ -139,12 +139,12 @@ func SubmitAssignment(c config.Config, filePath string, code []byte) (r submitRe
 	url := fmt.Sprintf("%s/%s", c.Hostname, path)
 
 	submission := submitRequest{Key: c.APIKey, Code: string(code), Path: filePath}
-	submissionJson, err := json.Marshal(submission)
+	submissionJSON, err := json.Marshal(submission)
 	if err != nil {
 		return
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewReader(submissionJson))
+	req, err := http.NewRequest("POST", url, bytes.NewReader(submissionJSON))
 	if err != nil {
 		return
 	}
