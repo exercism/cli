@@ -15,7 +15,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "exercism"
 	app.Usage = "A command line tool to interact with http://exercism.io"
-	app.Version = VERSION
+	app.Version = Version
 	app.Flags = []cli.Flag{
 		cli.StringFlag{"config, c", config.Filename(config.HomeDir()), "path to config file"},
 	}
