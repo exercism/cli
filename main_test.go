@@ -6,11 +6,71 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/exercism/cli/config"
 	"github.com/stretchr/testify/assert"
 )
+
+func assertFileDoesNotExist(t *testing.T, filename string) {
+	_, err := os.Stat(filename)
+
+	if err == nil {
+		t.Errorf("File [%s] already exist.", filename)
+	}
+}
+
+func TestLogoutDeletesConfigFile(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "")
+	assert.NoError(t, err)
+
+	c := config.Config{}
+
+	config.ToFile(tmpDir, c)
+
+	logout(tmpDir)
+
+	assertFileDoesNotExist(t, config.Filename(tmpDir))
+}
+
+func TestAskForConfigInfoAllowsSpaces(t *testing.T) {
+	oldStdin := os.Stdin
+	dirName := "dirname with spaces"
+	userName := "TestUsername"
+	apiKey := "abc123"
+
+	fakeStdin, err := ioutil.TempFile("", "stdin_mock")
+	assert.NoError(t, err)
+
+	fakeStdin.WriteString(fmt.Sprintf("%s\r\n%s\r\n%s\r\n", userName, apiKey, dirName))
+	assert.NoError(t, err)
+
+	_, err = fakeStdin.Seek(0, os.SEEK_SET)
+	assert.NoError(t, err)
+
+	defer fakeStdin.Close()
+
+	os.Stdin = fakeStdin
+
+	c, err := askForConfigInfo()
+	if err != nil {
+		t.Errorf("Error asking for configuration info [%v]", err)
+	}
+	os.Stdin = oldStdin
+	absoluteDirName, _ := absolutePath(dirName)
+	_, err = os.Stat(absoluteDirName)
+	if err != nil {
+		t.Errorf("Excercism directory [%s] was not created.", absoluteDirName)
+	}
+	os.Remove(absoluteDirName)
+	os.Remove(fakeStdin.Name())
+
+	assert.Equal(t, c.ExercismDirectory, absoluteDirName)
+	assert.Equal(t, c.GithubUsername, userName)
+	assert.Equal(t, c.APIKey, apiKey)
+}
 
 var assignmentsJSON = `
 {
@@ -196,4 +256,72 @@ func TestSubmitWithIncorrectKey(t *testing.T) {
 	_, err := SubmitAssignment(c, "ruby/bob/bob.rb", code)
 
 	assert.Error(t, err)
+}
+
+func TestSavingAssignment(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "")
+	assert.NoError(t, err)
+
+	prepareFixture(t, fmt.Sprintf("%s/ruby/bob/stub.rb", tmpDir), "Existing stub")
+
+	assignment := Assignment{
+		Track: "ruby",
+		Slug:  "bob",
+		Files: map[string]string{
+			"bob_test.rb":     "Tests text",
+			"README.md":       "Readme text",
+			"path/to/file.rb": "File text",
+			"stub.rb":         "New version of stub",
+		},
+	}
+
+	err = SaveAssignment(tmpDir, assignment)
+	assert.NoError(t, err)
+
+	readme, err := ioutil.ReadFile(tmpDir + "/ruby/bob/README.md")
+	assert.NoError(t, err)
+	assert.Equal(t, string(readme), "Readme text")
+
+	tests, err := ioutil.ReadFile(tmpDir + "/ruby/bob/bob_test.rb")
+	assert.NoError(t, err)
+	assert.Equal(t, string(tests), "Tests text")
+
+	fileInDir, err := ioutil.ReadFile(tmpDir + "/ruby/bob/path/to/file.rb")
+	assert.NoError(t, err)
+	assert.Equal(t, string(fileInDir), "File text")
+
+	stubFile, err := ioutil.ReadFile(tmpDir + "/ruby/bob/stub.rb")
+	assert.NoError(t, err)
+	assert.Equal(t, string(stubFile), "Existing stub")
+}
+
+func prepareFixture(t *testing.T, fixture, s string) {
+	err := os.MkdirAll(filepath.Dir(fixture), 0755)
+	assert.NoError(t, err)
+
+	err = ioutil.WriteFile(fixture, []byte(s), 0644)
+	assert.NoError(t, err)
+
+	// ensure fixture is set up correctly
+	fixtureContents, err := ioutil.ReadFile(fixture)
+	assert.NoError(t, err)
+	assert.Equal(t, string(fixtureContents), s)
+}
+
+func TestFetchCurrentEndpoint(t *testing.T) {
+	expected := "/api/v1/user/assignments/current"
+	actual := FetchEndpoint([]string{})
+	assert.Equal(t, expected, actual)
+}
+
+func TestFetchExerciseEndpoint(t *testing.T) {
+	expected := "/api/v1/assignments/language/slug"
+	actual := FetchEndpoint([]string{"language", "slug"})
+	assert.Equal(t, expected, actual)
+}
+
+func TestFetchExerciseEndpointByLanguage(t *testing.T) {
+	expected := "/api/v1/assignments/language"
+	actual := FetchEndpoint([]string{"language"})
+	assert.Equal(t, expected, actual)
 }
