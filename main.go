@@ -50,7 +50,11 @@ func main() {
 	app.Usage = "A command line tool to interact with http://exercism.io"
 	app.Version = Version
 	app.Flags = []cli.Flag{
-		cli.StringFlag{"config, c", config.Filename(config.HomeDir()), "path to config file"},
+		cli.StringFlag{
+			Name:  "config, c",
+			Value: config.Filename(config.HomeDir()),
+			Usage: "path to config file",
+		},
 	}
 	app.Commands = []cli.Command{
 		{
