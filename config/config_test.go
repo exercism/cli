@@ -34,16 +34,41 @@ func TestReadingWritingConfig(t *testing.T) {
 	filename := Filename(tmpDir)
 	assert.NoError(t, err)
 
-	writtenConfig := Config{
+	currentConfig := Config{
 		GithubUsername:    "user",
 		APIKey:            "MyKey",
 		ExercismDirectory: "/exercism/directory",
+		Hostname:          "localhost\r\n",
+	}
+	sanitizedConfig := Config{
+		GithubUsername:    "user",
+		APIKey:            "MyKey",
+		ExercismDirectory: "/exercism/directory",
+		Hostname:          "localhost",
 	}
 
-	ToFile(filename, writtenConfig)
+	ToFile(filename, currentConfig)
 
 	loadedConfig, err := FromFile(filename)
 	assert.NoError(t, err)
 
-	assert.Equal(t, writtenConfig, loadedConfig)
+	assert.Equal(t, sanitizedConfig, loadedConfig)
+}
+
+func TestSanitizeFields(t *testing.T) {
+	config := Config{
+		GithubUsername:    "user ",
+		APIKey:            "MyKey     ",
+		ExercismDirectory: "/home/user name\r\n",
+		Hostname:          "localhost\n",
+	}
+	sanitizedConfig := Config{
+		GithubUsername:    "user",
+		APIKey:            "MyKey",
+		ExercismDirectory: "/home/user name",
+		Hostname:          "localhost",
+	}
+	sanitize(&config)
+
+	assert.Equal(t, config, sanitizedConfig)
 }
