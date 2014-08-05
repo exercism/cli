@@ -35,6 +35,7 @@ type Config struct {
 
 // ToFile writes a Config to a JSON file.
 func ToFile(path string, c Config) error {
+	sanitize(&c)
 	bytes, err := json.Marshal(c)
 	if err != nil {
 		return err
@@ -56,6 +57,11 @@ func FromFile(path string) (c Config, err error) {
 	}
 
 	err = json.Unmarshal(bytes, &c)
+	if err != nil {
+		return
+	}
+	sanitize(&c)
+
 	return
 }
 
@@ -105,4 +111,15 @@ func demoDirectory() (dir string, err error) {
 	}
 	dir = filepath.Join(dir, DemoDirname)
 	return
+}
+
+func sanitize(c *Config) {
+	c.GithubUsername = sanitizeField(c.GithubUsername)
+	c.APIKey = sanitizeField(c.APIKey)
+	c.ExercismDirectory = sanitizeField(c.ExercismDirectory)
+	c.Hostname = sanitizeField(c.Hostname)
+}
+
+func sanitizeField(v string) string {
+	return strings.TrimSpace(v)
 }
