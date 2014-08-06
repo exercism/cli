@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -34,41 +35,49 @@ func TestReadingWritingConfig(t *testing.T) {
 	filename := Filename(tmpDir)
 	assert.NoError(t, err)
 
-	currentConfig := Config{
-		GithubUsername:    "user",
-		APIKey:            "MyKey",
-		ExercismDirectory: "/exercism/directory",
-		Hostname:          "localhost\r\n",
-	}
-	sanitizedConfig := Config{
+	writtenConfig := Config{
 		GithubUsername:    "user",
 		APIKey:            "MyKey",
 		ExercismDirectory: "/exercism/directory",
 		Hostname:          "localhost",
 	}
 
-	ToFile(filename, currentConfig)
+	ToFile(filename, writtenConfig)
 
 	loadedConfig, err := FromFile(filename)
 	assert.NoError(t, err)
 
-	assert.Equal(t, sanitizedConfig, loadedConfig)
+	assert.Equal(t, writtenConfig, loadedConfig)
 }
 
-func TestSanitizeFields(t *testing.T) {
-	config := Config{
-		GithubUsername:    "user ",
-		APIKey:            "MyKey     ",
-		ExercismDirectory: "/home/user name\r\n",
-		Hostname:          "localhost\n",
-	}
+func TestDecodingConfig(t *testing.T) {
+	unsanitizedJson := `{"githubUsername":"user ","apiKey":"MyKey  ","exercismDirectory":"/exercism/directory\r\n","hostname":"localhost \r\n"}`
 	sanitizedConfig := Config{
 		GithubUsername:    "user",
 		APIKey:            "MyKey",
-		ExercismDirectory: "/home/user name",
+		ExercismDirectory: "/exercism/directory",
 		Hostname:          "localhost",
 	}
-	sanitize(&config)
+	b := bytes.NewBufferString(unsanitizedJson)
+	c, err := Decode(b)
 
-	assert.Equal(t, config, sanitizedConfig)
+	assert.NoError(t, err)
+	assert.Equal(t, sanitizedConfig, c)
+}
+
+func TestEncodingConfig(t *testing.T) {
+	currentConfig := Config{
+		GithubUsername:    "user\r\n",
+		APIKey:            "MyKey ",
+		ExercismDirectory: "/home/user name  ",
+		Hostname:          "localhost  ",
+	}
+	sanitizedJson := `{"githubUsername":"user","apiKey":"MyKey","exercismDirectory":"/home/user name","hostname":"localhost"}
+`
+
+	buf := new(bytes.Buffer)
+	err := Encode(buf, currentConfig)
+
+	assert.NoError(t, err)
+	assert.Equal(t, sanitizedJson, buf.String())
 }
