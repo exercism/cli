@@ -3,7 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -35,13 +35,13 @@ type Config struct {
 
 // ToFile writes a Config to a JSON file.
 func ToFile(path string, c Config) error {
-	sanitize(&c)
-	bytes, err := json.Marshal(c)
+	f, err := os.Create(path) // truncates existing file if it exists
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
-	err = ioutil.WriteFile(path, bytes, 0644)
+	err = Encode(f, c)
 	if err != nil {
 		return err
 	}
@@ -51,18 +51,30 @@ func ToFile(path string, c Config) error {
 
 // FromFile loads a Config object from a JSON file.
 func FromFile(path string) (c Config, err error) {
-	bytes, err := ioutil.ReadFile(path)
+	f, err := os.Open(path)
 	if err != nil {
-		return
+		return c, err
 	}
+	defer f.Close()
+	return Decode(f)
+}
 
-	err = json.Unmarshal(bytes, &c)
+func Encode(w io.Writer, c Config) error {
+	sanitize(&c)
+	e := json.NewEncoder(w)
+	return e.Encode(c)
+}
+
+func Decode(r io.Reader) (Config, error) {
+	d := json.NewDecoder(r)
+	var c Config
+	err := d.Decode(&c)
 	if err != nil {
-		return
+		return c, err
 	}
 	sanitize(&c)
 
-	return
+	return c, err
 }
 
 // HomeDir return's the user's canonical home directory.
