@@ -27,8 +27,7 @@ func TestLogoutDeletesConfigFile(t *testing.T) {
 	assert.NoError(t, err)
 
 	c := config.Config{}
-
-	config.ToFile(tmpDir, c)
+	c.ToFile(tmpDir)
 
 	logout(tmpDir)
 

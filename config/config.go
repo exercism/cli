@@ -34,7 +34,7 @@ type Config struct {
 }
 
 // ToFile writes a Config to a JSON file.
-func ToFile(path string, c Config) error {
+func (c Config) ToFile(path string) error {
 	f, err := os.Create(path) // truncates existing file if it exists
 	if err != nil {
 		return err
