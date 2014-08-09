@@ -35,19 +35,19 @@ func TestReadingWritingConfig(t *testing.T) {
 	filename := Filename(tmpDir)
 	assert.NoError(t, err)
 
-	writtenConfig := Config{
+	c := Config{
 		GithubUsername:    "user",
 		APIKey:            "MyKey",
 		ExercismDirectory: "/exercism/directory",
 		Hostname:          "localhost",
 	}
 
-	ToFile(filename, writtenConfig)
+	c.ToFile(filename)
 
 	loadedConfig, err := FromFile(filename)
 	assert.NoError(t, err)
 
-	assert.Equal(t, writtenConfig, loadedConfig)
+	assert.Equal(t, c, loadedConfig)
 }
 
 func TestDecodingConfig(t *testing.T) {

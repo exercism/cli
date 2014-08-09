@@ -366,7 +366,7 @@ func login(path string) (c config.Config, err error) {
 	if err != nil {
 		return
 	}
-	config.ToFile(path, c)
+	c.ToFile(path)
 	fmt.Printf("Your exercism directory can be found at %s\n", c.ExercismDirectory)
 	return
 }
