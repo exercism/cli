@@ -33,6 +33,14 @@ type Config struct {
 	Hostname          string `json:"hostname"`
 }
 
+func WithDefaultPath(p string) string {
+	if p == "" {
+		return Filename(HomeDir())
+	} else {
+		return p
+	}
+}
+
 // ToFile writes a Config to a JSON file.
 func (c Config) ToFile(path string) error {
 	f, err := os.Create(path) // truncates existing file if it exists
@@ -50,6 +58,8 @@ func (c Config) ToFile(path string) error {
 
 // FromFile loads a Config object from a JSON file.
 func FromFile(path string) (*Config, error) {
+	path = WithDefaultPath(path)
+
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
