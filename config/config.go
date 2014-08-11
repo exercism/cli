@@ -50,31 +50,31 @@ func (c Config) ToFile(path string) error {
 }
 
 // FromFile loads a Config object from a JSON file.
-func FromFile(path string) (c Config, err error) {
+func FromFile(path string) (c *Config, err error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return c, err
+		return nil, err
 	}
 	defer f.Close()
 	return Decode(f)
 }
 
 // Encode writes a Config into JSON format.
-func (c Config) Encode(w io.Writer) error {
-	sanitize(&c)
+func (c *Config) Encode(w io.Writer) error {
+	c.sanitize()
 	e := json.NewEncoder(w)
 	return e.Encode(c)
 }
 
 // Decode loads a Config from JSON format.
-func Decode(r io.Reader) (Config, error) {
+func Decode(r io.Reader) (*Config, error) {
 	d := json.NewDecoder(r)
-	var c Config
+	var c *Config
 	err := d.Decode(&c)
 	if err != nil {
 		return c, err
 	}
-	sanitize(&c)
+	c.sanitize()
 
 	return c, err
 }
@@ -100,12 +100,12 @@ func Filename(dir string) string {
 }
 
 // Demo is a default configuration for unauthenticated users.
-func Demo() (c Config, err error) {
+func Demo() (c *Config, err error) {
 	demoDir, err := demoDirectory()
 	if err != nil {
 		return
 	}
-	c = Config{
+	c = &Config{
 		Hostname:          Host,
 		APIKey:            "",
 		ExercismDirectory: demoDir,
@@ -127,7 +127,7 @@ func demoDirectory() (dir string, err error) {
 	return
 }
 
-func sanitize(c *Config) {
+func (c *Config) sanitize() {
 	c.GithubUsername = sanitizeField(c.GithubUsername)
 	c.APIKey = sanitizeField(c.APIKey)
 	c.ExercismDirectory = sanitizeField(c.ExercismDirectory)
