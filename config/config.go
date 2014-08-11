@@ -168,7 +168,9 @@ func NormalizeConfig(path string) error {
 	}
 
 	err = os.Rename(oldPath, currentPath)
-	if err != nil {
+	if err == nil {
+		fmt.Printf("renamed %s to %s\n", oldPath, currentPath)
+	} else {
 		return err
 	}
 
