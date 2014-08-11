@@ -321,16 +321,11 @@ func main() {
 					}
 				}
 
-				response, err := UnsubmitAssignment(c)
+				err = UnsubmitAssignment(c)
 				if err != nil {
 					fmt.Println(err)
 					return
 				}
-
-				if response != "" {
-					return
-				}
-
 				fmt.Println("The last submission was successfully deleted.")
 			},
 		},
@@ -361,14 +356,14 @@ func main() {
 	}
 }
 
-func login(path string) (c *config.Config, err error) {
-	c, err = askForConfigInfo()
+func login(path string) (*config.Config, error) {
+	c, err := askForConfigInfo()
 	if err != nil {
-		return
+		return nil, err
 	}
 	c.ToFile(path)
 	fmt.Printf("Your exercism directory can be found at %s\n", c.ExercismDirectory)
-	return
+	return c, nil
 }
 
 func logout(path string) {
@@ -383,7 +378,7 @@ func absolutePath(path string) (string, error) {
 	return filepath.EvalSymlinks(path)
 }
 
-func askForConfigInfo() (c *config.Config, err error) {
+func askForConfigInfo() (*config.Config, error) {
 	var un, key, dir string
 	delim := "\r\n"
 
@@ -391,19 +386,19 @@ func askForConfigInfo() (c *config.Config, err error) {
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	fmt.Print("Your GitHub username: ")
 	un, err = bio.ReadString('\n')
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	fmt.Print("Your Exercism API key (found at http://exercism.io/account): ")
 	key, err = bio.ReadString('\n')
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	fmt.Println("What is your exercism exercises project path?")
@@ -411,7 +406,7 @@ func askForConfigInfo() (c *config.Config, err error) {
 	fmt.Print("> ")
 	dir, err = bio.ReadString('\n')
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	key = strings.TrimRight(key, delim)
@@ -427,12 +422,12 @@ func askForConfigInfo() (c *config.Config, err error) {
 	err = os.MkdirAll(dir, 0755)
 	if err != nil {
 		err = fmt.Errorf("Error making directory %v: [%v]", dir, err)
-		return
+		return nil, err
 	}
 
 	dir, err = absolutePath(dir)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	return &config.Config{
@@ -458,17 +453,17 @@ type submitRequest struct {
 	Path string `json:"path"`
 }
 
-func FetchAssignments(c *config.Config, path string) (as []Assignment, err error) {
+func FetchAssignments(c *config.Config, path string) ([]Assignment, error) {
 	url := fmt.Sprintf("%s%s?key=%s", c.Hostname, path, c.APIKey)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		err = fmt.Errorf("Error fetching assignments: [%v]", err)
-		return
+		return nil, err
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
@@ -476,7 +471,7 @@ func FetchAssignments(c *config.Config, path string) (as []Assignment, err error
 
 	if err != nil {
 		err = fmt.Errorf("Error fetching assignments: [%v]", err)
-		return
+		return nil, err
 	}
 
 	if resp.StatusCode != http.StatusOK {
@@ -486,11 +481,11 @@ func FetchAssignments(c *config.Config, path string) (as []Assignment, err error
 		err = json.Unmarshal(body, &apiError)
 		if err != nil {
 			err = fmt.Errorf("Error parsing API response: [%v]", err)
-			return
+			return nil, err
 		}
 
 		err = fmt.Errorf("Error fetching assignments. HTTP Status Code: %d\n%s", resp.StatusCode, apiError.Error)
-		return
+		return nil, err
 	}
 
 	var fr struct {
@@ -500,20 +495,20 @@ func FetchAssignments(c *config.Config, path string) (as []Assignment, err error
 	err = json.Unmarshal(body, &fr)
 	if err != nil {
 		err = fmt.Errorf("Error parsing API response: [%v]", err)
-		return
+		return nil, err
 	}
 
-	return fr.Assignments, err
+	return fr.Assignments, nil
 }
 
-func UnsubmitAssignment(c *config.Config) (r string, err error) {
+func UnsubmitAssignment(c *config.Config) error {
 	path := "api/v1/user/assignments"
 
 	url := fmt.Sprintf("%s/%s?key=%s", c.Hostname, path, c.APIKey)
 
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
-		return
+		return err
 	}
 
 	req.Header.Set("User-Agent", UserAgent)
@@ -521,13 +516,13 @@ func UnsubmitAssignment(c *config.Config) (r string, err error) {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		err = fmt.Errorf("Error destroying submission: [%v]", err)
-		return
+		return err
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	if err != nil {
-		return
+		return err
 	}
 
 	if resp.StatusCode != http.StatusNoContent {
@@ -538,16 +533,16 @@ func UnsubmitAssignment(c *config.Config) (r string, err error) {
 
 		err = json.Unmarshal(body, &ur)
 		if err != nil {
-			return
+			return err
 		}
 
 		err = fmt.Errorf("Status: %d, Error: %v", resp.StatusCode, ur.Error)
-		return ur.Error, err
+		return err
 	}
 
-	return
+	return nil
 }
-func SubmitAssignment(c *config.Config, filePath string, code []byte) (r submitResponse, err error) {
+func SubmitAssignment(c *config.Config, filePath string, code []byte) (*submitResponse, error) {
 	path := "api/v1/user/assignments"
 
 	url := fmt.Sprintf("%s/%s", c.Hostname, path)
@@ -555,12 +550,12 @@ func SubmitAssignment(c *config.Config, filePath string, code []byte) (r submitR
 	submission := submitRequest{Key: c.APIKey, Code: string(code), Path: filePath}
 	submissionJSON, err := json.Marshal(submission)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewReader(submissionJSON))
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	req.Header.Set("User-Agent", UserAgent)
@@ -569,30 +564,30 @@ func SubmitAssignment(c *config.Config, filePath string, code []byte) (r submitR
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		err = fmt.Errorf("Error posting assignment: [%v]", err)
-		return
+		return nil, err
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	if err != nil {
-		return
+		return nil, err
 	}
 
+	var r submitResponse
 	if resp.StatusCode != http.StatusCreated {
 		err = json.Unmarshal(body, &r)
 		if err != nil {
-			return
+			return nil, err
 		}
 		err = fmt.Errorf("Status: %d, Error: %v", resp.StatusCode, r)
-		return
+		return nil, err
 	}
 
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		err = fmt.Errorf("Error parsing API response: [%v]", err)
+		return nil, fmt.Errorf("Error parsing API response: [%v]", err)
 	}
-
-	return
+	return &r, nil
 }
 
 type Assignment struct {
@@ -602,23 +597,21 @@ type Assignment struct {
 	IsFresh bool `json:"fresh"`
 }
 
-func SaveAssignment(dir string, a Assignment) (err error) {
+func SaveAssignment(dir string, a Assignment) error {
 	root := fmt.Sprintf("%s/%s/%s", dir, a.Track, a.Slug)
 
 	for name, text := range a.Files {
 		file := fmt.Sprintf("%s/%s", root, name)
 		dir := filepath.Dir(file)
-		err = os.MkdirAll(dir, 0755)
+		err := os.MkdirAll(dir, 0755)
 		if err != nil {
-			err = fmt.Errorf("Error making directory %v: [%v]", dir, err)
-			return
+			return fmt.Errorf("Error making directory %v: [%v]", dir, err)
 		}
 		if _, err = os.Stat(file); err != nil {
 			if os.IsNotExist(err) {
 				err = ioutil.WriteFile(file, []byte(text), 0644)
 				if err != nil {
-					err = fmt.Errorf("Error writing file %v: [%v]", name, err)
-					return
+					return fmt.Errorf("Error writing file %v: [%v]", name, err)
 				}
 			}
 		}
@@ -630,7 +623,7 @@ func SaveAssignment(dir string, a Assignment) (err error) {
 	}
 	fmt.Println(fresh, a.Track, "-", a.Slug)
 
-	return
+	return nil
 }
 
 func FetchEndpoint(args []string) string {
