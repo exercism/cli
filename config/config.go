@@ -33,16 +33,16 @@ type Config struct {
 	Hostname          string `json:"hostname"`
 }
 
-func WithDefaultPath(p string) string {
-	if p == "" {
-		return Filename(HomeDir())
-	} else {
-		return p
-	}
-}
-
 // ToFile writes a Config to a JSON file.
 func (c Config) ToFile(path string) error {
+	if path == "" {
+		path = WithDefaultPath(path)
+		err := NormalizeConfig(path)
+		if err != nil {
+			return err
+		}
+	}
+
 	f, err := os.Create(path) // truncates existing file if it exists
 	if err != nil {
 		return err
@@ -58,7 +58,13 @@ func (c Config) ToFile(path string) error {
 
 // FromFile loads a Config object from a JSON file.
 func FromFile(path string) (*Config, error) {
-	path = WithDefaultPath(path)
+	if path == "" {
+		path = WithDefaultPath(path)
+		err := NormalizeConfig(path)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	f, err := os.Open(path)
 	if err != nil {
@@ -86,6 +92,14 @@ func Decode(r io.Reader) (*Config, error) {
 	c.sanitize()
 
 	return c, err
+}
+
+func WithDefaultPath(p string) string {
+	if p == "" {
+		return Filename(HomeDir())
+	} else {
+		return p
+	}
 }
 
 // HomeDir return's the user's canonical home directory.
@@ -124,6 +138,31 @@ func Demo() (*Config, error) {
 // ReplaceTilde replaces the short-hand home path with the absolute path.
 func ReplaceTilde(oldPath string) string {
 	return strings.Replace(oldPath, "~/", HomeDir()+"/", 1)
+}
+
+func NormalizeConfig(path string) error {
+	var err error
+	currentPath := filepath.Join(path, ".exercism.json")
+	oldPath := filepath.Join(path, ".exercism.go")
+
+	// Do nothing if we already have a current config file
+	_, err = os.Stat(currentPath)
+	if !os.IsNotExist(err) {
+		return nil
+	}
+
+	// Do nothing if we have no old file to rename
+	_, err = os.Stat(oldPath)
+	if os.IsNotExist(err) {
+		return nil
+	}
+
+	err = os.Rename(oldPath, currentPath)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func demoDirectory() (string, error) {
