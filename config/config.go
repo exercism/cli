@@ -41,7 +41,7 @@ func (c Config) ToFile(path string) error {
 	}
 	defer f.Close()
 
-	err = Encode(f, c)
+	err = c.Encode(f)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func FromFile(path string) (c Config, err error) {
 }
 
 // Encode writes a Config into JSON format.
-func Encode(w io.Writer, c Config) error {
+func (c Config) Encode(w io.Writer) error {
 	sanitize(&c)
 	e := json.NewEncoder(w)
 	return e.Encode(c)
