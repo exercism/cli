@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -37,7 +38,7 @@ type Config struct {
 func (c Config) ToFile(path string) error {
 	if path == "" {
 		path = WithDefaultPath(path)
-		err := NormalizeConfig(path)
+		err := NormalizeConfig(HomeDir())
 		if err != nil {
 			return err
 		}
@@ -60,7 +61,7 @@ func (c Config) ToFile(path string) error {
 func FromFile(path string) (*Config, error) {
 	if path == "" {
 		path = WithDefaultPath(path)
-		err := NormalizeConfig(path)
+		err := NormalizeConfig(HomeDir())
 		if err != nil {
 			return nil, err
 		}
@@ -142,6 +143,15 @@ func ReplaceTilde(oldPath string) string {
 
 func NormalizeConfig(path string) error {
 	var err error
+
+	fi, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+	if !fi.IsDir() {
+		return errors.New("expected path to be a directory")
+	}
+
 	currentPath := filepath.Join(path, ".exercism.json")
 	oldPath := filepath.Join(path, ".exercism.go")
 
