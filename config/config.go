@@ -59,12 +59,14 @@ func FromFile(path string) (c Config, err error) {
 	return Decode(f)
 }
 
+// Encode writes a Config into JSON format.
 func Encode(w io.Writer, c Config) error {
 	sanitize(&c)
 	e := json.NewEncoder(w)
 	return e.Encode(c)
 }
 
+// Decode loads a Config from JSON format.
 func Decode(r io.Reader) (Config, error) {
 	d := json.NewDecoder(r)
 	var c Config
