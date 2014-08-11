@@ -14,8 +14,7 @@ import (
 const (
 	// File is the default name of the JSON file where the config written.
 	// The user can pass an alternate filename when using the CLI.
-	// TODO: rename to .exercism.json
-	File = ".exercism.go"
+	File = ".exercism.json"
 	// Host is the default hostname for fetching problems and submitting exercises.
 	// TODO: We need to operate against two hosts (one for problems and one for submissions),
 	// or define a proxy that both APIs can go through.
