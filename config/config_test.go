@@ -76,7 +76,7 @@ func TestEncodingConfig(t *testing.T) {
 `
 
 	buf := new(bytes.Buffer)
-	err := Encode(buf, currentConfig)
+	err := currentConfig.Encode(buf)
 
 	assert.NoError(t, err)
 	assert.Equal(t, sanitizedJSON, buf.String())
