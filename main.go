@@ -361,7 +361,7 @@ func main() {
 	}
 }
 
-func login(path string) (c config.Config, err error) {
+func login(path string) (c *config.Config, err error) {
 	c, err = askForConfigInfo()
 	if err != nil {
 		return
@@ -383,7 +383,7 @@ func absolutePath(path string) (string, error) {
 	return filepath.EvalSymlinks(path)
 }
 
-func askForConfigInfo() (c config.Config, err error) {
+func askForConfigInfo() (c *config.Config, err error) {
 	var un, key, dir string
 	delim := "\r\n"
 
@@ -435,8 +435,12 @@ func askForConfigInfo() (c config.Config, err error) {
 		return
 	}
 
-	c = config.Config{GithubUsername: un, APIKey: key, ExercismDirectory: dir, Hostname: "http://exercism.io"}
-	return
+	return &config.Config{
+		GithubUsername:    un,
+		APIKey:            key,
+		ExercismDirectory: dir,
+		Hostname:          "http://exercism.io",
+	}, nil
 }
 
 type submitResponse struct {
@@ -454,7 +458,7 @@ type submitRequest struct {
 	Path string `json:"path"`
 }
 
-func FetchAssignments(c config.Config, path string) (as []Assignment, err error) {
+func FetchAssignments(c *config.Config, path string) (as []Assignment, err error) {
 	url := fmt.Sprintf("%s%s?key=%s", c.Hostname, path, c.APIKey)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -502,7 +506,7 @@ func FetchAssignments(c config.Config, path string) (as []Assignment, err error)
 	return fr.Assignments, err
 }
 
-func UnsubmitAssignment(c config.Config) (r string, err error) {
+func UnsubmitAssignment(c *config.Config) (r string, err error) {
 	path := "api/v1/user/assignments"
 
 	url := fmt.Sprintf("%s/%s?key=%s", c.Hostname, path, c.APIKey)
@@ -543,7 +547,7 @@ func UnsubmitAssignment(c config.Config) (r string, err error) {
 
 	return
 }
-func SubmitAssignment(c config.Config, filePath string, code []byte) (r submitResponse, err error) {
+func SubmitAssignment(c *config.Config, filePath string, code []byte) (r submitResponse, err error) {
 	path := "api/v1/user/assignments"
 
 	url := fmt.Sprintf("%s/%s", c.Hostname, path)

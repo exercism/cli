@@ -107,7 +107,7 @@ var fetchHandler = func(rw http.ResponseWriter, r *http.Request) {
 func TestFetchWithKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(fetchHandler))
 
-	c := config.Config{
+	c := &config.Config{
 		Hostname: server.URL,
 		APIKey:   "myAPIKey",
 	}
@@ -131,7 +131,7 @@ func TestFetchWithKey(t *testing.T) {
 func TestFetchWithIncorrectKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(fetchHandler))
 
-	c := config.Config{
+	c := &config.Config{
 		Hostname: server.URL,
 		APIKey:   "myWrongAPIKey",
 	}
@@ -229,7 +229,7 @@ func TestSubmitWithKey(t *testing.T) {
 	defer server.Close()
 
 	var code = []byte("My source code\n")
-	c := config.Config{
+	c := &config.Config{
 		Hostname: server.URL,
 		APIKey:   "myAPIKey",
 	}
@@ -246,7 +246,7 @@ func TestSubmitWithIncorrectKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(submitHandler))
 	defer server.Close()
 
-	c := config.Config{
+	c := &config.Config{
 		Hostname: server.URL,
 		APIKey:   "myWrongAPIKey",
 	}

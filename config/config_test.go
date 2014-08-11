@@ -35,7 +35,7 @@ func TestReadingWritingConfig(t *testing.T) {
 	filename := Filename(tmpDir)
 	assert.NoError(t, err)
 
-	c := Config{
+	c := &Config{
 		GithubUsername:    "user",
 		APIKey:            "MyKey",
 		ExercismDirectory: "/exercism/directory",
@@ -52,7 +52,7 @@ func TestReadingWritingConfig(t *testing.T) {
 
 func TestDecodingConfig(t *testing.T) {
 	unsanitizedJSON := `{"githubUsername":"user ","apiKey":"MyKey  ","exercismDirectory":"/exercism/directory\r\n","hostname":"localhost \r\n"}`
-	sanitizedConfig := Config{
+	sanitizedConfig := &Config{
 		GithubUsername:    "user",
 		APIKey:            "MyKey",
 		ExercismDirectory: "/exercism/directory",
