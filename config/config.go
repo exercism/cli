@@ -50,7 +50,7 @@ func (c Config) ToFile(path string) error {
 }
 
 // FromFile loads a Config object from a JSON file.
-func FromFile(path string) (c *Config, err error) {
+func FromFile(path string) (*Config, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -100,17 +100,16 @@ func Filename(dir string) string {
 }
 
 // Demo is a default configuration for unauthenticated users.
-func Demo() (c *Config, err error) {
+func Demo() (*Config, error) {
 	demoDir, err := demoDirectory()
 	if err != nil {
-		return
+		return nil, err
 	}
-	c = &Config{
+	return &Config{
 		Hostname:          Host,
 		APIKey:            "",
 		ExercismDirectory: demoDir,
-	}
-	return
+	}, err
 }
 
 // ReplaceTilde replaces the short-hand home path with the absolute path.
@@ -118,13 +117,12 @@ func ReplaceTilde(oldPath string) string {
 	return strings.Replace(oldPath, "~/", HomeDir()+"/", 1)
 }
 
-func demoDirectory() (dir string, err error) {
-	dir, err = os.Getwd()
+func demoDirectory() (string, error) {
+	dir, err := os.Getwd()
 	if err != nil {
-		return
+		return "", err
 	}
-	dir = filepath.Join(dir, DemoDirname)
-	return
+	return filepath.Join(dir, DemoDirname), nil
 }
 
 func (c *Config) sanitize() {
