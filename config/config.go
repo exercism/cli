@@ -37,7 +37,7 @@ type Config struct {
 func (c Config) ToFile(path string) error {
 	if path == "" {
 		path = WithDefaultPath(path)
-		err := NormalizeConfig(HomeDir())
+		err := normalizeFilename(HomeDir())
 		if err != nil {
 			return err
 		}
@@ -60,7 +60,7 @@ func (c Config) ToFile(path string) error {
 func FromFile(path string) (*Config, error) {
 	if path == "" {
 		path = WithDefaultPath(path)
-		err := NormalizeConfig(HomeDir())
+		err := normalizeFilename(HomeDir())
 		if err != nil {
 			return nil, err
 		}
@@ -140,7 +140,7 @@ func ReplaceTilde(oldPath string) string {
 	return strings.Replace(oldPath, "~/", HomeDir()+"/", 1)
 }
 
-func NormalizeConfig(path string) error {
+func normalizeFilename(path string) error {
 	var err error
 
 	fi, err := os.Stat(path)
