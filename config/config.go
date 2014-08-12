@@ -95,6 +95,7 @@ func Decode(r io.Reader) (*Config, error) {
 	return c, err
 }
 
+// WithDefaultPath returns the default configuration path if none is provided.
 func WithDefaultPath(p string) string {
 	if p == "" {
 		return Filename(HomeDir())
@@ -103,7 +104,7 @@ func WithDefaultPath(p string) string {
 	}
 }
 
-// HomeDir return's the user's canonical home directory.
+// HomeDir returns the user's canonical home directory.
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 // we can't cross compile using cgo and use user.Current()
 func HomeDir() string {
