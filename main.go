@@ -361,7 +361,11 @@ func login(path string) (*config.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	c.ToFile(path)
+	err = c.ToFile(path)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("Your credentials have been written to %s\n", path)
 	fmt.Printf("Your exercism directory can be found at %s\n", c.ExercismDirectory)
 	return c, nil
 }

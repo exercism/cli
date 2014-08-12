@@ -45,7 +45,6 @@ func (c Config) ToFile(path string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Your credentials have been written to %s\n", path)
 	return nil
 }
 
