@@ -155,10 +155,14 @@ func normalizeFilename(path string) error {
 	currentPath := filepath.Join(path, File)
 	oldPath := filepath.Join(path, LegacyFile)
 
-	// Do nothing if we already have a current config file
 	_, err = os.Stat(currentPath)
-	if !os.IsNotExist(err) {
+	// Do nothing nil means we already have a current config file
+	if err == nil {
 		return nil
+	}
+	// return any error unless the error is because the file is missing
+	if err != nil && !os.IsNotExist(err) {
+		return err
 	}
 
 	// Do nothing if we have no old file to rename
