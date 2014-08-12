@@ -173,11 +173,10 @@ func normalizeFilename(path string) error {
 	}
 
 	err = os.Rename(oldPath, currentPath)
-	if err == nil {
-		fmt.Printf("renamed %s to %s\n", oldPath, currentPath)
-	} else {
+	if err != nil {
 		return err
 	}
+	fmt.Printf("renamed %s to %s\n", oldPath, currentPath)
 
 	return nil
 }
