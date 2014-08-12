@@ -99,9 +99,9 @@ func Decode(r io.Reader) (*Config, error) {
 func WithDefaultPath(p string) string {
 	if p == "" {
 		return Filename(HomeDir())
-	} else {
-		return p
 	}
+
+	return p
 }
 
 // HomeDir returns the user's canonical home directory.
