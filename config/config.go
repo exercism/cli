@@ -14,7 +14,8 @@ import (
 const (
 	// File is the default name of the JSON file where the config written.
 	// The user can pass an alternate filename when using the CLI.
-	File = ".exercism.json"
+	File       = ".exercism.json"
+	LegacyFile = ".exercism.go"
 	// Host is the default hostname for fetching problems and submitting exercises.
 	// TODO: We need to operate against two hosts (one for problems and one for submissions),
 	// or define a proxy that both APIs can go through.
@@ -151,8 +152,8 @@ func normalizeFilename(path string) error {
 		return errors.New("expected path to be a directory")
 	}
 
-	currentPath := filepath.Join(path, ".exercism.json")
-	oldPath := filepath.Join(path, ".exercism.go")
+	currentPath := filepath.Join(path, File)
+	oldPath := filepath.Join(path, LegacyFile)
 
 	// Do nothing if we already have a current config file
 	_, err = os.Stat(currentPath)

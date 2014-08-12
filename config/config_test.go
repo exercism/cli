@@ -126,8 +126,8 @@ func withPreparedConfigDir(t *testing.T, jsonExists, goExists bool, fn func(conf
 	tmpDir, err := ioutil.TempDir("", "")
 	assert.NoError(t, err)
 
-	jsonPath := filepath.Join(tmpDir, ".exercism.json")
-	goPath := filepath.Join(tmpDir, ".exercism.go")
+	jsonPath := filepath.Join(tmpDir, File)
+	goPath := filepath.Join(tmpDir, LegacyFile)
 
 	if jsonExists {
 		f, err := os.Create(jsonPath)
