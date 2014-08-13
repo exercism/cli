@@ -52,7 +52,6 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "config, c",
-			Value: config.Filename(config.HomeDir()),
 			Usage: "path to config file",
 		},
 	}
@@ -197,7 +196,7 @@ func main() {
 			ShortName: "l",
 			Usage:     "Save exercism.io api credentials",
 			Action: func(ctx *cli.Context) {
-				_, err := login(ctx.GlobalString("config"))
+				_, err := login(config.WithDefaultPath(ctx.GlobalString("config")))
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -208,7 +207,7 @@ func main() {
 			ShortName: "o",
 			Usage:     "Clear exercism.io api credentials",
 			Action: func(ctx *cli.Context) {
-				logout(ctx.GlobalString("config"))
+				logout(config.WithDefaultPath(ctx.GlobalString("config")))
 			},
 		},
 		{
