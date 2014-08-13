@@ -42,6 +42,7 @@ var testExtensions = map[string]string{
 	"python":  "_test.py",
 	"go":      "_test.go",
 	"haskell": "_test.hs",
+	"cpp":     "_test.cpp",
 }
 
 func main() {
