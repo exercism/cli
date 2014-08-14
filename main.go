@@ -20,7 +20,7 @@ const (
 	// We try to follow Semantic Versioning (http://semver.org),
 	// but with the http://exercism.io app being a prototype, a
 	// lot of things get out of hand.
-	Version = "1.6.2"
+	Version = "1.6.3"
 	// UserAgent is sent along as a header to HTTP requests that the
 	// CLI makes. This helps with debugging.
 	UserAgent = "github.com/exercism/cli v" + Version
