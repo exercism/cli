@@ -111,11 +111,7 @@ func main() {
 				configPath := ctx.GlobalString("config")
 				c, err := config.FromFile(configPath)
 				if err != nil {
-					c, err = config.Demo()
-					if err != nil {
-						fmt.Println(err)
-						return
-					}
+					c = config.Demo()
 				}
 				assignments, err := FetchAssignments(c, FetchEndpoints["demo"])
 				if err != nil {
@@ -156,11 +152,7 @@ func main() {
 							return
 						}
 					} else {
-						c, err = config.Demo()
-						if err != nil {
-							fmt.Println(err)
-							return
-						}
+						c = config.Demo()
 					}
 				}
 
