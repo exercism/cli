@@ -134,16 +134,12 @@ func Filename(dir string) string {
 }
 
 // Demo is a default configuration for unauthenticated users.
-func Demo() (*Config, error) {
-	demoDir, err := demoDirectory()
-	if err != nil {
-		return nil, err
-	}
+func Demo() *Config {
 	return &Config{
 		Hostname:          Host,
 		APIKey:            "",
-		ExercismDirectory: demoDir,
-	}, err
+		ExercismDirectory: demoDirectory(),
+	}
 }
 
 // ReplaceTilde replaces the short-hand home path with the absolute path.
@@ -190,12 +186,8 @@ func normalizeFilename(path string) error {
 	return nil
 }
 
-func demoDirectory() (string, error) {
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(dir, DemoDirname), nil
+func demoDirectory() string {
+	return filepath.Join(HomeDir(), DemoDirname)
 }
 
 func (c *Config) sanitize() {
