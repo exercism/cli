@@ -27,6 +27,15 @@ func TestDemoDir(t *testing.T) {
 	assert.Equal(t, demoDir, path)
 }
 
+func TestDefaultAssignmentPath(t *testing.T) {
+	homeDir, err := os.Getwd()
+	assert.NoError(t, err)
+
+	path := DefaultAssignmentPath()
+
+	assert.Equal(t, filepath.Join(homeDir, AssignmentDirname), path)
+}
+
 func TestExpandsTildeInExercismDirectory(t *testing.T) {
 	expandedDir := ReplaceTilde("~/exercism/directory")
 	assert.NotContains(t, "~", expandedDir)

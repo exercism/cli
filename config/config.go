@@ -22,6 +22,9 @@ const (
 	Host = "http://exercism.io"
 	// DemoDirname is the default directory to download problems to.
 	DemoDirname = "exercism-demo"
+
+	// AssignmentDirname is the default name of the directory for active users.
+	AssignmentDirname = "exercism"
 )
 
 // Config represents the settings for particular user.
@@ -144,6 +147,11 @@ func Demo() *Config {
 		APIKey:            "",
 		ExercismDirectory: demoDirectory(),
 	}
+}
+
+// DefaultAssignmentPath returns the absolute path of the default exercism directory
+func DefaultAssignmentPath() string {
+	return filepath.Join(HomeDir(), AssignmentDirname)
 }
 
 // ReplaceTilde replaces the short-hand home path with the absolute path.
