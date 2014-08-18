@@ -104,27 +104,31 @@ func WithDefaultPath(p string) string {
 	return p
 }
 
+var homeDir string
+
 // HomeDir returns the user's canonical home directory.
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 // we can't cross compile using cgo and use user.Current()
 func HomeDir() string {
-	var home string
+	if homeDir != "" {
+		return homeDir
+	}
 
 	if runtime.GOOS == "windows" {
-		home = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if home == "" {
-			home = os.Getenv("USERPROFILE")
+		homeDir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if homeDir == "" {
+			homeDir = os.Getenv("USERPROFILE")
 		}
 	} else {
-		home = os.Getenv("HOME")
+		homeDir = os.Getenv("HOME")
 	}
 
 	// TODO should we fall back to the CWD instead ?
-	if home == "" {
+	if homeDir == "" {
 		panic("unable to determine the location of your home directory")
 	}
 
-	return home
+	return homeDir
 
 }
 

@@ -5,34 +5,21 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDemoDir(t *testing.T) {
-	// TODO need to implement better $HOME handling for this to work
-	if runtime.GOOS == "windows" {
-		t.Skip("This test cannot currently be run on windows")
-	}
-
 	path, err := ioutil.TempDir("", "")
 	assert.NoError(t, err)
 
 	err = os.Chdir(path)
 	assert.NoError(t, err)
 
-	// put the old home back when we're done
-	oldHome := os.Getenv("HOME")
-	defer func() {
-		os.Setenv("HOME", oldHome)
-	}()
-
 	path, err = filepath.EvalSymlinks(path)
 	assert.NoError(t, err)
-
-	os.Setenv("HOME", path)
+	homeDir = path
 
 	path = filepath.Join(path, "exercism-demo")
 
