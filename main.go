@@ -111,11 +111,7 @@ func main() {
 				configPath := ctx.GlobalString("config")
 				c, err := config.FromFile(configPath)
 				if err != nil {
-					c, err = config.Demo()
-					if err != nil {
-						fmt.Println(err)
-						return
-					}
+					c = config.Demo()
 				}
 				assignments, err := FetchAssignments(c, FetchEndpoints["demo"])
 				if err != nil {
@@ -156,11 +152,7 @@ func main() {
 							return
 						}
 					} else {
-						c, err = config.Demo()
-						if err != nil {
-							fmt.Println(err)
-							return
-						}
+						c = config.Demo()
 					}
 				}
 
@@ -388,13 +380,8 @@ func askForConfigInfo() (*config.Config, error) {
 
 	bio := bufio.NewReader(os.Stdin)
 
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return nil, err
-	}
-
 	fmt.Print("Your GitHub username: ")
-	un, err = bio.ReadString('\n')
+	un, err := bio.ReadString('\n')
 	if err != nil {
 		return nil, err
 	}
@@ -406,7 +393,7 @@ func askForConfigInfo() (*config.Config, error) {
 	}
 
 	fmt.Println("What is your exercism exercises project path?")
-	fmt.Printf("Press Enter to select the default (%s):\n", currentDir)
+	fmt.Printf("Press Enter to select the default (%s):\n", config.DefaultAssignmentPath())
 	fmt.Print("> ")
 	dir, err = bio.ReadString('\n')
 	if err != nil {
@@ -418,7 +405,7 @@ func askForConfigInfo() (*config.Config, error) {
 	dir = strings.TrimRight(dir, delim)
 
 	if dir == "" {
-		dir = currentDir
+		dir = config.DefaultAssignmentPath()
 	}
 
 	dir = config.ReplaceTilde(dir)

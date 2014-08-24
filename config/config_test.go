@@ -13,16 +13,27 @@ import (
 func TestDemoDir(t *testing.T) {
 	path, err := ioutil.TempDir("", "")
 	assert.NoError(t, err)
-	os.Chdir(path)
+
+	err = os.Chdir(path)
+	assert.NoError(t, err)
 
 	path, err = filepath.EvalSymlinks(path)
 	assert.NoError(t, err)
+	homeDir = path
 
 	path = filepath.Join(path, "exercism-demo")
 
-	demoDir, err := demoDirectory()
-	assert.NoError(t, err)
+	demoDir := demoDirectory()
 	assert.Equal(t, demoDir, path)
+}
+
+func TestDefaultAssignmentPath(t *testing.T) {
+	homeDir, err := os.Getwd()
+	assert.NoError(t, err)
+
+	path := DefaultAssignmentPath()
+
+	assert.Equal(t, filepath.Join(homeDir, AssignmentDirname), path)
 }
 
 func TestExpandsTildeInExercismDirectory(t *testing.T) {

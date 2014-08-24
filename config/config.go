@@ -22,6 +22,9 @@ const (
 	Host = "http://exercism.io"
 	// DemoDirname is the default directory to download problems to.
 	DemoDirname = "exercism-demo"
+
+	// AssignmentDirname is the default name of the directory for active users.
+	AssignmentDirname = "exercism"
 )
 
 // Config represents the settings for particular user.
@@ -104,19 +107,32 @@ func WithDefaultPath(p string) string {
 	return p
 }
 
+var homeDir string
+
 // HomeDir returns the user's canonical home directory.
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 // we can't cross compile using cgo and use user.Current()
 func HomeDir() string {
-	if runtime.GOOS == "windows" {
-		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if home == "" {
-			home = os.Getenv("USERPROFILE")
-		}
-		return home
+	if homeDir != "" {
+		return homeDir
 	}
 
-	return os.Getenv("HOME")
+	if runtime.GOOS == "windows" {
+		homeDir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if homeDir == "" {
+			homeDir = os.Getenv("USERPROFILE")
+		}
+	} else {
+		homeDir = os.Getenv("HOME")
+	}
+
+	// TODO should we fall back to the CWD instead ?
+	if homeDir == "" {
+		panic("unable to determine the location of your home directory")
+	}
+
+	return homeDir
+
 }
 
 // Filename is the name of the JSON file containing the user's config.
@@ -125,16 +141,17 @@ func Filename(dir string) string {
 }
 
 // Demo is a default configuration for unauthenticated users.
-func Demo() (*Config, error) {
-	demoDir, err := demoDirectory()
-	if err != nil {
-		return nil, err
-	}
+func Demo() *Config {
 	return &Config{
 		Hostname:          Host,
 		APIKey:            "",
-		ExercismDirectory: demoDir,
-	}, err
+		ExercismDirectory: demoDirectory(),
+	}
+}
+
+// DefaultAssignmentPath returns the absolute path of the default exercism directory
+func DefaultAssignmentPath() string {
+	return filepath.Join(HomeDir(), AssignmentDirname)
 }
 
 // ReplaceTilde replaces the short-hand home path with the absolute path.
@@ -181,12 +198,8 @@ func normalizeFilename(path string) error {
 	return nil
 }
 
-func demoDirectory() (string, error) {
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(dir, DemoDirname), nil
+func demoDirectory() string {
+	return filepath.Join(HomeDir(), DemoDirname)
 }
 
 func (c *Config) sanitize() {
