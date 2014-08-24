@@ -35,15 +35,48 @@ func TestLogoutDeletesConfigFile(t *testing.T) {
 }
 
 func TestAskForConfigInfoAllowsSpaces(t *testing.T) {
-	oldStdin := os.Stdin
 	dirName := "dirname with spaces"
 	userName := "TestUsername"
 	apiKey := "abc123"
 
+	c := respondToAskForConfig(t, fmt.Sprintf("%s\r\n%s\r\n%s\r\n", userName, apiKey, dirName))
+	absoluteDirName, _ := absolutePath(dirName)
+	_, err := os.Stat(absoluteDirName)
+	if err != nil {
+		t.Errorf("Excercism directory [%s] was not created.", absoluteDirName)
+	}
+	os.Remove(absoluteDirName)
+
+	assert.Equal(t, c.ExercismDirectory, absoluteDirName)
+	assert.Equal(t, c.GithubUsername, userName)
+	assert.Equal(t, c.APIKey, apiKey)
+}
+
+func TestAskForConfigInfoDefaultPath(t *testing.T) {
+	dirName := ""
+	userName := "TestUsername"
+	apiKey := "abc123"
+
+	c := respondToAskForConfig(t, fmt.Sprintf("%s\r\n%s\r\n%s\r\n", userName, apiKey, dirName))
+	absoluteDirName := config.DefaultAssignmentPath()
+	_, err := os.Stat(absoluteDirName)
+	if err != nil {
+		t.Errorf("Excercism directory [%s] was not created.", absoluteDirName)
+	}
+	os.Remove(absoluteDirName)
+
+	assert.Equal(t, c.ExercismDirectory, absoluteDirName)
+	assert.Equal(t, c.GithubUsername, userName)
+	assert.Equal(t, c.APIKey, apiKey)
+}
+
+func respondToAskForConfig(t *testing.T, input string) *config.Config {
+	oldStdin := os.Stdin
+
 	fakeStdin, err := ioutil.TempFile("", "stdin_mock")
 	assert.NoError(t, err)
 
-	fakeStdin.WriteString(fmt.Sprintf("%s\r\n%s\r\n%s\r\n", userName, apiKey, dirName))
+	fakeStdin.WriteString(input)
 	assert.NoError(t, err)
 
 	_, err = fakeStdin.Seek(0, os.SEEK_SET)
@@ -58,17 +91,9 @@ func TestAskForConfigInfoAllowsSpaces(t *testing.T) {
 		t.Errorf("Error asking for configuration info [%v]", err)
 	}
 	os.Stdin = oldStdin
-	absoluteDirName, _ := absolutePath(dirName)
-	_, err = os.Stat(absoluteDirName)
-	if err != nil {
-		t.Errorf("Excercism directory [%s] was not created.", absoluteDirName)
-	}
-	os.Remove(absoluteDirName)
 	os.Remove(fakeStdin.Name())
 
-	assert.Equal(t, c.ExercismDirectory, absoluteDirName)
-	assert.Equal(t, c.GithubUsername, userName)
-	assert.Equal(t, c.APIKey, apiKey)
+	return c
 }
 
 var assignmentsJSON = `
