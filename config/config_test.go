@@ -10,32 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDemoDir(t *testing.T) {
-	path, err := ioutil.TempDir("", "")
-	assert.NoError(t, err)
-
-	err = os.Chdir(path)
-	assert.NoError(t, err)
-
-	path, err = filepath.EvalSymlinks(path)
-	assert.NoError(t, err)
-	homeDir = path
-
-	path = filepath.Join(path, "exercism-demo")
-
-	demoDir := demoDirectory()
-	assert.Equal(t, demoDir, path)
-}
-
-func TestDefaultAssignmentPath(t *testing.T) {
-	homeDir, err := os.Getwd()
-	assert.NoError(t, err)
-
-	path := DefaultAssignmentPath()
-
-	assert.Equal(t, filepath.Join(homeDir, AssignmentDirname), path)
-}
-
 func TestExpandsTildeInExercismDirectory(t *testing.T) {
 	expandedDir := ReplaceTilde("~/exercism/directory")
 	assert.NotContains(t, "~", expandedDir)
