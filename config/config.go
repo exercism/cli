@@ -20,11 +20,9 @@ const (
 	// TODO: We need to operate against two hosts (one for problems and one for submissions),
 	// or define a proxy that both APIs can go through.
 	Host = "http://exercism.io"
-	// DemoDirname is the default directory to download problems to.
-	DemoDirname = "exercism-demo"
 
-	// AssignmentDirname is the default name of the directory for active users.
-	AssignmentDirname = "exercism"
+	// DirExercises is the default name of the directory for active users.
+	DirExercises = "exercism"
 )
 
 // Config represents the settings for particular user.
@@ -106,16 +104,11 @@ func WithDefaultPath(p string) string {
 	return p
 }
 
-var homeDir string
-
 // HomeDir returns the user's canonical home directory.
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 // we can't cross compile using cgo and use user.Current()
 func HomeDir() string {
-	if homeDir != "" {
-		return homeDir
-	}
-
+	var homeDir string
 	if runtime.GOOS == "windows" {
 		homeDir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
 		if homeDir == "" {
@@ -144,13 +137,13 @@ func Demo() *Config {
 	return &Config{
 		Hostname:          Host,
 		APIKey:            "",
-		ExercismDirectory: demoDirectory(),
+		ExercismDirectory: DefaultAssignmentPath(),
 	}
 }
 
 // DefaultAssignmentPath returns the absolute path of the default exercism directory
 func DefaultAssignmentPath() string {
-	return filepath.Join(HomeDir(), AssignmentDirname)
+	return filepath.Join(HomeDir(), DirExercises)
 }
 
 // ReplaceTilde replaces the short-hand home path with the absolute path.
@@ -195,10 +188,6 @@ func normalizeFilename(path string) error {
 	fmt.Printf("renamed %s to %s\n", oldPath, currentPath)
 
 	return nil
-}
-
-func demoDirectory() string {
-	return filepath.Join(HomeDir(), DemoDirname)
 }
 
 func (c *Config) sanitize() {
