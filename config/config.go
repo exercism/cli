@@ -31,7 +31,6 @@ const (
 // This defines both the auth for talking to the API, as well as
 // where to put problems that get downloaded.
 type Config struct {
-	GithubUsername    string `json:"githubUsername"`
 	APIKey            string `json:"apiKey"`
 	ExercismDirectory string `json:"exercismDirectory"`
 	Hostname          string `json:"hostname"`
@@ -203,7 +202,6 @@ func demoDirectory() string {
 }
 
 func (c *Config) sanitize() {
-	c.GithubUsername = sanitizeField(c.GithubUsername)
 	c.APIKey = sanitizeField(c.APIKey)
 	c.ExercismDirectory = sanitizeField(c.ExercismDirectory)
 	c.Hostname = sanitizeField(c.Hostname)

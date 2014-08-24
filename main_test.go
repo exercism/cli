@@ -36,10 +36,9 @@ func TestLogoutDeletesConfigFile(t *testing.T) {
 
 func TestAskForConfigInfoAllowsSpaces(t *testing.T) {
 	dirName := "dirname with spaces"
-	userName := "TestUsername"
 	apiKey := "abc123"
 
-	c := respondToAskForConfig(t, fmt.Sprintf("%s\r\n%s\r\n%s\r\n", userName, apiKey, dirName))
+	c := respondToAskForConfig(t, fmt.Sprintf("%s\r\n%s\r\n", apiKey, dirName))
 	absoluteDirName, _ := absolutePath(dirName)
 	_, err := os.Stat(absoluteDirName)
 	if err != nil {
@@ -48,16 +47,14 @@ func TestAskForConfigInfoAllowsSpaces(t *testing.T) {
 	os.Remove(absoluteDirName)
 
 	assert.Equal(t, c.ExercismDirectory, absoluteDirName)
-	assert.Equal(t, c.GithubUsername, userName)
 	assert.Equal(t, c.APIKey, apiKey)
 }
 
 func TestAskForConfigInfoDefaultPath(t *testing.T) {
 	dirName := ""
-	userName := "TestUsername"
 	apiKey := "abc123"
 
-	c := respondToAskForConfig(t, fmt.Sprintf("%s\r\n%s\r\n%s\r\n", userName, apiKey, dirName))
+	c := respondToAskForConfig(t, fmt.Sprintf("%s\r\n%s\r\n", apiKey, dirName))
 	absoluteDirName := config.DefaultAssignmentPath()
 	_, err := os.Stat(absoluteDirName)
 	if err != nil {
@@ -66,7 +63,6 @@ func TestAskForConfigInfoDefaultPath(t *testing.T) {
 	os.Remove(absoluteDirName)
 
 	assert.Equal(t, c.ExercismDirectory, absoluteDirName)
-	assert.Equal(t, c.GithubUsername, userName)
 	assert.Equal(t, c.APIKey, apiKey)
 }
 

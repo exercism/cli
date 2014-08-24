@@ -321,25 +321,6 @@ func main() {
 				fmt.Println("The last submission was successfully deleted.")
 			},
 		},
-		{
-			Name:      "whoami",
-			ShortName: "w",
-			Usage:     "Get the github username that you are logged in as",
-			Action: func(ctx *cli.Context) {
-				configPath := ctx.GlobalString("config")
-				c, err := config.FromFile(configPath)
-				if err != nil {
-					fmt.Println("Are you sure you are logged in? Please login again.")
-					c, err = login(configPath)
-					if err != nil {
-						fmt.Println(err)
-						return
-					}
-				}
-
-				fmt.Println(c.GithubUsername)
-			},
-		},
 	}
 	err := app.Run(os.Args)
 	if err != nil {
@@ -375,19 +356,13 @@ func absolutePath(path string) (string, error) {
 }
 
 func askForConfigInfo() (*config.Config, error) {
-	var un, key, dir string
+	var key, dir string
 	delim := "\r\n"
 
 	bio := bufio.NewReader(os.Stdin)
 
-	fmt.Print("Your GitHub username: ")
-	un, err := bio.ReadString('\n')
-	if err != nil {
-		return nil, err
-	}
-
 	fmt.Print("Your Exercism API key (found at http://exercism.io/account): ")
-	key, err = bio.ReadString('\n')
+	key, err := bio.ReadString('\n')
 	if err != nil {
 		return nil, err
 	}
@@ -401,7 +376,6 @@ func askForConfigInfo() (*config.Config, error) {
 	}
 
 	key = strings.TrimRight(key, delim)
-	un = strings.TrimRight(un, delim)
 	dir = strings.TrimRight(dir, delim)
 
 	if dir == "" {
@@ -422,7 +396,6 @@ func askForConfigInfo() (*config.Config, error) {
 	}
 
 	return &config.Config{
-		GithubUsername:    un,
 		APIKey:            key,
 		ExercismDirectory: dir,
 		Hostname:          "http://exercism.io",
