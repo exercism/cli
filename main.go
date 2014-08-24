@@ -70,6 +70,10 @@ func main() {
 				}
 
 				configPath := ctx.GlobalString("config")
+				err := config.NormalizeFilename(configPath)
+				if err != nil {
+					fmt.Println(err)
+				}
 				c, err := config.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
@@ -109,6 +113,10 @@ func main() {
 			Usage:     "Fetch first assignment for each language from exercism.io",
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
+				err := config.NormalizeFilename(configPath)
+				if err != nil {
+					fmt.Println(err)
+				}
 				c, err := config.FromFile(configPath)
 				if err != nil {
 					c = config.Demo()
@@ -142,6 +150,10 @@ func main() {
 				}
 
 				configPath := ctx.GlobalString("config")
+				err := config.NormalizeFilename(configPath)
+				if err != nil {
+					fmt.Println(err)
+				}
 				c, err := config.FromFile(configPath)
 				if err != nil {
 					if argCount == 0 || argCount == 1 {
@@ -189,7 +201,11 @@ func main() {
 			ShortName: "l",
 			Usage:     "Save exercism.io api credentials",
 			Action: func(ctx *cli.Context) {
-				_, err := login(config.WithDefaultPath(ctx.GlobalString("config")))
+				configPath := ctx.GlobalString("config")
+				// ignore errors, we're just going to overwrite it anyway
+				config.NormalizeFilename(configPath)
+
+				_, err := login(config.WithDefaultPath(configPath))
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -200,7 +216,13 @@ func main() {
 			ShortName: "o",
 			Usage:     "Clear exercism.io api credentials",
 			Action: func(ctx *cli.Context) {
-				logout(config.WithDefaultPath(ctx.GlobalString("config")))
+				configPath := ctx.GlobalString("config")
+				err := config.NormalizeFilename(configPath)
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				logout(config.WithDefaultPath(configPath))
 			},
 		},
 		{
@@ -213,6 +235,10 @@ func main() {
 				"submitted version, first move that file out of the way, then call restore.",
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
+				err := config.NormalizeFilename(configPath)
+				if err != nil {
+					fmt.Println(err)
+				}
 				c, err := config.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
@@ -245,6 +271,10 @@ func main() {
 			Usage:     "Submit code to exercism.io on your current assignment",
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
+				err := config.NormalizeFilename(configPath)
+				if err != nil {
+					fmt.Println(err)
+				}
 				c, err := config.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
@@ -303,6 +333,10 @@ func main() {
 			Usage:     "Delete the last submission",
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
+				err := config.NormalizeFilename(configPath)
+				if err != nil {
+					fmt.Println(err)
+				}
 				c, err := config.FromFile(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
