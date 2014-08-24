@@ -36,12 +36,10 @@ type Config struct {
 
 // ToFile writes a Config to a JSON file.
 func (c Config) ToFile(path string) error {
-	if path == "" {
-		path = WithDefaultPath(path)
-		err := normalizeFilename(HomeDir())
-		if err != nil {
-			return err
-		}
+	path = WithDefaultPath(path)
+	err := normalizeFilename(homeDir())
+	if err != nil {
+		return err
 	}
 
 	f, err := os.Create(path) // truncates existing file if it exists
@@ -59,12 +57,10 @@ func (c Config) ToFile(path string) error {
 
 // FromFile loads a Config object from a JSON file.
 func FromFile(path string) (*Config, error) {
-	if path == "" {
-		path = WithDefaultPath(path)
-		err := normalizeFilename(HomeDir())
-		if err != nil {
-			return nil, err
-		}
+	path = WithDefaultPath(path)
+	err := normalizeFilename(homeDir())
+	if err != nil {
+		return nil, err
 	}
 
 	f, err := os.Open(path)
@@ -98,38 +94,31 @@ func Decode(r io.Reader) (*Config, error) {
 // WithDefaultPath returns the default configuration path if none is provided.
 func WithDefaultPath(p string) string {
 	if p == "" {
-		return Filename(HomeDir())
+		return fmt.Sprintf("%s/%s", homeDir(), File)
 	}
 
 	return p
 }
 
-// HomeDir returns the user's canonical home directory.
+// homeDir returns the user's canonical home directory.
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 // we can't cross compile using cgo and use user.Current()
-func HomeDir() string {
-	var homeDir string
+func homeDir() string {
+	var dir string
 	if runtime.GOOS == "windows" {
-		homeDir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if homeDir == "" {
-			homeDir = os.Getenv("USERPROFILE")
+		dir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if dir == "" {
+			dir = os.Getenv("USERPROFILE")
 		}
 	} else {
-		homeDir = os.Getenv("HOME")
+		dir = os.Getenv("HOME")
 	}
 
-	// TODO should we fall back to the CWD instead ?
-	if homeDir == "" {
+	if dir == "" {
 		panic("unable to determine the location of your home directory")
 	}
 
-	return homeDir
-
-}
-
-// Filename is the name of the JSON file containing the user's config.
-func Filename(dir string) string {
-	return fmt.Sprintf("%s/%s", dir, File)
+	return dir
 }
 
 // Demo is a default configuration for unauthenticated users.
@@ -143,12 +132,12 @@ func Demo() *Config {
 
 // DefaultAssignmentPath returns the absolute path of the default exercism directory
 func DefaultAssignmentPath() string {
-	return filepath.Join(HomeDir(), DirExercises)
+	return filepath.Join(homeDir(), DirExercises)
 }
 
 // ReplaceTilde replaces the short-hand home path with the absolute path.
 func ReplaceTilde(oldPath string) string {
-	return strings.Replace(oldPath, "~/", HomeDir()+"/", 1)
+	return strings.Replace(oldPath, "~/", homeDir()+"/", 1)
 }
 
 func normalizeFilename(path string) error {
