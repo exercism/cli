@@ -73,6 +73,7 @@ func main() {
 				err := config.NormalizeFilename(configPath)
 				if err != nil {
 					fmt.Println(err)
+					return
 				}
 				c, err := config.FromFile(configPath)
 				if err != nil {
@@ -116,6 +117,7 @@ func main() {
 				err := config.NormalizeFilename(configPath)
 				if err != nil {
 					fmt.Println(err)
+					return
 				}
 				c, err := config.FromFile(configPath)
 				if err != nil {
@@ -153,6 +155,7 @@ func main() {
 				err := config.NormalizeFilename(configPath)
 				if err != nil {
 					fmt.Println(err)
+					return
 				}
 				c, err := config.FromFile(configPath)
 				if err != nil {
