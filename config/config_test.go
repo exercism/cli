@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -17,7 +18,7 @@ func TestExpandsTildeInExercismDirectory(t *testing.T) {
 
 func TestReadingWritingConfig(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "")
-	filename := Filename(tmpDir)
+	filename := fmt.Sprintf("%s/%s", tmpDir, File)
 	assert.NoError(t, err)
 
 	c := &Config{

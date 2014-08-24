@@ -31,7 +31,8 @@ func TestLogoutDeletesConfigFile(t *testing.T) {
 
 	logout(tmpDir)
 
-	assertFileDoesNotExist(t, config.Filename(tmpDir))
+	file := fmt.Sprintf("%s/%s", tmpDir, config.File)
+	assertFileDoesNotExist(t, file)
 }
 
 func TestAskForConfigInfoAllowsSpaces(t *testing.T) {
