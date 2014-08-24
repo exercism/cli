@@ -136,13 +136,11 @@ func DefaultAssignmentPath() string {
 }
 
 // ReplaceTilde replaces the short-hand home path with the absolute path.
-func ReplaceTilde(oldPath string) string {
-	return strings.Replace(oldPath, "~/", homeDir()+"/", 1)
+func ReplaceTilde(path string) string {
+	return strings.Replace(path, "~/", homeDir()+"/", 1)
 }
 
 func normalizeFilename(path string) error {
-	var err error
-
 	fi, err := os.Stat(path)
 	if err != nil {
 		return err
@@ -151,40 +149,27 @@ func normalizeFilename(path string) error {
 		return errors.New("expected path to be a directory")
 	}
 
-	currentPath := filepath.Join(path, File)
-	oldPath := filepath.Join(path, LegacyFile)
+	correctPath := filepath.Join(path, File)
+	legacyPath := filepath.Join(path, LegacyFile)
 
-	_, err = os.Stat(currentPath)
-	// Do nothing nil means we already have a current config file
+	_, err = os.Stat(correctPath)
 	if err == nil {
 		return nil
 	}
-	// return any error unless the error is because the file is missing
-	if err != nil && !os.IsNotExist(err) {
+	if !os.IsNotExist(err) {
 		return err
 	}
 
-	// Do nothing if we have no old file to rename
-	_, err = os.Stat(oldPath)
+	_, err = os.Stat(legacyPath)
 	if os.IsNotExist(err) {
 		return nil
 	}
 
-	err = os.Rename(oldPath, currentPath)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("renamed %s to %s\n", oldPath, currentPath)
-
-	return nil
+	return os.Rename(legacyPath, correctPath)
 }
 
 func (c *Config) sanitize() {
-	c.APIKey = sanitizeField(c.APIKey)
-	c.ExercismDirectory = sanitizeField(c.ExercismDirectory)
-	c.Hostname = sanitizeField(c.Hostname)
-}
-
-func sanitizeField(v string) string {
-	return strings.TrimSpace(v)
+	c.APIKey = strings.TrimSpace(c.APIKey)
+	c.ExercismDirectory = strings.TrimSpace(c.ExercismDirectory)
+	c.Hostname = strings.TrimSpace(c.Hostname)
 }
