@@ -67,7 +67,7 @@ func TestEncodingConfig(t *testing.T) {
 
 func TestNormalizeGoPresent(t *testing.T) {
 	withPreparedConfigDir(t, false, true, func(confDir, jsonPath, goPath string) {
-		err := normalizeFilename(confDir)
+		err := NormalizeFilename(confDir)
 		assert.NoError(t, err)
 
 		assertFileExists(t, jsonPath)
@@ -77,7 +77,7 @@ func TestNormalizeGoPresent(t *testing.T) {
 
 func TestNormalizeJsonPresent(t *testing.T) {
 	withPreparedConfigDir(t, true, false, func(confDir, jsonPath, goPath string) {
-		err := normalizeFilename(confDir)
+		err := NormalizeFilename(confDir)
 		assert.NoError(t, err)
 
 		assertFileExists(t, jsonPath)
@@ -87,7 +87,7 @@ func TestNormalizeJsonPresent(t *testing.T) {
 
 func TestNormalizeBothPresent(t *testing.T) {
 	withPreparedConfigDir(t, true, true, func(confDir, jsonPath, goPath string) {
-		err := normalizeFilename(confDir)
+		err := NormalizeFilename(confDir)
 		assert.NoError(t, err)
 
 		assertFileExists(t, jsonPath)
@@ -97,7 +97,7 @@ func TestNormalizeBothPresent(t *testing.T) {
 
 func TestNormalizeNeitherPresent(t *testing.T) {
 	withPreparedConfigDir(t, false, false, func(confDir, jsonPath, goPath string) {
-		err := normalizeFilename(confDir)
+		err := NormalizeFilename(confDir)
 		assert.NoError(t, err)
 
 		assertNoFileExists(t, jsonPath)

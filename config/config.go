@@ -37,11 +37,6 @@ type Config struct {
 // ToFile writes a Config to a JSON file.
 func (c Config) ToFile(path string) error {
 	path = WithDefaultPath(path)
-	err := normalizeFilename(homeDir())
-	if err != nil {
-		return err
-	}
-
 	f, err := os.Create(path) // truncates existing file if it exists
 	if err != nil {
 		return err
@@ -58,11 +53,6 @@ func (c Config) ToFile(path string) error {
 // FromFile loads a Config object from a JSON file.
 func FromFile(path string) (*Config, error) {
 	path = WithDefaultPath(path)
-	err := normalizeFilename(homeDir())
-	if err != nil {
-		return nil, err
-	}
-
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -140,7 +130,10 @@ func ReplaceTilde(path string) string {
 	return strings.Replace(path, "~/", homeDir()+"/", 1)
 }
 
-func normalizeFilename(path string) error {
+func NormalizeFilename(path string) error {
+	if path == "" {
+		path = homeDir()
+	}
 	fi, err := os.Stat(path)
 	if err != nil {
 		return err
