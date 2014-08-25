@@ -38,7 +38,8 @@ type Config struct {
 	APIKey   string `json:"apiKey"`
 	Dir      string `json:"exercismDirectory"`
 	Hostname string `json:"hostname"`
-	home     string
+	home     string // cache user's home directory
+	path     string // path to config file
 }
 
 // New returns a new config.
@@ -46,7 +47,7 @@ type Config struct {
 func New(key, host, dir string) (*Config, error) {
 	c := &Config{
 		APIKey:   key,
-		Hostname: Host,
+		Hostname: host,
 		Dir:      dir,
 	}
 	return c.configure()
@@ -63,11 +64,37 @@ func (c *Config) configure() (*Config, error) {
 	if err != nil {
 		return c, err
 	}
+	c.path = fmt.Sprintf("%s/%s", dir, File)
+
 	if c.Dir == "" {
 		c.Dir = fmt.Sprintf("%s/%s", dir, DirExercises)
 	}
 	c.Dir = strings.Replace(c.Dir, "~/", fmt.Sprintf("%s/", dir), 1)
 	return c, nil
+}
+
+// SavePath allows the user to customize the location of the JSON file.
+func (c *Config) SavePath(path string) {
+	c.path = path
+}
+
+func (c *Config) File() string {
+	return c.path
+}
+
+func (c *Config) Write() error {
+	// truncates existing file if it exists
+	f, err := os.Create(c.path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	err = c.Encode(f)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // ToFile writes a Config to a JSON file.

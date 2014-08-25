@@ -49,6 +49,20 @@ func TestSanitizeWhitespace(t *testing.T) {
 	assert.Equal(t, "/path/to/exercises", c.Dir)
 }
 
+func TestFilePath(t *testing.T) {
+	// defaults to home directory
+	c := &Config{}
+	c.home = "/home/alice"
+	c.configure()
+	assert.Equal(t, "/home/alice/.exercism.json", c.File())
+
+	// can override location of config file
+	c = &Config{}
+	c.configure()
+	c.SavePath("/tmp/config/exercism.conf")
+	assert.Equal(t, "/tmp/config/exercism.conf", c.File())
+}
+
 func TestExpandsTildeInExercismDirectory(t *testing.T) {
 	expandedDir := ReplaceTilde("~/exercism/directory")
 	assert.NotContains(t, "~", expandedDir)
