@@ -141,9 +141,8 @@ func Decode(r io.Reader) (*Config, error) {
 	if err != nil {
 		return c, err
 	}
-	c.sanitize()
-
-	return c, err
+	c.configure()
+	return c, nil
 }
 
 // Path returns the path to the config file.
