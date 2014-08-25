@@ -221,6 +221,7 @@ func main() {
 			},
 		},
 		{
+			// Deprecated, just use configure command
 			Name:      "login",
 			ShortName: "l",
 			Usage:     "Save exercism.io api credentials",
@@ -236,6 +237,8 @@ func main() {
 			},
 		},
 		{
+			// deprecated, just use configure command to overwrite
+			// or delete the file
 			Name:      "logout",
 			ShortName: "o",
 			Usage:     "Clear exercism.io api credentials",
