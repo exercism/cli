@@ -75,7 +75,9 @@ func (c *Config) configure() (*Config, error) {
 
 // SavePath allows the user to customize the location of the JSON file.
 func (c *Config) SavePath(path string) {
-	c.path = path
+	if path != "" {
+		c.path = path
+	}
 }
 
 func (c *Config) File() string {
