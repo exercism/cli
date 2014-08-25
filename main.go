@@ -14,6 +14,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/config"
+	"github.com/exercism/cli/handlers"
 )
 
 const (
@@ -58,6 +59,25 @@ func main() {
 		},
 	}
 	app.Commands = []cli.Command{
+		{
+			Name:  "configure",
+			Usage: "Write config values to a JSON file",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "dir, d",
+					Usage: "path to exercises directory",
+				},
+				cli.StringFlag{
+					Name:  "host, u",
+					Usage: "exercism api host",
+				},
+				cli.StringFlag{
+					Name:  "key, k",
+					Usage: "exercism.io API key (see http://exercism.io/account)",
+				},
+			},
+			Action: handlers.Configure,
+		},
 		{
 			Name:      "current",
 			ShortName: "c",
