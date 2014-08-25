@@ -79,9 +79,10 @@ func main() {
 			Action: handlers.Configure,
 		},
 		{
-			Name:   "home",
-			Usage:  "Output path to exercises directory",
-			Action: handlers.Home,
+			Name:      "info",
+			ShortName: "i",
+			Usage:     "output config info",
+			Action:    handlers.Info,
 		},
 		{
 			Name:      "current",

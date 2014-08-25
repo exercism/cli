@@ -8,7 +8,7 @@ import (
 	"github.com/exercism/cli/config"
 )
 
-func Home(ctx *cli.Context) {
+func Info(ctx *cli.Context) {
 	path, err := config.Path(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
@@ -17,5 +17,8 @@ func Home(ctx *cli.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Your exercism directory can be found at %s\n", c.Dir)
+	fmt.Println("API Key:", c.APIKey)
+	fmt.Println("Exercises Directory:", c.Dir)
+	fmt.Println("Config file:", c.File())
+	fmt.Println("API:", c.Hostname)
 }
