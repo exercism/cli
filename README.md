@@ -19,12 +19,11 @@ If that throws an error, try ```brew install go --cross-compile-common --with-ll
 
 Development
 ===========
-1. `cd $GOPATH`
-1. git clone https://github.com/exercism/cli src/github.com/exercism/cli
-1. cd src/github.com/exercism/cli
-1. go get
-1. go get github.com/levicook/glitch
-1. go install github.com/levicook/glitch
+1. `go get github.com/exercism/cli`
+1. `cd $GOPATH/src/exercism/cli`
+1. `go get`
+1. `go get github.com/levicook/glitch`
+1. `go install github.com/levicook/glitch`
 1. Make sure $GOPATH/bin is on your path (you may need something like `export PATH=$PATH:/projects/goprojects/bin`)
 1. Open a separate terminal window to your project directory and run the command `glitch`
 1. Write a test.
