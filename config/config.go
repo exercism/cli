@@ -108,6 +108,7 @@ func (c *Config) ToFile(path string) error {
 	}
 	defer f.Close()
 
+	c.path = path
 	err = c.Encode(f)
 	if err != nil {
 		return err
