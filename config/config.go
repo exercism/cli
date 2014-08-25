@@ -71,7 +71,7 @@ func (c *Config) configure() (*Config, error) {
 }
 
 // ToFile writes a Config to a JSON file.
-func (c Config) ToFile(path string) error {
+func (c *Config) ToFile(path string) error {
 	path = WithDefaultPath(path)
 	f, err := os.Create(path) // truncates existing file if it exists
 	if err != nil {
