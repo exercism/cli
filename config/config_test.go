@@ -73,32 +73,36 @@ func TestReadingWritingConfig(t *testing.T) {
 	filename := fmt.Sprintf("%s/%s", tmpDir, File)
 	assert.NoError(t, err)
 
-	c := &Config{
+	c1 := &Config{
 		APIKey:   "MyKey",
 		Dir:      "/exercism/directory",
 		Hostname: "localhost",
 	}
 
-	c.ToFile(filename)
+	c1.ToFile(filename)
 
-	loadedConfig, err := FromFile(filename)
+	c2, err := FromFile(filename)
 	assert.NoError(t, err)
 
-	assert.Equal(t, c, loadedConfig)
+	assert.Equal(t, c1.APIKey, c2.APIKey)
+	assert.Equal(t, c1.Dir, c2.Dir)
+	assert.Equal(t, c1.Hostname, c2.Hostname)
 }
 
 func TestDecodingConfig(t *testing.T) {
 	unsanitizedJSON := `{"apiKey":"MyKey  ","exercismDirectory":"/exercism/directory\r\n","hostname":"localhost \r\n"}`
-	sanitizedConfig := &Config{
+	c1 := &Config{
 		APIKey:   "MyKey",
 		Dir:      "/exercism/directory",
 		Hostname: "localhost",
 	}
 	b := bytes.NewBufferString(unsanitizedJSON)
-	c, err := Decode(b)
-
+	c2, err := Decode(b)
 	assert.NoError(t, err)
-	assert.Equal(t, sanitizedConfig, c)
+
+	assert.Equal(t, c1.APIKey, c2.APIKey)
+	assert.Equal(t, c1.Dir, c2.Dir)
+	assert.Equal(t, c1.Hostname, c2.Hostname)
 }
 
 func TestEncodingConfig(t *testing.T) {
