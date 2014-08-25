@@ -79,6 +79,11 @@ func main() {
 			Action: handlers.Configure,
 		},
 		{
+			Name:   "home",
+			Usage:  "Output path to exercises directory",
+			Action: handlers.Home,
+		},
+		{
 			Name:      "current",
 			ShortName: "c",
 			Usage:     "Show the current assignments",

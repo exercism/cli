@@ -144,6 +144,19 @@ func Decode(r io.Reader) (*Config, error) {
 	return c, err
 }
 
+// Path returns the path to the config file.
+func Path(path string) (string, error) {
+	if path != "" {
+		return path, nil
+	}
+
+	dir, err := Home()
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s/%s", dir, File), nil
+}
+
 // WithDefaultPath returns the default configuration path if none is provided.
 func WithDefaultPath(p string) string {
 	if p == "" {
@@ -159,7 +172,13 @@ func (c *Config) homeDir() (string, error) {
 	if c.home != "" {
 		return c.home, nil
 	}
+	return Home()
+}
 
+// HomeDir returns the user's canonical home directory.
+// See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
+// we can't cross compile using cgo and use user.Current()
+func Home() (string, error) {
 	var dir string
 	if runtime.GOOS == "windows" {
 		dir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
