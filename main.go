@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -70,7 +71,7 @@ func main() {
 				}
 
 				configPath := ctx.GlobalString("config")
-				err := config.NormalizeFilename(configPath)
+				err := normalizeConfigFile(configPath)
 				if err != nil {
 					fmt.Println(err)
 					return
@@ -114,7 +115,7 @@ func main() {
 			Usage:     "Fetch first assignment for each language from exercism.io",
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
-				err := config.NormalizeFilename(configPath)
+				err := normalizeConfigFile(configPath)
 				if err != nil {
 					fmt.Println(err)
 					return
@@ -152,7 +153,7 @@ func main() {
 				}
 
 				configPath := ctx.GlobalString("config")
-				err := config.NormalizeFilename(configPath)
+				err := normalizeConfigFile(configPath)
 				if err != nil {
 					fmt.Println(err)
 					return
@@ -206,7 +207,7 @@ func main() {
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
 				// ignore errors, we're just going to overwrite it anyway
-				config.NormalizeFilename(configPath)
+				normalizeConfigFile(configPath)
 
 				_, err := login(config.WithDefaultPath(configPath))
 				if err != nil {
@@ -220,7 +221,7 @@ func main() {
 			Usage:     "Clear exercism.io api credentials",
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
-				err := config.NormalizeFilename(configPath)
+				err := normalizeConfigFile(configPath)
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -238,7 +239,7 @@ func main() {
 				"submitted version, first move that file out of the way, then call restore.",
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
-				err := config.NormalizeFilename(configPath)
+				err := normalizeConfigFile(configPath)
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -274,7 +275,7 @@ func main() {
 			Usage:     "Submit code to exercism.io on your current assignment",
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
-				err := config.NormalizeFilename(configPath)
+				err := normalizeConfigFile(configPath)
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -336,7 +337,7 @@ func main() {
 			Usage:     "Delete the last submission",
 			Action: func(ctx *cli.Context) {
 				configPath := ctx.GlobalString("config")
-				err := config.NormalizeFilename(configPath)
+				err := normalizeConfigFile(configPath)
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -647,4 +648,35 @@ func IsTest(filename string) bool {
 		}
 	}
 	return false
+}
+
+func normalizeConfigFile(path string) error {
+	if path == "" {
+		path = config.HomeDir()
+	}
+	fi, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+	if !fi.IsDir() {
+		return errors.New("expected path to be a directory")
+	}
+
+	correctPath := filepath.Join(path, config.File)
+	legacyPath := filepath.Join(path, config.LegacyFile)
+
+	_, err = os.Stat(correctPath)
+	if err == nil {
+		return nil
+	}
+	if !os.IsNotExist(err) {
+		return err
+	}
+
+	_, err = os.Stat(legacyPath)
+	if os.IsNotExist(err) {
+		return nil
+	}
+
+	return os.Rename(legacyPath, correctPath)
 }

@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -84,16 +83,16 @@ func Decode(r io.Reader) (*Config, error) {
 // WithDefaultPath returns the default configuration path if none is provided.
 func WithDefaultPath(p string) string {
 	if p == "" {
-		return fmt.Sprintf("%s/%s", homeDir(), File)
+		return fmt.Sprintf("%s/%s", HomeDir(), File)
 	}
 
 	return p
 }
 
-// homeDir returns the user's canonical home directory.
+// HomeDir returns the user's canonical home directory.
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 // we can't cross compile using cgo and use user.Current()
-func homeDir() string {
+func HomeDir() string {
 	var dir string
 	if runtime.GOOS == "windows" {
 		dir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
@@ -122,43 +121,12 @@ func Demo() *Config {
 
 // DefaultAssignmentPath returns the absolute path of the default exercism directory
 func DefaultAssignmentPath() string {
-	return filepath.Join(homeDir(), DirExercises)
+	return filepath.Join(HomeDir(), DirExercises)
 }
 
 // ReplaceTilde replaces the short-hand home path with the absolute path.
 func ReplaceTilde(path string) string {
-	return strings.Replace(path, "~/", homeDir()+"/", 1)
-}
-
-func NormalizeFilename(path string) error {
-	if path == "" {
-		path = homeDir()
-	}
-	fi, err := os.Stat(path)
-	if err != nil {
-		return err
-	}
-	if !fi.IsDir() {
-		return errors.New("expected path to be a directory")
-	}
-
-	correctPath := filepath.Join(path, File)
-	legacyPath := filepath.Join(path, LegacyFile)
-
-	_, err = os.Stat(correctPath)
-	if err == nil {
-		return nil
-	}
-	if !os.IsNotExist(err) {
-		return err
-	}
-
-	_, err = os.Stat(legacyPath)
-	if os.IsNotExist(err) {
-		return nil
-	}
-
-	return os.Rename(legacyPath, correctPath)
+	return strings.Replace(path, "~/", HomeDir()+"/", 1)
 }
 
 func (c *Config) sanitize() {
