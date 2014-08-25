@@ -131,14 +131,14 @@ func main() {
 				}
 
 				for _, a := range assignments {
-					err := SaveAssignment(c.ExercismDirectory, a)
+					err := SaveAssignment(c.Dir, a)
 					if err != nil {
 						fmt.Println(err)
 					}
 				}
 
 				msg := "\nThe demo exercises have been written to %s, in subdirectories by language.\n\nTo try an exercise, change directory to a language/exercise, read the README and run the tests.\n\n"
-				fmt.Printf(msg, c.ExercismDirectory)
+				fmt.Printf(msg, c.Dir)
 			},
 		},
 		{
@@ -191,13 +191,13 @@ func main() {
 				}
 
 				for _, a := range assignments {
-					err := SaveAssignment(c.ExercismDirectory, a)
+					err := SaveAssignment(c.Dir, a)
 					if err != nil {
 						fmt.Println(err)
 					}
 				}
 
-				fmt.Printf("Exercises written to %s\n", c.ExercismDirectory)
+				fmt.Printf("Exercises written to %s\n", c.Dir)
 			},
 		},
 		{
@@ -260,13 +260,13 @@ func main() {
 				}
 
 				for _, a := range assignments {
-					err := SaveAssignment(c.ExercismDirectory, a)
+					err := SaveAssignment(c.Dir, a)
 					if err != nil {
 						fmt.Println(err)
 					}
 				}
 
-				fmt.Printf("Exercises written to %s\n", c.ExercismDirectory)
+				fmt.Printf("Exercises written to %s\n", c.Dir)
 			},
 		},
 		{
@@ -296,13 +296,13 @@ func main() {
 
 				filename := ctx.Args()[0]
 
-				// Make filename relative to config.ExercismDirectory.
+				// Make filename relative to config.Dir.
 				absPath, err := absolutePath(filename)
 				if err != nil {
 					fmt.Printf("Couldn't find %v: %v\n", filename, err)
 					return
 				}
-				exDir := c.ExercismDirectory + string(filepath.Separator)
+				exDir := c.Dir + string(filepath.Separator)
 				if !strings.HasPrefix(absPath, exDir) {
 					fmt.Printf("%v is not under your exercism project path (%v)\n", absPath, exDir)
 					return
@@ -377,7 +377,7 @@ func login(path string) (*config.Config, error) {
 		return nil, err
 	}
 	fmt.Printf("Your credentials have been written to %s\n", path)
-	fmt.Printf("Your exercism directory can be found at %s\n", c.ExercismDirectory)
+	fmt.Printf("Your exercism directory can be found at %s\n", c.Dir)
 	return c, nil
 }
 
@@ -434,9 +434,9 @@ func askForConfigInfo() (*config.Config, error) {
 	}
 
 	return &config.Config{
-		APIKey:            key,
-		ExercismDirectory: dir,
-		Hostname:          "http://exercism.io",
+		APIKey:   key,
+		Dir:      dir,
+		Hostname: "http://exercism.io",
 	}, nil
 }
 

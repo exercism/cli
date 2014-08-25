@@ -47,7 +47,7 @@ func TestAskForConfigInfoAllowsSpaces(t *testing.T) {
 	}
 	os.Remove(absoluteDirName)
 
-	assert.Equal(t, c.ExercismDirectory, absoluteDirName)
+	assert.Equal(t, c.Dir, absoluteDirName)
 	assert.Equal(t, c.APIKey, apiKey)
 }
 
@@ -63,7 +63,7 @@ func TestAskForConfigInfoDefaultPath(t *testing.T) {
 	}
 	os.Remove(absoluteDirName)
 
-	assert.Equal(t, c.ExercismDirectory, absoluteDirName)
+	assert.Equal(t, c.Dir, absoluteDirName)
 	assert.Equal(t, c.APIKey, apiKey)
 }
 
