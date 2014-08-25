@@ -9,6 +9,46 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestDefaultValues(t *testing.T) {
+	c := &Config{}
+	c.home = "/home/alice"
+	c.configure()
+	assert.Equal(t, "", c.APIKey)
+	assert.Equal(t, "http://exercism.io", c.Hostname)
+	assert.Equal(t, "/home/alice/exercism", c.Dir)
+}
+
+func TestCustomValues(t *testing.T) {
+	c := &Config{
+		APIKey:   "abc123",
+		Hostname: "http://example.org",
+		Dir:      "/path/to/exercises",
+	}
+	c.configure()
+	assert.Equal(t, "abc123", c.APIKey)
+	assert.Equal(t, "http://example.org", c.Hostname)
+	assert.Equal(t, "/path/to/exercises", c.Dir)
+}
+
+func TestExpandHomeDir(t *testing.T) {
+	c := &Config{Dir: "~/practice"}
+	c.home = "/home/alice"
+	c.configure()
+	assert.Equal(t, "/home/alice/practice", c.Dir)
+}
+
+func TestSanitizeWhitespace(t *testing.T) {
+	c := &Config{
+		APIKey:   "   abc123\n\r\n  ",
+		Hostname: "       ",
+		Dir:      "  \r\n/path/to/exercises   \r\n",
+	}
+	c.configure()
+	assert.Equal(t, "abc123", c.APIKey)
+	assert.Equal(t, "http://exercism.io", c.Hostname)
+	assert.Equal(t, "/path/to/exercises", c.Dir)
+}
+
 func TestExpandsTildeInExercismDirectory(t *testing.T) {
 	expandedDir := ReplaceTilde("~/exercism/directory")
 	assert.NotContains(t, "~", expandedDir)
@@ -20,9 +60,9 @@ func TestReadingWritingConfig(t *testing.T) {
 	assert.NoError(t, err)
 
 	c := &Config{
-		APIKey:            "MyKey",
-		ExercismDirectory: "/exercism/directory",
-		Hostname:          "localhost",
+		APIKey:   "MyKey",
+		Dir:      "/exercism/directory",
+		Hostname: "localhost",
 	}
 
 	c.ToFile(filename)
@@ -36,9 +76,9 @@ func TestReadingWritingConfig(t *testing.T) {
 func TestDecodingConfig(t *testing.T) {
 	unsanitizedJSON := `{"apiKey":"MyKey  ","exercismDirectory":"/exercism/directory\r\n","hostname":"localhost \r\n"}`
 	sanitizedConfig := &Config{
-		APIKey:            "MyKey",
-		ExercismDirectory: "/exercism/directory",
-		Hostname:          "localhost",
+		APIKey:   "MyKey",
+		Dir:      "/exercism/directory",
+		Hostname: "localhost",
 	}
 	b := bytes.NewBufferString(unsanitizedJSON)
 	c, err := Decode(b)
@@ -49,9 +89,9 @@ func TestDecodingConfig(t *testing.T) {
 
 func TestEncodingConfig(t *testing.T) {
 	currentConfig := Config{
-		APIKey:            "MyKey ",
-		ExercismDirectory: "/home/user name  ",
-		Hostname:          "localhost  ",
+		APIKey:   "MyKey ",
+		Dir:      "/home/user name  ",
+		Hostname: "localhost  ",
 	}
 	sanitizedJSON := `{"apiKey":"MyKey","exercismDirectory":"/home/user name","hostname":"localhost"}
 `
