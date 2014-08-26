@@ -18,7 +18,7 @@ func assertFileDoesNotExist(t *testing.T, filename string) {
 	_, err := os.Stat(filename)
 
 	if err == nil {
-		t.Errorf("File [%s] already exist.", filename)
+		t.Errorf("File exists: %s", filename)
 	}
 }
 
@@ -26,12 +26,13 @@ func TestLogoutDeletesConfigFile(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "")
 	assert.NoError(t, err)
 
-	c := config.Config{}
-	c.ToFile(tmpDir)
-
-	logout(tmpDir)
-
 	file := fmt.Sprintf("%s/%s", tmpDir, config.File)
+
+	c := config.Config{}
+	c.SavePath(file)
+	c.Write()
+
+	logout(file)
 	assertFileDoesNotExist(t, file)
 }
 

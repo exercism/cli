@@ -114,24 +114,13 @@ func Read(file string) (*Config, error) {
 		return nil, err
 	}
 	defer f.Close()
-	return Decode(f)
-}
 
-// ToFile writes a Config to a JSON file.
-func (c *Config) ToFile(file string) error {
-	file = WithDefaultPath(file)
-	f, err := os.Create(file) // truncates existing file if it exists
+	c, err := Decode(f)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	defer f.Close()
-
-	c.file = file
-	err = c.Encode(f)
-	if err != nil {
-		return err
-	}
-	return nil
+	c.SavePath(file)
+	return c, nil
 }
 
 // Encode writes a Config into JSON format.
