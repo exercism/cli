@@ -177,7 +177,7 @@ func (c *Config) homeDir() (string, error) {
 	return Home()
 }
 
-// HomeDir returns the user's canonical home directory.
+// Home returns the user's canonical home directory.
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 // we can't cross compile using cgo and use user.Current()
 func Home() (string, error) {
@@ -198,24 +198,12 @@ func Home() (string, error) {
 }
 
 // HomeDir returns the user's canonical home directory.
-// See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
-// we can't cross compile using cgo and use user.Current()
 // FIXME: This one will go away. Refactoring in progress.
 func HomeDir() string {
-	var dir string
-	if runtime.GOOS == "windows" {
-		dir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if dir == "" {
-			dir = os.Getenv("USERPROFILE")
-		}
-	} else {
-		dir = os.Getenv("HOME")
-	}
-
-	if dir == "" {
+	dir, err := Home()
+	if err != nil {
 		panic("unable to determine the location of your home directory")
 	}
-
 	return dir
 }
 
