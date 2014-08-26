@@ -39,7 +39,7 @@ type Config struct {
 	Dir      string `json:"exercismDirectory"`
 	Hostname string `json:"hostname"`
 	home     string // cache user's home directory
-	path     string // path to config file
+	file     string // full path to config file
 }
 
 // New returns a new config.
@@ -64,7 +64,7 @@ func (c *Config) configure() (*Config, error) {
 	if err != nil {
 		return c, err
 	}
-	c.path = fmt.Sprintf("%s/%s", dir, File)
+	c.file = fmt.Sprintf("%s/%s", dir, File)
 
 	if c.Dir == "" {
 		c.Dir = fmt.Sprintf("%s/%s", dir, DirExercises)
@@ -74,19 +74,19 @@ func (c *Config) configure() (*Config, error) {
 }
 
 // SavePath allows the user to customize the location of the JSON file.
-func (c *Config) SavePath(path string) {
-	if path != "" {
-		c.path = path
+func (c *Config) SavePath(file string) {
+	if file != "" {
+		c.file = file
 	}
 }
 
 func (c *Config) File() string {
-	return c.path
+	return c.file
 }
 
 func (c *Config) Write() error {
 	// truncates existing file if it exists
-	f, err := os.Create(c.path)
+	f, err := os.Create(c.file)
 	if err != nil {
 		return err
 	}
@@ -100,15 +100,15 @@ func (c *Config) Write() error {
 }
 
 // ToFile writes a Config to a JSON file.
-func (c *Config) ToFile(path string) error {
-	path = WithDefaultPath(path)
-	f, err := os.Create(path) // truncates existing file if it exists
+func (c *Config) ToFile(file string) error {
+	file = WithDefaultPath(file)
+	f, err := os.Create(file) // truncates existing file if it exists
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	c.path = path
+	c.file = file
 	err = c.Encode(f)
 	if err != nil {
 		return err
@@ -117,9 +117,9 @@ func (c *Config) ToFile(path string) error {
 }
 
 // FromFile loads a Config object from a JSON file.
-func FromFile(path string) (*Config, error) {
-	path = WithDefaultPath(path)
-	f, err := os.Open(path)
+func FromFile(file string) (*Config, error) {
+	file = WithDefaultPath(file)
+	f, err := os.Open(file)
 	if err != nil {
 		return nil, err
 	}
