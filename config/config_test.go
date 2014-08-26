@@ -79,7 +79,8 @@ func TestReadingWritingConfig(t *testing.T) {
 		Hostname: "localhost",
 	}
 
-	c1.ToFile(filename)
+	c1.SavePath(filename)
+	c1.Write()
 
 	c2, err := Read(filename)
 	assert.NoError(t, err)

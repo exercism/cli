@@ -401,7 +401,8 @@ func login(path string) (*config.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = c.ToFile(path)
+	c.SavePath(path)
+	err = c.Write()
 	if err != nil {
 		return nil, err
 	}
