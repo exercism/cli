@@ -102,7 +102,7 @@ func main() {
 					fmt.Println(err)
 					return
 				}
-				c, err := config.FromFile(configPath)
+				c, err := config.Read(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					c, err = login(configPath)
@@ -146,7 +146,7 @@ func main() {
 					fmt.Println(err)
 					return
 				}
-				c, err := config.FromFile(configPath)
+				c, err := config.Read(configPath)
 				if err != nil {
 					c = config.Demo()
 				}
@@ -184,7 +184,7 @@ func main() {
 					fmt.Println(err)
 					return
 				}
-				c, err := config.FromFile(configPath)
+				c, err := config.Read(configPath)
 				if err != nil {
 					if argCount == 0 || argCount == 1 {
 						fmt.Println("Are you sure you are logged in? Please login again.")
@@ -272,7 +272,7 @@ func main() {
 				if err != nil {
 					fmt.Println(err)
 				}
-				c, err := config.FromFile(configPath)
+				c, err := config.Read(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					c, err = login(configPath)
@@ -308,7 +308,7 @@ func main() {
 				if err != nil {
 					fmt.Println(err)
 				}
-				c, err := config.FromFile(configPath)
+				c, err := config.Read(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					c, err = login(configPath)
@@ -370,7 +370,7 @@ func main() {
 				if err != nil {
 					fmt.Println(err)
 				}
-				c, err := config.FromFile(configPath)
+				c, err := config.Read(configPath)
 				if err != nil {
 					fmt.Println("Are you sure you are logged in? Please login again.")
 					c, err = login(configPath)

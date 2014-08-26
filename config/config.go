@@ -101,6 +101,22 @@ func (c *Config) Write() error {
 	return nil
 }
 
+func Read(file string) (*Config, error) {
+	renameLegacy()
+
+	file, err := FilePath(file)
+	if err != nil {
+		return nil, err
+	}
+
+	f, err := os.Open(file)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	return Decode(f)
+}
+
 // ToFile writes a Config to a JSON file.
 func (c *Config) ToFile(file string) error {
 	file = WithDefaultPath(file)
@@ -116,17 +132,6 @@ func (c *Config) ToFile(file string) error {
 		return err
 	}
 	return nil
-}
-
-// FromFile loads a Config object from a JSON file.
-func FromFile(file string) (*Config, error) {
-	file = WithDefaultPath(file)
-	f, err := os.Open(file)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	return Decode(f)
 }
 
 // Encode writes a Config into JSON format.

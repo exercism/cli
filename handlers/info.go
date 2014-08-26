@@ -14,7 +14,7 @@ func Info(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
-	c, err := config.FromFile(file)
+	c, err := config.Read(file)
 	if err != nil {
 		log.Fatal(err)
 	}
