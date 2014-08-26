@@ -22,20 +22,6 @@ func assertFileDoesNotExist(t *testing.T, filename string) {
 	}
 }
 
-func TestLogoutDeletesConfigFile(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "")
-	assert.NoError(t, err)
-
-	file := fmt.Sprintf("%s/%s", tmpDir, config.File)
-
-	c := config.Config{}
-	c.SavePath(file)
-	c.Write()
-
-	logout(file)
-	assertFileDoesNotExist(t, file)
-}
-
 func TestAskForConfigInfoAllowsSpaces(t *testing.T) {
 	dirName := "dirname with spaces"
 	apiKey := "abc123"

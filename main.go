@@ -243,20 +243,10 @@ func main() {
 			},
 		},
 		{
-			// deprecated, just use configure command to overwrite
-			// or delete the file
 			Name:      "logout",
 			ShortName: "o",
-			Usage:     "Clear exercism.io api credentials",
-			Action: func(ctx *cli.Context) {
-				configPath := ctx.GlobalString("config")
-				err := normalizeConfigFile(configPath)
-				if err != nil {
-					fmt.Println(err)
-				}
-
-				logout(config.WithDefaultPath(configPath))
-			},
+			Usage:     "DEPRECATED: Clear exercism.io api credentials",
+			Action:    handlers.Logout,
 		},
 		{
 			Name:      "restore",
@@ -409,10 +399,6 @@ func login(path string) (*config.Config, error) {
 	fmt.Printf("Your credentials have been written to %s\n", path)
 	fmt.Printf("Your exercism directory can be found at %s\n", c.Dir)
 	return c, nil
-}
-
-func logout(path string) {
-	os.Remove(path)
 }
 
 func absolutePath(path string) (string, error) {
