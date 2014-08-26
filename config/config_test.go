@@ -81,7 +81,7 @@ func TestReadingWritingConfig(t *testing.T) {
 
 	c1.ToFile(filename)
 
-	c2, err := FromFile(filename)
+	c2, err := Read(filename)
 	assert.NoError(t, err)
 
 	assert.Equal(t, c1.APIKey, c2.APIKey)
