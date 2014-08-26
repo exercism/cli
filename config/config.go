@@ -148,10 +148,10 @@ func Decode(r io.Reader) (*Config, error) {
 	return c, nil
 }
 
-// Path returns the path to the config file.
-func Path(path string) (string, error) {
-	if path != "" {
-		return path, nil
+// FilePath returns the path to the config file.
+func FilePath(file string) (string, error) {
+	if file != "" {
+		return file, nil
 	}
 
 	dir, err := Home()

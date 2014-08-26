@@ -9,11 +9,12 @@ import (
 )
 
 func Info(ctx *cli.Context) {
-	path, err := config.Path(ctx.GlobalString("config"))
+	file, err := config.FilePath(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	c, err := config.FromFile(path)
+
+	c, err := config.FromFile(file)
 	if err != nil {
 		log.Fatal(err)
 	}
