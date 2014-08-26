@@ -85,6 +85,8 @@ func (c *Config) File() string {
 }
 
 func (c *Config) Write() error {
+	renameLegacy()
+
 	// truncates existing file if it exists
 	f, err := os.Create(c.file)
 	if err != nil {
@@ -230,4 +232,22 @@ func (c *Config) sanitize() {
 	c.APIKey = strings.TrimSpace(c.APIKey)
 	c.Dir = strings.TrimSpace(c.Dir)
 	c.Hostname = strings.TrimSpace(c.Hostname)
+}
+
+// renameLegacy normalizes the default config file name.
+// This function will bail silently if any error occurs.
+func renameLegacy() {
+	dir, err := Home()
+	if err != nil {
+		return
+	}
+
+	legacyPath := filepath.Join(dir, LegacyFile)
+	if _, err = os.Stat(legacyPath); err != nil {
+		return
+	}
+
+	correctPath := filepath.Join(dir, File)
+	os.Rename(legacyPath, correctPath)
+	return
 }
