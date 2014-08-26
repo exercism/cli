@@ -231,16 +231,7 @@ func main() {
 			Name:      "login",
 			ShortName: "l",
 			Usage:     "Save exercism.io api credentials",
-			Action: func(ctx *cli.Context) {
-				configPath := ctx.GlobalString("config")
-				// ignore errors, we're just going to overwrite it anyway
-				normalizeConfigFile(configPath)
-
-				_, err := login(config.WithDefaultPath(configPath))
-				if err != nil {
-					fmt.Println(err)
-				}
-			},
+			Action:    handlers.Login,
 		},
 		{
 			Name:      "logout",
