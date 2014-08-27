@@ -60,6 +60,11 @@ func main() {
 	}
 	app.Commands = []cli.Command{
 		{
+			Name:   "debug",
+			Usage:  "Outputs useful debug information.",
+			Action: handlers.Debug,
+		},
+		{
 			Name:  "configure",
 			Usage: "Write config values to a JSON file",
 			Flags: []cli.Flag{
