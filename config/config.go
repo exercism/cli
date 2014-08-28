@@ -109,6 +109,13 @@ func Read(file string) (*Config, error) {
 		return nil, err
 	}
 
+	if _, err = os.Stat(file); err != nil {
+		if os.IsNotExist(err) {
+			return New("", "", "")
+		}
+		return nil, err
+	}
+
 	f, err := os.Open(file)
 	if err != nil {
 		return nil, err

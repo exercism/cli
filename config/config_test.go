@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -66,6 +67,16 @@ func TestFilePath(t *testing.T) {
 func TestExpandsTildeInExercismDirectory(t *testing.T) {
 	expandedDir := ReplaceTilde("~/exercism/directory")
 	assert.NotContains(t, "~", expandedDir)
+}
+
+func TestReadNonexistantConfig(t *testing.T) {
+	c, err := Read("/no/such/config.json")
+	assert.NoError(t, err)
+	assert.Equal(t, c.APIKey, "")
+	assert.Equal(t, c.Hostname, "http://exercism.io")
+	if !strings.HasSuffix(c.Dir, "/exercism") {
+		t.Fatal("Default unconfigured config should use home dir")
+	}
 }
 
 func TestReadingWritingConfig(t *testing.T) {
