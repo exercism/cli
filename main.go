@@ -84,12 +84,6 @@ func main() {
 			Action: handlers.Configure,
 		},
 		{
-			Name:      "info",
-			ShortName: "i",
-			Usage:     "output config info",
-			Action:    handlers.Info,
-		},
-		{
 			Name:      "current",
 			ShortName: "c",
 			Usage:     "Show the current assignments",
