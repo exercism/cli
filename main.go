@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/codegangsta/cli"
@@ -23,9 +24,12 @@ const (
 	// but with the http://exercism.io app being a prototype, a
 	// lot of things get out of hand.
 	Version = "1.6.2"
+)
+
+var (
 	// UserAgent is sent along as a header to HTTP requests that the
 	// CLI makes. This helps with debugging.
-	UserAgent = "github.com/exercism/cli v" + Version
+	UserAgent = fmt.Sprintf("github.com/exercism/cli v%s (%s/%s)", Version, runtime.GOOS, runtime.GOARCH)
 )
 
 var FetchEndpoints = map[string]string{

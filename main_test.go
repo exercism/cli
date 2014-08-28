@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/exercism/cli/config"
@@ -162,7 +163,7 @@ var submitHandler = func(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userAgentMatches := r.Header.Get("User-Agent") == fmt.Sprintf("github.com/exercism/cli v%s", Version)
+	userAgentMatches := strings.HasPrefix(r.Header.Get("User-Agent"), fmt.Sprintf("github.com/exercism/cli v%s", Version))
 
 	if !userAgentMatches {
 		fmt.Printf("User agent mismatch: %s\n", r.Header.Get("User-Agent"))
