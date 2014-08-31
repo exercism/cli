@@ -80,10 +80,12 @@ func (c *Config) SavePath(file string) {
 	}
 }
 
+// File represents the path to the config file.
 func (c *Config) File() string {
 	return c.file
 }
 
+// Write() saves the config as JSON.
 func (c *Config) Write() error {
 	renameLegacy()
 
@@ -101,6 +103,7 @@ func (c *Config) Write() error {
 	return nil
 }
 
+// Read loads the config from the stored JSON file.
 func Read(file string) (*Config, error) {
 	renameLegacy()
 

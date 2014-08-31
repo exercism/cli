@@ -10,6 +10,7 @@ import (
 	"github.com/exercism/cli/config"
 )
 
+// Debug provides information about the user's environment and configuration.
 func Debug(ctx *cli.Context) {
 	defer fmt.Printf("\nIf you are having any issues, please contact kytrinyx@exercism.io with this information.\n")
 

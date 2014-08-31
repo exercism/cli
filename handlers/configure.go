@@ -8,6 +8,9 @@ import (
 	"github.com/exercism/cli/config"
 )
 
+// Configure stores settings in a JSON file.
+// If a setting is not passed as an argument, default
+// values are used.
 func Configure(ctx *cli.Context) {
 	key := ctx.String("key")
 	host := ctx.String("host")
