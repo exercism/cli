@@ -74,6 +74,7 @@ func TestReadNonexistantConfig(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, c.APIKey, "")
 	assert.Equal(t, c.Hostname, "http://exercism.io")
+	assert.False(t, c.IsAuthenticated())
 	if !strings.HasSuffix(c.Dir, "/exercism") {
 		t.Fatal("Default unconfigured config should use home dir")
 	}

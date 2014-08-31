@@ -162,6 +162,12 @@ func FilePath(file string) (string, error) {
 	return fmt.Sprintf("%s/%s", dir, File), nil
 }
 
+// IsAuthenticated returns true if the config contains an API key.
+// This does not check whether or not that key is valid.
+func (c *Config) IsAuthenticated() bool {
+	return c.APIKey != ""
+}
+
 // WithDefaultPath returns the default configuration path if none is provided.
 func WithDefaultPath(p string) string {
 	if p == "" {

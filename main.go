@@ -1,10 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -24,6 +22,8 @@ const (
 	// but with the http://exercism.io app being a prototype, a
 	// lot of things get out of hand.
 	Version = "1.7.0"
+
+	msgPleaseAuthenticate = "You must be authenticated. Run `exercism configure --key=YOUR_API_KEY`."
 )
 
 var (
@@ -92,15 +92,10 @@ func main() {
 			ShortName: "d",
 			Usage:     "Fetch first assignment for each language from exercism.io",
 			Action: func(ctx *cli.Context) {
-				configPath := ctx.GlobalString("config")
-				err := normalizeConfigFile(configPath)
+				c, err := config.Read(ctx.GlobalString("config"))
 				if err != nil {
 					fmt.Println(err)
 					return
-				}
-				c, err := config.Read(configPath)
-				if err != nil {
-					c = config.Demo()
 				}
 				assignments, err := FetchAssignments(c, FetchEndpoints["demo"])
 				if err != nil {
@@ -130,24 +125,15 @@ func main() {
 					return
 				}
 
-				configPath := ctx.GlobalString("config")
-				err := normalizeConfigFile(configPath)
+				c, err := config.Read(ctx.GlobalString("config"))
 				if err != nil {
 					fmt.Println(err)
 					return
 				}
-				c, err := config.Read(configPath)
-				if err != nil {
-					if argCount == 0 || argCount == 1 {
-						fmt.Println("Are you sure you are logged in? Please login again.")
-						c, err = login(configPath)
-						if err != nil {
-							fmt.Println(err)
-							return
-						}
-					} else {
-						c = config.Demo()
-					}
+
+				if !c.IsAuthenticated() && (argCount == 0 || argCount == 1) {
+					fmt.Println(msgPleaseAuthenticate)
+					return
 				}
 
 				assignments, err := FetchAssignments(c, FetchEndpoint(ctx.Args()))
@@ -200,19 +186,15 @@ func main() {
 				"to a file and have not submitted it, and you're trying to restore the last " +
 				"submitted version, first move that file out of the way, then call restore.",
 			Action: func(ctx *cli.Context) {
-				configPath := ctx.GlobalString("config")
-				err := normalizeConfigFile(configPath)
+				c, err := config.Read(ctx.GlobalString("config"))
 				if err != nil {
 					fmt.Println(err)
+					return
 				}
-				c, err := config.Read(configPath)
-				if err != nil {
-					fmt.Println("Are you sure you are logged in? Please login again.")
-					c, err = login(configPath)
-					if err != nil {
-						fmt.Println(err)
-						return
-					}
+
+				if !c.IsAuthenticated() {
+					fmt.Println(msgPleaseAuthenticate)
+					return
 				}
 
 				assignments, err := FetchAssignments(c, FetchEndpoints["restore"])
@@ -236,23 +218,19 @@ func main() {
 			ShortName: "s",
 			Usage:     "Submit code to exercism.io on your current assignment",
 			Action: func(ctx *cli.Context) {
-				configPath := ctx.GlobalString("config")
-				err := normalizeConfigFile(configPath)
-				if err != nil {
-					fmt.Println(err)
-				}
-				c, err := config.Read(configPath)
-				if err != nil {
-					fmt.Println("Are you sure you are logged in? Please login again.")
-					c, err = login(configPath)
-					if err != nil {
-						fmt.Println(err)
-						return
-					}
-				}
-
 				if len(ctx.Args()) == 0 {
 					fmt.Println("Please enter a file name")
+					return
+				}
+
+				c, err := config.Read(ctx.GlobalString("config"))
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+
+				if !c.IsAuthenticated() {
+					fmt.Println(msgPleaseAuthenticate)
 					return
 				}
 
@@ -272,7 +250,7 @@ func main() {
 				filename = absPath[len(exDir):]
 
 				if IsTest(filename) {
-					fmt.Println("It looks like this is a test, please enter an example file name.")
+					fmt.Println("It looks like this is a test, please submit a solution.")
 					return
 				}
 
@@ -298,19 +276,15 @@ func main() {
 			ShortName: "u",
 			Usage:     "Delete the last submission",
 			Action: func(ctx *cli.Context) {
-				configPath := ctx.GlobalString("config")
-				err := normalizeConfigFile(configPath)
+				c, err := config.Read(ctx.GlobalString("config"))
 				if err != nil {
 					fmt.Println(err)
+					return
 				}
-				c, err := config.Read(configPath)
-				if err != nil {
-					fmt.Println("Are you sure you are logged in? Please login again.")
-					c, err = login(configPath)
-					if err != nil {
-						fmt.Println(err)
-						return
-					}
+
+				if !c.IsAuthenticated() {
+					fmt.Println(msgPleaseAuthenticate)
+					return
 				}
 
 				err = UnsubmitAssignment(c)
@@ -329,74 +303,12 @@ func main() {
 	}
 }
 
-func login(path string) (*config.Config, error) {
-	c, err := askForConfigInfo()
-	if err != nil {
-		return nil, err
-	}
-	c.SavePath(path)
-	err = c.Write()
-	if err != nil {
-		return nil, err
-	}
-	fmt.Printf("Your credentials have been written to %s\n", path)
-	fmt.Printf("Your exercism directory can be found at %s\n", c.Dir)
-	return c, nil
-}
-
 func absolutePath(path string) (string, error) {
 	path, err := filepath.Abs(path)
 	if err != nil {
 		return "", err
 	}
 	return filepath.EvalSymlinks(path)
-}
-
-func askForConfigInfo() (*config.Config, error) {
-	var key, dir string
-	delim := "\r\n"
-
-	bio := bufio.NewReader(os.Stdin)
-
-	fmt.Print("Your Exercism API key (found at http://exercism.io/account): ")
-	key, err := bio.ReadString('\n')
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Println("What is your exercism exercises project path?")
-	fmt.Printf("Press Enter to select the default (%s):\n", config.DefaultAssignmentPath())
-	fmt.Print("> ")
-	dir, err = bio.ReadString('\n')
-	if err != nil {
-		return nil, err
-	}
-
-	key = strings.TrimRight(key, delim)
-	dir = strings.TrimRight(dir, delim)
-
-	if dir == "" {
-		dir = config.DefaultAssignmentPath()
-	}
-
-	dir = config.ReplaceTilde(dir)
-
-	err = os.MkdirAll(dir, 0755)
-	if err != nil {
-		err = fmt.Errorf("Error making directory %v: [%v]", dir, err)
-		return nil, err
-	}
-
-	dir, err = absolutePath(dir)
-	if err != nil {
-		return nil, err
-	}
-
-	return &config.Config{
-		APIKey:   key,
-		Dir:      dir,
-		Hostname: "http://exercism.io",
-	}, nil
 }
 
 type submitResponse struct {
@@ -607,35 +519,4 @@ func IsTest(filename string) bool {
 		}
 	}
 	return false
-}
-
-func normalizeConfigFile(path string) error {
-	if path == "" {
-		path = config.HomeDir()
-	}
-	fi, err := os.Stat(path)
-	if err != nil {
-		return err
-	}
-	if !fi.IsDir() {
-		return errors.New("expected path to be a directory")
-	}
-
-	correctPath := filepath.Join(path, config.File)
-	legacyPath := filepath.Join(path, config.LegacyFile)
-
-	_, err = os.Stat(correctPath)
-	if err == nil {
-		return nil
-	}
-	if !os.IsNotExist(err) {
-		return err
-	}
-
-	_, err = os.Stat(legacyPath)
-	if os.IsNotExist(err) {
-		return nil
-	}
-
-	return os.Rename(legacyPath, correctPath)
 }
