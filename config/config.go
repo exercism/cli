@@ -18,10 +18,11 @@ const (
 	// LegacyFile is the name of the original config file.
 	// It is a misnomer, since the config was in json, not go.
 	LegacyFile = ".exercism.go"
-	// Host is the default hostname for fetching problems and submitting exercises.
-	// TODO: We need to operate against two hosts (one for problems and one for submissions),
-	// or define a proxy that both APIs can go through.
-	Host = "http://exercism.io"
+
+	// hostAPI is the endpoint to submit solutions to, and to get personalized data
+	hostAPI = "http://exercism.io"
+	// hostXAPI is the endpoint to fetch problems from
+	hostXAPI = "http://x.exercism.io"
 
 	// DirExercises is the default name of the directory for active users.
 	DirExercises = "exercism"
@@ -35,20 +36,22 @@ var (
 // This defines both the auth for talking to the API, as well as
 // where to put problems that get downloaded.
 type Config struct {
-	APIKey   string `json:"apiKey"`
-	Dir      string `json:"exercismDirectory"`
-	Hostname string `json:"hostname"`
-	home     string // cache user's home directory
-	file     string // full path to config file
+	APIKey       string `json:"apiKey"`
+	Dir          string `json:"exercismDirectory"`
+	Hostname     string `json:"hostname"`
+	ProblemsHost string `json:"problemsHost"`
+	home         string // cache user's home directory
+	file         string // full path to config file
 }
 
 // New returns a new config.
 // It will attempt to set defaults where no value is passed in.
 func New(key, host, dir string) (*Config, error) {
 	c := &Config{
-		APIKey:   key,
-		Hostname: host,
-		Dir:      dir,
+		APIKey:       key,
+		Hostname:     host,
+		ProblemsHost: host,
+		Dir:          dir,
 	}
 	return c.configure()
 }
@@ -57,7 +60,11 @@ func (c *Config) configure() (*Config, error) {
 	c.sanitize()
 
 	if c.Hostname == "" {
-		c.Hostname = Host
+		c.Hostname = hostAPI
+	}
+
+	if c.ProblemsHost == "" {
+		c.ProblemsHost = hostXAPI
 	}
 
 	dir, err := c.homeDir()
@@ -135,7 +142,6 @@ func Read(file string) (*Config, error) {
 
 // Encode writes a Config into JSON format.
 func (c *Config) Encode(w io.Writer) error {
-	c.sanitize()
 	e := json.NewEncoder(w)
 	return e.Encode(c)
 }
@@ -222,7 +228,7 @@ func HomeDir() string {
 // Demo is a default configuration for unauthenticated users.
 func Demo() *Config {
 	return &Config{
-		Hostname: Host,
+		Hostname: hostAPI,
 		APIKey:   "",
 		Dir:      DefaultAssignmentPath(),
 	}
@@ -242,6 +248,7 @@ func (c *Config) sanitize() {
 	c.APIKey = strings.TrimSpace(c.APIKey)
 	c.Dir = strings.TrimSpace(c.Dir)
 	c.Hostname = strings.TrimSpace(c.Hostname)
+	c.ProblemsHost = strings.TrimSpace(c.Hostname)
 }
 
 // renameLegacy normalizes the default config file name.

@@ -119,16 +119,18 @@ func TestDecodingConfig(t *testing.T) {
 }
 
 func TestEncodingConfig(t *testing.T) {
-	currentConfig := Config{
-		APIKey:   "MyKey ",
-		Dir:      "/home/user name  ",
-		Hostname: "localhost  ",
+	c := Config{
+		APIKey:       "MyKey ",
+		Dir:          "/home/user name  ",
+		Hostname:     "localhost  ",
+		ProblemsHost: " localhost:9292 ",
 	}
-	sanitizedJSON := `{"apiKey":"MyKey","exercismDirectory":"/home/user name","hostname":"localhost"}
+	c.configure()
+	sanitizedJSON := `{"apiKey":"MyKey","exercismDirectory":"/home/user name","hostname":"localhost","problemsHost":"localhost"}
 `
 
 	buf := new(bytes.Buffer)
-	err := currentConfig.Encode(buf)
+	err := c.Encode(buf)
 
 	assert.NoError(t, err)
 	assert.Equal(t, sanitizedJSON, buf.String())
