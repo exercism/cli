@@ -126,7 +126,7 @@ func TestEncodingConfig(t *testing.T) {
 		ProblemsHost: " localhost:9292 ",
 	}
 	c.configure()
-	sanitizedJSON := `{"apiKey":"MyKey","exercismDirectory":"/home/user name","hostname":"localhost","problemsHost":"localhost"}
+	sanitizedJSON := `{"apiKey":"MyKey","exercismDirectory":"/home/user name","hostname":"localhost","problemsHost":"localhost:9292"}
 `
 
 	buf := new(bytes.Buffer)

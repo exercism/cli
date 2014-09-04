@@ -48,10 +48,9 @@ type Config struct {
 // It will attempt to set defaults where no value is passed in.
 func New(key, host, dir string) (*Config, error) {
 	c := &Config{
-		APIKey:       key,
-		Hostname:     host,
-		ProblemsHost: host,
-		Dir:          dir,
+		APIKey:   key,
+		Hostname: host,
+		Dir:      dir,
 	}
 	return c.configure()
 }
@@ -248,7 +247,7 @@ func (c *Config) sanitize() {
 	c.APIKey = strings.TrimSpace(c.APIKey)
 	c.Dir = strings.TrimSpace(c.Dir)
 	c.Hostname = strings.TrimSpace(c.Hostname)
-	c.ProblemsHost = strings.TrimSpace(c.Hostname)
+	c.ProblemsHost = strings.TrimSpace(c.ProblemsHost)
 }
 
 // renameLegacy normalizes the default config file name.
