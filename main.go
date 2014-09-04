@@ -36,7 +36,6 @@ var FetchEndpoints = map[string]string{
 	"current":  "/api/v1/user/assignments/current",
 	"next":     "/api/v1/user/assignments/next",
 	"restore":  "/api/v1/user/assignments/restore",
-	"demo":     "/api/v1/assignments/demo",
 	"exercise": "/api/v1/assignments",
 }
 
@@ -91,28 +90,7 @@ func main() {
 			Name:      "demo",
 			ShortName: "d",
 			Usage:     "Fetch first assignment for each language from exercism.io",
-			Action: func(ctx *cli.Context) {
-				c, err := config.Read(ctx.GlobalString("config"))
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-				assignments, err := FetchAssignments(c, FetchEndpoints["demo"])
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-
-				for _, a := range assignments {
-					err := SaveAssignment(c.Dir, a)
-					if err != nil {
-						fmt.Println(err)
-					}
-				}
-
-				msg := "\nThe demo exercises have been written to %s, in subdirectories by language.\n\nTo try an exercise, change directory to a language/exercise, read the README and run the tests.\n\n"
-				fmt.Printf(msg, c.Dir)
-			},
+			Action:    handlers.Demo,
 		},
 		{
 			Name:      "fetch",
