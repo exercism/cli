@@ -30,8 +30,8 @@ func Demo(ctx *cli.Context) {
 		}
 	}
 
+	fmt.Println()
 	NewHomework(problems, c).Report()
-
 	fmt.Println()
 	fmt.Println("Next step: choose a language, read the README, and make the test suite pass.")
 }
