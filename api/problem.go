@@ -18,7 +18,7 @@ type Problem struct {
 }
 
 func (p *Problem) String() string {
-	return fmt.Sprintf("%s - %s in %s", p.ID, p.Name, p.Language)
+	return fmt.Sprintf("%s (%s)", p.Name, p.Language)
 }
 
 func (p *Problem) ExistsIn(dir string) bool {

@@ -28,6 +28,10 @@ func Demo(ctx *cli.Context) {
 			fmt.Println(err)
 			return
 		}
-		fmt.Printf("%s (%s) - %s/%s\n", problem.Name, problem.Language, c.Dir, problem.ID)
 	}
+
+	NewHomework(problems, c).Report()
+
+	fmt.Println()
+	fmt.Println("Next step: choose a language, read the README, and make the test suite pass.")
 }
