@@ -12,7 +12,7 @@ import (
 func Demo(ctx *cli.Context) {
 	c, err := config.Read(ctx.GlobalString("config"))
 	if err != nil {
-		fmt.Println(nil)
+		fmt.Println(err)
 		return
 	}
 
