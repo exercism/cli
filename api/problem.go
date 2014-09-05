@@ -17,8 +17,8 @@ type Problem struct {
 	Files    map[string]string `json:"files"`
 }
 
-func (p *Problem) String() {
-	fmt.Sprintf("%s - %s in %s", p.ID, p.Name, p.Language)
+func (p *Problem) String() string {
+	return fmt.Sprintf("%s - %s in %s", p.ID, p.Name, p.Language)
 }
 
 func (p *Problem) ExistsIn(dir string) bool {
