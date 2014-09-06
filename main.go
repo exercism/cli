@@ -96,51 +96,7 @@ func main() {
 			Name:      "fetch",
 			ShortName: "f",
 			Usage:     "Fetch assignments from exercism.io",
-			Action: func(ctx *cli.Context) {
-				argCount := len(ctx.Args())
-				if argCount < 0 || argCount > 2 {
-					fmt.Println("Usage: exercism fetch\n   or: exercism fetch LANGUAGE\n   or: exercism fetch LANGUAGE EXERCISE")
-					return
-				}
-
-				c, err := config.Read(ctx.GlobalString("config"))
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-
-				if !c.IsAuthenticated() && (argCount == 0 || argCount == 1) {
-					fmt.Println(msgPleaseAuthenticate)
-					return
-				}
-
-				assignments, err := FetchAssignments(c, FetchEndpoint(ctx.Args()))
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-
-				if len(assignments) == 0 {
-					noAssignmentMessage := "No assignments found"
-					if argCount == 2 {
-						fmt.Printf("%s for %s - %s\n", noAssignmentMessage, ctx.Args()[0], ctx.Args()[1])
-					} else if argCount == 1 {
-						fmt.Printf("%s for %s\n", noAssignmentMessage, ctx.Args()[0])
-					} else {
-						fmt.Printf("%s\n", noAssignmentMessage)
-					}
-					return
-				}
-
-				for _, a := range assignments {
-					err := SaveAssignment(c.Dir, a)
-					if err != nil {
-						fmt.Println(err)
-					}
-				}
-
-				fmt.Printf("Exercises written to %s\n", c.Dir)
-			},
+			Action:    handlers.Fetch,
 		},
 		{
 			// Deprecated, just use configure command
