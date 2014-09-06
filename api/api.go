@@ -17,9 +17,7 @@ type PayloadError struct {
 	Error string `json:"error"`
 }
 
-func Demo(c *config.Config) ([]*Problem, error) {
-	url := fmt.Sprintf("%s/problems/demo?key=%s", c.ProblemsHost, c.APIKey)
-
+func Fetch(url string) ([]*Problem, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -53,4 +51,10 @@ func Demo(c *config.Config) ([]*Problem, error) {
 	}
 
 	return payload.Problems, nil
+}
+
+func Demo(c *config.Config) ([]*Problem, error) {
+	url := fmt.Sprintf("%s/problems/demo?key=%s", c.ProblemsHost, c.APIKey)
+
+	return Fetch(url)
 }
