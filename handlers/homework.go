@@ -8,8 +8,12 @@ import (
 )
 
 type Item struct {
-	Title string
-	Path  string
+	*api.Problem
+	dir string
+}
+
+func (it *Item) Path() string {
+	return fmt.Sprintf("%s/%s", it.dir, it.Problem.ID)
 }
 
 type Homework struct {
@@ -17,22 +21,12 @@ type Homework struct {
 	template string
 }
 
-func (hw Homework) MaxTitleWidth() int {
-	var max int
-	for _, item := range hw.Items {
-		if len(item.Title) > max {
-			max = len(item.Title)
-		}
-	}
-	return max
-}
-
 func NewHomework(problems []*api.Problem, c *config.Config) Homework {
 	hw := Homework{}
 	for _, problem := range problems {
 		item := &Item{
-			Title: problem.String(),
-			Path:  fmt.Sprintf("%s/%s", c.Dir, problem.ID),
+			Problem: problem,
+			dir:     c.Dir,
 		}
 		hw.Items = append(hw.Items, item)
 	}
@@ -43,6 +37,16 @@ func NewHomework(problems []*api.Problem, c *config.Config) Homework {
 
 func (hw Homework) Report() {
 	for _, item := range hw.Items {
-		fmt.Printf(hw.template, item.Title, item.Path)
+		fmt.Printf(hw.template, item.String(), item.Path())
 	}
+}
+
+func (hw Homework) MaxTitleWidth() int {
+	var max int
+	for _, item := range hw.Items {
+		if len(item.String()) > max {
+			max = len(item.String())
+		}
+	}
+	return max
 }
