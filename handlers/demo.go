@@ -29,9 +29,7 @@ func Demo(ctx *cli.Context) {
 		return
 	}
 
-	fmt.Println()
-	hw.Report()
-	fmt.Println()
+	hw.Report(HWAll)
 
 	fmt.Println("Next step: choose a language, read the README, and make the test suite pass.")
 }

@@ -42,7 +42,5 @@ func Fetch(ctx *cli.Context) {
 		return
 	}
 
-	fmt.Println()
-	hw.Report()
-	fmt.Println()
+	hw.Summarize()
 }

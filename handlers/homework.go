@@ -7,6 +7,14 @@ import (
 	"github.com/exercism/cli/config"
 )
 
+type HWFilter int
+
+const (
+	HWAll = iota
+	HWUpdated
+	HWNew
+)
+
 type Homework struct {
 	Items    []*Item
 	template string
@@ -36,10 +44,48 @@ func (hw *Homework) Save() error {
 	return nil
 }
 
-func (hw *Homework) Report() {
+func (hw *Homework) ItemsMatching(filter HWFilter) []*Item {
+	items := []*Item{}
 	for _, item := range hw.Items {
+		if item.Matches(filter) {
+			items = append(items, item)
+		}
+	}
+	return items
+}
+
+func (hw *Homework) Report(filter HWFilter) {
+	items := hw.ItemsMatching(filter)
+	hw.Heading(filter, len(items))
+	for _, item := range items {
 		fmt.Printf(hw.template, item.String(), item.Path())
 	}
+}
+
+func (hw *Homework) Heading(filter HWFilter, count int) {
+	if count == 0 {
+		return
+	}
+	fmt.Println()
+
+	if filter == HWAll {
+		return
+	}
+
+	unit := "problems"
+	if count == 1 {
+		unit = "problem"
+	}
+
+	var status string
+	switch filter {
+	case HWUpdated:
+		status = "Updated:"
+	case HWNew:
+		status = "New:"
+	}
+	summary := fmt.Sprintf("%d %s", count, unit)
+	fmt.Printf(hw.template, status, summary)
 }
 
 func (hw *Homework) MaxTitleWidth() int {
@@ -50,4 +96,14 @@ func (hw *Homework) MaxTitleWidth() int {
 		}
 	}
 	return max
+}
+
+func (hw *Homework) Summarize() {
+	hw.Report(HWUpdated)
+	hw.Report(HWNew)
+
+	fresh := len(hw.ItemsMatching(HWNew))
+	updated := len(hw.ItemsMatching(HWUpdated))
+	unchanged := len(hw.Items) - updated - fresh
+	fmt.Printf("\nunchanged: %d, updated: %d, new: %d\n\n", unchanged, updated, fresh)
 }
