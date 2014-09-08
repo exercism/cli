@@ -21,7 +21,7 @@ type Homework struct {
 	template string
 }
 
-func NewHomework(problems []*api.Problem, c *config.Config) Homework {
+func NewHomework(problems []*api.Problem, c *config.Config) *Homework {
 	hw := Homework{}
 	for _, problem := range problems {
 		item := &Item{
@@ -32,16 +32,16 @@ func NewHomework(problems []*api.Problem, c *config.Config) Homework {
 	}
 
 	hw.template = fmt.Sprintf("%%%ds %%s\n", hw.MaxTitleWidth())
-	return hw
+	return &hw
 }
 
-func (hw Homework) Report() {
+func (hw *Homework) Report() {
 	for _, item := range hw.Items {
 		fmt.Printf(hw.template, item.String(), item.Path())
 	}
 }
 
-func (hw Homework) MaxTitleWidth() int {
+func (hw *Homework) MaxTitleWidth() int {
 	var max int
 	for _, item := range hw.Items {
 		if len(item.String()) > max {
