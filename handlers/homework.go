@@ -7,15 +7,6 @@ import (
 	"github.com/exercism/cli/config"
 )
 
-type Item struct {
-	*api.Problem
-	dir string
-}
-
-func (it *Item) Path() string {
-	return fmt.Sprintf("%s/%s", it.dir, it.Problem.ID)
-}
-
 type Homework struct {
 	Items    []*Item
 	template string
@@ -33,6 +24,16 @@ func NewHomework(problems []*api.Problem, c *config.Config) *Homework {
 
 	hw.template = fmt.Sprintf("%%%ds %%s\n", hw.MaxTitleWidth())
 	return &hw
+}
+
+func (hw *Homework) Save() error {
+	for _, item := range hw.Items {
+		err := item.Save()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (hw *Homework) Report() {
