@@ -1,11 +1,6 @@
 package api
 
-import (
-	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-)
+import "fmt"
 
 type Problem struct {
 	ID       string            `json:"id"`
@@ -19,34 +14,4 @@ type Problem struct {
 
 func (p *Problem) String() string {
 	return fmt.Sprintf("%s (%s)", p.Name, p.Language)
-}
-
-func (p *Problem) ExistsIn(dir string) bool {
-	path := fmt.Sprintf("%s/%s", dir, p.ID)
-
-	if _, err := os.Stat(path); err != nil && os.IsNotExist(err) {
-		return false
-	}
-	return true
-}
-
-func (p *Problem) Save(dir string) error {
-	if p.ExistsIn(dir) {
-		return nil
-	}
-
-	for name, text := range p.Files {
-		file := fmt.Sprintf("%s/%s/%s", dir, p.ID, name)
-
-		err := os.MkdirAll(filepath.Dir(file), 0755)
-		if err != nil {
-			return err
-		}
-
-		err = ioutil.WriteFile(file, []byte(text), 0644)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
