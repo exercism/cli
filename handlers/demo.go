@@ -22,16 +22,16 @@ func Demo(ctx *cli.Context) {
 		return
 	}
 
-	for _, problem := range problems {
-		err := problem.Save(c.Dir)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	hw := NewHomework(problems, c)
+	err = hw.Save()
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
 	fmt.Println()
-	NewHomework(problems, c).Report()
+	hw.Report()
 	fmt.Println()
+
 	fmt.Println("Next step: choose a language, read the README, and make the test suite pass.")
 }

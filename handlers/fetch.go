@@ -35,12 +35,14 @@ func Fetch(ctx *cli.Context) {
 		return
 	}
 
-	for _, problem := range problems {
-		err := problem.Save(c.Dir)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Printf("%s - %s\n", problem, fmt.Sprintf("%s/%s", c.Dir, problem.ID))
+	hw := NewHomework(problems, c)
+	err = hw.Save()
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
+
+	fmt.Println()
+	hw.Report()
+	fmt.Println()
 }
