@@ -119,33 +119,7 @@ func main() {
 				"submitted. It will *not* overwrite existing files.  If you have made changes " +
 				"to a file and have not submitted it, and you're trying to restore the last " +
 				"submitted version, first move that file out of the way, then call restore.",
-			Action: func(ctx *cli.Context) {
-				c, err := config.Read(ctx.GlobalString("config"))
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-
-				if !c.IsAuthenticated() {
-					fmt.Println(msgPleaseAuthenticate)
-					return
-				}
-
-				assignments, err := FetchAssignments(c, FetchEndpoints["restore"])
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-
-				for _, a := range assignments {
-					err := SaveAssignment(c.Dir, a)
-					if err != nil {
-						fmt.Println(err)
-					}
-				}
-
-				fmt.Printf("Exercises written to %s\n", c.Dir)
-			},
+			Action: handlers.Restore,
 		},
 		{
 			Name:      "submit",
