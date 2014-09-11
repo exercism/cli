@@ -24,6 +24,18 @@ const (
 	Version = "1.7.0"
 
 	msgPleaseAuthenticate = "You must be authenticated. Run `exercism configure --key=YOUR_API_KEY`."
+
+	descDebug     = "Outputs useful debug information."
+	descConfigure = "Writes config values to a JSON file."
+	descDemo      = "Fetches a demo problem for each language track on exercism.io."
+	descFetch     = "Fetches your current problems on exercism.io, as well as the next unstarted problem in each language."
+	descRestore   = "Restores completed and current problems on from exercism.io, along with your most recent iteration for each."
+	descSubmit    = "Submits a new iteration to a problem on exercism.io."
+	descUnsubmit  = "Deletes the most recently submitted iteration."
+	descLogin     = "DEPRECATED: Interactively saves exercism.io api credentials."
+	descLogout    = "DEPRECATED: Clear exercism.io api credentials"
+
+	descLongRestore = "Restore will pull the latest revisions of exercises that have already been submitted. It will *not* overwrite existing files. If you have made changes to a file and have not submitted it, and you're trying to restore the last submitted version, first move that file out of the way, then call restore."
 )
 
 var (
@@ -64,12 +76,12 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name:   "debug",
-			Usage:  "Outputs useful debug information.",
+			Usage:  descDebug,
 			Action: handlers.Debug,
 		},
 		{
 			Name:  "configure",
-			Usage: "Write config values to a JSON file",
+			Usage: descConfigure,
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "dir, d",
@@ -89,42 +101,38 @@ func main() {
 		{
 			Name:      "demo",
 			ShortName: "d",
-			Usage:     "Fetch first assignment for each language from exercism.io",
+			Usage:     descDemo,
 			Action:    handlers.Demo,
 		},
 		{
 			Name:      "fetch",
 			ShortName: "f",
-			Usage:     "Fetch assignments from exercism.io",
+			Usage:     descFetch,
 			Action:    handlers.Fetch,
 		},
 		{
-			// Deprecated, just use configure command
 			Name:      "login",
 			ShortName: "l",
-			Usage:     "Save exercism.io api credentials",
+			Usage:     descLogin,
 			Action:    handlers.Login,
 		},
 		{
 			Name:      "logout",
 			ShortName: "o",
-			Usage:     "DEPRECATED: Clear exercism.io api credentials",
+			Usage:     descLogout,
 			Action:    handlers.Logout,
 		},
 		{
-			Name:      "restore",
-			ShortName: "r",
-			Usage:     "Restore completed and current assignments from exercism.io",
-			Description: "Restore will pull the latest revisions of exercises that have already been " +
-				"submitted. It will *not* overwrite existing files.  If you have made changes " +
-				"to a file and have not submitted it, and you're trying to restore the last " +
-				"submitted version, first move that file out of the way, then call restore.",
-			Action: handlers.Restore,
+			Name:        "restore",
+			ShortName:   "r",
+			Usage:       descRestore,
+			Description: descLongRestore,
+			Action:      handlers.Restore,
 		},
 		{
 			Name:      "submit",
 			ShortName: "s",
-			Usage:     "Submit code to exercism.io on your current assignment",
+			Usage:     descSubmit,
 			Action: func(ctx *cli.Context) {
 				if len(ctx.Args()) == 0 {
 					fmt.Println("Please enter a file name")
@@ -182,7 +190,7 @@ func main() {
 		{
 			Name:      "unsubmit",
 			ShortName: "u",
-			Usage:     "Delete the last submission",
+			Usage:     descUnsubmit,
 			Action: func(ctx *cli.Context) {
 				c, err := config.Read(ctx.GlobalString("config"))
 				if err != nil {
