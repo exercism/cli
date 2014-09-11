@@ -14,18 +14,14 @@ import (
 func Debug(ctx *cli.Context) {
 	defer fmt.Printf("\nIf you are having any issues, please contact kytrinyx@exercism.io with this information.\n")
 
-	bail := func(err error) {
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
 	fmt.Printf("\n**** Debug Information ****\n")
 	fmt.Printf("Exercism CLI Version: %s\n", ctx.App.Version)
 	fmt.Printf("OS/Architecture: %s/%s\n", runtime.GOOS, runtime.GOARCH)
 
 	dir, err := config.Home()
-	bail(err)
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Printf("Home Dir: %s\n", dir)
 
 	file, err := config.FilePath(ctx.GlobalString("config"))
@@ -34,12 +30,14 @@ func Debug(ctx *cli.Context) {
 		if os.IsNotExist(err) {
 			configured = false
 		} else {
-			bail(err)
+			log.Fatal(err)
 		}
 	}
 
 	c, err := config.Read(file)
-	bail(err)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	if configured {
 		fmt.Printf("Config file: %s\n", c.File())

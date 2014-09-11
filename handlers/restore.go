@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
@@ -12,23 +13,20 @@ import (
 func Restore(ctx *cli.Context) {
 	c, err := config.Read(ctx.GlobalString("config"))
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	url := fmt.Sprintf("%s/api/v1/iterations/%s/restore", c.Hostname, c.APIKey)
 
 	problems, err := api.Fetch(url)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	hw := NewHomework(problems, c)
 	err = hw.Save()
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 	hw.Summarize()
 }
