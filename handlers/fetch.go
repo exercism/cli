@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
@@ -12,8 +13,7 @@ import (
 func Fetch(ctx *cli.Context) {
 	c, err := config.Read(ctx.GlobalString("config"))
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	args := ctx.Args()
@@ -26,20 +26,19 @@ func Fetch(ctx *cli.Context) {
 	case 2:
 		url = fmt.Sprintf("%s/%s/%s/%s", c.ProblemsHost, "v2/exercises", args[0], args[1])
 	default:
-		fmt.Println("Usage: exercism fetch\n   or: exercism fetch LANGUAGE\n   or: exercism fetch LANGUAGE PROBLEM")
+		msg := "Usage: exercism fetch\n   or: exercism fetch LANGUAGE\n   or: exercism fetch LANGUAGE PROBLEM"
+		log.Fatal(msg)
 	}
 
 	problems, err := api.Fetch(url)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	hw := NewHomework(problems, c)
 	err = hw.Save()
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	hw.Summarize()

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
@@ -12,21 +13,18 @@ import (
 func Demo(ctx *cli.Context) {
 	c, err := config.Read(ctx.GlobalString("config"))
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	problems, err := api.Demo(c)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	hw := NewHomework(problems, c)
 	err = hw.Save()
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	hw.Report(HWAll)
