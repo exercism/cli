@@ -96,7 +96,7 @@ func (c *Config) Read(file string) error {
 		if err != nil {
 			return err
 		}
-		file = fmt.Sprintf("%s/%s", home, File)
+		file = filepath.Join(home, File)
 	}
 
 	if _, err := os.Stat(file); err != nil {
@@ -176,7 +176,7 @@ func (c *Config) configure() (*Config, error) {
 	if err != nil {
 		return c, err
 	}
-	c.file = fmt.Sprintf("%s/%s", dir, File)
+	c.file = filepath.Join(dir, File)
 
 	// use legacy value, if it exists
 	if c.ExercismDirectory != "" {
@@ -185,7 +185,7 @@ func (c *Config) configure() (*Config, error) {
 
 	// fall back to default value
 	if c.Dir == "" {
-		c.Dir = fmt.Sprintf("%s/%s", dir, DirExercises)
+		c.Dir = filepath.Join(dir, DirExercises)
 	}
 	c.Dir = strings.Replace(c.Dir, "~/", fmt.Sprintf("%s/", dir), 1)
 	return c, nil
@@ -201,7 +201,7 @@ func FilePath(file string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%s/%s", dir, File), nil
+	return filepath.Join(dir, File), nil
 }
 
 // IsAuthenticated returns true if the config contains an API key.
