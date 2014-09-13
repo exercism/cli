@@ -54,7 +54,7 @@ func Fetch(url string) ([]*Problem, error) {
 }
 
 func Demo(c *config.Config) ([]*Problem, error) {
-	url := fmt.Sprintf("%s/problems/demo?key=%s", c.ProblemsHost, c.APIKey)
+	url := fmt.Sprintf("%s/problems/demo?key=%s", c.XAPI, c.APIKey)
 
 	return Fetch(url)
 }

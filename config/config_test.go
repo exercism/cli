@@ -108,7 +108,7 @@ func TestReadDefaultConfig(t *testing.T) {
 	assert.Equal(t, "abc123", c.APIKey)
 	assert.Equal(t, "/path/to/exercism", c.Dir)
 	assert.Equal(t, "http://example.com", c.API)
-	assert.Equal(t, "http://x.example.com", c.ProblemsHost)
+	assert.Equal(t, "http://x.example.com", c.XAPI)
 }
 
 func TestReadCustomConfig(t *testing.T) {
@@ -122,7 +122,7 @@ func TestReadCustomConfig(t *testing.T) {
 	assert.Equal(t, "xyz000", c.APIKey)
 	assert.Equal(t, "/tmp/exercism", c.Dir)
 	assert.Equal(t, "http://example.org", c.API)
-	assert.Equal(t, "http://x.example.org", c.ProblemsHost)
+	assert.Equal(t, "http://x.example.org", c.XAPI)
 }
 
 func TestReadLegacyConfig(t *testing.T) {
@@ -136,5 +136,5 @@ func TestReadLegacyConfig(t *testing.T) {
 	assert.Equal(t, "prq567", c.APIKey)
 	assert.Equal(t, "/tmp/stuff", c.Dir)
 	assert.Equal(t, "http://api.example.com", c.API)
-	assert.Equal(t, "http://problems.example.com", c.ProblemsHost)
+	assert.Equal(t, "http://problems.example.com", c.XAPI)
 }
