@@ -1,7 +1,6 @@
 package config
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"strings"
@@ -95,38 +94,4 @@ func TestReadingWritingConfig(t *testing.T) {
 	assert.Equal(t, c1.APIKey, c2.APIKey)
 	assert.Equal(t, c1.Dir, c2.Dir)
 	assert.Equal(t, c1.Hostname, c2.Hostname)
-}
-
-func TestDecodingConfig(t *testing.T) {
-	unsanitizedJSON := `{"apiKey":"MyKey  ","exercismDirectory":"/exercism/directory\r\n","hostname":"localhost \r\n"}`
-	c1 := &Config{
-		APIKey:   "MyKey",
-		Dir:      "/exercism/directory",
-		Hostname: "localhost",
-	}
-	b := bytes.NewBufferString(unsanitizedJSON)
-	c2, err := Decode(b)
-	assert.NoError(t, err)
-
-	assert.Equal(t, c1.APIKey, c2.APIKey)
-	assert.Equal(t, c1.Dir, c2.Dir)
-	assert.Equal(t, c1.Hostname, c2.Hostname)
-}
-
-func TestEncodingConfig(t *testing.T) {
-	c := Config{
-		APIKey:       "MyKey ",
-		Dir:          "/home/user name  ",
-		Hostname:     "localhost  ",
-		ProblemsHost: " localhost:9292 ",
-	}
-	c.configure()
-	sanitizedJSON := `{"apiKey":"MyKey","exercismDirectory":"/home/user name","hostname":"localhost","problemsHost":"localhost:9292"}
-`
-
-	buf := new(bytes.Buffer)
-	err := c.Encode(buf)
-
-	assert.NoError(t, err)
-	assert.Equal(t, sanitizedJSON, buf.String())
 }
