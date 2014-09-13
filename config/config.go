@@ -24,6 +24,7 @@ const (
 	hostXAPI = "http://x.exercism.io"
 
 	// DirExercises is the default name of the directory for active users.
+	// Make this non-exported when handlers.Login is deleted.
 	DirExercises = "exercism"
 )
 
@@ -43,66 +44,24 @@ type Config struct {
 	file         string // full path to config file
 }
 
-// New returns a new config.
-// It will attempt to set defaults where no value is passed in.
-func New(key, host, dir string) (*Config, error) {
-	c := &Config{
-		APIKey:   key,
-		Hostname: host,
-		Dir:      dir,
-	}
-	return c.configure()
-}
-
-func (c *Config) configure() (*Config, error) {
-	c.sanitize()
-
-	if c.Hostname == "" {
-		c.Hostname = hostAPI
+// Home returns the user's canonical home directory.
+// See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
+// we can't cross compile using cgo and use user.Current()
+func Home() (string, error) {
+	var dir string
+	if runtime.GOOS == "windows" {
+		dir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if dir == "" {
+			dir = os.Getenv("USERPROFILE")
+		}
+	} else {
+		dir = os.Getenv("HOME")
 	}
 
-	if c.ProblemsHost == "" {
-		c.ProblemsHost = hostXAPI
+	if dir == "" {
+		return dir, errHomeNotFound
 	}
-
-	dir, err := c.homeDir()
-	if err != nil {
-		return c, err
-	}
-	c.file = fmt.Sprintf("%s/%s", dir, File)
-
-	if c.Dir == "" {
-		c.Dir = fmt.Sprintf("%s/%s", dir, DirExercises)
-	}
-	c.Dir = strings.Replace(c.Dir, "~/", fmt.Sprintf("%s/", dir), 1)
-	return c, nil
-}
-
-// SavePath allows the user to customize the location of the JSON file.
-func (c *Config) SavePath(file string) {
-	if file != "" {
-		c.file = file
-	}
-}
-
-// File represents the path to the config file.
-func (c *Config) File() string {
-	return c.file
-}
-
-// Write() saves the config as JSON.
-func (c *Config) Write() error {
-	renameLegacy()
-
-	// truncates existing file if it exists
-	f, err := os.Create(c.file)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	e := json.NewEncoder(f)
-	return e.Encode(c)
+	return dir, nil
 }
 
 // Read loads the config from the stored JSON file.
@@ -138,6 +97,68 @@ func Read(file string) (*Config, error) {
 	return c, nil
 }
 
+// New returns a new config.
+// It will attempt to set defaults where no value is passed in.
+func New(key, host, dir string) (*Config, error) {
+	c := &Config{
+		APIKey:   key,
+		Hostname: host,
+		Dir:      dir,
+	}
+	return c.configure()
+}
+
+// SavePath allows the user to customize the location of the JSON file.
+func (c *Config) SavePath(file string) {
+	if file != "" {
+		c.file = file
+	}
+}
+
+// File represents the path to the config file.
+func (c *Config) File() string {
+	return c.file
+}
+
+// Write() saves the config as JSON.
+func (c *Config) Write() error {
+	renameLegacy()
+
+	// truncates existing file if it exists
+	f, err := os.Create(c.file)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	e := json.NewEncoder(f)
+	return e.Encode(c)
+}
+
+func (c *Config) configure() (*Config, error) {
+	c.sanitize()
+
+	if c.Hostname == "" {
+		c.Hostname = hostAPI
+	}
+
+	if c.ProblemsHost == "" {
+		c.ProblemsHost = hostXAPI
+	}
+
+	dir, err := c.homeDir()
+	if err != nil {
+		return c, err
+	}
+	c.file = fmt.Sprintf("%s/%s", dir, File)
+
+	if c.Dir == "" {
+		c.Dir = fmt.Sprintf("%s/%s", dir, DirExercises)
+	}
+	c.Dir = strings.Replace(c.Dir, "~/", fmt.Sprintf("%s/", dir), 1)
+	return c, nil
+}
+
 // FilePath returns the path to the config file.
 func FilePath(file string) (string, error) {
 	if file != "" {
@@ -164,26 +185,6 @@ func (c *Config) homeDir() (string, error) {
 		return c.home, nil
 	}
 	return Home()
-}
-
-// Home returns the user's canonical home directory.
-// See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
-// we can't cross compile using cgo and use user.Current()
-func Home() (string, error) {
-	var dir string
-	if runtime.GOOS == "windows" {
-		dir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if dir == "" {
-			dir = os.Getenv("USERPROFILE")
-		}
-	} else {
-		dir = os.Getenv("HOME")
-	}
-
-	if dir == "" {
-		return dir, errHomeNotFound
-	}
-	return dir, nil
 }
 
 func (c *Config) sanitize() {

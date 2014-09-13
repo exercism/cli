@@ -13,6 +13,7 @@ import (
 )
 
 // Login interactively stores exercism API configuration.
+// Delete when nobody is using 1.6.x anymore.
 func Login(ctx *cli.Context) {
 	msg := `
 	*******************************************************************
