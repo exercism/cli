@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -17,7 +16,7 @@ type Item struct {
 }
 
 func (it *Item) Path() string {
-	return fmt.Sprintf("%s/%s", it.dir, it.Problem.ID)
+	return filepath.Join(it.dir, it.TrackID, it.Slug)
 }
 
 func (it *Item) Matches(filter HWFilter) bool {
@@ -39,7 +38,7 @@ func (it *Item) Save() error {
 	}
 
 	for name, text := range it.Files {
-		file := fmt.Sprintf("%s/%s/%s", it.dir, it.ID, name)
+		file := filepath.Join(it.Path(), name)
 
 		err := os.MkdirAll(filepath.Dir(file), 0755)
 		if err != nil {
