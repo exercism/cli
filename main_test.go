@@ -52,8 +52,8 @@ func TestFetchWithKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(fetchHandler))
 
 	c := &config.Config{
-		Hostname: server.URL,
-		APIKey:   "myAPIKey",
+		API:    server.URL,
+		APIKey: "myAPIKey",
 	}
 
 	assignments, err := FetchAssignments(c, "/api/v1/user/assignments/current")
@@ -76,8 +76,8 @@ func TestFetchWithIncorrectKey(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(fetchHandler))
 
 	c := &config.Config{
-		Hostname: server.URL,
-		APIKey:   "myWrongAPIKey",
+		API:    server.URL,
+		APIKey: "myWrongAPIKey",
 	}
 
 	assignments, err := FetchAssignments(c, "/api/v1/user/assignments/current")
@@ -174,8 +174,8 @@ func TestSubmitWithKey(t *testing.T) {
 
 	var code = []byte("My source code\n")
 	c := &config.Config{
-		Hostname: server.URL,
-		APIKey:   "myAPIKey",
+		API:    server.URL,
+		APIKey: "myAPIKey",
 	}
 	response, err := SubmitAssignment(c, "ruby/bob/bob.rb", code)
 	assert.NoError(t, err)
@@ -191,8 +191,8 @@ func TestSubmitWithIncorrectKey(t *testing.T) {
 	defer server.Close()
 
 	c := &config.Config{
-		Hostname: server.URL,
-		APIKey:   "myWrongAPIKey",
+		API:    server.URL,
+		APIKey: "myWrongAPIKey",
 	}
 
 	var code = []byte("My source code\n")

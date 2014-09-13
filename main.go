@@ -183,7 +183,7 @@ func main() {
 				}
 
 				fmt.Printf("For feedback on your submission visit %s%s%s\n",
-					c.Hostname, "/submissions/", response.ID)
+					c.API, "/submissions/", response.ID)
 
 			},
 		},
@@ -243,7 +243,7 @@ type submitRequest struct {
 }
 
 func FetchAssignments(c *config.Config, path string) ([]Assignment, error) {
-	url := fmt.Sprintf("%s%s?key=%s", c.Hostname, path, c.APIKey)
+	url := fmt.Sprintf("%s%s?key=%s", c.API, path, c.APIKey)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -293,7 +293,7 @@ func FetchAssignments(c *config.Config, path string) ([]Assignment, error) {
 func UnsubmitAssignment(c *config.Config) error {
 	path := "api/v1/user/assignments"
 
-	url := fmt.Sprintf("%s/%s?key=%s", c.Hostname, path, c.APIKey)
+	url := fmt.Sprintf("%s/%s?key=%s", c.API, path, c.APIKey)
 
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
@@ -334,7 +334,7 @@ func UnsubmitAssignment(c *config.Config) error {
 func SubmitAssignment(c *config.Config, filePath string, code []byte) (*submitResponse, error) {
 	path := "api/v1/user/assignments"
 
-	url := fmt.Sprintf("%s/%s", c.Hostname, path)
+	url := fmt.Sprintf("%s/%s", c.API, path)
 
 	submission := submitRequest{Key: c.APIKey, Code: string(code), Path: filePath}
 	submissionJSON, err := json.Marshal(submission)

@@ -15,19 +15,19 @@ func TestDefaultValues(t *testing.T) {
 	c.home = "/home/alice"
 	c.configure()
 	assert.Equal(t, "", c.APIKey)
-	assert.Equal(t, "http://exercism.io", c.Hostname)
+	assert.Equal(t, "http://exercism.io", c.API)
 	assert.Equal(t, "/home/alice/exercism", c.Dir)
 }
 
 func TestCustomValues(t *testing.T) {
 	c := &Config{
-		APIKey:   "abc123",
-		Hostname: "http://example.org",
-		Dir:      "/path/to/exercises",
+		APIKey: "abc123",
+		API:    "http://example.org",
+		Dir:    "/path/to/exercises",
 	}
 	c.configure()
 	assert.Equal(t, "abc123", c.APIKey)
-	assert.Equal(t, "http://example.org", c.Hostname)
+	assert.Equal(t, "http://example.org", c.API)
 	assert.Equal(t, "/path/to/exercises", c.Dir)
 }
 
@@ -40,13 +40,13 @@ func TestExpandHomeDir(t *testing.T) {
 
 func TestSanitizeWhitespace(t *testing.T) {
 	c := &Config{
-		APIKey:   "   abc123\n\r\n  ",
-		Hostname: "       ",
-		Dir:      "  \r\n/path/to/exercises   \r\n",
+		APIKey: "   abc123\n\r\n  ",
+		API:    "       ",
+		Dir:    "  \r\n/path/to/exercises   \r\n",
 	}
 	c.configure()
 	assert.Equal(t, "abc123", c.APIKey)
-	assert.Equal(t, "http://exercism.io", c.Hostname)
+	assert.Equal(t, "http://exercism.io", c.API)
 	assert.Equal(t, "/path/to/exercises", c.Dir)
 }
 
@@ -68,7 +68,7 @@ func TestReadNonexistantConfig(t *testing.T) {
 	c, err := Read("/no/such/config.json")
 	assert.NoError(t, err)
 	assert.Equal(t, c.APIKey, "")
-	assert.Equal(t, c.Hostname, "http://exercism.io")
+	assert.Equal(t, c.API, "http://exercism.io")
 	assert.False(t, c.IsAuthenticated())
 	if !strings.HasSuffix(c.Dir, "/exercism") {
 		t.Fatal("Default unconfigured config should use home dir")
@@ -81,10 +81,11 @@ func TestReadingWritingConfig(t *testing.T) {
 	assert.NoError(t, err)
 
 	c1 := &Config{
-		APIKey:   "MyKey",
-		Dir:      "/exercism/directory",
-		Hostname: "localhost",
+		APIKey: "MyKey",
+		Dir:    "/exercism/directory",
+		API:    "localhost",
 	}
+	c1.configure()
 
 	c1.SavePath(filename)
 	c1.Write()
@@ -94,7 +95,7 @@ func TestReadingWritingConfig(t *testing.T) {
 
 	assert.Equal(t, c1.APIKey, c2.APIKey)
 	assert.Equal(t, c1.Dir, c2.Dir)
-	assert.Equal(t, c1.Hostname, c2.Hostname)
+	assert.Equal(t, c1.API, c2.API)
 }
 
 func TestReadDefaultConfig(t *testing.T) {
@@ -106,7 +107,7 @@ func TestReadDefaultConfig(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "abc123", c.APIKey)
 	assert.Equal(t, "/path/to/exercism", c.Dir)
-	assert.Equal(t, "http://example.com", c.Hostname)
+	assert.Equal(t, "http://example.com", c.API)
 	assert.Equal(t, "http://x.example.com", c.ProblemsHost)
 }
 
@@ -120,7 +121,7 @@ func TestReadCustomConfig(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "xyz000", c.APIKey)
 	assert.Equal(t, "/tmp/exercism", c.Dir)
-	assert.Equal(t, "http://example.org", c.Hostname)
+	assert.Equal(t, "http://example.org", c.API)
 	assert.Equal(t, "http://x.example.org", c.ProblemsHost)
 }
 
@@ -134,6 +135,6 @@ func TestReadLegacyConfig(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "prq567", c.APIKey)
 	assert.Equal(t, "/tmp/stuff", c.Dir)
-	assert.Equal(t, "http://api.example.com", c.Hostname)
+	assert.Equal(t, "http://api.example.com", c.API)
 	assert.Equal(t, "http://problems.example.com", c.ProblemsHost)
 }
