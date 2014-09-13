@@ -9,7 +9,6 @@ type Problem struct {
 	Language string            `json:"language"`
 	Slug     string            `json:"slug"`
 	Name     string            `json:"name"`
-	IsFresh  bool              `json:"fresh"`
 	Files    map[string]string `json:"files"`
 }
 
