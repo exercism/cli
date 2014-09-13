@@ -37,11 +37,14 @@ var (
 // where to put problems that get downloaded.
 type Config struct {
 	APIKey       string `json:"apiKey"`
-	Dir          string `json:"exercismDirectory"`
+	Dir          string `json:"dir"`
 	Hostname     string `json:"hostname"`
 	ProblemsHost string `json:"problemsHost"`
 	home         string // cache user's home directory
 	file         string // full path to config file
+
+	// deprecated
+	ExercismDirectory string `json:"exercismDirectory,omitempty"`
 }
 
 // Home returns the user's canonical home directory.
@@ -133,6 +136,7 @@ func (c *Config) File() string {
 // Write() saves the config as JSON.
 func (c *Config) Write() error {
 	renameLegacy()
+	c.ExercismDirectory = ""
 
 	// truncates existing file if it exists
 	f, err := os.Create(c.file)
@@ -162,6 +166,12 @@ func (c *Config) configure() (*Config, error) {
 	}
 	c.file = fmt.Sprintf("%s/%s", dir, File)
 
+	// use legacy value, if it exists
+	if c.ExercismDirectory != "" {
+		c.Dir = c.ExercismDirectory
+	}
+
+	// fall back to default value
 	if c.Dir == "" {
 		c.Dir = fmt.Sprintf("%s/%s", dir, DirExercises)
 	}
