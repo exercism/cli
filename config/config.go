@@ -66,35 +66,9 @@ func Home() (string, error) {
 
 // Read loads the config from the stored JSON file.
 func Read(file string) (*Config, error) {
-	renameLegacy()
-
-	file, err := FilePath(file)
-	if err != nil {
-		return nil, err
-	}
-
-	if _, err = os.Stat(file); err != nil {
-		if os.IsNotExist(err) {
-			return New("", "", "")
-		}
-		return nil, err
-	}
-
-	f, err := os.Open(file)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	var c *Config
-	d := json.NewDecoder(f)
-	err = d.Decode(&c)
-	if err != nil {
-		return c, err
-	}
-	c.SavePath(file)
-	c.configure()
-	return c, nil
+	c := &Config{}
+	err := c.Read(file)
+	return c, err
 }
 
 // New returns a new config.
@@ -106,6 +80,42 @@ func New(key, host, dir string) (*Config, error) {
 		Dir:      dir,
 	}
 	return c.configure()
+}
+
+// Read loads the config from the stored JSON file.
+func (c *Config) Read(file string) error {
+	renameLegacy()
+
+	if file == "" {
+		home, err := c.homeDir()
+		if err != nil {
+			return err
+		}
+		file = fmt.Sprintf("%s/%s", home, File)
+	}
+
+	if _, err := os.Stat(file); err != nil {
+		if os.IsNotExist(err) {
+			c.configure()
+			return nil
+		}
+		return err
+	}
+
+	f, err := os.Open(file)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	d := json.NewDecoder(f)
+	err = d.Decode(&c)
+	if err != nil {
+		return err
+	}
+	c.SavePath(file)
+	c.configure()
+	return nil
 }
 
 // SavePath allows the user to customize the location of the JSON file.
