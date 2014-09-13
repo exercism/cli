@@ -64,11 +64,6 @@ func TestFilePath(t *testing.T) {
 	assert.Equal(t, "/tmp/config/exercism.conf", c.File())
 }
 
-func TestExpandsTildeInExercismDirectory(t *testing.T) {
-	expandedDir := ReplaceTilde("~/exercism/directory")
-	assert.NotContains(t, "~", expandedDir)
-}
-
 func TestReadNonexistantConfig(t *testing.T) {
 	c, err := Read("/no/such/config.json")
 	assert.NoError(t, err)
