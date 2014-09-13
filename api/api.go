@@ -9,11 +9,15 @@ import (
 	"github.com/exercism/cli/config"
 )
 
+// PayloadProblems represents a response containing problems.
 type PayloadProblems struct {
 	Problems []*Problem
 	Error    string `json:"error"`
 }
 
+// Fetch retrieves problems from the API.
+// In most cases these problems consist of a test suite and a README
+// from the x-api, but it is also used when restoring earlier iterations.
 func Fetch(url string) ([]*Problem, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -44,6 +48,7 @@ func Fetch(url string) ([]*Problem, error) {
 	return payload.Problems, nil
 }
 
+// Demo fetches the first problem in each language track.
 func Demo(c *config.Config) ([]*Problem, error) {
 	url := fmt.Sprintf("%s/problems/demo?key=%s", c.XAPI, c.APIKey)
 
