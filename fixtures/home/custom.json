@@ -1,1 +1,1 @@
-{"apiKey":"xyz000","dir":"/tmp/exercism","hostname":"http://example.org","problemsHost":"http://x.example.org"}
+{"apiKey":"xyz000","dir":"/tmp/exercism","api":"http://example.org","problemsHost":"http://x.example.org"}

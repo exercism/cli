@@ -16,7 +16,7 @@ func Restore(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
-	url := fmt.Sprintf("%s/api/v1/iterations/%s/restore", c.Hostname, c.APIKey)
+	url := fmt.Sprintf("%s/api/v1/iterations/%s/restore", c.API, c.APIKey)
 
 	problems, err := api.Fetch(url)
 	if err != nil {

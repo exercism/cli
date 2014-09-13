@@ -46,6 +46,6 @@ func Debug(ctx *cli.Context) {
 		fmt.Println("Config file: <not configured>")
 		fmt.Println("API Key: <not configured>")
 	}
-	fmt.Printf("API: %s\n", c.Hostname)
+	fmt.Printf("API: %s\n", c.API)
 	fmt.Printf("Exercises Directory: %s\n", c.Dir)
 }

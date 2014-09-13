@@ -38,13 +38,14 @@ var (
 type Config struct {
 	APIKey       string `json:"apiKey"`
 	Dir          string `json:"dir"`
-	Hostname     string `json:"hostname"`
+	API          string `json:"api"`
 	ProblemsHost string `json:"problemsHost"`
 	home         string // cache user's home directory
 	file         string // full path to config file
 
-	// deprecated
+	// deprecated, get rid of them when nobody uses 1.7.0 anymore
 	ExercismDirectory string `json:"exercismDirectory,omitempty"`
+	Hostname          string `json:"hostname,omitempty"`
 }
 
 // Home returns the user's canonical home directory.
@@ -78,9 +79,9 @@ func Read(file string) (*Config, error) {
 // It will attempt to set defaults where no value is passed in.
 func New(key, host, dir string) (*Config, error) {
 	c := &Config{
-		APIKey:   key,
-		Hostname: host,
-		Dir:      dir,
+		APIKey: key,
+		API:    host,
+		Dir:    dir,
 	}
 	return c.configure()
 }
@@ -137,6 +138,7 @@ func (c *Config) File() string {
 func (c *Config) Write() error {
 	renameLegacy()
 	c.ExercismDirectory = ""
+	c.Hostname = ""
 
 	// truncates existing file if it exists
 	f, err := os.Create(c.file)
@@ -152,8 +154,12 @@ func (c *Config) Write() error {
 func (c *Config) configure() (*Config, error) {
 	c.sanitize()
 
-	if c.Hostname == "" {
-		c.Hostname = hostAPI
+	if c.Hostname != "" {
+		c.API = c.Hostname
+	}
+
+	if c.API == "" {
+		c.API = hostAPI
 	}
 
 	if c.ProblemsHost == "" {
@@ -210,6 +216,7 @@ func (c *Config) homeDir() (string, error) {
 func (c *Config) sanitize() {
 	c.APIKey = strings.TrimSpace(c.APIKey)
 	c.Dir = strings.TrimSpace(c.Dir)
+	c.API = strings.TrimSpace(c.API)
 	c.Hostname = strings.TrimSpace(c.Hostname)
 	c.ProblemsHost = strings.TrimSpace(c.ProblemsHost)
 }
