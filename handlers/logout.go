@@ -10,6 +10,7 @@ import (
 )
 
 // Logout deletes the config file.
+// Delete when nobody is using 1.6.x anymore.
 func Logout(ctx *cli.Context) {
 	msg := `
 	*******************************************************************
