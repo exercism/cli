@@ -176,15 +176,6 @@ func (c *Config) IsAuthenticated() bool {
 	return c.APIKey != ""
 }
 
-// WithDefaultPath returns the default configuration path if none is provided.
-func WithDefaultPath(p string) string {
-	if p == "" {
-		return fmt.Sprintf("%s/%s", HomeDir(), File)
-	}
-
-	return p
-}
-
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 // we can't cross compile using cgo and use user.Current()
 func (c *Config) homeDir() (string, error) {
@@ -212,35 +203,6 @@ func Home() (string, error) {
 		return dir, errHomeNotFound
 	}
 	return dir, nil
-}
-
-// HomeDir returns the user's canonical home directory.
-// FIXME: This one will go away. Refactoring in progress.
-func HomeDir() string {
-	dir, err := Home()
-	if err != nil {
-		panic("unable to determine the location of your home directory")
-	}
-	return dir
-}
-
-// Demo is a default configuration for unauthenticated users.
-func Demo() *Config {
-	return &Config{
-		Hostname: hostAPI,
-		APIKey:   "",
-		Dir:      DefaultAssignmentPath(),
-	}
-}
-
-// DefaultAssignmentPath returns the absolute path of the default exercism directory
-func DefaultAssignmentPath() string {
-	return filepath.Join(HomeDir(), DirExercises)
-}
-
-// ReplaceTilde replaces the short-hand home path with the absolute path.
-func ReplaceTilde(path string) string {
-	return strings.Replace(path, "~/", HomeDir()+"/", 1)
 }
 
 func (c *Config) sanitize() {
