@@ -36,16 +36,17 @@ var (
 // This defines both the auth for talking to the API, as well as
 // where to put problems that get downloaded.
 type Config struct {
-	APIKey       string `json:"apiKey"`
-	Dir          string `json:"dir"`
-	API          string `json:"api"`
-	ProblemsHost string `json:"problemsHost"`
-	home         string // cache user's home directory
-	file         string // full path to config file
+	APIKey string `json:"apiKey"`
+	Dir    string `json:"dir"`
+	API    string `json:"api"`
+	XAPI   string `json:"xapi"`
+	home   string // cache user's home directory
+	file   string // full path to config file
 
 	// deprecated, get rid of them when nobody uses 1.7.0 anymore
 	ExercismDirectory string `json:"exercismDirectory,omitempty"`
 	Hostname          string `json:"hostname,omitempty"`
+	ProblemsHost      string `json:"problemsHost,omitempty"`
 }
 
 // Home returns the user's canonical home directory.
@@ -139,6 +140,7 @@ func (c *Config) Write() error {
 	renameLegacy()
 	c.ExercismDirectory = ""
 	c.Hostname = ""
+	c.ProblemsHost = ""
 
 	// truncates existing file if it exists
 	f, err := os.Create(c.file)
@@ -162,8 +164,12 @@ func (c *Config) configure() (*Config, error) {
 		c.API = hostAPI
 	}
 
-	if c.ProblemsHost == "" {
-		c.ProblemsHost = hostXAPI
+	if c.ProblemsHost != "" {
+		c.XAPI = c.ProblemsHost
+	}
+
+	if c.XAPI == "" {
+		c.XAPI = hostXAPI
 	}
 
 	dir, err := c.homeDir()
@@ -217,6 +223,7 @@ func (c *Config) sanitize() {
 	c.APIKey = strings.TrimSpace(c.APIKey)
 	c.Dir = strings.TrimSpace(c.Dir)
 	c.API = strings.TrimSpace(c.API)
+	c.XAPI = strings.TrimSpace(c.XAPI)
 	c.Hostname = strings.TrimSpace(c.Hostname)
 	c.ProblemsHost = strings.TrimSpace(c.ProblemsHost)
 }

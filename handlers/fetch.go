@@ -20,11 +20,11 @@ func Fetch(ctx *cli.Context) {
 	var url string
 	switch len(args) {
 	case 0:
-		url = fmt.Sprintf("%s/%s?key=%s", c.ProblemsHost, "v2/exercises", c.APIKey)
+		url = fmt.Sprintf("%s/%s?key=%s", c.XAPI, "v2/exercises", c.APIKey)
 	case 1:
-		url = fmt.Sprintf("%s/%s/%s?key=%s", c.ProblemsHost, "v2/exercises", args[0], c.APIKey)
+		url = fmt.Sprintf("%s/%s/%s?key=%s", c.XAPI, "v2/exercises", args[0], c.APIKey)
 	case 2:
-		url = fmt.Sprintf("%s/%s/%s/%s", c.ProblemsHost, "v2/exercises", args[0], args[1])
+		url = fmt.Sprintf("%s/%s/%s/%s", c.XAPI, "v2/exercises", args[0], args[1])
 	default:
 		msg := "Usage: exercism fetch\n   or: exercism fetch LANGUAGE\n   or: exercism fetch LANGUAGE PROBLEM"
 		log.Fatal(msg)
