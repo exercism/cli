@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -94,4 +95,31 @@ func TestReadingWritingConfig(t *testing.T) {
 	assert.Equal(t, c1.APIKey, c2.APIKey)
 	assert.Equal(t, c1.Dir, c2.Dir)
 	assert.Equal(t, c1.Hostname, c2.Hostname)
+}
+
+func TestReadDefaultConfig(t *testing.T) {
+	dir, err := filepath.Abs("../fixtures/home")
+	assert.NoError(t, err)
+
+	c := &Config{home: dir}
+	err = c.Read("")
+	assert.NoError(t, err)
+	assert.Equal(t, "abc123", c.APIKey)
+	assert.Equal(t, "/path/to/exercism", c.Dir)
+	assert.Equal(t, "http://example.com", c.Hostname)
+	assert.Equal(t, "http://x.example.com", c.ProblemsHost)
+}
+
+func TestReadCustomConfig(t *testing.T) {
+	dir, err := filepath.Abs("../fixtures/home/")
+	assert.NoError(t, err)
+
+	c := &Config{home: dir}
+	file := fmt.Sprintf("%s/custom.json", dir)
+	err = c.Read(file)
+	assert.NoError(t, err)
+	assert.Equal(t, "xyz000", c.APIKey)
+	assert.Equal(t, "/tmp/exercism", c.Dir)
+	assert.Equal(t, "http://example.org", c.Hostname)
+	assert.Equal(t, "http://x.example.org", c.ProblemsHost)
 }
