@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -102,11 +101,8 @@ func (c *Config) Write() error {
 	}
 	defer f.Close()
 
-	err = c.Encode(f)
-	if err != nil {
-		return err
-	}
-	return nil
+	e := json.NewEncoder(f)
+	return e.Encode(c)
 }
 
 // Read loads the config from the stored JSON file.
@@ -131,28 +127,13 @@ func Read(file string) (*Config, error) {
 	}
 	defer f.Close()
 
-	c, err := Decode(f)
-	if err != nil {
-		return nil, err
-	}
-	c.SavePath(file)
-	return c, nil
-}
-
-// Encode writes a Config into JSON format.
-func (c *Config) Encode(w io.Writer) error {
-	e := json.NewEncoder(w)
-	return e.Encode(c)
-}
-
-// Decode loads a Config from JSON format.
-func Decode(r io.Reader) (*Config, error) {
-	d := json.NewDecoder(r)
 	var c *Config
-	err := d.Decode(&c)
+	d := json.NewDecoder(f)
+	err = d.Decode(&c)
 	if err != nil {
 		return c, err
 	}
+	c.SavePath(file)
 	c.configure()
 	return c, nil
 }
