@@ -11,10 +11,7 @@ import (
 
 type PayloadProblems struct {
 	Problems []*Problem
-}
-
-type PayloadError struct {
-	Error string `json:"error"`
+	Error    string `json:"error"`
 }
 
 func Fetch(url string) ([]*Problem, error) {
@@ -34,20 +31,14 @@ func Fetch(url string) ([]*Problem, error) {
 		return nil, err
 	}
 
-	if res.StatusCode != http.StatusOK {
-		payload := &PayloadError{}
-		err := json.Unmarshal(body, payload)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing API response: [%v]", err)
-		}
-		return nil, fmt.Errorf(`unable to fetch problems (%d) - %s`, res.StatusCode, payload.Error)
-	}
-
 	payload := &PayloadProblems{}
-
 	err = json.Unmarshal(body, &payload)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing API response: [%v]", err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf(`unable to fetch problems (HTTP: %d) - %s`, res.StatusCode, payload.Error)
 	}
 
 	return payload.Problems, nil
