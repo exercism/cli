@@ -11,6 +11,12 @@ import (
 )
 
 const (
+	// Version is the current release of the command-line app.
+	// We try to follow Semantic Versioning (http://semver.org),
+	// but with the http://exercism.io app being a prototype, a
+	// lot of things get out of hand.
+	Version = "1.7.0"
+
 	// File is the default name of the JSON file where the config written.
 	// The user can pass an alternate filename when using the CLI.
 	File = ".exercism.json"
@@ -30,6 +36,10 @@ const (
 
 var (
 	errHomeNotFound = errors.New("unable to locate home directory")
+
+	// UserAgent is sent along as a header to HTTP requests that the
+	// CLI makes. This helps with debugging.
+	UserAgent = fmt.Sprintf("github.com/exercism/cli v%s (%s/%s)", Version, runtime.GOOS, runtime.GOARCH)
 )
 
 // Config represents the settings for particular user.
