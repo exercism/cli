@@ -36,7 +36,7 @@ func Fetch(url string) ([]*Problem, error) {
 	}
 
 	payload := &PayloadProblems{}
-	err = json.Unmarshal(body, &payload)
+	err = json.Unmarshal(body, payload)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing API response: [%v]", err)
 	}
