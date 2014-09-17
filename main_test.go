@@ -97,7 +97,7 @@ var submitHandler = func(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userAgentMatches := strings.HasPrefix(r.Header.Get("User-Agent"), fmt.Sprintf("github.com/exercism/cli v%s", Version))
+	userAgentMatches := strings.HasPrefix(r.Header.Get("User-Agent"), fmt.Sprintf("github.com/exercism/cli v%s", config.Version))
 
 	if !userAgentMatches {
 		fmt.Printf("User agent mismatch: %s\n", r.Header.Get("User-Agent"))
@@ -166,39 +166,6 @@ var submitHandler = func(rw http.ResponseWriter, r *http.Request) {
 }
 `
 	fmt.Fprintf(rw, submitJSON)
-}
-
-func TestSubmitWithKey(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(submitHandler))
-	defer server.Close()
-
-	var code = []byte("My source code\n")
-	c := &config.Config{
-		API:    server.URL,
-		APIKey: "myAPIKey",
-	}
-	response, err := SubmitAssignment(c, "ruby/bob/bob.rb", code)
-	assert.NoError(t, err)
-
-	assert.Equal(t, response.Status, "saved")
-	assert.Equal(t, response.Language, "ruby")
-	assert.Equal(t, response.Exercise, "bob")
-	assert.Equal(t, response.SubmissionPath, "/username/ruby/bob")
-}
-
-func TestSubmitWithIncorrectKey(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(submitHandler))
-	defer server.Close()
-
-	c := &config.Config{
-		API:    server.URL,
-		APIKey: "myWrongAPIKey",
-	}
-
-	var code = []byte("My source code\n")
-	_, err := SubmitAssignment(c, "ruby/bob/bob.rb", code)
-
-	assert.Error(t, err)
 }
 
 func TestSavingAssignment(t *testing.T) {
