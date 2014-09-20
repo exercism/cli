@@ -14,8 +14,7 @@ import (
 // Submit posts an iteration to the api
 func Submit(ctx *cli.Context) {
 	if len(ctx.Args()) == 0 {
-		fmt.Println("Please enter a file name")
-		return
+		log.Fatal("Please enter a file name")
 	}
 
 	c, err := config.Read(ctx.GlobalString("config"))
@@ -24,8 +23,7 @@ func Submit(ctx *cli.Context) {
 	}
 
 	if !c.IsAuthenticated() {
-		fmt.Println(msgPleaseAuthenticate)
-		return
+		log.Fatal(msgPleaseAuthenticate)
 	}
 
 	filename := ctx.Args()[0]
