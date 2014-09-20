@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,10 +10,22 @@ import (
 	"github.com/exercism/cli/config"
 )
 
+var (
+	// UserAgent lets the API know where the call is being made from.
+	// It's set from main() so that we have access to the version.
+	UserAgent string
+)
+
 // PayloadProblems represents a response containing problems.
 type PayloadProblems struct {
 	Problems []*Problem
 	Error    string `json:"error"`
+}
+
+// PayloadSubmission represents metadata about a successful submission.
+type PayloadSubmission struct {
+	*Submission
+	Error string `json:"error"`
 }
 
 // Fetch retrieves problems from the API.
@@ -38,7 +51,7 @@ func Fetch(url string) ([]*Problem, error) {
 	payload := &PayloadProblems{}
 	err = json.Unmarshal(body, payload)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing API response: [%v]", err)
+		return nil, fmt.Errorf("error parsing API response - %s", err)
 	}
 
 	if res.StatusCode != http.StatusOK {
@@ -53,4 +66,42 @@ func Demo(c *config.Config) ([]*Problem, error) {
 	url := fmt.Sprintf("%s/problems/demo?key=%s", c.XAPI, c.APIKey)
 
 	return Fetch(url)
+}
+
+// Submit posts code to the API
+func Submit(url string, iter *Iteration) (*Submission, error) {
+	payload, err := json.Marshal(iter)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewReader(payload))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("User-Agent", UserAgent)
+	req.Header.Set("Content-Type", "application/json")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("unable to submit solution - %s", err)
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	defer res.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	ps := &PayloadSubmission{}
+	err = json.Unmarshal(body, ps)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing API response - %s", err)
+	}
+	if res.StatusCode != http.StatusCreated {
+		return nil, fmt.Errorf(`unable to submit (HTTP: %d) - %s`, res.StatusCode, ps.Error)
+	}
+
+	return ps.Submission, nil
 }
