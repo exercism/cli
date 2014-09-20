@@ -1,16 +1,13 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
+	"log"
 	"os"
 	"runtime"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/handlers"
 )
 
@@ -20,8 +17,6 @@ const (
 	// but with the http://exercism.io app being a prototype, a
 	// lot of things get out of hand.
 	Version = "1.7.0"
-
-	msgPleaseAuthenticate = "You must be authenticated. Run `exercism configure --key=YOUR_API_KEY`."
 
 	descDebug     = "Outputs useful debug information."
 	descConfigure = "Writes config values to a JSON file."
@@ -115,72 +110,11 @@ func main() {
 			Name:      "unsubmit",
 			ShortName: "u",
 			Usage:     descUnsubmit,
-			Action: func(ctx *cli.Context) {
-				c, err := config.Read(ctx.GlobalString("config"))
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-
-				if !c.IsAuthenticated() {
-					fmt.Println(msgPleaseAuthenticate)
-					return
-				}
-
-				err = UnsubmitAssignment(c)
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-				fmt.Println("The last submission was successfully deleted.")
-			},
+			Action:    handlers.Unsubmit,
 		},
 	}
 	err := app.Run(os.Args)
 	if err != nil {
-		fmt.Errorf("%v", err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
-}
-
-func UnsubmitAssignment(c *config.Config) error {
-	path := "api/v1/user/assignments"
-
-	url := fmt.Sprintf("%s/%s?key=%s", c.API, path, c.APIKey)
-
-	req, err := http.NewRequest("DELETE", url, nil)
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("User-Agent", api.UserAgent)
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		err = fmt.Errorf("Error destroying submission: [%v]", err)
-		return err
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode != http.StatusNoContent {
-
-		var ur struct {
-			Error string
-		}
-
-		err = json.Unmarshal(body, &ur)
-		if err != nil {
-			return err
-		}
-
-		err = fmt.Errorf("Status: %d, Error: %v", resp.StatusCode, ur.Error)
-		return err
-	}
-
-	return nil
 }

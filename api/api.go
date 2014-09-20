@@ -16,16 +16,21 @@ var (
 	UserAgent string
 )
 
+// PayloadError represents an error message from the API.
+type PayloadError struct {
+	Error string `json:"error"`
+}
+
 // PayloadProblems represents a response containing problems.
 type PayloadProblems struct {
 	Problems []*Problem
-	Error    string `json:"error"`
+	PayloadError
 }
 
 // PayloadSubmission represents metadata about a successful submission.
 type PayloadSubmission struct {
 	*Submission
-	Error string `json:"error"`
+	PayloadError
 }
 
 // Fetch retrieves problems from the API.
@@ -104,4 +109,34 @@ func Submit(url string, iter *Iteration) (*Submission, error) {
 	}
 
 	return ps.Submission, nil
+}
+
+// Unsubmit deletes a submission.
+func Unsubmit(url string) error {
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("User-Agent", UserAgent)
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	pe := &PayloadError{}
+	err = json.Unmarshal(body, pe)
+	if err != nil {
+		return err
+	}
+	if res.StatusCode != http.StatusNoContent {
+		return fmt.Errorf(`unable to unsubmit (HTTP: %d) - %s`, res.StatusCode, pe.Error)
+	}
+	return nil
 }
