@@ -12,7 +12,7 @@ import (
 
 // Debug provides information about the user's environment and configuration.
 func Debug(ctx *cli.Context) {
-	defer fmt.Printf("\nIf you are having any issues, please contact kytrinyx@exercism.io with this information.\n")
+	defer fmt.Printf("\nIf you are having trouble and need to file a GitHub issue (https://github.com/exercism/exercism.io/issues) please include this information (except your API key. Keep that private).\n")
 
 	fmt.Printf("\n**** Debug Information ****\n")
 	fmt.Printf("Exercism CLI Version: %s\n", ctx.App.Version)
