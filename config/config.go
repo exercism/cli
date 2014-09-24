@@ -87,6 +87,30 @@ func New(key, host, dir string) (*Config, error) {
 	return c.configure()
 }
 
+func AddValues(filename, key, host, dir string) (*Config, error) {
+	c, err := Read(filename)
+	if err != nil {
+		return c, err
+	}
+
+	if key != "" {
+		c.APIKey = key
+	}
+
+	if host != "" {
+		c.API = host
+	}
+
+	if dir != "" {
+		err = c.setDir(dir)
+		if err != nil {
+			return c, err
+		}
+	}
+
+	return c, nil
+}
+
 // Read loads the config from the stored JSON file.
 func (c *Config) Read(file string) error {
 	renameLegacy()
@@ -187,8 +211,24 @@ func (c *Config) configure() (*Config, error) {
 	if c.Dir == "" {
 		c.Dir = filepath.Join(dir, DirExercises)
 	}
-	c.Dir = strings.Replace(c.Dir, "~/", fmt.Sprintf("%s/", dir), 1)
+
+	err = c.setDir(c.Dir)
+	if err != nil {
+		return c, err
+	}
+
 	return c, nil
+}
+
+func (c *Config) setDir(dir string) error {
+	homeDir, err := c.homeDir()
+	if err != nil {
+		return err
+	}
+
+	c.Dir = strings.Replace(dir, "~/", fmt.Sprintf("%s/", homeDir), 1)
+
+	return nil
 }
 
 // FilePath returns the path to the config file.
