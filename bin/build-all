@@ -15,14 +15,24 @@ GOARCH=${1#*/}
 echo "Creating $GOOS $GOARCH binary..."
 
 GOOS=$GOOS GOARCH=$GOARCH "$(dirname $0)/build"
+
+NAME=$GOOS
+if [ $NAME == "darwin" ]; then
+	NAME="mac"
+fi
+ARCH="32bit"
+if [ $GOARCH == "amd64" ]; then
+	ARCH="64bit"
+fi
+
 cd out
 ls
 
 if [ $GOOS == windows ]; then
     mv $EXECUTABLE_NAME $EXECUTABLE_NAME.exe
-    tar cvzf ../release/$EXECUTABLE_NAME-$GOOS-$GOARCH.tgz $EXECUTABLE_NAME.exe
+    tar cvzf ../release/$EXECUTABLE_NAME-$NAME-$ARCH.tgz $EXECUTABLE_NAME.exe
   else
-    tar cvzf ../release/$EXECUTABLE_NAME-$GOOS-$GOARCH.tgz $EXECUTABLE_NAME
+    tar cvzf ../release/$EXECUTABLE_NAME-$NAME-$ARCH.tgz $EXECUTABLE_NAME
   fi
 
   cd ..
