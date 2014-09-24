@@ -87,12 +87,7 @@ func New(key, host, dir string) (*Config, error) {
 	return c.configure()
 }
 
-func AddValues(filename, key, host, dir string) (*Config, error) {
-	c, err := Read(filename)
-	if err != nil {
-		return c, err
-	}
-
+func (c *Config) Update(key, host, dir string) {
 	if key != "" {
 		c.APIKey = key
 	}
@@ -102,13 +97,9 @@ func AddValues(filename, key, host, dir string) (*Config, error) {
 	}
 
 	if dir != "" {
-		err = c.setDir(dir)
-		if err != nil {
-			return c, err
-		}
+		c.Dir = dir
 	}
-
-	return c, nil
+	c.configure()
 }
 
 // Read loads the config from the stored JSON file.
