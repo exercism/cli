@@ -12,15 +12,16 @@ import (
 // If a setting is not passed as an argument, default
 // values are used.
 func Configure(ctx *cli.Context) {
-	key := ctx.String("key")
-	host := ctx.String("host")
-	dir := ctx.String("dir")
-	c, err := config.New(key, host, dir)
+	c, err := config.Read(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	c.SavePath(ctx.GlobalString("config"))
+
+	key := ctx.String("key")
+	host := ctx.String("host")
+	dir := ctx.String("dir")
+	c.Update(key, host, dir)
 
 	err = c.Write()
 	if err != nil {

@@ -98,25 +98,27 @@ func TestReadingWritingConfig(t *testing.T) {
 	assert.Equal(t, c1.API, c2.API)
 }
 
-func TestAddingNewValues(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "")
-	assert.NoError(t, err)
-
-	filename := fmt.Sprintf("%s/%s", tmpDir, File)
-
-	c1 := &Config{
+func TestUpdateConfig(t *testing.T) {
+	c := &Config{
 		APIKey: "MyKey",
 		Dir:    "/exercism/directory",
 		API:    "localhost",
 	}
-	c1.configure()
-	c1.SavePath(filename)
-	c1.Write()
 
-	c2, err := AddValues(filename, "NewKey", "", "")
-	assert.Equal(t, "NewKey", c2.APIKey)
-	assert.Equal(t, c1.API, c2.API)
-	assert.Equal(t, c1.Dir, c2.Dir)
+	c.Update("NewKey", "", "")
+	assert.Equal(t, "NewKey", c.APIKey)
+	assert.Equal(t, "localhost", c.API)
+	assert.Equal(t, "/exercism/directory", c.Dir)
+
+	c.Update("", "http://example.com", "")
+	assert.Equal(t, "NewKey", c.APIKey)
+	assert.Equal(t, "http://example.com", c.API)
+	assert.Equal(t, "/exercism/directory", c.Dir)
+
+	c.Update("", "", "/tmp/exercism")
+	assert.Equal(t, "NewKey", c.APIKey)
+	assert.Equal(t, "http://example.com", c.API)
+	assert.Equal(t, "/tmp/exercism", c.Dir)
 }
 
 func TestReadDefaultConfig(t *testing.T) {
