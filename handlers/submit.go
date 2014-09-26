@@ -41,6 +41,11 @@ func Submit(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
+	dir, err := filepath.EvalSymlinks(c.Dir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	code, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Fatalf("Cannot read the contents of %s - %s\n", filename, err)
@@ -51,7 +56,7 @@ func Submit(ctx *cli.Context) {
 	iteration := &api.Iteration{
 		Key:  c.APIKey,
 		Code: string(code),
-		Path: path[len(c.Dir):],
+		Path: path[len(dir):],
 		Dir:  c.Dir,
 	}
 
