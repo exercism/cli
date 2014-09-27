@@ -7,14 +7,20 @@ mkdir -p release
 
 EXECUTABLE_NAME="exercism"
 
-PLATFORMS="darwin/386 darwin/amd64 linux/386 linux/amd64 windows/386 windows/amd64"
+PLATFORMS="darwin/386 darwin/amd64 linux/386 linux/amd64 windows/386 windows/amd64 linux/arm"
 
 function build-architecture {
 GOOS=${1%/*}
 GOARCH=${1#*/}
+GOARM=""
+
+if [ $GOARCH == "arm" ]; then
+	GOARM=5
+fi
+
 echo "Creating $GOOS $GOARCH binary..."
 
-GOOS=$GOOS GOARCH=$GOARCH "$(dirname $0)/build"
+GOOS=$GOOS GOARCH=$GOARCH GOARM=$GOARM "$(dirname $0)/build"
 
 NAME=$GOOS
 if [ $NAME == "darwin" ]; then
@@ -23,6 +29,9 @@ fi
 ARCH="32bit"
 if [ $GOARCH == "amd64" ]; then
 	ARCH="64bit"
+fi
+if [ $GOARCH == "arm" ]; then
+	ARCH="arm-v5"
 fi
 
 cd out
