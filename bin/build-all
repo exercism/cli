@@ -30,7 +30,7 @@ ls
 
 if [ $GOOS == windows ]; then
     mv $EXECUTABLE_NAME $EXECUTABLE_NAME.exe
-    tar cvzf ../release/$EXECUTABLE_NAME-$NAME-$ARCH.tgz $EXECUTABLE_NAME.exe
+    zip ../release/$EXECUTABLE_NAME-$NAME-$ARCH.zip $EXECUTABLE_NAME.exe
   else
     tar cvzf ../release/$EXECUTABLE_NAME-$NAME-$ARCH.tgz $EXECUTABLE_NAME
   fi
