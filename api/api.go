@@ -38,7 +38,6 @@ type PayloadSubmission struct {
 // from the x-api, but it is also used when restoring earlier iterations.
 func Fetch(url string) ([]*Problem, error) {
 	req, err := http.NewRequest("GET", url, nil)
-	fmt.Println(url)
 	if err != nil {
 		return nil, err
 	}
