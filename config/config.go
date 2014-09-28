@@ -55,9 +55,9 @@ type Config struct {
 func Home() (string, error) {
 	var dir string
 	if runtime.GOOS == "windows" {
-		dir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		dir = os.Getenv("USERPROFILE")
 		if dir == "" {
-			dir = os.Getenv("USERPROFILE")
+			dir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
 		}
 	} else {
 		dir = os.Getenv("HOME")
