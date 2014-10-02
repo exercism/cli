@@ -16,7 +16,7 @@ func TestDefaultValues(t *testing.T) {
 	c.configure()
 	assert.Equal(t, "", c.APIKey)
 	assert.Equal(t, "http://exercism.io", c.API)
-	assert.Equal(t, "/home/alice/exercism", c.Dir)
+	assert.Equal(t, filepath.FromSlash("/home/alice/exercism"), c.Dir)
 }
 
 func TestCustomValues(t *testing.T) {
@@ -55,7 +55,7 @@ func TestFilePath(t *testing.T) {
 	c := &Config{}
 	c.home = "/home/alice"
 	c.configure()
-	assert.Equal(t, "/home/alice/.exercism.json", c.File())
+	assert.Equal(t, filepath.FromSlash("/home/alice/.exercism.json"), c.File())
 
 	// can override location of config file
 	c = &Config{}
@@ -70,7 +70,7 @@ func TestReadNonexistantConfig(t *testing.T) {
 	assert.Equal(t, c.APIKey, "")
 	assert.Equal(t, c.API, "http://exercism.io")
 	assert.False(t, c.IsAuthenticated())
-	if !strings.HasSuffix(c.Dir, "/exercism") {
+	if !strings.HasSuffix(c.Dir, filepath.FromSlash("/exercism") )  {
 		t.Fatal("Default unconfigured config should use home dir")
 	}
 }
