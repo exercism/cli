@@ -50,5 +50,4 @@ func TestIsTest(t *testing.T) {
 			t.Fatalf("Expected isTest(%s) to be %t", tt.name, tt.isTest)
 		}
 	}
-
 }

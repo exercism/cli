@@ -32,11 +32,11 @@ func Submit(ctx *cli.Context) {
 		log.Fatal("Please submit the solution, not the test file.")
 	}
 
-	path, err := filepath.Abs(filename)
+	file, err := filepath.Abs(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
-	path, err = filepath.EvalSymlinks(path)
+	file, err = filepath.EvalSymlinks(file)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,7 +46,7 @@ func Submit(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
-	code, err := ioutil.ReadFile(path)
+	code, err := ioutil.ReadFile(file)
 	if err != nil {
 		log.Fatalf("Cannot read the contents of %s - %s\n", filename, err)
 	}
@@ -56,8 +56,14 @@ func Submit(ctx *cli.Context) {
 	iteration := &api.Iteration{
 		Key:  c.APIKey,
 		Code: string(code),
-		Path: path[len(dir):],
-		Dir:  c.Dir,
+		File: file,
+		Dir:  dir,
+	}
+
+	err = iteration.Identify()
+	if err != nil {
+		msg := `Please leave the solution within the problem directory that was created by 'exercism fetch'`
+		log.Fatalf("Cannot submit - %s.\n\n%s", err, msg)
 	}
 
 	submission, err := api.Submit(url, iteration)
