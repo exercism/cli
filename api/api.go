@@ -94,10 +94,10 @@ func Submit(url string, iter *Iteration) (*Submission, error) {
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
-	defer res.Body.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer res.Body.Close()
 
 	ps := &PayloadSubmission{}
 	err = json.Unmarshal(body, ps)
