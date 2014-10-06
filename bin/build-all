@@ -5,48 +5,51 @@ set -e -x
 echo "Creating release dir..."
 mkdir -p release
 
-EXECUTABLE_NAME="exercism"
-
-PLATFORMS="darwin/386 darwin/amd64 linux/386 linux/amd64 windows/386 windows/amd64 linux/arm"
-
-function build-architecture {
-GOOS=${1%/*}
-GOARCH=${1#*/}
-GOARM=""
-
-if [ $GOARCH == "arm" ]; then
-	GOARM=5
-fi
-
-echo "Creating $GOOS $GOARCH binary..."
-
-GOOS=$GOOS GOARCH=$GOARCH GOARM=$GOARM "$(dirname $0)/build"
-
-NAME=$GOOS
-if [ $NAME == "darwin" ]; then
-	NAME="mac"
-fi
-ARCH="32bit"
-if [ $GOARCH == "amd64" ]; then
-	ARCH="64bit"
-fi
-if [ $GOARCH == "arm" ]; then
-	ARCH="arm-v5"
-fi
-
+echo "Creating darwin/386 binary..."
+GOOS=darwin GOARCH=386 go build -o out/exercism
 cd out
-ls
+tar cvzf ../release/exercism-mac-32bit.tgz exercism
+cd ..
 
-if [ $GOOS == windows ]; then
-    mv $EXECUTABLE_NAME $EXECUTABLE_NAME.exe
-    zip ../release/$EXECUTABLE_NAME-$NAME-$ARCH.zip $EXECUTABLE_NAME.exe
-  else
-    tar cvzf ../release/$EXECUTABLE_NAME-$NAME-$ARCH.tgz $EXECUTABLE_NAME
-  fi
+echo "Creating darwin/amd64 binary..."
+GOOS=darwin GOARCH=amd64 go build -o out/exercism
+cd out
+tar cvzf ../release/exercism-mac-64bit.tgz exercism
+cd ..
 
-  cd ..
-}
+echo "Creating linux/386 binary..."
+GOOS=linux GOARCH=386 go build -o out/exercism
+cd out
+tar cvzf ../release/exercism-linux-32bit.tgz exercism
+cd ..
 
-for PLATFORM in $PLATFORMS; do
-  build-architecture $PLATFORM
-done
+echo "Creating linux/amd64 binary..."
+GOOS=linux GOARCH=amd64 go build -o out/exercism
+cd out
+tar cvzf ../release/exercism-linux-64bit.tgz exercism
+cd ..
+
+echo "Creating linux/ARMv5 binary..."
+GOOS=linux GOARCH=arm GOARM=5 go build -o out/exercism
+cd out
+tar cvzf ../release/exercism-linux-arm-v5.tgz exercism
+cd ..
+
+echo "Creating linux/ARMv6 binary..."
+GOOS=linux GOARCH=arm GOARM=6 go build -o out/exercism
+cd out
+tar cvzf ../release/exercism-linux-arm-v6.tgz exercism
+cd ..
+
+echo "Creating windows/386 binary..."
+GOOS=windows GOARCH=386 go build -o out/exercism.exe
+cd out
+zip ../release/exercism-windows-32bit.zip exercism.exe
+cd ..
+
+echo "Creating windows/amd64 binary..."
+GOOS=windows GOARCH=amd64 go build -o out/exercism.exe
+cd out
+zip ../release/exercism-windows-64bit.zip exercism.exe
+cd ..
+
