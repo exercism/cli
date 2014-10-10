@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/config"
@@ -23,10 +24,14 @@ func Configure(ctx *cli.Context) {
 	dir := ctx.String("dir")
 	c.Update(key, host, dir)
 
-	err = c.Write()
-	if err != nil {
+	if err := os.MkdirAll(c.Dir, os.ModePerm); err != nil {
+		log.Fatalf("Error creating exercism directory %s\n", err)
+	}
+
+	if err := c.Write(); err != nil {
 		log.Fatal(err)
 	}
+
 	fmt.Printf("The configuration has been written to %s\n", c.File())
 	fmt.Printf("Your exercism directory can be found at %s\n", c.Dir)
 }
