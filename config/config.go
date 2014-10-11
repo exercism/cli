@@ -87,6 +87,7 @@ func New(key, host, dir string) (*Config, error) {
 	return c.configure()
 }
 
+// Update sets new values where given.
 func (c *Config) Update(key, host, dir string) {
 	if key != "" {
 		c.APIKey = key
