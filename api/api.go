@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/exercism/cli/config"
@@ -46,16 +45,11 @@ func Fetch(url string) ([]*Problem, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	body, err := ioutil.ReadAll(res.Body)
 	defer res.Body.Close()
-	if err != nil {
-		return nil, err
-	}
 
 	payload := &PayloadProblems{}
-	err = json.Unmarshal(body, payload)
-	if err != nil {
+	dec := json.NewDecoder(res.Body)
+	if err = dec.Decode(payload); err != nil {
 		return nil, fmt.Errorf("error parsing API response - %s", err)
 	}
 
@@ -92,18 +86,14 @@ func Submit(url string, iter *Iteration) (*Submission, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to submit solution - %s", err)
 	}
-
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
 	defer res.Body.Close()
 
 	ps := &PayloadSubmission{}
-	err = json.Unmarshal(body, ps)
-	if err != nil {
+	dec := json.NewDecoder(res.Body)
+	if err = dec.Decode(ps); err != nil {
 		return nil, fmt.Errorf("error parsing API response - %s", err)
 	}
+
 	if res.StatusCode != http.StatusCreated {
 		return nil, fmt.Errorf(`unable to submit (HTTP: %d) - %s`, res.StatusCode, ps.Error)
 	}
@@ -125,18 +115,14 @@ func Unsubmit(url string) error {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return err
+	if res.StatusCode == http.StatusNoContent {
+		return nil
 	}
 
 	pe := &PayloadError{}
-	err = json.Unmarshal(body, pe)
+	err = json.NewDecoder(res.Body).Decode(pe)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to unsubmit - %s", err)
 	}
-	if res.StatusCode != http.StatusNoContent {
-		return fmt.Errorf(`unable to unsubmit (HTTP: %d) - %s`, res.StatusCode, pe.Error)
-	}
-	return nil
+	return fmt.Errorf("failed to unsubmit - %s", pe.Error)
 }
