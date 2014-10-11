@@ -7,6 +7,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
+	"github.com/exercism/cli/rpt"
 )
 
 // Fetch returns exercism problems.
@@ -35,7 +36,7 @@ func Fetch(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
-	hw := NewHomework(problems, c)
+	hw := rpt.NewHomework(problems, c)
 	err = hw.Save()
 	if err != nil {
 		log.Fatal(err)
