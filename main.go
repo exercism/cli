@@ -8,7 +8,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/handlers"
+	"github.com/exercism/cli/cmd"
 )
 
 const (
@@ -48,7 +48,7 @@ func main() {
 		{
 			Name:   "debug",
 			Usage:  descDebug,
-			Action: handlers.Debug,
+			Action: cmd.Debug,
 		},
 		{
 			Name:  "configure",
@@ -67,50 +67,50 @@ func main() {
 					Usage: "exercism.io API key (see http://exercism.io/account)",
 				},
 			},
-			Action: handlers.Configure,
+			Action: cmd.Configure,
 		},
 		{
 			Name:      "demo",
 			ShortName: "d",
 			Usage:     descDemo,
-			Action:    handlers.Demo,
+			Action:    cmd.Demo,
 		},
 		{
 			Name:      "fetch",
 			ShortName: "f",
 			Usage:     descFetch,
-			Action:    handlers.Fetch,
+			Action:    cmd.Fetch,
 		},
 		{
 			Name:      "login",
 			ShortName: "l",
 			Usage:     descLogin,
-			Action:    handlers.Login,
+			Action:    cmd.Login,
 		},
 		{
 			Name:      "logout",
 			ShortName: "o",
 			Usage:     descLogout,
-			Action:    handlers.Logout,
+			Action:    cmd.Logout,
 		},
 		{
 			Name:        "restore",
 			ShortName:   "r",
 			Usage:       descRestore,
 			Description: descLongRestore,
-			Action:      handlers.Restore,
+			Action:      cmd.Restore,
 		},
 		{
 			Name:      "submit",
 			ShortName: "s",
 			Usage:     descSubmit,
-			Action:    handlers.Submit,
+			Action:    cmd.Submit,
 		},
 		{
 			Name:      "unsubmit",
 			ShortName: "u",
 			Usage:     descUnsubmit,
-			Action:    handlers.Unsubmit,
+			Action:    cmd.Unsubmit,
 		},
 	}
 	err := app.Run(os.Args)
