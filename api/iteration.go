@@ -22,6 +22,7 @@ type Iteration struct {
 	Problem  string `json:"-"`
 }
 
+// RelativePath returns the path relative to the exercism dir.
 func (iter *Iteration) RelativePath() string {
 	if iter.Path != "" {
 		return iter.Path
@@ -34,6 +35,7 @@ func (iter *Iteration) RelativePath() string {
 	return iter.Path
 }
 
+// Identify attempts to determine the track and problem of an iteration.
 func (iter *Iteration) Identify() error {
 	if !strings.HasPrefix(iter.File, iter.Dir) {
 		return fmt.Errorf(msgUnidentifiable)
