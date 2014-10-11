@@ -25,8 +25,7 @@ func Restore(ctx *cli.Context) {
 	}
 
 	hw := rpt.NewHomework(problems, c)
-	err = hw.Save()
-	if err != nil {
+	if err = hw.Save(); err != nil {
 		log.Fatal(err)
 	}
 	hw.Summarize()
