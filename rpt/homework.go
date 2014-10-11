@@ -46,8 +46,7 @@ func NewHomework(problems []*api.Problem, c *config.Config) *Homework {
 // Save saves all problems in the problem set.
 func (hw *Homework) Save() error {
 	for _, item := range hw.Items {
-		err := item.Save()
-		if err != nil {
+		if err := item.Save(); err != nil {
 			return err
 		}
 	}

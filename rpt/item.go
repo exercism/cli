@@ -46,8 +46,7 @@ func (it *Item) Save() error {
 	for name, text := range it.Files {
 		file := filepath.Join(it.Path(), name)
 
-		err := os.MkdirAll(filepath.Dir(file), 0755)
-		if err != nil {
+		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
 			return err
 		}
 
@@ -60,8 +59,7 @@ func (it *Item) Save() error {
 				it.isUpdated = true
 			}
 
-			err = ioutil.WriteFile(file, []byte(text), 0644)
-			if err != nil {
+			if err = ioutil.WriteFile(file, []byte(text), 0644); err != nil {
 				return err
 			}
 		}

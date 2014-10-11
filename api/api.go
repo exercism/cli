@@ -120,8 +120,7 @@ func Unsubmit(url string) error {
 	}
 
 	pe := &PayloadError{}
-	err = json.NewDecoder(res.Body).Decode(pe)
-	if err != nil {
+	if err = json.NewDecoder(res.Body).Decode(pe); err != nil {
 		return fmt.Errorf("failed to unsubmit - %s", err)
 	}
 	return fmt.Errorf("failed to unsubmit - %s", pe.Error)
