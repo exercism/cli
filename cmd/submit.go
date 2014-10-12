@@ -70,6 +70,11 @@ func Submit(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
-	msg := "Submitted %s in %s. Your submission can be found online at %s\n"
+	msg := `
+Submitted %s in %s.
+Your submission can be found online at %s
+
+To get the next exercise, run "exercism fetch" again.
+`
 	fmt.Printf(msg, submission.Name, submission.Language, submission.URL)
 }
