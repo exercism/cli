@@ -49,7 +49,7 @@ func Fetch(url string) ([]*Problem, error) {
 
 	payload := &PayloadProblems{}
 	dec := json.NewDecoder(res.Body)
-	if err = dec.Decode(payload); err != nil {
+	if err := dec.Decode(payload); err != nil {
 		return nil, fmt.Errorf("error parsing API response - %s", err)
 	}
 
@@ -90,7 +90,7 @@ func Submit(url string, iter *Iteration) (*Submission, error) {
 
 	ps := &PayloadSubmission{}
 	dec := json.NewDecoder(res.Body)
-	if err = dec.Decode(ps); err != nil {
+	if err := dec.Decode(ps); err != nil {
 		return nil, fmt.Errorf("error parsing API response - %s", err)
 	}
 
@@ -120,7 +120,7 @@ func Unsubmit(url string) error {
 	}
 
 	pe := &PayloadError{}
-	if err = json.NewDecoder(res.Body).Decode(pe); err != nil {
+	if err := json.NewDecoder(res.Body).Decode(pe); err != nil {
 		return fmt.Errorf("failed to unsubmit - %s", err)
 	}
 	return fmt.Errorf("failed to unsubmit - %s", pe.Error)

@@ -28,7 +28,7 @@ func TestLogoutDeletesConfigFile(t *testing.T) {
 
 	Logout(ctx)
 
-	if _, err = os.Stat(file); err == nil {
+	if _, err := os.Stat(file); err == nil {
 		t.Errorf("File exists: %s", file)
 	}
 }
