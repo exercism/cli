@@ -7,7 +7,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/rpt"
+	"github.com/exercism/cli/user"
 )
 
 // Demo returns one problem for each active track.
@@ -22,12 +22,12 @@ func Demo(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
-	hw := rpt.NewHomework(problems, c)
+	hw := user.NewHomework(problems, c)
 	if err = hw.Save(); err != nil {
 		log.Fatal(err)
 	}
 
-	hw.Report(rpt.HWAll)
+	hw.Report(user.HWAll)
 
 	fmt.Println("Next step: choose a language, read the README, and make the test suite pass.")
 }
