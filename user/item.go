@@ -59,7 +59,7 @@ func (it *Item) Save() error {
 				it.isUpdated = true
 			}
 
-			if err = ioutil.WriteFile(file, []byte(text), 0644); err != nil {
+			if err := ioutil.WriteFile(file, []byte(text), 0644); err != nil {
 				return err
 			}
 		}

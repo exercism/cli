@@ -28,7 +28,7 @@ func Configure(ctx *cli.Context) {
 		log.Fatalf("Error creating exercism directory %s\n", err)
 	}
 
-	if err = c.Write(); err != nil {
+	if err := c.Write(); err != nil {
 		log.Fatal(err)
 	}
 
