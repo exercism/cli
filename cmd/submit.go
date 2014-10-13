@@ -60,7 +60,7 @@ func Submit(ctx *cli.Context) {
 		Dir:  dir,
 	}
 
-	if err = iteration.Identify(); err != nil {
+	if err := iteration.Identify(); err != nil {
 		msg := `Please leave the solution within the problem directory that was created by 'exercism fetch'`
 		log.Fatalf("Cannot submit - %s.\n\n%s", err, msg)
 	}
