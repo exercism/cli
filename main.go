@@ -25,6 +25,7 @@ const (
 	descRestore   = "Restores completed and current problems on from exercism.io, along with your most recent iteration for each."
 	descSubmit    = "Submits a new iteration to a problem on exercism.io."
 	descUnsubmit  = "Deletes the most recently submitted iteration."
+	descTracks    = "List the available language tracks"
 	descLogin     = "DEPRECATED: Interactively saves exercism.io api credentials."
 	descLogout    = "DEPRECATED: Clear exercism.io api credentials"
 
@@ -111,6 +112,12 @@ func main() {
 			ShortName: "u",
 			Usage:     descUnsubmit,
 			Action:    cmd.Unsubmit,
+		},
+		{
+			Name:      "tracks",
+			ShortName: "t",
+			Usage:     descTracks,
+			Action:    cmd.Tracks,
 		},
 	}
 	if err := app.Run(os.Args); err != nil {

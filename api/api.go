@@ -125,3 +125,28 @@ func Unsubmit(url string) error {
 	}
 	return fmt.Errorf("failed to unsubmit - %s", pe.Error)
 }
+
+// Tracks gets the current list of active and inactive language tracks.
+func Tracks(url string) ([]*Track, error) {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return []*Track{}, err
+	}
+	req.Header.Set("User-Agent", UserAgent)
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return []*Track{}, err
+	}
+	defer res.Body.Close()
+
+	var payload struct {
+		Tracks []*Track
+	}
+	dec := json.NewDecoder(res.Body)
+	err = dec.Decode(&payload)
+	if err != nil {
+		return []*Track{}, err
+	}
+	return payload.Tracks, nil
+}
