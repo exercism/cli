@@ -3,7 +3,9 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -160,4 +162,19 @@ func TestReadLegacyConfig(t *testing.T) {
 	assert.Equal(t, "/tmp/stuff", c.Dir)
 	assert.Equal(t, "http://api.example.com", c.API)
 	assert.Equal(t, "http://problems.example.com", c.XAPI)
+}
+
+func TestConfigInEnv(t *testing.T) {
+	_, caller, _, ok := runtime.Caller(0)
+	assert.True(t, ok)
+	file := filepath.Join(filepath.Dir(caller), "..", "fixtures", "special.json")
+	os.Setenv(fileEnvKey, file)
+
+	c := &Config{home: "/tmp/home"}
+	err := c.Read("")
+	assert.NoError(t, err)
+	assert.Equal(t, "abc123", c.APIKey)
+	assert.Equal(t, "/a/b/c", c.Dir)
+	assert.Equal(t, "http://api.example.com", c.API)
+	assert.Equal(t, "http://x.example.com", c.XAPI)
 }

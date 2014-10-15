@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	fileEnvKey = "EXERCISM_CONFIG_FILE"
 	// File is the default name of the JSON file where the config written.
 	// The user can pass an alternate filename when using the CLI.
 	File = ".exercism.json"
@@ -106,6 +107,10 @@ func (c *Config) Update(key, host, dir string) {
 // Read loads the config from the stored JSON file.
 func (c *Config) Read(file string) error {
 	renameLegacy()
+
+	if file == "" {
+		file = os.Getenv(fileEnvKey)
+	}
 
 	if file == "" {
 		home, err := c.homeDir()
