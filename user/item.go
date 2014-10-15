@@ -4,8 +4,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-    "runtime"
-    "strings"
+	"runtime"
+	"strings"
 
 	"github.com/exercism/cli/api"
 )
@@ -60,10 +60,10 @@ func (it *Item) Save() error {
 			if !it.isNew {
 				it.isUpdated = true
 			}
-            
-            if runtime.GOOS == "windows" {
-                text = strings.Replace(text, "\n", "\r\n", -1)
-            }
+
+			if runtime.GOOS == "windows" {
+				text = strings.Replace(text, "\n", "\r\n", -1)
+			}
 
 			if err := ioutil.WriteFile(file, []byte(text), 0644); err != nil {
 				return err
