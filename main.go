@@ -44,6 +44,10 @@ func main() {
 			Name:  "config, c",
 			Usage: "path to config file",
 		},
+		cli.BoolFlag{
+			Name:  "debug, d",
+			Usage: "turn on verbose logging",
+		},
 	}
 	app.Commands = []cli.Command{
 		{

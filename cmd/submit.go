@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 
 	"github.com/codegangsta/cli"
@@ -22,11 +23,25 @@ func Submit(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
+	if ctx.GlobalBool("debug") {
+		log.Printf("Exercises dir: %s", c.Dir)
+		dir, err := os.Getwd()
+		if err != nil {
+			log.Printf("Unable to get current working directory - %s", err)
+		} else {
+			log.Printf("Current dir: %s", dir)
+		}
+	}
+
 	if !c.IsAuthenticated() {
 		log.Fatal(msgPleaseAuthenticate)
 	}
 
 	filename := ctx.Args()[0]
+
+	if ctx.GlobalBool("debug") {
+		log.Printf("file name: %s", filename)
+	}
 
 	if isTest(filename) {
 		log.Fatal("Please submit the solution, not the test file.")
@@ -36,14 +51,27 @@ func Submit(ctx *cli.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	if ctx.GlobalBool("debug") {
+		log.Printf("absolute path: %s", file)
+	}
+
 	file, err = filepath.EvalSymlinks(file)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	if ctx.GlobalBool("debug") {
+		log.Printf("eval symlinks (file): %s", file)
+	}
+
 	dir, err := filepath.EvalSymlinks(c.Dir)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if ctx.GlobalBool("debug") {
+		log.Printf("eval symlinks (dir): %s", dir)
 	}
 
 	code, err := ioutil.ReadFile(file)
