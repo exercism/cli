@@ -20,6 +20,10 @@ func TestIdentify(t *testing.T) {
 			ok:   false,
 		},
 		{
+			file: "/users/me/exercism/ruby/bob/bob.rb",
+			ok:   true,
+		},
+		{
 			file: "/Users/me/bob.rb",
 			ok:   false,
 		},

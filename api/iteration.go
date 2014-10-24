@@ -37,7 +37,7 @@ func (iter *Iteration) RelativePath() string {
 
 // Identify attempts to determine the track and problem of an iteration.
 func (iter *Iteration) Identify() error {
-	if !strings.HasPrefix(iter.File, iter.Dir) {
+	if !strings.HasPrefix(strings.ToLower(iter.File), strings.ToLower(iter.Dir)) {
 		return fmt.Errorf(msgUnidentifiable)
 	}
 
