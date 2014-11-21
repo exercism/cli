@@ -3,7 +3,7 @@
 Goals
 ===========
 
-Provide developers an easy way to work with [exercism.io](http://exercism.io) that doesn't require a 
+Provide developers an easy way to work with [exercism.io](http://exercism.io) that doesn't require a
 Ruby environment.
 
 Installing Go
@@ -19,7 +19,7 @@ If that throws an error, try ```brew install go --cross-compile-common --with-ll
 
 Development
 ===========
-1. `go get github.com/exercism/cli`
+1. `go get github.com/exercism/cli/exercism`
 1. `cd $GOPATH/src/github.com/exercism/cli`
 1. `go get`
 1. `go get github.com/levicook/glitch`
