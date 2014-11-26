@@ -1,5 +1,5 @@
 #!/bin/bash
 
-set -e
-
 go build -o out/exercism exercism/main.go
+
+set -e
