@@ -60,6 +60,32 @@ func Fetch(url string) ([]*Problem, error) {
 	return payload.Problems, nil
 }
 
+func Download(url string) (*Submission, error) {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	payload := &PayloadSubmission{}
+	dec := json.NewDecoder(res.Body)
+	err = dec.Decode(payload)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing API response - %s", err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf(`unable to fetch Submission (HTTP: %d) - %s`, res.StatusCode, payload.Error)
+	}
+
+	return payload.Submission, err
+}
+
 // Demo fetches the first problem in each language track.
 func Demo(c *config.Config) ([]*Problem, error) {
 	url := fmt.Sprintf("%s/problems/demo?key=%s", c.XAPI, c.APIKey)
