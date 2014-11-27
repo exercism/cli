@@ -1,5 +1,3 @@
 #!/bin/bash
 
 go build -o out/exercism exercism/main.go
-
-set -e
