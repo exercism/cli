@@ -30,6 +30,7 @@ const (
 	descLogout    = "DEPRECATED: Clear exercism.io api credentials"
 
 	descLongRestore = "Restore will pull the latest revisions of exercises that have already been submitted. It will *not* overwrite existing files. If you have made changes to a file and have not submitted it, and you're trying to restore the last submitted version, first move that file out of the way, then call restore."
+	descDownload 	= "Downloads and saves a specified submission into the local system"
 )
 
 func main() {
@@ -122,6 +123,12 @@ func main() {
 			ShortName: "t",
 			Usage:     descTracks,
 			Action:    cmd.Tracks,
+		},
+		{
+			Name:      "download",
+			ShortName: "dl",
+			Usage:     descDownload,
+			Action:    cmd.Download,
 		},
 	}
 	if err := app.Run(os.Args); err != nil {
