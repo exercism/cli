@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 
 	"github.com/codegangsta/cli"
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
+	"../api"
+	"../config"
 )
 
 // Submit posts an iteration to the api

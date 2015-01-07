@@ -3,8 +3,8 @@ package user
 import (
 	"fmt"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
+	"../api"
+	"../config"
 )
 
 // HWFilter is used to categorize homework items.

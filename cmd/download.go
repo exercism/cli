@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 
 	"github.com/codegangsta/cli"
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
+	"../api"
+	"../config"
 )
 
 // Download returns specified submissions and related problem.

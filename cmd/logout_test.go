@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/codegangsta/cli"
-	"github.com/exercism/cli/config"
+	"../config"
 	"github.com/stretchr/testify/assert"
 )
 

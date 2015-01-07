@@ -5,9 +5,9 @@ import (
 	"log"
 
 	"github.com/codegangsta/cli"
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/user"
+	"../api"
+	"../config"
+	"../user"
 )
 
 // Restore returns a user's solved problems.

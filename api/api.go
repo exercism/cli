@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/exercism/cli/config"
+	"../config"
 )
 
 var (

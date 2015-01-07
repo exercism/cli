@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/exercism/cli/api"
+	"../api"
 )
 
 // Item is a problem that has been fetched from the APIs.

@@ -7,8 +7,8 @@ import (
 	"runtime"
 
 	"github.com/codegangsta/cli"
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/cmd"
+	"../api"
+	"../cmd"
 )
 
 const (
@@ -71,6 +71,10 @@ func main() {
 				cli.StringFlag{
 					Name:  "key, k",
 					Usage: "exercism.io API key (see http://exercism.io/account)",
+				},
+				cli.StringFlag{
+					Name:  "api, a",
+					Usage: "exercism xapi host",
 				},
 			},
 			Action: cmd.Configure,

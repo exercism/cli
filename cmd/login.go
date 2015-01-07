@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/codegangsta/cli"
-	"github.com/exercism/cli/config"
+	"../config"
 )
 
 // Login interactively stores exercism API configuration.
