@@ -72,6 +72,10 @@ func main() {
 					Name:  "key, k",
 					Usage: "exercism.io API key (see http://exercism.io/account)",
 				},
+				cli.StringFlag{
+					Name:  "api, a",
+					Usage: "exercism xapi host",
+				},
 			},
 			Action: cmd.Configure,
 		},
