@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/exercism/cli/api"
+	"../api"
 )
 
 // Status is the status of a track (active/inactive).

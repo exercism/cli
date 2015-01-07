@@ -26,11 +26,13 @@ func TestCustomValues(t *testing.T) {
 		APIKey: "abc123",
 		API:    "http://example.org",
 		Dir:    "/path/to/exercises",
+		XAPI:   "http://x.example.org",
 	}
 	c.configure()
 	assert.Equal(t, "abc123", c.APIKey)
 	assert.Equal(t, "http://example.org", c.API)
 	assert.Equal(t, "/path/to/exercises", c.Dir)
+	assert.Equal(t, "http://x.example.org", c.XAPI)
 }
 
 func TestExpandHomeDir(t *testing.T) {
@@ -45,11 +47,13 @@ func TestSanitizeWhitespace(t *testing.T) {
 		APIKey: "   abc123\n\r\n  ",
 		API:    "       ",
 		Dir:    "  \r\n/path/to/exercises   \r\n",
+		XAPI:   "   ",
 	}
 	c.configure()
 	assert.Equal(t, "abc123", c.APIKey)
 	assert.Equal(t, "http://exercism.io", c.API)
 	assert.Equal(t, "/path/to/exercises", c.Dir)
+	assert.Equal(t, "http://x.exercism.io", c.XAPI)
 }
 
 func TestFilePath(t *testing.T) {
@@ -71,6 +75,7 @@ func TestReadNonexistantConfig(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, c.APIKey, "")
 	assert.Equal(t, c.API, "http://exercism.io")
+	assert.Equal(t, c.XAPI, "http://x.exercism.io")
 	assert.False(t, c.IsAuthenticated())
 	if !strings.HasSuffix(c.Dir, filepath.FromSlash("/exercism")) {
 		t.Fatal("Default unconfigured config should use home dir")
@@ -86,6 +91,7 @@ func TestReadingWritingConfig(t *testing.T) {
 		APIKey: "MyKey",
 		Dir:    "/exercism/directory",
 		API:    "localhost",
+		XAPI:   "localhost",
 	}
 	c1.configure()
 
@@ -98,6 +104,7 @@ func TestReadingWritingConfig(t *testing.T) {
 	assert.Equal(t, c1.APIKey, c2.APIKey)
 	assert.Equal(t, c1.Dir, c2.Dir)
 	assert.Equal(t, c1.API, c2.API)
+	assert.Equal(t, c1.XAPI, c2.XAPI)
 }
 
 func TestUpdateConfig(t *testing.T) {
@@ -105,22 +112,32 @@ func TestUpdateConfig(t *testing.T) {
 		APIKey: "MyKey",
 		Dir:    "/exercism/directory",
 		API:    "localhost",
+		XAPI:   "localhost",
 	}
 
-	c.Update("NewKey", "", "")
+	c.Update("NewKey", "", "", "")
 	assert.Equal(t, "NewKey", c.APIKey)
 	assert.Equal(t, "localhost", c.API)
 	assert.Equal(t, "/exercism/directory", c.Dir)
+	assert.Equal(t, "localhost", c.XAPI)
 
-	c.Update("", "http://example.com", "")
+	c.Update("", "http://example.com", "", "")
 	assert.Equal(t, "NewKey", c.APIKey)
 	assert.Equal(t, "http://example.com", c.API)
 	assert.Equal(t, "/exercism/directory", c.Dir)
+	assert.Equal(t, "localhost", c.XAPI)
 
-	c.Update("", "", "/tmp/exercism")
+	c.Update("", "", "/tmp/exercism", "")
 	assert.Equal(t, "NewKey", c.APIKey)
 	assert.Equal(t, "http://example.com", c.API)
 	assert.Equal(t, "/tmp/exercism", c.Dir)
+	assert.Equal(t, "localhost", c.XAPI)
+
+	c.Update("", "", "", "http://x.example.org")
+	assert.Equal(t, "NewKey", c.APIKey)
+	assert.Equal(t, "http://example.com", c.API)
+	assert.Equal(t, "/tmp/exercism", c.Dir)
+	assert.Equal(t, "http://x.example.org", c.XAPI)
 }
 
 func TestReadDefaultConfig(t *testing.T) {

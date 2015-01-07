@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/exercism/cli/config"
+	"../config"
 )
 
 // Logout deletes the config file.

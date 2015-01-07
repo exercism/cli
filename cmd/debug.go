@@ -7,7 +7,7 @@ import (
 	"runtime"
 
 	"github.com/codegangsta/cli"
-	"github.com/exercism/cli/config"
+	"../config"
 )
 
 // Debug provides information about the user's environment and configuration.

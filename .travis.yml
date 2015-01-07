@@ -4,7 +4,8 @@ go:
   - 1.1.2
   - tip
 
-install: true
+install:
+  go get -d -v ./... && go build -v ./...
 
 before_install:
   go get github.com/codegangsta/cli && go get github.com/stretchr/testify/assert
