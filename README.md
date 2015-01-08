@@ -19,8 +19,10 @@ If that throws an error, try ```brew install go --cross-compile-common --with-ll
 
 Development
 ===========
+1. fork this repo
 1. `go get github.com/exercism/cli/exercism`
 1. `cd $GOPATH/src/github.com/exercism/cli`
+1. `git remote set-url origin https://github.com/<your-github-username>/cli`
 1. `go get`
 1. `go get github.com/levicook/glitch`
 1. `go install github.com/levicook/glitch`
