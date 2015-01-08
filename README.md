@@ -1,45 +1,49 @@
 [![Build Status](https://travis-ci.org/exercism/cli.png?branch=master)](https://travis-ci.org/exercism/cli)
 
-Goals
-===========
+# Exercism Command-Line Client
 
-Provide developers an easy way to work with [exercism.io](http://exercism.io) that doesn't require a
-Ruby environment.
+The CLI provides a way to do the problems on
+[exercism.io](http://exercism.io).
 
-Installing Go
-=============
+This CLI ships as a binary with no additional runtime requirements. This means
+that if you're doing the Haskell problems on exercism you don't need a working
+Python or Ruby environment simply to fetch and submit exercises.
 
-### On Mac OS X
+## Installing Go
 
-You may get away with ```brew install go --cross-compile-common``` unless you have the latest XCode, which does not ship with gcc.
+Follow the directions on http://golang.org/doc/install
 
-If have the latest XCode, try ```brew install go --cross-compile-common --without-cgo```.
+## Development
 
-If that throws an error, try ```brew install go --cross-compile-common --with-llvm```.
-
-Development
-===========
 1. fork this repo
 1. `go get github.com/exercism/cli/exercism`
 1. `cd $GOPATH/src/github.com/exercism/cli`
 1. `git remote set-url origin https://github.com/<your-github-username>/cli`
 1. `go get`
-1. `go get github.com/levicook/glitch`
-1. `go install github.com/levicook/glitch`
 1. Make sure $GOPATH/bin is on your path (you may need something like `export PATH=$PATH:/projects/goprojects/bin`)
 1. Open a separate terminal window to your project directory and run the command `glitch`
-1. Write a test.
-1. Watch test fail.
-1. Make test pass.
+1. Make the change.
 1. Submit a pull request.
 
-Building
-========
-1. Run ```bin/build``` and the binary for your platform will be built into the out directory.
-1. Run ```bin/build-all``` and the binaries for OSX, Linux and Windows will be built into the release directory.
+Please provide tests for the changes where possible.
 
-Troubleshooting
-===============
+At the moment the CLI commands are not tested, so if you're adding a new
+command don't worry too hard about tests.
+
+## Building
+
+To build the binary for your platform run
+
+```
+bin/build
+```
+
+The resulting binary can be found in `out/exercism` (Linux, Mac OS X) or `out/exercism.exe` (Windows).
+
+In order to cross-compile for all platforms, run `bin/build-all`. The binaries
+will be built into the `release` directory.
+
+## Troubleshooting
 
 ```plain
 app.Run(os.Args) used as value
@@ -53,10 +57,16 @@ To fix it update the `codegangsta/cli` dependency:
 $ go get -u github.com/codegangsta/cli
 ```
 
-New to go?  Missing packages for glitch?
--------------------------------------------
+## Using Glitch
 
-### missing assertion library
+If you'd like to run lint, vet, and the tests on every change, install Levi Cook's `glitch` library:
+
+1. `go get github.com/levicook/glitch`
+1. `go install github.com/levicook/glitch`
+1. Ensure that you have `go vet`
+1. Run it with `glitch`.
+
+### Troubleshooting.
 
 When you `glitch`, do you get stymied like this?
 
@@ -68,37 +78,9 @@ FAIL	github.com/exercism/cli [setup failed]
 
 You may need to
 
-
 ```shell
 $ go get github.com/stretchr/testify/assert
 $ go install github.com/stretchr/testify/assert
-$ glitch
-```
-
-### `go vet` on MacOS
-
-Depending on your brew installation of `go` you may not yet have the `vet` command available.  You may also need `hg` (mercurial) to get rolling.
-
-Here's a sample (trimmed) output from a successful installation of `vet` on MacOSX 10.8.5 with XCode 5.0.2
-
-```shell
-% brew install go --cross-compile-common
-
-... installation output ...
-
-% go vet
-go tool: no such tool "vet"; to install:
-	go get code.google.com/p/go.tools/cmd/vet
-
-% go get code.google.com/p/go.tools/cmd/vet
-go: missing Mercurial command. See http://golang.org/s/gogetcmd
-
-% brew install hg
-% go get code.google.com/p/go.tools/cmd/vet
-% go vet
-
 ```
 
 Now you should be able to run `glitch`.
-
-
