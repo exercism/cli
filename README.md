@@ -68,7 +68,7 @@ If you'd like to run lint, vet, and the tests on every change, install Levi Cook
 
 ### Troubleshooting.
 
-When you `glitch`, do you get stymied like this?
+When you use `glitch`, do you get something like this?
 
 ```shell
 # github.com/exercism/cli
