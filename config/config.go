@@ -79,17 +79,18 @@ func Read(file string) (*Config, error) {
 
 // New returns a new config.
 // It will attempt to set defaults where no value is passed in.
-func New(key, host, dir string) (*Config, error) {
+func New(key, host, dir, xapi string) (*Config, error) {
 	c := &Config{
 		APIKey: key,
 		API:    host,
 		Dir:    dir,
+		XAPI:   xapi,
 	}
 	return c.configure()
 }
 
 // Update sets new values where given.
-func (c *Config) Update(key, host, dir string) {
+func (c *Config) Update(key, host, dir, xapi string) {
 	if key != "" {
 		c.APIKey = key
 	}
@@ -101,6 +102,11 @@ func (c *Config) Update(key, host, dir string) {
 	if dir != "" {
 		c.Dir = dir
 	}
+	
+	if xapi != "" {
+		c.XAPI = xapi
+	}
+	
 	c.configure()
 }
 
