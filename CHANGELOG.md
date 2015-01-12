@@ -61,6 +61,27 @@
 * [8b174e2](https://github.com/exercism/cli/commit/17fc1644e9fc9ee5aa4e136de11556e65a7b6036): Made the output of demo command more helpful
 * [8b174e2](https://github.com/exercism/cli/commit/8b174e2fd8c7a545ea5c47c998ac10c5a7ab371f): Deleted the 'current' command
 
+## v1.7.0 (Aug 28, 2014)
+
+* [ac6dbfd](https://github.com/exercism/cli/commit/ac6dbfd81a86e7a9a5a9b68521b0226c40d8e813): Added os and architecture to the user agent
+* [5d58fd1](https://github.com/exercism/cli/commit/5d58fd14b9db84fb752b3bf6112123cd6f04c532): Fixed bug in detecting user's home directory
+* [#100](https://github.com/exercism/cli/pull/100): Added 'debug' command, which supersedes the 'info' command - @Tonkpils
+* Extracted a couple of commands into separate handlers
+* [6ec5876](https://github.com/exercism/cli/commit/6ec5876bde0b02206cacbe685bb8aedcbdba25d4): Added a hack to rename old config files to the new default name
+* [bb7d0d6](https://github.com/exercism/cli/commit/bb7d0d6151a950c92590dc771ec3ff5fdd1c83b0): Rename 'home' command to 'info'
+* [#95](https://github.com/exercism/cli/issues/95): Added 'home' command
+* Deprecate login/logout commands
+* [1a39134](https://github.com/exercism/cli/commit/1a391342da93aa32ae398f1500a3981aa65b9f41): Changed demo to write exercises to the default exercism problems directory
+* [07cc334](https://github.com/exercism/cli/commit/07cc334739465b21d6eb5d973e16e1c88f67758e): Deleted the whoami command, we weren't using github usernames for anything
+* [#97](https://github.com/exercism/cli/pull/97): Changed default exercism directory to ~/exercism - @lcowell
+* [#94](https://github.com/exercism/cli/pull/94): Updated language detection to handle C++ - @LegalizeAdulthood
+* [#92](https://github.com/exercism/cli/pull/92): Renamed config json file to .exercism.json instead of .exercism.go - @lcowell
+* [f55653f](https://github.com/exercism/cli/commit/f55653f35863914086a54375afb0898e142c1638): Deleted go vet from travis build temporarily until the codebase can be cleaned up
+* [#91](https://github.com/exercism/cli/pull/91): Replaced temp file usage with encode/decode - @lcowell
+* [#90](https://github.com/exercism/cli/pull/90): Added sanitization to config values to trim whitespace before writing it - @lcowell
+* Did a fair amount of cleanup to make code a bit more idiomatic
+* [#86](https://github.com/exercism/cli/pull/86): Triggered interactive login command for commands that require auth - @Tonkpils
+
 -------------
 
 **WIP** - I'm slowly building up the full changelog history for the project.
