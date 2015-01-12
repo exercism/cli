@@ -2,6 +2,7 @@
 
 ----------------
 
+* [exercism.io#2155](https://github.com/exercism/exercism.io/issues/2155): Fixed problem with passed in config file being ignored.
 * Added first version of changelog
 * Your contribution here
 

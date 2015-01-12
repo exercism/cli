@@ -126,6 +126,7 @@ func (c *Config) Read(file string) error {
 		file = filepath.Join(home, File)
 	}
 
+	c.file = file
 	if _, err := os.Stat(file); err != nil {
 		if os.IsNotExist(err) {
 			c.configure()
@@ -145,7 +146,6 @@ func (c *Config) Read(file string) error {
 	if err != nil {
 		return err
 	}
-	c.SavePath(file)
 	c.configure()
 	return nil
 }
@@ -203,7 +203,6 @@ func (c *Config) configure() (*Config, error) {
 	if err != nil {
 		return c, err
 	}
-	c.file = filepath.Join(dir, File)
 
 	// use legacy value, if it exists
 	if c.ExercismDirectory != "" {
@@ -215,9 +214,12 @@ func (c *Config) configure() (*Config, error) {
 		c.Dir = filepath.Join(dir, DirExercises)
 	}
 
-	err = c.setDir(c.Dir)
-	if err != nil {
+	if err := c.setDir(c.Dir); err != nil {
 		return c, err
+	}
+
+	if c.file == "" {
+		c.file = filepath.Join(dir, File)
 	}
 
 	return c, nil
