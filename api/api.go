@@ -60,6 +60,7 @@ func Fetch(url string) ([]*Problem, error) {
 	return payload.Problems, nil
 }
 
+// Download fetches a solution by submission key and writes it to disk.
 func Download(url string) (*Submission, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
