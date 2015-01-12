@@ -102,11 +102,11 @@ func (c *Config) Update(key, host, dir, xapi string) {
 	if dir != "" {
 		c.Dir = dir
 	}
-	
+
 	if xapi != "" {
 		c.XAPI = xapi
 	}
-	
+
 	c.configure()
 }
 
