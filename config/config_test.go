@@ -61,13 +61,13 @@ func TestFilePath(t *testing.T) {
 	c := &Config{}
 	c.home = "/home/alice"
 	c.configure()
-	assert.Equal(t, filepath.FromSlash("/home/alice/.exercism.json"), c.File())
+	assert.Equal(t, filepath.FromSlash("/home/alice/.exercism.json"), c.File)
 
 	// can override location of config file
 	c = &Config{}
 	c.configure()
 	c.SavePath("/tmp/config/exercism.conf")
-	assert.Equal(t, "/tmp/config/exercism.conf", c.File())
+	assert.Equal(t, "/tmp/config/exercism.conf", c.File)
 }
 
 func TestReadNonexistantConfig(t *testing.T) {
