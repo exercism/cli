@@ -2,9 +2,12 @@
 
 ----------------
 
+* Your contribution here
+
+## v1.9.2 (Jan 11, 2015)
+
 * [exercism.io#2155](https://github.com/exercism/exercism.io/issues/2155): Fixed problem with passed in config file being ignored.
 * Added first version of changelog
-* Your contribution here
 
 ## v1.9.1 (Jan 10, 2015)
 
