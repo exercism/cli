@@ -40,7 +40,7 @@ func Debug(ctx *cli.Context) {
 	}
 
 	if configured {
-		fmt.Printf("Config file: %s\n", c.File())
+		fmt.Printf("Config file: %s\n", c.File)
 		fmt.Printf("API Key: %s\n", c.APIKey)
 	} else {
 		fmt.Println("Config file: <not configured>")

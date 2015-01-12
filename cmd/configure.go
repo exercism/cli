@@ -33,6 +33,6 @@ func Configure(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("The configuration has been written to %s\n", c.File())
+	fmt.Printf("The configuration has been written to %s\n", c.File)
 	fmt.Printf("Your exercism directory can be found at %s\n", c.Dir)
 }

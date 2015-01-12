@@ -41,8 +41,8 @@ type Config struct {
 	Dir    string `json:"dir"`
 	API    string `json:"api"`
 	XAPI   string `json:"xapi"`
+	File   string `json:"-"` // full path to config file
 	home   string // cache user's home directory
-	file   string // full path to config file
 
 	// deprecated, get rid of them when nobody uses 1.7.0 anymore
 	ExercismDirectory string `json:"exercismDirectory,omitempty"`
@@ -126,7 +126,7 @@ func (c *Config) Read(file string) error {
 		file = filepath.Join(home, File)
 	}
 
-	c.file = file
+	c.File = file
 	if _, err := os.Stat(file); err != nil {
 		if os.IsNotExist(err) {
 			c.configure()
@@ -153,13 +153,8 @@ func (c *Config) Read(file string) error {
 // SavePath allows the user to customize the location of the JSON file.
 func (c *Config) SavePath(file string) {
 	if file != "" {
-		c.file = file
+		c.File = file
 	}
-}
-
-// File represents the path to the config file.
-func (c *Config) File() string {
-	return c.file
 }
 
 // Write() saves the config as JSON.
@@ -170,7 +165,7 @@ func (c *Config) Write() error {
 	c.ProblemsHost = ""
 
 	// truncates existing file if it exists
-	f, err := os.Create(c.file)
+	f, err := os.Create(c.File)
 	if err != nil {
 		return err
 	}
@@ -218,8 +213,8 @@ func (c *Config) configure() (*Config, error) {
 		return c, err
 	}
 
-	if c.file == "" {
-		c.file = filepath.Join(dir, File)
+	if c.File == "" {
+		c.File = filepath.Join(dir, File)
 	}
 
 	return c, nil
