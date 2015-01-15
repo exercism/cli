@@ -194,7 +194,7 @@ func (c *Config) configure() (*Config, error) {
 		c.XAPI = hostXAPI
 	}
 
-	dir, err := c.homeDir()
+	homeDir, err := c.homeDir()
 	if err != nil {
 		return c, err
 	}
@@ -204,31 +204,19 @@ func (c *Config) configure() (*Config, error) {
 		c.Dir = c.ExercismDirectory
 	}
 
-	// fall back to default value
 	if c.Dir == "" {
-		c.Dir = filepath.Join(dir, DirExercises)
-	}
-
-	if err := c.setDir(c.Dir); err != nil {
-		return c, err
+		// fall back to default value
+		c.Dir = filepath.Join(homeDir, DirExercises)
+	} else {
+		// replace '~' with user's home
+		c.Dir = strings.Replace(c.Dir, "~/", fmt.Sprintf("%s/", homeDir), 1)
 	}
 
 	if c.File == "" {
-		c.File = filepath.Join(dir, File)
+		c.File = filepath.Join(homeDir, File)
 	}
 
 	return c, nil
-}
-
-func (c *Config) setDir(dir string) error {
-	homeDir, err := c.homeDir()
-	if err != nil {
-		return err
-	}
-
-	c.Dir = strings.Replace(dir, "~/", fmt.Sprintf("%s/", homeDir), 1)
-
-	return nil
 }
 
 // FilePath returns the path to the config file.
