@@ -116,6 +116,10 @@ func Expand(path, env, home string) string {
 		path = env
 	}
 
+	if path != "" && path[0] == '~' {
+		path = strings.Replace(path, "~/", fmt.Sprintf("%s/", home), 1)
+	}
+
 	if path == "" {
 		path = filepath.Join(home, File)
 	}

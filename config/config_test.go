@@ -55,6 +55,11 @@ func TestExpandConfigPath(t *testing.T) {
 		},
 		{
 			"",
+			"~/config.json",
+			"/home/alice/config.json",
+		},
+		{
+			"",
 			"",
 			"/home/alice/.exercism.json",
 		},
