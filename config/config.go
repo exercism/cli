@@ -110,24 +110,31 @@ func (c *Config) Update(key, host, dir, xapi string) {
 	c.configure()
 }
 
+// Expand takes inputs for a config file location and builds an absolute path.
+func Expand(path, env, home string) string {
+	if path == "" {
+		path = env
+	}
+
+	if path == "" {
+		path = filepath.Join(home, File)
+	}
+
+	return path
+}
+
 // Read loads the config from the stored JSON file.
 func (c *Config) Read(file string) error {
 	renameLegacy()
 
-	if file == "" {
-		file = os.Getenv(fileEnvKey)
+	home, err := c.homeDir()
+	if err != nil {
+		return err
 	}
 
-	if file == "" {
-		home, err := c.homeDir()
-		if err != nil {
-			return err
-		}
-		file = filepath.Join(home, File)
-	}
+	c.File = Expand(file, os.Getenv(fileEnvKey), home)
 
-	c.File = file
-	if _, err := os.Stat(file); err != nil {
+	if _, err := os.Stat(c.File); err != nil {
 		if os.IsNotExist(err) {
 			c.configure()
 			return nil
@@ -135,7 +142,7 @@ func (c *Config) Read(file string) error {
 		return err
 	}
 
-	f, err := os.Open(file)
+	f, err := os.Open(c.File)
 	if err != nil {
 		return err
 	}
