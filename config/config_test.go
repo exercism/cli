@@ -42,6 +42,35 @@ func TestExpandHomeDir(t *testing.T) {
 	assert.Equal(t, "/home/alice/practice", c.Dir)
 }
 
+func TestExpandConfigPath(t *testing.T) {
+	testCases := []struct {
+		path   string
+		env    string
+		result string
+	}{
+		{
+			"path/to/config.json",
+			"",
+			"path/to/config.json",
+		},
+		{
+			"",
+			"~/config.json",
+			"/home/alice/config.json",
+		},
+		{
+			"",
+			"",
+			"/home/alice/.exercism.json",
+		},
+	}
+	home := "/home/alice"
+
+	for _, tt := range testCases {
+		assert.Equal(t, Expand(tt.path, tt.env, home), tt.result)
+	}
+}
+
 func TestSanitizeWhitespace(t *testing.T) {
 	c := &Config{
 		APIKey: "   abc123\n\r\n  ",
