@@ -32,6 +32,8 @@ func (it *Item) Matches(filter HWFilter) bool {
 		return it.isNew
 	case HWUpdated:
 		return it.isUpdated
+	case HWNotSubmitted:
+		return !it.Submitted
 	}
 	return true
 }

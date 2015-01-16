@@ -27,5 +27,5 @@ func Restore(ctx *cli.Context) {
 	if err := hw.Save(); err != nil {
 		log.Fatal(err)
 	}
-	hw.Summarize()
+	hw.Summarize(user.HWNotSubmitted)
 }

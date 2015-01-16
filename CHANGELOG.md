@@ -13,6 +13,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 * [#153](https://github.com/exercism/cli/pull/153): Refactored configuration package - [@kytrinyx](https://github.com/kytrinyx)
 * [#154](https://github.com/exercism/cli/pull/154): Add 'list' command to list available exercises for a language - [@lcowell](https://github.com/lcowell)
 * [#157](https://github.com/exercism/cli/pull/157): Refactored API package - [@Tonkpils](https://github.com/Tonkpils)
+* [#155](https://github.com/exercism/cli/pull/155): Display problems not yet submitted on fetch API - [@Tonkpils](https://github.com/Tonkpils)
 * **Your contribution here**
 
 ## v1.9.2 (2015-01-11)

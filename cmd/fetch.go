@@ -22,10 +22,32 @@ func Fetch(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
+	submissionInfo, err := client.Submissions()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := setSubmissionState(problems, submissionInfo); err != nil {
+		log.Fatal(err)
+	}
+
 	hw := user.NewHomework(problems, c)
 	if err := hw.Save(); err != nil {
 		log.Fatal(err)
 	}
 
-	hw.Summarize()
+	hw.Summarize(user.HWAll)
+}
+
+func setSubmissionState(problems []*api.Problem, submissionInfo map[string][]api.SubmissionInfo) error {
+	for _, problem := range problems {
+		langSubmissions := submissionInfo[problem.Language]
+		for _, submission := range langSubmissions {
+			if submission.Slug == problem.Slug {
+				problem.Submitted = true
+			}
+		}
+	}
+
+	return nil
 }

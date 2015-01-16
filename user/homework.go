@@ -10,6 +10,10 @@ import (
 // HWFilter is used to categorize homework items.
 type HWFilter int
 
+// SummaryOption is an alias of HWFilter that allows
+// selective display of summary items
+type SummaryOption HWFilter
+
 const (
 	// HWAll represents all items in the collection.
 	HWAll = iota
@@ -19,6 +23,9 @@ const (
 	// HWNew represents problems that did not yet exist on the
 	// user's filesystem.
 	HWNew
+	// HWNotSubmitted represents problems that have not been submitted
+	// for review.
+	HWNotSubmitted
 )
 
 // Homework is a collection of problems that were fetched from the APIs.
@@ -96,6 +103,8 @@ func (hw *Homework) heading(filter HWFilter, count int) {
 		status = "Updated:"
 	case HWNew:
 		status = "New:"
+	case HWNotSubmitted:
+		status = "Not Submitted:"
 	}
 	summary := fmt.Sprintf("%d %s", count, unit)
 	fmt.Printf(hw.template, status, summary)
@@ -112,9 +121,13 @@ func (hw *Homework) maxTitleWidth() int {
 }
 
 // Summarize prints a full report of new and updated items in the set.
-func (hw *Homework) Summarize() {
+func (hw *Homework) Summarize(summaryFilter SummaryOption) {
 	hw.Report(HWUpdated)
 	hw.Report(HWNew)
+
+	if summaryFilter != HWNotSubmitted {
+		hw.Report(HWNotSubmitted)
+	}
 
 	fresh := len(hw.ItemsMatching(HWNew))
 	updated := len(hw.ItemsMatching(HWUpdated))
