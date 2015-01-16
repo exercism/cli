@@ -11,12 +11,12 @@
 
 ## v1.9.1 (Jan 10, 2015)
 
-* [#147](https://github.com/exercism/cli/pull/147): added `--api` option to exercism configure - @morphatic
+* [#147](https://github.com/exercism/cli/pull/147): added `--api` option to exercism configure - [@morphatic](https://github.com/morphatic)
 
 ## v1.9.0 (Nov 27, 2014)
 
-* [#143](https://github.com/exercism/cli/pull/143): added command for downloading a specific solution - @harimp
-* [#142](https://github.com/exercism/cli/pull/142): fixed command name to be `exercism` rather than `cli` on `go get` - @Tonkpils
+* [#143](https://github.com/exercism/cli/pull/143): added command for downloading a specific solution - [@harimp](https://github.com/harimp)
+* [#142](https://github.com/exercism/cli/pull/142): fixed command name to be `exercism` rather than `cli` on `go get` - [@Tonkpils](https://github.com/Tonkpils)
 
 ## v1.8.2 (Oct 24, 2014)
 
@@ -28,23 +28,23 @@
 
 ## v1.8.0 (Oct 15, 2014)
 
-* [#138](https://github.com/exercism/cli/pull/138): Added conversion to line endings for submissions on Windows - @rprouse
+* [#138](https://github.com/exercism/cli/pull/138): Added conversion to line endings for submissions on Windows - [@rprouse](https://github.com/rprouse)
 * [#116](https://github.com/exercism/cli/issues/116): Added support for setting name of config file in an environment variable
 * [47d6fd4](https://github.com/exercism/cli/commit/47d6fd407fd0410f5c81d60172e01e8624608f53): Added a `track` command to list the problems in a given language
 * [#126](https://github.com/exercism/cli/issues/126): Added explanation in `submit` response about fetching the next problems
-* [#133](https://github.com/exercism/cli/pull/133): Changed config command to create the exercism directory, rather than waiting until the first time problems are fetched - @Tonkpils
+* [#133](https://github.com/exercism/cli/pull/133): Changed config command to create the exercism directory, rather than waiting until the first time problems are fetched - [@Tonkpils](https://github.com/Tonkpils)
 
 ## v1.7.5 (Oct 5, 2014)
 
 * [88cf1a1fbc884545dfc10e98535f667e4a43e693](https://github.com/exercism/cli/commit/88cf1a1fbc884545dfc10e98535f667e4a43e693): Added ARMv6 to build
 * [12672c4](https://github.com/exercism/cli/commit/12672c4f695cfe3891f96467619a3615e6d57c34): Added an error message when people submit a file that is not within the exercism directory tree
-* [#128](https://github.com/exercism/cli/pull/128): Made paths os-agnostic in tests - @ccnp123
+* [#128](https://github.com/exercism/cli/pull/128): Made paths os-agnostic in tests - [@ccnp123](https://github.com/ccnp123)
 
 ## v1.7.4 (Sep 27, 2014)
 
 * [4ca3e97](https://github.com/exercism/cli/commit/4ca3e9743f6d421903c91dfa27f4747fb1081392): Fixed incorrect HOME directory on Windows
 * [8bd1a25](https://github.com/exercism/cli/commit/4ca3e9743f6d421903c91dfa27f4747fb1081392): Added ARMv5 to build
-* [#117](https://github.com/exercism/cli/pull/117): Archive windows binaries using zip rather than tar and gzip - @LegalizeAdulthood
+* [#117](https://github.com/exercism/cli/pull/117): Archive windows binaries using zip rather than tar and gzip - [@LegalizeAdulthood](https://github.com/LegalizeAdulthood)
 
 ## v1.7.3 (Sep 26, 2014)
 
@@ -52,7 +52,7 @@
 
 ## v1.7.2 (Sep 24, 2014)
 
-* [#111](https://github.com/exercism/cli/pull/111): Don't clobber existing config values when adding more - @jish
+* [#111](https://github.com/exercism/cli/pull/111): Don't clobber existing config values when adding more - [@jish](https://github.com/jish)
 
 ## v1.7.1 (Sep 19, 2014)
 
@@ -65,7 +65,7 @@
 
 * [ac6dbfd](https://github.com/exercism/cli/commit/ac6dbfd81a86e7a9a5a9b68521b0226c40d8e813): Added os and architecture to the user agent
 * [5d58fd1](https://github.com/exercism/cli/commit/5d58fd14b9db84fb752b3bf6112123cd6f04c532): Fixed bug in detecting user's home directory
-* [#100](https://github.com/exercism/cli/pull/100): Added 'debug' command, which supersedes the 'info' command - @Tonkpils
+* [#100](https://github.com/exercism/cli/pull/100): Added 'debug' command, which supersedes the 'info' command - [@Tonkpils](https://github.com/Tonkpils)
 * Extracted a couple of commands into separate handlers
 * [6ec5876](https://github.com/exercism/cli/commit/6ec5876bde0b02206cacbe685bb8aedcbdba25d4): Added a hack to rename old config files to the new default name
 * [bb7d0d6](https://github.com/exercism/cli/commit/bb7d0d6151a950c92590dc771ec3ff5fdd1c83b0): Rename 'home' command to 'info'
@@ -73,17 +73,16 @@
 * Deprecate login/logout commands
 * [1a39134](https://github.com/exercism/cli/commit/1a391342da93aa32ae398f1500a3981aa65b9f41): Changed demo to write exercises to the default exercism problems directory
 * [07cc334](https://github.com/exercism/cli/commit/07cc334739465b21d6eb5d973e16e1c88f67758e): Deleted the whoami command, we weren't using github usernames for anything
-* [#97](https://github.com/exercism/cli/pull/97): Changed default exercism directory to ~/exercism - @lcowell
-* [#94](https://github.com/exercism/cli/pull/94): Updated language detection to handle C++ - @LegalizeAdulthood
-* [#92](https://github.com/exercism/cli/pull/92): Renamed config json file to .exercism.json instead of .exercism.go - @lcowell
+* [#97](https://github.com/exercism/cli/pull/97): Changed default exercism directory to ~/exercism - [@lcowell](https://github.com/lcowell)
+* [#94](https://github.com/exercism/cli/pull/94): Updated language detection to handle C++ - [@LegalizeAdulthood](https://github.com/LegalizeAdulthood)
+* [#92](https://github.com/exercism/cli/pull/92): Renamed config json file to .exercism.json instead of .exercism.go - [@lcowell](https://github.com/lcowell)
 * [f55653f](https://github.com/exercism/cli/commit/f55653f35863914086a54375afb0898e142c1638): Deleted go vet from travis build temporarily until the codebase can be cleaned up
-* [#91](https://github.com/exercism/cli/pull/91): Replaced temp file usage with encode/decode - @lcowell
-* [#90](https://github.com/exercism/cli/pull/90): Added sanitization to config values to trim whitespace before writing it - @lcowell
+* [#91](https://github.com/exercism/cli/pull/91): Replaced temp file usage with encode/decode - [@lcowell](https://github.com/lcowell)
+* [#90](https://github.com/exercism/cli/pull/90): Added sanitization to config values to trim whitespace before writing it - [@lcowell](https://github.com/lcowell)
 * Did a fair amount of cleanup to make code a bit more idiomatic
-* [#86](https://github.com/exercism/cli/pull/86): Triggered interactive login command for commands that require auth - @Tonkpils
+* [#86](https://github.com/exercism/cli/pull/86): Triggered interactive login command for commands that require auth - [@Tonkpils](https://github.com/Tonkpils)
 
 -------------
 
 **WIP** - I'm slowly building up the full changelog history for the project.
-
 
