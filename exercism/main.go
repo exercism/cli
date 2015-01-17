@@ -26,8 +26,6 @@ const (
 	descSubmit    = "Submits a new iteration to a problem on exercism.io."
 	descUnsubmit  = "Deletes the most recently submitted iteration."
 	descTracks    = "List the available language tracks"
-	descLogin     = "DEPRECATED: Interactively saves exercism.io api credentials."
-	descLogout    = "DEPRECATED: Clear exercism.io api credentials"
 
 	descLongRestore = "Restore will pull the latest revisions of exercises that have already been submitted. It will *not* overwrite existing files. If you have made changes to a file and have not submitted it, and you're trying to restore the last submitted version, first move that file out of the way, then call restore."
 	descDownload    = "Downloads and saves a specified submission into the local system"
@@ -90,18 +88,6 @@ func main() {
 			ShortName: "f",
 			Usage:     descFetch,
 			Action:    cmd.Fetch,
-		},
-		{
-			Name:      "login",
-			ShortName: "l",
-			Usage:     descLogin,
-			Action:    cmd.Login,
-		},
-		{
-			Name:      "logout",
-			ShortName: "o",
-			Usage:     descLogout,
-			Action:    cmd.Logout,
 		},
 		{
 			Name:        "restore",
