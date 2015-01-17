@@ -2,7 +2,7 @@
 
 ----------------
 
-* [#151](https://github.com/exercism/cli/pull/151): Expand '~' in config path to home directory - @lcowell
+* [#151](https://github.com/exercism/cli/pull/151): Expand '~' in config path to home directory - [@lcowell](https://github.com/lcowell)
 * Stop supporting legacy config files (~/.exercism.go)
 * Deleted deprecated login/logout commands
 * Your contribution here
