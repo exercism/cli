@@ -147,13 +147,6 @@ func (c *Config) Read(file string) error {
 	return nil
 }
 
-// SavePath allows the user to customize the location of the JSON file.
-func (c *Config) SavePath(file string) {
-	if file != "" {
-		c.File = file
-	}
-}
-
 // Write() saves the config as JSON.
 func (c *Config) Write() error {
 	c.ExercismDirectory = ""

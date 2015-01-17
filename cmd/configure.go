@@ -17,7 +17,6 @@ func Configure(ctx *cli.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	c.SavePath(ctx.GlobalString("config"))
 
 	key := ctx.String("key")
 	host := ctx.String("host")
