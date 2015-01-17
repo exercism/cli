@@ -24,19 +24,18 @@ func Debug(ctx *cli.Context) {
 	}
 	fmt.Printf("Home Dir: %s\n", dir)
 
-	file, err := config.FilePath(ctx.GlobalString("config"))
+	c, err := config.Read(ctx.GlobalString("config"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	configured := true
-	if _, err = os.Stat(file); err != nil {
+	if _, err = os.Stat(c.File); err != nil {
 		if os.IsNotExist(err) {
 			configured = false
 		} else {
 			log.Fatal(err)
 		}
-	}
-
-	c, err := config.Read(file)
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	if configured {
