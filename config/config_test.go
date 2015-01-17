@@ -85,20 +85,6 @@ func TestSanitizeWhitespace(t *testing.T) {
 	assert.Equal(t, "http://x.exercism.io", c.XAPI)
 }
 
-func TestFilePath(t *testing.T) {
-	// defaults to home directory
-	c := &Config{}
-	c.home = "/home/alice"
-	c.configure()
-	assert.Equal(t, filepath.FromSlash("/home/alice/.exercism.json"), c.File)
-
-	// can override location of config file
-	c = &Config{}
-	c.configure()
-	c.SavePath("/tmp/config/exercism.conf")
-	assert.Equal(t, "/tmp/config/exercism.conf", c.File)
-}
-
 func TestReadNonexistantConfig(t *testing.T) {
 	c, err := Read("/no/such/config.json")
 	assert.NoError(t, err)

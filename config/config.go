@@ -215,19 +215,6 @@ func (c *Config) configure() (*Config, error) {
 	return c, nil
 }
 
-// FilePath returns the path to the config file.
-func FilePath(file string) (string, error) {
-	if file != "" {
-		return file, nil
-	}
-
-	dir, err := Home()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(dir, File), nil
-}
-
 // IsAuthenticated returns true if the config contains an API key.
 // This does not check whether or not that key is valid.
 func (c *Config) IsAuthenticated() bool {
