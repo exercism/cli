@@ -3,6 +3,7 @@
 ----------------
 
 * [#151](https://github.com/exercism/cli/pull/151): Expand '~' in config path to home directory - @lcowell
+* Stop supporting legacy config files (~/.exercism.go)
 * Your contribution here
 
 ## v1.9.2 (Jan 11, 2015)

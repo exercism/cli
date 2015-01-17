@@ -117,8 +117,6 @@ func Expand(path, env, home string) string {
 
 // Read loads the config from the stored JSON file.
 func (c *Config) Read(file string) error {
-	renameLegacy()
-
 	home, err := c.homeDir()
 	if err != nil {
 		return err
@@ -158,7 +156,6 @@ func (c *Config) SavePath(file string) {
 
 // Write() saves the config as JSON.
 func (c *Config) Write() error {
-	renameLegacy()
 	c.ExercismDirectory = ""
 	c.Hostname = ""
 	c.ProblemsHost = ""
@@ -253,22 +250,4 @@ func (c *Config) sanitize() {
 	c.XAPI = strings.TrimSpace(c.XAPI)
 	c.Hostname = strings.TrimSpace(c.Hostname)
 	c.ProblemsHost = strings.TrimSpace(c.ProblemsHost)
-}
-
-// renameLegacy normalizes the default config file name.
-// This function will bail silently if any error occurs.
-func renameLegacy() {
-	dir, err := Home()
-	if err != nil {
-		return
-	}
-
-	legacyPath := filepath.Join(dir, LegacyFile)
-	if _, err = os.Stat(legacyPath); err != nil {
-		return
-	}
-
-	correctPath := filepath.Join(dir, File)
-	os.Rename(legacyPath, correctPath)
-	return
 }
