@@ -125,30 +125,20 @@ func TestReadingWritingConfig(t *testing.T) {
 func TestUpdateConfig(t *testing.T) {
 	c := &Config{
 		APIKey: "MyKey",
-		Dir:    "/exercism/directory",
 		API:    "localhost",
+		Dir:    "/exercism/directory",
 		XAPI:   "localhost",
 	}
 
-	c.Update("NewKey", "", "", "")
-	assert.Equal(t, "NewKey", c.APIKey)
+	// Test the blank values don't overwrite existing values
+	c.Update("", "", "", "")
+	assert.Equal(t, "MyKey", c.APIKey)
 	assert.Equal(t, "localhost", c.API)
 	assert.Equal(t, "/exercism/directory", c.Dir)
 	assert.Equal(t, "localhost", c.XAPI)
 
-	c.Update("", "http://example.com", "", "")
-	assert.Equal(t, "NewKey", c.APIKey)
-	assert.Equal(t, "http://example.com", c.API)
-	assert.Equal(t, "/exercism/directory", c.Dir)
-	assert.Equal(t, "localhost", c.XAPI)
-
-	c.Update("", "", "/tmp/exercism", "")
-	assert.Equal(t, "NewKey", c.APIKey)
-	assert.Equal(t, "http://example.com", c.API)
-	assert.Equal(t, "/tmp/exercism", c.Dir)
-	assert.Equal(t, "localhost", c.XAPI)
-
-	c.Update("", "", "", "http://x.example.org")
+	// Test that each value can be overwritten
+	c.Update("NewKey", "http://example.com", "/tmp/exercism", "http://x.example.org")
 	assert.Equal(t, "NewKey", c.APIKey)
 	assert.Equal(t, "http://example.com", c.API)
 	assert.Equal(t, "/tmp/exercism", c.Dir)
