@@ -107,10 +107,10 @@ func TestReadingWritingConfig(t *testing.T) {
 		Dir:    "/exercism/directory",
 		API:    "localhost",
 		XAPI:   "localhost",
+		File: filename,
 	}
 	c1.configure()
 
-	c1.SavePath(filename)
 	c1.Write()
 
 	c2, err := Read(filename)
