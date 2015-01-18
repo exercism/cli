@@ -81,7 +81,7 @@ func Download(url string) (*Submission, error) {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf(`unable to fetch Submission (HTTP: %d) - %s`, res.StatusCode, payload.Error)
+		return nil, fmt.Errorf("unable to fetch Submission (HTTP: %d) - %s", res.StatusCode, payload.Error)
 	}
 
 	return payload.Submission, err
