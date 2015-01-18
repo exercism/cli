@@ -3,8 +3,10 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/exercism/cli/config"
 )
@@ -13,6 +15,8 @@ var (
 	// UserAgent lets the API know where the call is being made from.
 	// It's set from main() so that we have access to the version.
 	UserAgent string
+
+	UnknownLanguageError = errors.New("the language is unknown")
 )
 
 // PayloadError represents an error message from the API.
@@ -126,6 +130,40 @@ func Submit(url string, iter *Iteration) (*Submission, error) {
 	}
 
 	return ps.Submission, nil
+}
+
+// List available problems for a language
+func List(language, host string) ([]string, error) {
+	url := fmt.Sprintf("%s/tracks/%s", host, language)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", UserAgent)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return nil, UnknownLanguageError
+	}
+
+	var payload struct {
+		Track Track
+	}
+	if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
+		return nil, err
+	}
+	problems := make([]string, len(payload.Track.Problems))
+	prefix := language + "/"
+
+	for n, p := range payload.Track.Problems {
+		problems[n] = strings.TrimPrefix(p, prefix)
+	}
+
+	return problems, nil
 }
 
 // Unsubmit deletes a submission.
