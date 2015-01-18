@@ -29,6 +29,7 @@ const (
 
 	descLongRestore = "Restore will pull the latest revisions of exercises that have already been submitted. It will *not* overwrite existing files. If you have made changes to a file and have not submitted it, and you're trying to restore the last submitted version, first move that file out of the way, then call restore."
 	descDownload    = "Downloads and saves a specified submission into the local system"
+	descList        = "Lists all available assignments for a given language"
 )
 
 func main() {
@@ -119,6 +120,12 @@ func main() {
 			ShortName: "dl",
 			Usage:     descDownload,
 			Action:    cmd.Download,
+		},
+		{
+			Name:      "list",
+			ShortName: "li",
+			Usage:     descList,
+			Action:    cmd.List,
 		},
 	}
 	if err := app.Run(os.Args); err != nil {
