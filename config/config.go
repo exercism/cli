@@ -3,7 +3,6 @@ package config
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -65,84 +64,36 @@ func Home() (string, error) {
 	return dir, nil
 }
 
-// Read loads the config from the stored JSON file.
-func Read(file string) (*Config, error) {
+func New(path string) (*Config, error) {
 	c := &Config{}
-	err := c.Read(file)
+	err := c.load(path, os.Getenv(fileEnvKey))
 	return c, err
 }
 
 // Update sets new values where given.
 func (c *Config) Update(key, host, dir, xapi string) {
+	key = strings.TrimSpace(key)
 	if key != "" {
 		c.APIKey = key
 	}
 
+	host = strings.TrimSpace(host)
 	if host != "" {
 		c.API = host
 	}
 
+	dir = strings.TrimSpace(dir)
 	if dir != "" {
 		c.Dir = dir
 	}
 
+	xapi = strings.TrimSpace(xapi)
 	if xapi != "" {
 		c.XAPI = xapi
 	}
-
-	c.configure()
 }
 
-// Expand takes inputs for a config file location and builds an absolute path.
-func Expand(path, env, home string) string {
-	if path == "" {
-		path = env
-	}
-
-	if path != "" && path[0] == '~' {
-		path = strings.Replace(path, "~/", fmt.Sprintf("%s/", home), 1)
-	}
-
-	if path == "" {
-		path = filepath.Join(home, File)
-	}
-
-	return path
-}
-
-// Read loads the config from the stored JSON file.
-func (c *Config) Read(file string) error {
-	home, err := c.homeDir()
-	if err != nil {
-		return err
-	}
-
-	c.File = Expand(file, os.Getenv(fileEnvKey), home)
-
-	if _, err := os.Stat(c.File); err != nil {
-		if os.IsNotExist(err) {
-			c.configure()
-			return nil
-		}
-		return err
-	}
-
-	f, err := os.Open(c.File)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	d := json.NewDecoder(f)
-	err = d.Decode(&c)
-	if err != nil {
-		return err
-	}
-	c.configure()
-	return nil
-}
-
-// Write() saves the config as JSON.
+// Write saves the config as JSON.
 func (c *Config) Write() error {
 	// truncates existing file if it exists
 	f, err := os.Create(c.File)
@@ -155,35 +106,42 @@ func (c *Config) Write() error {
 	return e.Encode(c)
 }
 
-func (c *Config) configure() (*Config, error) {
-	c.sanitize()
-
-	if c.API == "" {
-		c.API = hostAPI
-	}
-
-	if c.XAPI == "" {
-		c.XAPI = hostXAPI
-	}
-
-	homeDir, err := c.homeDir()
+func (c *Config) load(argPath, envPath string) error {
+	path, err := c.resolvePath(argPath, envPath)
 	if err != nil {
-		return c, err
+		return err
+	}
+	c.File = path
+
+	if err := c.read(); err != nil {
+		return err
 	}
 
-	if c.Dir == "" {
-		// fall back to default value
-		c.Dir = filepath.Join(homeDir, DirExercises)
-	} else {
-		// replace '~' with user's home
-		c.Dir = strings.Replace(c.Dir, "~/", fmt.Sprintf("%s/", homeDir), 1)
-	}
+	// in case people manually update the config file
+	// with weird formatting
+	c.APIKey = strings.TrimSpace(c.APIKey)
+	c.Dir = strings.TrimSpace(c.Dir)
+	c.API = strings.TrimSpace(c.API)
+	c.XAPI = strings.TrimSpace(c.XAPI)
 
-	if c.File == "" {
-		c.File = filepath.Join(homeDir, File)
-	}
+	return c.setDefaults()
+}
 
-	return c, nil
+func (c *Config) read() error {
+	if _, err := os.Stat(c.File); err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	f, err := os.Open(c.File)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	d := json.NewDecoder(f)
+	return d.Decode(&c)
 }
 
 // IsAuthenticated returns true if the config contains an API key.
@@ -192,8 +150,7 @@ func (c *Config) IsAuthenticated() bool {
 	return c.APIKey != ""
 }
 
-// See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
-// we can't cross compile using cgo and use user.Current()
+// homeDir caches the lookup of the user's home directory.
 func (c *Config) homeDir() (string, error) {
 	if c.home != "" {
 		return c.home, nil
@@ -201,9 +158,39 @@ func (c *Config) homeDir() (string, error) {
 	return Home()
 }
 
-func (c *Config) sanitize() {
-	c.APIKey = strings.TrimSpace(c.APIKey)
-	c.Dir = strings.TrimSpace(c.Dir)
-	c.API = strings.TrimSpace(c.API)
-	c.XAPI = strings.TrimSpace(c.XAPI)
+func (c *Config) resolvePath(argPath, envPath string) (string, error) {
+	path := argPath
+	if path == "" {
+		path = envPath
+	}
+	if path == "" {
+		path = filepath.Join("~", File)
+	}
+	h, err := c.homeDir()
+	if err != nil {
+		return "", err
+	}
+	return strings.Replace(path, "~", h, 1), nil
+}
+
+func (c *Config) setDefaults() error {
+	if c.API == "" {
+		c.API = hostAPI
+	}
+
+	if c.XAPI == "" {
+		c.XAPI = hostXAPI
+	}
+
+	h, err := c.homeDir()
+	if err != nil {
+		return err
+	}
+
+	if c.Dir == "" {
+		c.Dir = filepath.Join(h, DirExercises)
+	}
+	c.Dir = strings.Replace(c.Dir, "~", h, 1)
+
+  return nil
 }

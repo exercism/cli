@@ -13,7 +13,7 @@ import (
 // If no iteration is specified, the most recent iteration
 // is deleted.
 func Unsubmit(ctx *cli.Context) {
-	c, err := config.Read(ctx.GlobalString("config"))
+	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
 	}

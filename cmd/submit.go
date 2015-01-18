@@ -18,7 +18,7 @@ func Submit(ctx *cli.Context) {
 		log.Fatal("Please enter a file name")
 	}
 
-	c, err := config.Read(ctx.GlobalString("config"))
+	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
 	}
