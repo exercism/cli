@@ -43,11 +43,6 @@ type Config struct {
 	XAPI   string `json:"xapi"`
 	File   string `json:"-"` // full path to config file
 	home   string // cache user's home directory
-
-	// deprecated, get rid of them when nobody uses 1.7.0 anymore
-	ExercismDirectory string `json:"exercismDirectory,omitempty"`
-	Hostname          string `json:"hostname,omitempty"`
-	ProblemsHost      string `json:"problemsHost,omitempty"`
 }
 
 // Home returns the user's canonical home directory.
@@ -149,10 +144,6 @@ func (c *Config) Read(file string) error {
 
 // Write() saves the config as JSON.
 func (c *Config) Write() error {
-	c.ExercismDirectory = ""
-	c.Hostname = ""
-	c.ProblemsHost = ""
-
 	// truncates existing file if it exists
 	f, err := os.Create(c.File)
 	if err != nil {
@@ -167,16 +158,8 @@ func (c *Config) Write() error {
 func (c *Config) configure() (*Config, error) {
 	c.sanitize()
 
-	if c.Hostname != "" {
-		c.API = c.Hostname
-	}
-
 	if c.API == "" {
 		c.API = hostAPI
-	}
-
-	if c.ProblemsHost != "" {
-		c.XAPI = c.ProblemsHost
 	}
 
 	if c.XAPI == "" {
@@ -186,11 +169,6 @@ func (c *Config) configure() (*Config, error) {
 	homeDir, err := c.homeDir()
 	if err != nil {
 		return c, err
-	}
-
-	// use legacy value, if it exists
-	if c.ExercismDirectory != "" {
-		c.Dir = c.ExercismDirectory
 	}
 
 	if c.Dir == "" {
@@ -228,6 +206,4 @@ func (c *Config) sanitize() {
 	c.Dir = strings.TrimSpace(c.Dir)
 	c.API = strings.TrimSpace(c.API)
 	c.XAPI = strings.TrimSpace(c.XAPI)
-	c.Hostname = strings.TrimSpace(c.Hostname)
-	c.ProblemsHost = strings.TrimSpace(c.ProblemsHost)
 }
