@@ -173,10 +173,7 @@ func TestReadCustomConfig(t *testing.T) {
 }
 
 func TestConfigInEnv(t *testing.T) {
-	_, caller, _, ok := runtime.Caller(0)
-	assert.True(t, ok)
-	file := filepath.Join(filepath.Dir(caller), "..", "fixtures", "special.json")
-	os.Setenv(fileEnvKey, file)
+	os.Setenv(fileEnvKey, fixturePath(t, "special.json"))
 
 	c := &Config{home: "/tmp/home"}
 	err := c.Read("")
@@ -185,4 +182,10 @@ func TestConfigInEnv(t *testing.T) {
 	assert.Equal(t, "/a/b/c", c.Dir)
 	assert.Equal(t, "http://api.example.com", c.API)
 	assert.Equal(t, "http://x.example.com", c.XAPI)
+}
+
+func fixturePath(t *testing.T, filename string) string {
+	_, caller, _, ok := runtime.Caller(0)
+	assert.True(t, ok)
+	return filepath.Join(filepath.Dir(caller), "..", "fixtures", filename)
 }
