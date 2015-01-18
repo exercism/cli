@@ -85,6 +85,26 @@
 * Did a fair amount of cleanup to make code a bit more idiomatic
 * [#86](https://github.com/exercism/cli/pull/86): Triggered interactive login command for commands that require auth - [@Tonkpils](https://github.com/Tonkpils)
 
+## v1.6.2 (Jun 2, 2014)
+
+* [a5b7a55](https://github.com/exercism/cli/commit/a5b7a55f52c23ac5ce2c6bd1826ea7767aea38c4): Update login prompt
+
+## v1.6.1 (May 16, 2014)
+
+* [#84](https://github.com/exercism/cli/pull/84): Change hard-coded filepath so that it will work on any platform - [@simonjefford](https://github.com/simonjefford)
+
+## v1.6.0 (May 10, 2014)
+
+* [#82](https://github.com/exercism/cli/pull/82): Fixed typo in tests - [@srt32](https://github.com/srt32)
+* [aa7446d](https://github.com/exercism/cli/commit/aa7446d598fc894ef329756555c48ef358baf676): Clarified output to user after they fetch
+* [#79](https://github.com/exercism/cli/pull/79): Updated development instructions to fix permissions problem - [@andrewsardone](https://github.com/andrewsardone)
+* [#78](https://github.com/exercism/cli/pull/78): Deleted deprecated action `peek` - [@djquan](https://github.com/djquan)
+* [#74](https://github.com/exercism/cli/pull/74): Implemented new option on `fetch` to get a single language - [@Tonkpils](https://github.com/Tonkpils)
+* [#75](https://github.com/exercism/cli/pull/75): Improved feedback to user after logging in - [@Tonkpils](https://github.com/Tonkpils)
+* [#72](https://github.com/exercism/cli/pull/72): Optimized use of temp file - [@Dparker1990](https://github.com/Dparker1990)
+* [#70](https://github.com/exercism/cli/pull/70): Fixed a panic - [@Tonkpils](https://github.com/Tonkpils)
+* [#68](https://github.com/exercism/cli/pull/68): Fixed how user input is read so that it doesn't stop at the first space - [@Tonkpils](https://github.com/Tonkpils)
+
 -------------
 
 **WIP** - I'm slowly building up the full changelog history for the project.
