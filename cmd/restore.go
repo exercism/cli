@@ -12,7 +12,7 @@ import (
 
 // Restore returns a user's solved problems.
 func Restore(ctx *cli.Context) {
-	c, err := config.Read(ctx.GlobalString("config"))
+	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
 	}

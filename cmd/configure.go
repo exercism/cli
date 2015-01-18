@@ -13,7 +13,7 @@ import (
 // If a setting is not passed as an argument, default
 // values are used.
 func Configure(ctx *cli.Context) {
-	c, err := config.Read(ctx.GlobalString("config"))
+	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
 	}
