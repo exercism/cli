@@ -172,20 +172,6 @@ func TestReadCustomConfig(t *testing.T) {
 	assert.Equal(t, "http://x.example.org", c.XAPI)
 }
 
-func TestReadLegacyConfig(t *testing.T) {
-	dir, err := filepath.Abs("../fixtures/home/")
-	assert.NoError(t, err)
-
-	c := &Config{home: dir}
-	file := fmt.Sprintf("%s/legacy.json", dir)
-	err = c.Read(file)
-	assert.NoError(t, err)
-	assert.Equal(t, "prq567", c.APIKey)
-	assert.Equal(t, "/tmp/stuff", c.Dir)
-	assert.Equal(t, "http://api.example.com", c.API)
-	assert.Equal(t, "http://problems.example.com", c.XAPI)
-}
-
 func TestConfigInEnv(t *testing.T) {
 	_, caller, _, ok := runtime.Caller(0)
 	assert.True(t, ok)
