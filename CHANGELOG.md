@@ -106,6 +106,18 @@
 * [#70](https://github.com/exercism/cli/pull/70): Fixed a panic - [@Tonkpils](https://github.com/Tonkpils)
 * [#68](https://github.com/exercism/cli/pull/68): Fixed how user input is read so that it doesn't stop at the first space - [@Tonkpils](https://github.com/Tonkpils)
 
+## v1.5.1 (Mar 14, 2014)
+
+* [5b672ee](https://github.com/exercism/cli/commit/5b672ee7bf26859c41de9eed83396b7454286063 ): Provided a visual mark next to new problems that get fetched
+
+## v1.5.0 (Feb 28, 2014)
+
+* [#63](https://github.com/exercism/cli/pull/63): Implemeted `fetch` for a single language - [@Tonkpils](https://github.com/Tonkpils)
+* [#62](https://github.com/exercism/cli/pull/62): Expose error message from API to user on `fetch` - [@Tonkpils](https://github.com/Tonkpils)
+* [#59](https://github.com/exercism/cli/pull/59): Added global flag to pass the path to the config file instead of relying on default - [@isbadawi](https://github.com/isbadawi)
+* [#57](https://github.com/exercism/cli/pull/57): Added description to the restore command - [@rcode5](https://github.com/rcode5)
+* [#56](https://github.com/exercism/cli/pull/56): Updated developer instructions in README based on real-life experience - [@rcode5](https://github.com/rcode5)
+
 -------------
 
 **WIP** - I'm slowly building up the full changelog history for the project.
