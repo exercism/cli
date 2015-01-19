@@ -24,7 +24,7 @@ func Debug(ctx *cli.Context) {
 	}
 	fmt.Printf("Home Dir: %s\n", dir)
 
-	c, err := config.Read(ctx.GlobalString("config"))
+	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
 	}

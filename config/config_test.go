@@ -6,94 +6,125 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDefaultValues(t *testing.T) {
-	c := &Config{}
-	c.home = "/home/alice"
-	c.configure()
-	assert.Equal(t, "", c.APIKey)
-	assert.Equal(t, "http://exercism.io", c.API)
-	assert.Equal(t, filepath.FromSlash("/home/alice/exercism"), c.Dir)
-}
-
-func TestCustomValues(t *testing.T) {
-	c := &Config{
-		APIKey: "abc123",
-		API:    "http://example.org",
-		Dir:    "/path/to/exercises",
-		XAPI:   "http://x.example.org",
+func TestLoad(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "")
+	if err != nil {
+		t.Fatal(err)
 	}
-	c.configure()
-	assert.Equal(t, "abc123", c.APIKey)
-	assert.Equal(t, "http://example.org", c.API)
-	assert.Equal(t, "/path/to/exercises", c.Dir)
-	assert.Equal(t, "http://x.example.org", c.XAPI)
-}
+	configPath := filepath.Join(tmpDir, "config.json")
+	if err := os.Link(fixturePath(t, "config.json"), configPath); err != nil {
+		t.Fatal(err)
+	}
+  dirtyPath := filepath.Join(tmpDir, "dirty.json")
+	if err := os.Link(fixturePath(t, "dirty.json"), dirtyPath); err != nil {
+		t.Fatal(err)
+	}
 
-func TestExpandHomeDir(t *testing.T) {
-	c := &Config{Dir: "~/practice"}
-	c.home = "/home/alice"
-	c.configure()
-	assert.Equal(t, "/home/alice/practice", c.Dir)
-}
-
-func TestExpandConfigPath(t *testing.T) {
-	testCases := []struct {
-		path   string
-		env    string
-		result string
+	testCases := []struct{
+		desc string
+		in string // the name of the file passed as a command line argument
+		env string // the name of the file stored in the environment variable
+		out string // the name of the file that the config will be written to
+		dir, key, api, xapi string // the actual config values
 	}{
 		{
-			"path/to/config.json",
-			"",
-			"path/to/config.json",
+			desc: "defaults",
+			in: "",
+			env: "",
+			out: filepath.Join(tmpDir, File),
+			dir: filepath.Join(tmpDir, DirExercises),
+			key: "",
+			api: hostAPI,
+			xapi: hostXAPI,
 		},
 		{
-			"",
-			"~/config.json",
-			"/home/alice/config.json",
+			desc: "no such file",
+			in: filepath.Join(tmpDir, "no-such.json"),
+			env: "",
+			out: filepath.Join(tmpDir, "no-such.json"),
+			dir: filepath.Join(tmpDir, DirExercises),
+			key: "",
+			api: hostAPI,
+			xapi: hostXAPI,
 		},
 		{
-			"",
-			"",
-			"/home/alice/.exercism.json",
+			desc: "file exists",
+			in: configPath,
+			env: "",
+			out: configPath,
+			dir: "/a/b/c",
+			key: "abc123",
+			api: "http://api.example.com",
+			xapi: "http://x.example.com",
+		},
+		{
+			desc: "unexpanded path",
+			in: "~/config.json",
+			env: "",
+			out: configPath,
+			dir: "/a/b/c",
+			key: "abc123",
+			api: "http://api.example.com",
+			xapi: "http://x.example.com",
+		},
+		{
+			desc: "file in env",
+			in: "",
+			env: configPath,
+			out: configPath,
+			dir: "/a/b/c",
+			key: "abc123",
+			api: "http://api.example.com",
+			xapi: "http://x.example.com",
+		},
+		{
+			desc: "unexpanded path in env",
+			in: "",
+			env: "~/env.json",
+			out: filepath.Join(tmpDir, "env.json"),
+			dir: filepath.Join(tmpDir, DirExercises),
+			key: "",
+			api: hostAPI,
+			xapi: hostXAPI,
+		},
+		{
+			desc: "command line argument overrides env",
+			in: "~/arg.json",
+			env: "~/env.json",
+			out: filepath.Join(tmpDir, "arg.json"),
+			dir: filepath.Join(tmpDir, DirExercises),
+			key: "",
+			api: hostAPI,
+			xapi: hostXAPI,
+		},
+		{
+			desc: "sanitizes whitespace",
+			in: "~/dirty.json",
+      env: "",
+			out: filepath.Join(tmpDir, "dirty.json"),
+			dir: "/a/b/c",
+			key: "abc123",
+			api: "http://api.example.com",
+			xapi: "http://x.example.com",
 		},
 	}
-	home := "/home/alice"
 
-	for _, tt := range testCases {
-		assert.Equal(t, Expand(tt.path, tt.env, home), tt.result)
-	}
-}
+	for _, tc := range testCases {
+		c := &Config{home: tmpDir}
 
-func TestSanitizeWhitespace(t *testing.T) {
-	c := &Config{
-		APIKey: "   abc123\n\r\n  ",
-		API:    "       ",
-		Dir:    "  \r\n/path/to/exercises   \r\n",
-		XAPI:   "   ",
-	}
-	c.configure()
-	assert.Equal(t, "abc123", c.APIKey)
-	assert.Equal(t, "http://exercism.io", c.API)
-	assert.Equal(t, "/path/to/exercises", c.Dir)
-	assert.Equal(t, "http://x.exercism.io", c.XAPI)
-}
-
-func TestReadNonexistantConfig(t *testing.T) {
-	c, err := Read("/no/such/config.json")
-	assert.NoError(t, err)
-	assert.Equal(t, c.APIKey, "")
-	assert.Equal(t, c.API, "http://exercism.io")
-	assert.Equal(t, c.XAPI, "http://x.exercism.io")
-	assert.False(t, c.IsAuthenticated())
-	if !strings.HasSuffix(c.Dir, filepath.FromSlash("/exercism")) {
-		t.Fatal("Default unconfigured config should use home dir")
+		if err := c.load(tc.in, tc.env); err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, tc.out, c.File, tc.desc)
+		assert.Equal(t, tc.dir, c.Dir, tc.desc)
+		assert.Equal(t, tc.key, c.APIKey, tc.desc)
+		assert.Equal(t, tc.api, c.API, tc.desc)
+		assert.Equal(t, tc.xapi, c.XAPI, tc.desc)
 	}
 }
 
@@ -109,11 +140,10 @@ func TestReadingWritingConfig(t *testing.T) {
 		XAPI:   "localhost",
 		File: filename,
 	}
-	c1.configure()
 
 	c1.Write()
 
-	c2, err := Read(filename)
+	c2, err := New(filename)
 	assert.NoError(t, err)
 
 	assert.Equal(t, c1.APIKey, c2.APIKey)
@@ -145,44 +175,8 @@ func TestUpdateConfig(t *testing.T) {
 	assert.Equal(t, "http://x.example.org", c.XAPI)
 }
 
-func TestReadDefaultConfig(t *testing.T) {
-	dir, err := filepath.Abs("../fixtures/home")
-	assert.NoError(t, err)
-
-	c := &Config{home: dir}
-	err = c.Read("")
-	assert.NoError(t, err)
-	assert.Equal(t, "abc123", c.APIKey)
-	assert.Equal(t, "/path/to/exercism", c.Dir)
-	assert.Equal(t, "http://example.com", c.API)
-	assert.Equal(t, "http://x.example.com", c.XAPI)
-}
-
-func TestReadCustomConfig(t *testing.T) {
-	dir, err := filepath.Abs("../fixtures/home/")
-	assert.NoError(t, err)
-
-	c := &Config{home: dir}
-	file := fmt.Sprintf("%s/custom.json", dir)
-	err = c.Read(file)
-	assert.NoError(t, err)
-	assert.Equal(t, "xyz000", c.APIKey)
-	assert.Equal(t, "/tmp/exercism", c.Dir)
-	assert.Equal(t, "http://example.org", c.API)
-	assert.Equal(t, "http://x.example.org", c.XAPI)
-}
-
-func TestConfigInEnv(t *testing.T) {
+func fixturePath(t *testing.T, filename string) string {
 	_, caller, _, ok := runtime.Caller(0)
 	assert.True(t, ok)
-	file := filepath.Join(filepath.Dir(caller), "..", "fixtures", "special.json")
-	os.Setenv(fileEnvKey, file)
-
-	c := &Config{home: "/tmp/home"}
-	err := c.Read("")
-	assert.NoError(t, err)
-	assert.Equal(t, "abc123", c.APIKey)
-	assert.Equal(t, "/a/b/c", c.Dir)
-	assert.Equal(t, "http://api.example.com", c.API)
-	assert.Equal(t, "http://x.example.com", c.XAPI)
+	return filepath.Join(filepath.Dir(caller), "..", "fixtures", filename)
 }
