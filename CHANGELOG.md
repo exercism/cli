@@ -6,6 +6,7 @@
 * Stop supporting legacy config files (~/.exercism.go)
 * Deleted deprecated login/logout commands
 * Deleted deprecated key names in config
+* [#153](https://github.com/exercism/cli/pull/153): Refactored configuration package - [@kytrinyx](https://github.com/kytrinyx)
 * Your contribution here
 
 ## v1.9.2 (Jan 11, 2015)

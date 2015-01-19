@@ -12,7 +12,7 @@ import (
 
 // Tracks lists available tracks.
 func Tracks(ctx *cli.Context) {
-	c, err := config.Read(ctx.GlobalString("config"))
+	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
 	}
