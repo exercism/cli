@@ -7,6 +7,7 @@
 * Deleted deprecated login/logout commands
 * Deleted deprecated key names in config
 * [#153](https://github.com/exercism/cli/pull/153): Refactored configuration package - [@kytrinyx](https://github.com/kytrinyx)
+* [#154](https://github.com/exercism/cli/pull/154): Add 'list' command to list available exercises for a language - [@lcowell](https://github.com/lcowell)
 * Your contribution here
 
 ## v1.9.2 (Jan 11, 2015)
