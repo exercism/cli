@@ -64,6 +64,7 @@ func Home() (string, error) {
 	return dir, nil
 }
 
+// New returns a configuration struct with content from the exercism.json file
 func New(path string) (*Config, error) {
 	c := &Config{}
 	err := c.load(path, os.Getenv(fileEnvKey))
@@ -192,5 +193,5 @@ func (c *Config) setDefaults() error {
 	}
 	c.Dir = strings.Replace(c.Dir, "~", h, 1)
 
-  return nil
+	return nil
 }

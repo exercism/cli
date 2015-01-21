@@ -16,8 +16,9 @@ func Tracks(ctx *cli.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	client := api.NewClient(c)
 
-	tracks, err := api.Tracks(fmt.Sprintf("%s/tracks", c.XAPI))
+	tracks, err := client.Tracks()
 	if err != nil {
 		log.Fatal(err)
 	}
