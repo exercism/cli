@@ -22,9 +22,10 @@ func Unsubmit(ctx *cli.Context) {
 		log.Fatal(msgPleaseAuthenticate)
 	}
 
-	url := fmt.Sprintf("%s/api/v1/user/assignments?key=%s", c.API, c.APIKey)
-	if err := api.Unsubmit(url); err != nil {
+	client := api.NewClient(c)
+	if err := client.Unsubmit(); err != nil {
 		log.Fatal(err)
 	}
+
 	fmt.Println("Your most recent submission was successfully deleted.")
 }

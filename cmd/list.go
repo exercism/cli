@@ -25,10 +25,10 @@ func List(ctx *cli.Context) {
 	}
 
 	language := args[0]
-
-	problems, err := api.List(language, c.XAPI)
+	client := api.NewClient(c)
+	problems, err := client.List(language)
 	if err != nil {
-		if err == api.UnknownLanguageError {
+		if err == api.ErrUnknownLanguage {
 			log.Fatalf("The requested language '%s' is unknown", language)
 		}
 		log.Fatal(err)

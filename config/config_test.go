@@ -20,96 +20,96 @@ func TestLoad(t *testing.T) {
 	if err := os.Link(fixturePath(t, "config.json"), configPath); err != nil {
 		t.Fatal(err)
 	}
-  dirtyPath := filepath.Join(tmpDir, "dirty.json")
+	dirtyPath := filepath.Join(tmpDir, "dirty.json")
 	if err := os.Link(fixturePath(t, "dirty.json"), dirtyPath); err != nil {
 		t.Fatal(err)
 	}
 
-	testCases := []struct{
-		desc string
-		in string // the name of the file passed as a command line argument
-		env string // the name of the file stored in the environment variable
-		out string // the name of the file that the config will be written to
+	testCases := []struct {
+		desc                string
+		in                  string // the name of the file passed as a command line argument
+		env                 string // the name of the file stored in the environment variable
+		out                 string // the name of the file that the config will be written to
 		dir, key, api, xapi string // the actual config values
 	}{
 		{
 			desc: "defaults",
-			in: "",
-			env: "",
-			out: filepath.Join(tmpDir, File),
-			dir: filepath.Join(tmpDir, DirExercises),
-			key: "",
-			api: hostAPI,
+			in:   "",
+			env:  "",
+			out:  filepath.Join(tmpDir, File),
+			dir:  filepath.Join(tmpDir, DirExercises),
+			key:  "",
+			api:  hostAPI,
 			xapi: hostXAPI,
 		},
 		{
 			desc: "no such file",
-			in: filepath.Join(tmpDir, "no-such.json"),
-			env: "",
-			out: filepath.Join(tmpDir, "no-such.json"),
-			dir: filepath.Join(tmpDir, DirExercises),
-			key: "",
-			api: hostAPI,
+			in:   filepath.Join(tmpDir, "no-such.json"),
+			env:  "",
+			out:  filepath.Join(tmpDir, "no-such.json"),
+			dir:  filepath.Join(tmpDir, DirExercises),
+			key:  "",
+			api:  hostAPI,
 			xapi: hostXAPI,
 		},
 		{
 			desc: "file exists",
-			in: configPath,
-			env: "",
-			out: configPath,
-			dir: "/a/b/c",
-			key: "abc123",
-			api: "http://api.example.com",
+			in:   configPath,
+			env:  "",
+			out:  configPath,
+			dir:  "/a/b/c",
+			key:  "abc123",
+			api:  "http://api.example.com",
 			xapi: "http://x.example.com",
 		},
 		{
 			desc: "unexpanded path",
-			in: "~/config.json",
-			env: "",
-			out: configPath,
-			dir: "/a/b/c",
-			key: "abc123",
-			api: "http://api.example.com",
+			in:   "~/config.json",
+			env:  "",
+			out:  configPath,
+			dir:  "/a/b/c",
+			key:  "abc123",
+			api:  "http://api.example.com",
 			xapi: "http://x.example.com",
 		},
 		{
 			desc: "file in env",
-			in: "",
-			env: configPath,
-			out: configPath,
-			dir: "/a/b/c",
-			key: "abc123",
-			api: "http://api.example.com",
+			in:   "",
+			env:  configPath,
+			out:  configPath,
+			dir:  "/a/b/c",
+			key:  "abc123",
+			api:  "http://api.example.com",
 			xapi: "http://x.example.com",
 		},
 		{
 			desc: "unexpanded path in env",
-			in: "",
-			env: "~/env.json",
-			out: filepath.Join(tmpDir, "env.json"),
-			dir: filepath.Join(tmpDir, DirExercises),
-			key: "",
-			api: hostAPI,
+			in:   "",
+			env:  "~/env.json",
+			out:  filepath.Join(tmpDir, "env.json"),
+			dir:  filepath.Join(tmpDir, DirExercises),
+			key:  "",
+			api:  hostAPI,
 			xapi: hostXAPI,
 		},
 		{
 			desc: "command line argument overrides env",
-			in: "~/arg.json",
-			env: "~/env.json",
-			out: filepath.Join(tmpDir, "arg.json"),
-			dir: filepath.Join(tmpDir, DirExercises),
-			key: "",
-			api: hostAPI,
+			in:   "~/arg.json",
+			env:  "~/env.json",
+			out:  filepath.Join(tmpDir, "arg.json"),
+			dir:  filepath.Join(tmpDir, DirExercises),
+			key:  "",
+			api:  hostAPI,
 			xapi: hostXAPI,
 		},
 		{
 			desc: "sanitizes whitespace",
-			in: "~/dirty.json",
-      env: "",
-			out: filepath.Join(tmpDir, "dirty.json"),
-			dir: "/a/b/c",
-			key: "abc123",
-			api: "http://api.example.com",
+			in:   "~/dirty.json",
+			env:  "",
+			out:  filepath.Join(tmpDir, "dirty.json"),
+			dir:  "/a/b/c",
+			key:  "abc123",
+			api:  "http://api.example.com",
 			xapi: "http://x.example.com",
 		},
 	}
@@ -138,7 +138,7 @@ func TestReadingWritingConfig(t *testing.T) {
 		Dir:    "/exercism/directory",
 		API:    "localhost",
 		XAPI:   "localhost",
-		File: filename,
+		File:   filename,
 	}
 
 	c1.Write()

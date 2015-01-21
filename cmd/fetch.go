@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/codegangsta/cli"
@@ -16,22 +15,9 @@ func Fetch(ctx *cli.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	client := api.NewClient(c)
 
-	args := ctx.Args()
-	var url string
-	switch len(args) {
-	case 0:
-		url = fmt.Sprintf("%s/%s?key=%s", c.XAPI, "v2/exercises", c.APIKey)
-	case 1:
-		url = fmt.Sprintf("%s/%s/%s?key=%s", c.XAPI, "v2/exercises", args[0], c.APIKey)
-	case 2:
-		url = fmt.Sprintf("%s/%s/%s/%s", c.XAPI, "v2/exercises", args[0], args[1])
-	default:
-		msg := "Usage: exercism fetch\n   or: exercism fetch LANGUAGE\n   or: exercism fetch LANGUAGE PROBLEM"
-		log.Fatal(msg)
-	}
-
-	problems, err := api.Fetch(url)
+	problems, err := client.Fetch(ctx.Args())
 	if err != nil {
 		log.Fatal(err)
 	}

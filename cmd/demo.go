@@ -17,7 +17,9 @@ func Demo(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
-	problems, err := api.Demo(c)
+	client := api.NewClient(c)
+
+	problems, err := client.Demo()
 	if err != nil {
 		log.Fatal(err)
 	}

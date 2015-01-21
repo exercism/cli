@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/exercism/cli/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +25,10 @@ func TestListTrack(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	problems, err := List("clojure", ts.URL)
+	conf := &config.Config{XAPI: ts.URL}
+	client := NewClient(conf)
+
+	problems, err := client.List("clojure")
 	assert.NoError(t, err)
 
 	assert.Equal(t, len(problems), 34)
@@ -37,6 +41,9 @@ func TestUnknownLanguage(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	_, err := List("rubbbby", ts.URL)
-	assert.Equal(t, err, UnknownLanguageError)
+	conf := &config.Config{XAPI: ts.URL}
+	client := NewClient(conf)
+
+	_, err := client.List("rubbbby")
+	assert.Equal(t, err, ErrUnknownLanguage)
 }

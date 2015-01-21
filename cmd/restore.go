@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/codegangsta/cli"
@@ -17,9 +16,9 @@ func Restore(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
-	url := fmt.Sprintf("%s/api/v1/iterations/%s/restore", c.API, c.APIKey)
+	client := api.NewClient(c)
 
-	problems, err := api.Fetch(url)
+	problems, err := client.Restore()
 	if err != nil {
 		log.Fatal(err)
 	}
