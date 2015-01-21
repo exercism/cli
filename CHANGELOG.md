@@ -120,6 +120,11 @@
 * [#57](https://github.com/exercism/cli/pull/57): Added description to the restore command - [@rcode5](https://github.com/rcode5)
 * [#56](https://github.com/exercism/cli/pull/56): Updated developer instructions in README based on real-life experience - [@rcode5](https://github.com/rcode5)
 
+## v1.4.0 (Jan 13, 2014)
+
+* [#47](https://github.com/exercism/cli/pull/47): Added 'restore' command to download all of a user's existing solutions with their corresponding problems - [@ebautistabar](https://github.com/ebautistabar)
+* Numerous small fixes and cleanup to code and documentation - [@dpritchett](https://github.com/dpritchett), [@TrevorBramble](https://github.com/TrevorBramble), [@elimisteve](https://github.com/elimisteve)
+
 -------------
 
 **WIP** - I'm slowly building up the full changelog history for the project.
