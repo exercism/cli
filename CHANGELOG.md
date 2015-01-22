@@ -125,6 +125,16 @@
 * [#47](https://github.com/exercism/cli/pull/47): Added 'restore' command to download all of a user's existing solutions with their corresponding problems - [@ebautistabar](https://github.com/ebautistabar)
 * Numerous small fixes and cleanup to code and documentation - [@dpritchett](https://github.com/dpritchett), [@TrevorBramble](https://github.com/TrevorBramble), [@elimisteve](https://github.com/elimisteve)
 
+## v1.3.2 (Dec 14, 2013)
+
+* [f8dd974](https://github.com/exercism/cli/commit/f8dd9748078b1b191629eae385aaeda8af94305b): Fixed content-type header when posting to API
+* Fixed user-agent string
+
+## v1.3.1 (Dec 1, 2013)
+
+* [exercism.io#1039](https://github.com/exercism/exercism.io/issues/1039): Stopped clobbering existing files on fetch
+
+
 -------------
 
 **WIP** - I'm slowly building up the full changelog history for the project.
