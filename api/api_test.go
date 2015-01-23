@@ -1,30 +1,105 @@
 package api
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 
+	"github.com/exercism/cli/config"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestListTrack(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// check that we correctly built the URI path
-		assert.Equal(t, "/tracks/clojure", r.RequestURI)
+func respondWithFixture(w http.ResponseWriter, name string) error {
+	f, err := os.Open("../fixtures/" + name)
+	if err != nil {
+		return err
+	}
 
-		f, err := os.Open("../fixtures/tracks.json")
-		if err != nil {
+	io.Copy(w, f)
+	f.Close()
+
+	return nil
+}
+func TestFetchAllProblem(t *testing.T) {
+	APIKey := "mykey"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		allProblemsAPI := fmt.Sprintf("/v2/exercises?key=%s", APIKey)
+		assert.Equal(t, allProblemsAPI, req.RequestURI)
+
+		if err := respondWithFixture(w, "problems.json"); err != nil {
 			t.Fatal(err)
 		}
-		io.Copy(w, f)
-		f.Close()
 	}))
 	defer ts.Close()
 
-	problems, err := List("clojure", ts.URL)
+	client := NewClient(&config.Config{XAPI: ts.URL, APIKey: APIKey})
+
+	problems, err := client.Fetch([]string{})
+	assert.NoError(t, err)
+
+	assert.Equal(t, len(problems), 3)
+}
+
+func TestFetchATrack(t *testing.T) {
+	var (
+		APIKey   = "mykey"
+		language = "go"
+	)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		languageProblemsAPI := fmt.Sprintf("/v2/exercises/%s?key=%s", language, APIKey)
+		assert.Equal(t, languageProblemsAPI, req.RequestURI)
+
+		if err := respondWithFixture(w, "problems.json"); err != nil {
+			t.Fatal(err)
+		}
+	}))
+	defer ts.Close()
+
+	client := NewClient(&config.Config{XAPI: ts.URL, APIKey: APIKey})
+
+	_, err := client.Fetch([]string{language})
+	assert.NoError(t, err)
+}
+
+func TestFetchASpecificProblem(t *testing.T) {
+	var (
+		APIKey   = "mykey"
+		language = "go"
+		problem  = "leap"
+	)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		languageProblemsAPI := fmt.Sprintf("/v2/exercises/%s/%s", language, problem)
+		assert.Equal(t, languageProblemsAPI, req.RequestURI)
+
+		if err := respondWithFixture(w, "problems.json"); err != nil {
+			t.Fatal(err)
+		}
+	}))
+	defer ts.Close()
+
+	client := NewClient(&config.Config{XAPI: ts.URL, APIKey: APIKey})
+
+	_, err := client.Fetch([]string{language, problem})
+	assert.NoError(t, err)
+}
+
+func TestListTrack(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		// check that we correctly built the URI path
+		assert.Equal(t, "/tracks/clojure", req.RequestURI)
+
+		if err := respondWithFixture(w, "tracks.json"); err != nil {
+			t.Fatal(err)
+		}
+	}))
+	defer ts.Close()
+
+	client := NewClient(&config.Config{XAPI: ts.URL})
+
+	problems, err := client.List("clojure")
 	assert.NoError(t, err)
 
 	assert.Equal(t, len(problems), 34)
@@ -32,11 +107,13 @@ func TestListTrack(t *testing.T) {
 }
 
 func TestUnknownLanguage(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.NotFound(w, r)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		http.NotFound(w, req)
 	}))
 	defer ts.Close()
 
-	_, err := List("rubbbby", ts.URL)
-	assert.Equal(t, err, UnknownLanguageError)
+	client := NewClient(&config.Config{XAPI: ts.URL})
+
+	_, err := client.List("rubbbby")
+	assert.Equal(t, err, ErrUnknownLanguage)
 }

@@ -18,25 +18,20 @@ func Download(ctx *cli.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	client := api.NewClient(c)
 
 	args := ctx.Args()
-
 	if len(args) != 1 {
 		msg := "Usage: exercism download SUBMISSION_ID"
 		log.Fatal(msg)
 	}
 
-	var url string
-	url = fmt.Sprintf("%s/api/v1/submissions/%s", c.API, args[0])
-
-	submission, err := api.Download(url)
+	submission, err := client.Download(args[0])
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var path string
-
-	path = filepath.Join(c.Dir, "solutions", submission.Username, submission.Language, submission.Slug, args[0])
+	path := filepath.Join(c.Dir, "solutions", submission.Username, submission.Language, submission.Slug, args[0])
 
 	if err := os.MkdirAll(path, 0755); err != nil {
 		log.Fatal(err)

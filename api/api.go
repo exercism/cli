@@ -7,16 +7,11 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-
-	"github.com/exercism/cli/config"
 )
 
 var (
-	// UserAgent lets the API know where the call is being made from.
-	// It's set from main() so that we have access to the version.
-	UserAgent string
-
-	UnknownLanguageError = errors.New("the language is unknown")
+	// ErrUnknownLanguage represents an error returned when the language requested does not exist
+	ErrUnknownLanguage = errors.New("the language is unknown")
 )
 
 // PayloadError represents an error message from the API.
@@ -39,22 +34,52 @@ type PayloadSubmission struct {
 // Fetch retrieves problems from the API.
 // In most cases these problems consist of a test suite and a README
 // from the x-api, but it is also used when restoring earlier iterations.
-func Fetch(url string) ([]*Problem, error) {
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
+func (c *Client) Fetch(args []string) ([]*Problem, error) {
+	var url string
+	switch len(args) {
+	case 0:
+		url = fmt.Sprintf("%s/v2/exercises?key=%s", c.XAPIHost, c.APIKey)
+	case 1:
+		language := args[0]
+		url = fmt.Sprintf("%s/v2/exercises/%s?key=%s", c.XAPIHost, language, c.APIKey)
+	case 2:
+		language := args[0]
+		problem := args[1]
+		url = fmt.Sprintf("%s/v2/exercises/%s/%s", c.XAPIHost, language, problem)
+	default:
+		return nil, fmt.Errorf("Usage: exercism fetch\n   or: exercism fetch LANGUAGE\n   or: exercism fetch LANGUAGE PROBLEM")
 	}
 
-	res, err := http.DefaultClient.Do(req)
+	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
 
 	payload := &PayloadProblems{}
-	dec := json.NewDecoder(res.Body)
-	if err := dec.Decode(payload); err != nil {
-		return nil, fmt.Errorf("error parsing API response - %s", err)
+	res, err := c.Do(req, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf(`unable to fetch problems (HTTP: %d) - %s`, res.StatusCode, payload.Error)
+	}
+
+	return payload.Problems, nil
+}
+
+// Restore fetches the latest revision of a solution and writes it to disk.
+func (c *Client) Restore() ([]*Problem, error) {
+	url := fmt.Sprintf("%s/api/v1/iterations/%s/restore", c.APIHost, c.APIKey)
+	req, err := c.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	payload := &PayloadProblems{}
+	res, err := c.Do(req, payload)
+	if err != nil {
+		return nil, err
 	}
 
 	if res.StatusCode != http.StatusOK {
@@ -65,23 +90,18 @@ func Fetch(url string) ([]*Problem, error) {
 }
 
 // Download fetches a solution by submission key and writes it to disk.
-func Download(url string) (*Submission, error) {
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
+func (c *Client) Download(submissionID string) (*Submission, error) {
+	url := fmt.Sprintf("%s/api/v1/submissions/%s", c.APIHost, submissionID)
 
-	res, err := http.DefaultClient.Do(req)
+	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
 
 	payload := &PayloadSubmission{}
-	dec := json.NewDecoder(res.Body)
-	err = dec.Decode(payload)
+	res, err := c.Do(req, payload)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing API response - %s", err)
+		return nil, err
 	}
 
 	if res.StatusCode != http.StatusOK {
@@ -92,37 +112,43 @@ func Download(url string) (*Submission, error) {
 }
 
 // Demo fetches the first problem in each language track.
-func Demo(c *config.Config) ([]*Problem, error) {
-	url := fmt.Sprintf("%s/problems/demo?key=%s", c.XAPI, c.APIKey)
+func (c *Client) Demo() ([]*Problem, error) {
+	url := fmt.Sprintf("%s/problems/demo?key=%s", c.XAPIHost, c.APIKey)
+	req, err := c.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
 
-	return Fetch(url)
+	payload := &PayloadProblems{}
+	res, err := c.Do(req, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf(`unable to fetch problems (HTTP: %d) - %s`, res.StatusCode, payload.Error)
+	}
+
+	return payload.Problems, nil
 }
 
 // Submit posts code to the API
-func Submit(url string, iter *Iteration) (*Submission, error) {
+func (c *Client) Submit(iter *Iteration) (*Submission, error) {
+	url := fmt.Sprintf("%s/api/v1/user/assignments", c.APIHost)
 	payload, err := json.Marshal(iter)
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewReader(payload))
+	req, err := c.NewRequest("POST", url, bytes.NewReader(payload))
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Set("User-Agent", UserAgent)
-	req.Header.Set("Content-Type", "application/json")
-
-	res, err := http.DefaultClient.Do(req)
+	ps := &PayloadSubmission{}
+	res, err := c.Do(req, ps)
 	if err != nil {
 		return nil, fmt.Errorf("unable to submit solution - %s", err)
-	}
-	defer res.Body.Close()
-
-	ps := &PayloadSubmission{}
-	dec := json.NewDecoder(res.Body)
-	if err := dec.Decode(ps); err != nil {
-		return nil, fmt.Errorf("error parsing API response - %s", err)
 	}
 
 	if res.StatusCode != http.StatusCreated {
@@ -133,21 +159,22 @@ func Submit(url string, iter *Iteration) (*Submission, error) {
 }
 
 // List available problems for a language
-func List(language, host string) ([]string, error) {
-	url := fmt.Sprintf("%s/tracks/%s", host, language)
+func (c *Client) List(language string) ([]string, error) {
+	url := fmt.Sprintf("%s/tracks/%s", c.XAPIHost, language)
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", UserAgent)
-	res, err := http.DefaultClient.Do(req)
+
+	res, err := c.Do(req, nil)
 	if err != nil {
 		return nil, err
 	}
+
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
-		return nil, UnknownLanguageError
+		return nil, ErrUnknownLanguage
 	}
 
 	var payload struct {
@@ -167,51 +194,35 @@ func List(language, host string) ([]string, error) {
 }
 
 // Unsubmit deletes a submission.
-func Unsubmit(url string) error {
-	req, err := http.NewRequest("DELETE", url, nil)
+func (c *Client) Unsubmit() error {
+	url := fmt.Sprintf("%s/api/v1/user/assignments?key=%s", c.APIHost, c.APIKey)
+	req, err := c.NewRequest("DELETE", url, nil)
 	if err != nil {
 		return err
-	}
-	req.Header.Set("User-Agent", UserAgent)
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode == http.StatusNoContent {
-		return nil
 	}
 
 	pe := &PayloadError{}
-	if err := json.NewDecoder(res.Body).Decode(pe); err != nil {
-		return fmt.Errorf("failed to unsubmit - %s", err)
+	if _, err := c.Do(req, pe); err != nil {
+		return fmt.Errorf("failed to unsubmit - %s", pe.Error)
 	}
-	return fmt.Errorf("failed to unsubmit - %s", pe.Error)
+
+	return nil
 }
 
 // Tracks gets the current list of active and inactive language tracks.
-func Tracks(url string) ([]*Track, error) {
+func (c *Client) Tracks() ([]*Track, error) {
+	url := fmt.Sprintf("%s/tracks", c.XAPIHost)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return []*Track{}, err
 	}
-	req.Header.Set("User-Agent", UserAgent)
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return []*Track{}, err
-	}
-	defer res.Body.Close()
 
 	var payload struct {
 		Tracks []*Track
 	}
-	dec := json.NewDecoder(res.Body)
-	err = dec.Decode(&payload)
-	if err != nil {
+	if _, err := c.Do(req, &payload); err != nil {
 		return []*Track{}, err
 	}
+
 	return payload.Tracks, nil
 }

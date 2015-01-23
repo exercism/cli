@@ -79,8 +79,6 @@ func Submit(ctx *cli.Context) {
 		log.Fatalf("Cannot read the contents of %s - %s\n", filename, err)
 	}
 
-	url := fmt.Sprintf("%s/api/v1/user/assignments", c.API)
-
 	iteration := &api.Iteration{
 		Key:  c.APIKey,
 		Code: string(code),
@@ -93,7 +91,8 @@ func Submit(ctx *cli.Context) {
 		log.Fatalf("Cannot submit - %s.\n\n%s", err, msg)
 	}
 
-	submission, err := api.Submit(url, iteration)
+	client := api.NewClient(c)
+	submission, err := client.Submit(iteration)
 	if err != nil {
 		log.Fatal(err)
 	}
