@@ -134,6 +134,30 @@
 
 * [exercism.io#1039](https://github.com/exercism/exercism.io/issues/1039): Stopped clobbering existing files on fetch
 
+## v1.3.0 (Nov 16, 2013)
+
+* [7f39ee4](https://github.com/exercism/cli/commit/7f39ee4802752925466bc2715790dc965026b09d): Allow users to specify a particular problem when fetching.
+
+## v1.2.3 (Nov 13, 2013)
+
+* [exercism.io#998](https://github.com/exercism/exercism.io/issues/998): Fix problem with writing an empty config file under certain circumstances.
+
+## v1.2.2 (Nov 12, 2013)
+
+* [#28](https://github.com/exercism/cli/issues/28): Create exercism directory immediately upon logging in.
+* Upgrade to newer version of [codegangsta/cli](https://github.com/codegansta/cli) library, which returns an error from the main Run() function.
+
+## v1.2.1 (Nov 9, 2013)
+
+* [371521f](https://github.com/exercism/cli/commit/371521fd97460aa92269831f10dadd467cb06592): Add support for nested directories under the language track directory allowing us to create idiomatic scala, clojure, and other exercises.
+
+## v1.2.0 (Nov 7, 2013)
+
+* [371521f](https://github.com/exercism/cli/commit/371521fd97460aa92269831f10dadd467cb06592): Consume the new hash of filename => content that the problem API returns.
+
+## v1.1.1 (Oct 30, 2013)
+
+* [371521f](https://github.com/exercism/cli/commit/371521fd97460aa92269831f10dadd467cb06592): Add output when fetching to tell the user where the files where created.
 
 -------------
 
