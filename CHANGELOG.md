@@ -160,6 +160,15 @@
 
 * [371521f](https://github.com/exercism/cli/commit/371521fd97460aa92269831f10dadd467cb06592): Add output when fetching to tell the user where the files where created.
 
+## v1.1.0 (Oct 24, 2013)
+
+* Refactor to extract config package
+* Delete stray binary **TODO** we might rewrite history on this one, see [#102](https://github.com/exercism/xgo/issues/102).
+* [#22](https://github.com/exercism/cli/pull/22): Display submission url after submitting solution - [@Tonkpils](http://github.com/Tonkpils)
+* [#21](https://github.com/exercism/cli/pull/21): Add unsubmit command - [@Tonkpils](http://github.com/Tonkpils)
+* [#20](https://github.com/exercism/cli/pull/20): Add current command - [@Tonkpils](http://github.com/Tonkpils)
+* Inline refactoring experiment, various cleanup
+
 -------------
 
 **WIP** - I'm slowly building up the full changelog history for the project.
