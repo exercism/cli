@@ -164,10 +164,17 @@
 
 * Refactor to extract config package
 * Delete stray binary **TODO** we might rewrite history on this one, see [#102](https://github.com/exercism/xgo/issues/102).
-* [#22](https://github.com/exercism/cli/pull/22): Display submission url after submitting solution - [@Tonkpils](http://github.com/Tonkpils)
-* [#21](https://github.com/exercism/cli/pull/21): Add unsubmit command - [@Tonkpils](http://github.com/Tonkpils)
-* [#20](https://github.com/exercism/cli/pull/20): Add current command - [@Tonkpils](http://github.com/Tonkpils)
+* [#22](https://github.com/exercism/cli/pull/22): Display submission url after submitting solution - [@Tonkpils](https://github.com/Tonkpils)
+* [#21](https://github.com/exercism/cli/pull/21): Add unsubmit command - [@Tonkpils](https://github.com/Tonkpils)
+* [#20](https://github.com/exercism/cli/pull/20): Add current command - [@Tonkpils](https://github.com/Tonkpils)
 * Inline refactoring experiment, various cleanup
+
+## v1.0.1 (Sep 27, 2013)
+
+* [#11](https://github.com/exercism/cli/pull/11): Don't require authentication for demo - [@msgehard](https://github.com/mshegard)
+* [#14](https://github.com/exercism/cli/pull/14): Print out fetched assignments - [@Tonkpils](https://github.com/Tonkpils)
+* [#16](https://github.com/exercism/cli/pull/16): Fix broken submit for relative path names - [@nf](https://github.com/nf)
+* Create a separate demo directory if there's no configured exercism directory
 
 -------------
 
