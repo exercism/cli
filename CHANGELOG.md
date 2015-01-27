@@ -176,6 +176,13 @@
 * [#16](https://github.com/exercism/cli/pull/16): Fix broken submit for relative path names - [@nf](https://github.com/nf)
 * Create a separate demo directory if there's no configured exercism directory
 
+## v1.0.0 (Sep 22, 2013)
+
+* [#7](https://github.com/exercism/cli/pull/7): Recognize haskell test files
+* [#5](https://github.com/exercism/cli/pull/5): Fix typo - [@simonjefford](https://github.com/simonjefford)
+* [#1](https://github.com/exercism/cli/pull/1): Output the location of the config file - [@msgehard](https://github.com/msgehard)
+* Recognize more language test files - [@msgehard](https://github.com/msgehard)
+
 -------------
 
 **WIP** - I'm slowly building up the full changelog history for the project.
