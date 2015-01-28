@@ -183,7 +183,26 @@
 * [#1](https://github.com/exercism/cli/pull/1): Output the location of the config file - [@msgehard](https://github.com/msgehard)
 * Recognize more language test files - [@msgehard](https://github.com/msgehard)
 
--------------
+## v0.0.27.beta (Aug 25, 2013)
 
-**WIP** - I'm slowly building up the full changelog history for the project.
+All changes by [@msgehard](https://github.com/msgehard)
 
+* Clean up homedir
+* Add dev instructions to README
+
+## v0.0.26.beta (Aug 24, 2013)
+
+All changes by [@msgehard](https://github.com/msgehard)
+
+* Ensure that ruby gem's config file doesn't get clobbered
+* Add cross-compilation
+* Set proper User-Agent so server doesn't blow up.
+* Implement `submit`
+* Implement `demo`
+* Implement `peek`
+* Expand ~ in config
+* Implement `fetch`
+* Implement `current`
+* Implement `whoami`
+* Implement login and logout
+* Build on Travis
