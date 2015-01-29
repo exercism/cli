@@ -15,29 +15,29 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 * [#157](https://github.com/exercism/cli/pull/157): Refactored API package - [@Tonkpils](https://github.com/Tonkpils)
 * **Your contribution here**
 
-## v1.9.2 (Jan 11, 2015)
+## v1.9.2 (2015-01-11)
 
 * [exercism.io#2155](https://github.com/exercism/exercism.io/issues/2155): Fixed problem with passed in config file being ignored.
 * Added first version of changelog
 
-## v1.9.1 (Jan 10, 2015)
+## v1.9.1 (2015-01-10)
 
 * [#147](https://github.com/exercism/cli/pull/147): added `--api` option to exercism configure - [@morphatic](https://github.com/morphatic)
 
-## v1.9.0 (Nov 27, 2014)
+## v1.9.0 (2014-11-27)
 
 * [#143](https://github.com/exercism/cli/pull/143): added command for downloading a specific solution - [@harimp](https://github.com/harimp)
 * [#142](https://github.com/exercism/cli/pull/142): fixed command name to be `exercism` rather than `cli` on `go get` - [@Tonkpils](https://github.com/Tonkpils)
 
-## v1.8.2 (Oct 24, 2014)
+## v1.8.2 (2014-10-24)
 
 * [9cbd069](https://github.com/exercism/cli/commit/9cbd06916cc05bbb165e8c2cb00d5e03cb4dbb99): Made path comparison case insensitive
 
-## v1.8.1 (Oct 23, 2014)
+## v1.8.1 (2014-10-23)
 
 * [0ccc7a4](https://github.com/exercism/cli/commit/0ccc7a479940d2d7bb5e12eab41c91105519f135): Implemented debug flag on submit command
 
-## v1.8.0 (Oct 15, 2014)
+## v1.8.0 (2014-10-15)
 
 * [#138](https://github.com/exercism/cli/pull/138): Added conversion to line endings for submissions on Windows - [@rprouse](https://github.com/rprouse)
 * [#116](https://github.com/exercism/cli/issues/116): Added support for setting name of config file in an environment variable
@@ -45,34 +45,34 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 * [#126](https://github.com/exercism/cli/issues/126): Added explanation in `submit` response about fetching the next problems
 * [#133](https://github.com/exercism/cli/pull/133): Changed config command to create the exercism directory, rather than waiting until the first time problems are fetched - [@Tonkpils](https://github.com/Tonkpils)
 
-## v1.7.5 (Oct 5, 2014)
+## v1.7.5 (2014-10-5)
 
 * [88cf1a1fbc884545dfc10e98535f667e4a43e693](https://github.com/exercism/cli/commit/88cf1a1fbc884545dfc10e98535f667e4a43e693): Added ARMv6 to build
 * [12672c4](https://github.com/exercism/cli/commit/12672c4f695cfe3891f96467619a3615e6d57c34): Added an error message when people submit a file that is not within the exercism directory tree
 * [#128](https://github.com/exercism/cli/pull/128): Made paths os-agnostic in tests - [@ccnp123](https://github.com/ccnp123)
 
-## v1.7.4 (Sep 27, 2014)
+## v1.7.4 (2014-09-27)
 
 * [4ca3e97](https://github.com/exercism/cli/commit/4ca3e9743f6d421903c91dfa27f4747fb1081392): Fixed incorrect HOME directory on Windows
 * [8bd1a25](https://github.com/exercism/cli/commit/4ca3e9743f6d421903c91dfa27f4747fb1081392): Added ARMv5 to build
 * [#117](https://github.com/exercism/cli/pull/117): Archive windows binaries using zip rather than tar and gzip - [@LegalizeAdulthood](https://github.com/LegalizeAdulthood)
 
-## v1.7.3 (Sep 26, 2014)
+## v1.7.3 (2014-09-26)
 
 * [8bec393](https://github.com/exercism/cli/commit/8bec39387094680990af7cf438ada1780cf87129): Fixed submit so it can handle symlinks
 
-## v1.7.2 (Sep 24, 2014)
+## v1.7.2 (2014-09-24)
 
 * [#111](https://github.com/exercism/cli/pull/111): Don't clobber existing config values when adding more - [@jish](https://github.com/jish)
 
-## v1.7.1 (Sep 19, 2014)
+## v1.7.1 (2014-09-19)
 
 * Completely reorganized the code, separating each command into a separate handler
 * [17fc164](https://github.com/exercism/cli/commit/17fc1644e9fc9ee5aa4e136de11556e65a7b6036): Fixed paths to be platform-independent
 * [8b174e2](https://github.com/exercism/cli/commit/17fc1644e9fc9ee5aa4e136de11556e65a7b6036): Made the output of demo command more helpful
 * [8b174e2](https://github.com/exercism/cli/commit/8b174e2fd8c7a545ea5c47c998ac10c5a7ab371f): Deleted the 'current' command
 
-## v1.7.0 (Aug 28, 2014)
+## v1.7.0 (2014-08-28)
 
 * [ac6dbfd](https://github.com/exercism/cli/commit/ac6dbfd81a86e7a9a5a9b68521b0226c40d8e813): Added os and architecture to the user agent
 * [5d58fd1](https://github.com/exercism/cli/commit/5d58fd14b9db84fb752b3bf6112123cd6f04c532): Fixed bug in detecting user's home directory
@@ -93,15 +93,15 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 * Did a fair amount of cleanup to make code a bit more idiomatic
 * [#86](https://github.com/exercism/cli/pull/86): Triggered interactive login command for commands that require auth - [@Tonkpils](https://github.com/Tonkpils)
 
-## v1.6.2 (Jun 2, 2014)
+## v1.6.2 (2014-06-02)
 
 * [a5b7a55](https://github.com/exercism/cli/commit/a5b7a55f52c23ac5ce2c6bd1826ea7767aea38c4): Update login prompt
 
-## v1.6.1 (May 16, 2014)
+## v1.6.1 (2014-05-16)
 
 * [#84](https://github.com/exercism/cli/pull/84): Change hard-coded filepath so that it will work on any platform - [@simonjefford](https://github.com/simonjefford)
 
-## v1.6.0 (May 10, 2014)
+## v1.6.0 (2014-05-10)
 
 * [#82](https://github.com/exercism/cli/pull/82): Fixed typo in tests - [@srt32](https://github.com/srt32)
 * [aa7446d](https://github.com/exercism/cli/commit/aa7446d598fc894ef329756555c48ef358baf676): Clarified output to user after they fetch
@@ -113,11 +113,11 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 * [#70](https://github.com/exercism/cli/pull/70): Fixed a panic - [@Tonkpils](https://github.com/Tonkpils)
 * [#68](https://github.com/exercism/cli/pull/68): Fixed how user input is read so that it doesn't stop at the first space - [@Tonkpils](https://github.com/Tonkpils)
 
-## v1.5.1 (Mar 14, 2014)
+## v1.5.1 (2014-03-14)
 
 * [5b672ee](https://github.com/exercism/cli/commit/5b672ee7bf26859c41de9eed83396b7454286063 ): Provided a visual mark next to new problems that get fetched
 
-## v1.5.0 (Feb 28, 2014)
+## v1.5.0 (2014-02-28)
 
 * [#63](https://github.com/exercism/cli/pull/63): Implemeted `fetch` for a single language - [@Tonkpils](https://github.com/Tonkpils)
 * [#62](https://github.com/exercism/cli/pull/62): Expose error message from API to user on `fetch` - [@Tonkpils](https://github.com/Tonkpils)
@@ -125,46 +125,46 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 * [#57](https://github.com/exercism/cli/pull/57): Added description to the restore command - [@rcode5](https://github.com/rcode5)
 * [#56](https://github.com/exercism/cli/pull/56): Updated developer instructions in README based on real-life experience - [@rcode5](https://github.com/rcode5)
 
-## v1.4.0 (Jan 13, 2014)
+## v1.4.0 (2014-01-13)
 
 * [#47](https://github.com/exercism/cli/pull/47): Added 'restore' command to download all of a user's existing solutions with their corresponding problems - [@ebautistabar](https://github.com/ebautistabar)
 * Numerous small fixes and cleanup to code and documentation - [@dpritchett](https://github.com/dpritchett), [@TrevorBramble](https://github.com/TrevorBramble), [@elimisteve](https://github.com/elimisteve)
 
-## v1.3.2 (Dec 14, 2013)
+## v1.3.2 (2013-12-14)
 
 * [f8dd974](https://github.com/exercism/cli/commit/f8dd9748078b1b191629eae385aaeda8af94305b): Fixed content-type header when posting to API
 * Fixed user-agent string
 
-## v1.3.1 (Dec 1, 2013)
+## v1.3.1 (2013-12-01)
 
 * [exercism.io#1039](https://github.com/exercism/exercism.io/issues/1039): Stopped clobbering existing files on fetch
 
-## v1.3.0 (Nov 16, 2013)
+## v1.3.0 (2013-11-16)
 
 * [7f39ee4](https://github.com/exercism/cli/commit/7f39ee4802752925466bc2715790dc965026b09d): Allow users to specify a particular problem when fetching.
 
-## v1.2.3 (Nov 13, 2013)
+## v1.2.3 (2013-11-13)
 
 * [exercism.io#998](https://github.com/exercism/exercism.io/issues/998): Fix problem with writing an empty config file under certain circumstances.
 
-## v1.2.2 (Nov 12, 2013)
+## v1.2.2 (2013-11-12)
 
 * [#28](https://github.com/exercism/cli/issues/28): Create exercism directory immediately upon logging in.
 * Upgrade to newer version of [codegangsta/cli](https://github.com/codegansta/cli) library, which returns an error from the main Run() function.
 
-## v1.2.1 (Nov 9, 2013)
+## v1.2.1 (2013-11-09)
 
 * [371521f](https://github.com/exercism/cli/commit/371521fd97460aa92269831f10dadd467cb06592): Add support for nested directories under the language track directory allowing us to create idiomatic scala, clojure, and other exercises.
 
-## v1.2.0 (Nov 7, 2013)
+## v1.2.0 (2013-11-07)
 
 * [371521f](https://github.com/exercism/cli/commit/371521fd97460aa92269831f10dadd467cb06592): Consume the new hash of filename => content that the problem API returns.
 
-## v1.1.1 (Oct 30, 2013)
+## v1.1.1 (2013-10-20)
 
 * [371521f](https://github.com/exercism/cli/commit/371521fd97460aa92269831f10dadd467cb06592): Add output when fetching to tell the user where the files where created.
 
-## v1.1.0 (Oct 24, 2013)
+## v1.1.0 (2013-10-24)
 
 * Refactor to extract config package
 * Delete stray binary **TODO** we might rewrite history on this one, see [#102](https://github.com/exercism/xgo/issues/102).
@@ -173,28 +173,28 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 * [#20](https://github.com/exercism/cli/pull/20): Add current command - [@Tonkpils](https://github.com/Tonkpils)
 * Inline refactoring experiment, various cleanup
 
-## v1.0.1 (Sep 27, 2013)
+## v1.0.1 (2013-09-27)
 
 * [#11](https://github.com/exercism/cli/pull/11): Don't require authentication for demo - [@msgehard](https://github.com/mshegard)
 * [#14](https://github.com/exercism/cli/pull/14): Print out fetched assignments - [@Tonkpils](https://github.com/Tonkpils)
 * [#16](https://github.com/exercism/cli/pull/16): Fix broken submit for relative path names - [@nf](https://github.com/nf)
 * Create a separate demo directory if there's no configured exercism directory
 
-## v1.0.0 (Sep 22, 2013)
+## v1.0.0 (2013-09-22)
 
 * [#7](https://github.com/exercism/cli/pull/7): Recognize haskell test files
 * [#5](https://github.com/exercism/cli/pull/5): Fix typo - [@simonjefford](https://github.com/simonjefford)
 * [#1](https://github.com/exercism/cli/pull/1): Output the location of the config file - [@msgehard](https://github.com/msgehard)
 * Recognize more language test files - [@msgehard](https://github.com/msgehard)
 
-## v0.0.27.beta (Aug 25, 2013)
+## v0.0.27.beta (2013-08-25)
 
 All changes by [@msgehard](https://github.com/msgehard)
 
 * Clean up homedir
 * Add dev instructions to README
 
-## v0.0.26.beta (Aug 24, 2013)
+## v0.0.26.beta (2013-08-24)
 
 All changes by [@msgehard](https://github.com/msgehard)
 
