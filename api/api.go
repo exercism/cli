@@ -31,6 +31,12 @@ type PayloadSubmission struct {
 	PayloadError
 }
 
+// SubmissionInfo contains state information about a submission.
+type SubmissionInfo struct {
+	Slug  string `json:"slug"`
+	State string `json:"state"`
+}
+
 // Fetch retrieves problems from the API.
 // In most cases these problems consist of a test suite and a README
 // from the x-api, but it is also used when restoring earlier iterations.
@@ -62,7 +68,7 @@ func (c *Client) Fetch(args []string) ([]*Problem, error) {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf(`unable to fetch problems (HTTP: %d) - %s`, res.StatusCode, payload.Error)
+		return nil, fmt.Errorf("unable to fetch problems (HTTP: %d) - %s", res.StatusCode, payload.Error)
 	}
 
 	return payload.Problems, nil
@@ -83,10 +89,26 @@ func (c *Client) Restore() ([]*Problem, error) {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf(`unable to fetch problems (HTTP: %d) - %s`, res.StatusCode, payload.Error)
+		return nil, fmt.Errorf("unable to fetch problems (HTTP: %d) - %s", res.StatusCode, payload.Error)
 	}
 
 	return payload.Problems, nil
+}
+
+// Submissions gets a list of submitted exercises and their current acceptance state.
+func (c *Client) Submissions() (map[string][]SubmissionInfo, error) {
+	url := fmt.Sprintf("%s/api/v1/exercises?key=%s", c.APIHost, c.APIKey)
+	req, err := c.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var payload map[string][]SubmissionInfo
+	if _, err := c.Do(req, &payload); err != nil {
+		return nil, err
+	}
+
+	return payload, nil
 }
 
 // Download fetches a solution by submission key and writes it to disk.
@@ -126,7 +148,7 @@ func (c *Client) Demo() ([]*Problem, error) {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf(`unable to fetch problems (HTTP: %d) - %s`, res.StatusCode, payload.Error)
+		return nil, fmt.Errorf("unable to fetch problems (HTTP: %d) - %s", res.StatusCode, payload.Error)
 	}
 
 	return payload.Problems, nil
@@ -152,7 +174,7 @@ func (c *Client) Submit(iter *Iteration) (*Submission, error) {
 	}
 
 	if res.StatusCode != http.StatusCreated {
-		return nil, fmt.Errorf(`unable to submit (HTTP: %d) - %s`, res.StatusCode, ps.Error)
+		return nil, fmt.Errorf("unable to submit (HTTP: %d) - %s", res.StatusCode, ps.Error)
 	}
 
 	return ps.Submission, nil
