@@ -86,6 +86,24 @@ func TestFetchASpecificProblem(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestSubmitAssignment(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		w.WriteHeader(http.StatusCreated)
+
+		if err := respondWithFixture(w, "submit.json"); err != nil {
+			t.Fatal(err)
+		}
+	}))
+	defer ts.Close()
+
+	client := NewClient(&config.Config{API: ts.URL})
+	iter := &Iteration{Key: "123", Code: "456", Path: "/foo/bar/bob/bob.rb", Dir: "/foo/bar"}
+	sub, err := client.Submit(iter)
+	assert.NoError(t, err)
+
+	assert.Equal(t, sub.Language, "ruby")
+}
+
 func TestListTrack(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		// check that we correctly built the URI path
