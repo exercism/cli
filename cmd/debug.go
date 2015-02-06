@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"runtime"
 
@@ -45,6 +46,17 @@ func Debug(ctx *cli.Context) {
 		fmt.Println("Config file: <not configured>")
 		fmt.Println("API Key: <not configured>")
 	}
-	fmt.Printf("API: %s\n", c.API)
+	fmt.Printf("API: %s [%s]\n", c.API, pingUrl(c.API))
+	fmt.Printf("XAPI: %s [%s]\n", c.XAPI, pingUrl(c.XAPI))
 	fmt.Printf("Exercises Directory: %s\n", c.Dir)
+}
+
+func pingUrl(url string) string {
+	res, err := http.Get(url)
+	if err != nil {
+		return err.Error()
+	}
+	defer res.Body.Close()
+
+	return "connected"
 }
