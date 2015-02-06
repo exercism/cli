@@ -39,14 +39,19 @@ func main() {
 	app.Name = "exercism"
 	app.Usage = "A command line tool to interact with http://exercism.io"
 	app.Version = Version
+	app.HideVersion = true
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "config, c",
 			Usage: "path to config file",
 		},
 		cli.BoolFlag{
-			Name:  "debug, d",
+			Name:  "verbose, v",
 			Usage: "turn on verbose logging",
+		},
+		cli.BoolFlag{
+			Name:  "version",
+			Usage: "print the version",
 		},
 	}
 	app.Commands = []cli.Command{
