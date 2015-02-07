@@ -14,6 +14,8 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 * [#154](https://github.com/exercism/cli/pull/154): Add 'list' command to list available exercises for a language - [@lcowell](https://github.com/lcowell)
 * [#157](https://github.com/exercism/cli/pull/157): Refactored API package - [@Tonkpils](https://github.com/Tonkpils)
 * [#155](https://github.com/exercism/cli/pull/155): Display problems not yet submitted on fetch API - [@Tonkpils](https://github.com/Tonkpils)
+* [3551884](https://github.com/exercism/cli/commit/3551884e9f38d6e563b99dae7b28a18d4525455d): Add host connectivity status to debug output. - [@lcowell](https://github.com/lcowell)
+* [f999e69](https://github.com/exercism/cli/commit/f999e69e5290cec6c5c9933aecc6fddfad8cf019): Disambiguate debug and verbose flags. - [@lcowell](https://github.com/lcowell)
 * **Your contribution here**
 
 ## v1.9.2 (2015-01-11)
