@@ -1,3 +1,3 @@
 #!/bin/bash
 
-go build -o out/exercism exercism/main.go
+CGO_ENABLED=0 go build -o out/exercism exercism/main.go
