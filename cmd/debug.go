@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/config"
@@ -46,13 +47,15 @@ func Debug(ctx *cli.Context) {
 		fmt.Println("Config file: <not configured>")
 		fmt.Println("API Key: <not configured>")
 	}
-	fmt.Printf("API: %s [%s]\n", c.API, pingUrl(c.API))
-	fmt.Printf("XAPI: %s [%s]\n", c.XAPI, pingUrl(c.XAPI))
+	client := http.Client{Timeout: 5 * time.Second}
+
+	fmt.Printf("API: %s [%s]\n", c.API, pingUrl(client, c.API))
+	fmt.Printf("XAPI: %s [%s]\n", c.XAPI, pingUrl(client, c.XAPI))
 	fmt.Printf("Exercises Directory: %s\n", c.Dir)
 }
 
-func pingUrl(url string) string {
-	res, err := http.Get(url)
+func pingUrl(client http.Client, url string) string {
+	res, err := client.Get(url)
 	if err != nil {
 		return err.Error()
 	}
