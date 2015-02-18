@@ -86,6 +86,27 @@ func TestFetchASpecificProblem(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestGetSubmission(t *testing.T) {
+	var (
+		APIKey   = "mykey"
+		language = "go"
+		problem  = "leap"
+	)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		languageProblemsAPI := fmt.Sprintf("/api/v1/submissions/%s/%s?key=%s", language, problem, APIKey)
+		assert.Equal(t, languageProblemsAPI, req.RequestURI)
+
+		if err := respondWithFixture(w, "submission.json"); err != nil {
+			t.Fatal(err)
+		}
+	}))
+	defer ts.Close()
+
+	client := NewClient(&config.Config{API: ts.URL, APIKey: APIKey})
+	_, err := client.Submission(language, problem)
+	assert.NoError(t, err)
+}
+
 func TestSubmitAssignment(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusCreated)
