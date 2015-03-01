@@ -123,11 +123,12 @@ func (hw *Homework) maxTitleWidth() int {
 // Summarize prints a full report of new and updated items in the set.
 func (hw *Homework) Summarize(summaryFilter SummaryOption) {
 	hw.Report(HWUpdated)
-	hw.Report(HWNew)
 
 	if summaryFilter != HWNotSubmitted {
 		hw.Report(HWNotSubmitted)
 	}
+
+	hw.Report(HWNew)
 
 	fresh := len(hw.ItemsMatching(HWNew))
 	updated := len(hw.ItemsMatching(HWUpdated))

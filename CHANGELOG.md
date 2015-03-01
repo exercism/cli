@@ -17,6 +17,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 * [3551884](https://github.com/exercism/cli/commit/3551884e9f38d6e563b99dae7b28a18d4525455d): Add host connectivity status to debug output. - [@lcowell](https://github.com/lcowell)
 * [f999e69](https://github.com/exercism/cli/commit/f999e69e5290cec6c5c9933aecc6fddfad8cf019): Disambiguate debug and verbose flags. - [@lcowell](https://github.com/lcowell)
 * Set environment variable in build script
+* Report 'new' at the bottom after fetching, it's going to be more relevant than 'unchanged', which includes all the languages they don't care about.
 * **Your contribution here**
 
 ## v1.9.2 (2015-01-11)
