@@ -26,6 +26,7 @@ const (
 	descSubmit    = "Submits a new iteration to a problem on exercism.io."
 	descUnsubmit  = "Deletes the most recently submitted iteration."
 	descTracks    = "List the available language tracks"
+	descOpen      = "Opens the current submission of the specified exercise"
 
 	descLongRestore = "Restore will pull the latest revisions of exercises that have already been submitted. It will *not* overwrite existing files. If you have made changes to a file and have not submitted it, and you're trying to restore the last submitted version, first move that file out of the way, then call restore."
 	descDownload    = "Downloads and saves a specified submission into the local system"
@@ -119,6 +120,12 @@ func main() {
 			ShortName: "t",
 			Usage:     descTracks,
 			Action:    cmd.Tracks,
+		},
+		{
+			Name:      "open",
+			ShortName: "op",
+			Usage:     descOpen,
+			Action:    cmd.Open,
 		},
 		{
 			Name:      "download",

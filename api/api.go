@@ -111,6 +111,22 @@ func (c *Client) Submissions() (map[string][]SubmissionInfo, error) {
 	return payload, nil
 }
 
+// Submission get the latest submitted exercise for the given language and exercise
+func (c *Client) Submission(language, excercise string) (*Submission, error) {
+	url := fmt.Sprintf("%s/api/v1/submissions/%s/%s?key=%s", c.APIHost, language, excercise, c.APIKey)
+	req, err := c.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var payload Submission
+	if _, err := c.Do(req, &payload); err != nil {
+		return nil, err
+	}
+
+	return &payload, nil
+}
+
 // Download fetches a solution by submission key and writes it to disk.
 func (c *Client) Download(submissionID string) (*Submission, error) {
 	url := fmt.Sprintf("%s/api/v1/submissions/%s", c.APIHost, submissionID)
