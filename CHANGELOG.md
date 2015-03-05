@@ -18,6 +18,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 * [f999e69](https://github.com/exercism/cli/commit/f999e69e5290cec6c5c9933aecc6fddfad8cf019): Disambiguate debug and verbose flags. - [@lcowell](https://github.com/lcowell)
 * Set environment variable in build script
 * Report 'new' at the bottom after fetching, it's going to be more relevant than 'unchanged', which includes all the languages they don't care about.
+* [#162](https://github.com/exercism/cli/pull/162): Allow users to open the browser from the terminal. - [@zabawaba99](https://github.com/zabawaba99)
 * **Your contribution here**
 
 ## v1.9.2 (2015-01-11)
