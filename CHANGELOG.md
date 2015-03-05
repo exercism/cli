@@ -6,20 +6,34 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## Next Release
 
-* [#151](https://github.com/exercism/cli/pull/151): Expand '~' in config path to home directory - [@lcowell](https://github.com/lcowell)
+* **Your contribution here**
+
+## v2.0.0 (2015-03-05)
+
+Added:
+
+* [#154](https://github.com/exercism/cli/pull/154): Add 'list' command to list available exercises for a language - [@lcowell](https://github.com/lcowell)
+* [3551884](https://github.com/exercism/cli/commit/3551884e9f38d6e563b99dae7b28a18d4525455d): Add host connectivity status to debug output. - [@lcowell](https://github.com/lcowell)
+* [#162](https://github.com/exercism/cli/pull/162): Allow users to open the browser from the terminal. - [@zabawaba99](https://github.com/zabawaba99)
+
+Removed:
+
 * Stop supporting legacy config files (`~/.exercism.go`)
 * Deleted deprecated login/logout commands
 * Deleted deprecated key names in config
-* [#153](https://github.com/exercism/cli/pull/153): Refactored configuration package - [@kytrinyx](https://github.com/kytrinyx)
-* [#154](https://github.com/exercism/cli/pull/154): Add 'list' command to list available exercises for a language - [@lcowell](https://github.com/lcowell)
-* [#157](https://github.com/exercism/cli/pull/157): Refactored API package - [@Tonkpils](https://github.com/Tonkpils)
+
+Fixed:
+
+* [#151](https://github.com/exercism/cli/pull/151): Expand '~' in config path to home directory - [@lcowell](https://github.com/lcowell)
 * [#155](https://github.com/exercism/cli/pull/155): Display problems not yet submitted on fetch API - [@Tonkpils](https://github.com/Tonkpils)
-* [3551884](https://github.com/exercism/cli/commit/3551884e9f38d6e563b99dae7b28a18d4525455d): Add host connectivity status to debug output. - [@lcowell](https://github.com/lcowell)
 * [f999e69](https://github.com/exercism/cli/commit/f999e69e5290cec6c5c9933aecc6fddfad8cf019): Disambiguate debug and verbose flags. - [@lcowell](https://github.com/lcowell)
-* Set environment variable in build script
 * Report 'new' at the bottom after fetching, it's going to be more relevant than 'unchanged', which includes all the languages they don't care about.
-* [#162](https://github.com/exercism/cli/pull/162): Allow users to open the browser from the terminal. - [@zabawaba99](https://github.com/zabawaba99)
-* **Your contribution here**
+
+Tweaked:
+
+* Set environment variable in build script
+* [#153](https://github.com/exercism/cli/pull/153): Refactored configuration package - [@kytrinyx](https://github.com/kytrinyx)
+* [#157](https://github.com/exercism/cli/pull/157): Refactored API package - [@Tonkpils](https://github.com/Tonkpils)
 
 ## v1.9.2 (2015-01-11)
 
