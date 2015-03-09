@@ -9,6 +9,9 @@ This CLI ships as a binary with no additional runtime requirements. This means
 that if you're doing the Haskell problems on exercism you don't need a working
 Python or Ruby environment simply to fetch and submit exercises.
 
+## Dependencies
+Go version 1.3 or higher
+
 ## Installing Go
 
 Follow the directions on http://golang.org/doc/install
