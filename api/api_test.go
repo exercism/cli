@@ -118,7 +118,7 @@ func TestSubmitAssignment(t *testing.T) {
 	defer ts.Close()
 
 	client := NewClient(&config.Config{API: ts.URL})
-	iter := &Iteration{Key: "123", Code: "456", Path: "/foo/bar/bob/bob.rb", Dir: "/foo/bar"}
+	iter := &Iteration{} // it doesn't matter, we're testing that we can read the fixture
 	sub, err := client.Submit(iter)
 	assert.NoError(t, err)
 

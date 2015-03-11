@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -37,34 +36,6 @@ func Submit(ctx *cli.Context) {
 		log.Fatal(msgPleaseAuthenticate)
 	}
 
-	filename := ctx.Args()[0]
-
-	if ctx.GlobalBool("debug") {
-		log.Printf("file name: %s", filename)
-	}
-
-	if isTest(filename) {
-		log.Fatal("Please submit the solution, not the test file.")
-	}
-
-	file, err := filepath.Abs(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if ctx.GlobalBool("debug") {
-		log.Printf("absolute path: %s", file)
-	}
-
-	file, err = filepath.EvalSymlinks(file)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if ctx.GlobalBool("debug") {
-		log.Printf("eval symlinks (file): %s", file)
-	}
-
 	dir, err := filepath.EvalSymlinks(c.Dir)
 	if err != nil {
 		log.Fatal(err)
@@ -74,22 +45,42 @@ func Submit(ctx *cli.Context) {
 		log.Printf("eval symlinks (dir): %s", dir)
 	}
 
-	code, err := ioutil.ReadFile(file)
+	files := []string{}
+	for _, filename := range ctx.Args() {
+		if ctx.GlobalBool("debug") {
+			log.Printf("file name: %s", filename)
+		}
+
+		if isTest(filename) {
+			log.Fatal("Please submit the solution, not the test file.")
+		}
+
+		file, err := filepath.Abs(filename)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if ctx.GlobalBool("debug") {
+			log.Printf("absolute path: %s", file)
+		}
+
+		file, err = filepath.EvalSymlinks(file)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if ctx.GlobalBool("debug") {
+			log.Printf("eval symlinks (file): %s", file)
+		}
+
+		files = append(files, file)
+	}
+
+	iteration, err := api.NewIteration(dir, files)
 	if err != nil {
-		log.Fatalf("Cannot read the contents of %s - %s\n", filename, err)
+		log.Fatalf("Unable to submit - %s", err)
 	}
-
-	iteration := &api.Iteration{
-		Key:  c.APIKey,
-		Code: string(code),
-		File: file,
-		Dir:  dir,
-	}
-
-	if err := iteration.Identify(); err != nil {
-		msg := `Please leave the solution within the problem directory that was created by 'exercism fetch'`
-		log.Fatalf("Cannot submit - %s.\n\n%s", err, msg)
-	}
+	iteration.Key = c.APIKey
 
 	client := api.NewClient(c)
 	submission, err := client.Submit(iteration)
