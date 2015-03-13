@@ -86,6 +86,46 @@ func TestFetchASpecificProblem(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestSkipProblem(t *testing.T) {
+	var (
+		APIKey   = "mykey"
+		language = "go"
+		problem  = "leap"
+	)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		skipAPI := fmt.Sprintf("/api/v1/iterations/%s/%s/skip?key=%s", language, problem, APIKey)
+		assert.Equal(t, skipAPI, req.RequestURI)
+
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&config.Config{API: ts.URL, APIKey: APIKey})
+
+	err := client.Skip(language, problem)
+	assert.NoError(t, err)
+}
+
+func TestSkipProblemErrorResponse(t *testing.T) {
+	var (
+		APIKey   = "mykey"
+		language = "go"
+		problem  = "leap"
+	)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		skipAPI := fmt.Sprintf("/api/v1/iterations/%s/%s/skip?key=%s", language, problem, APIKey)
+		assert.Equal(t, skipAPI, req.RequestURI)
+
+		w.Write([]byte(`{"error":"exercise skipped"}`))
+	}))
+	defer ts.Close()
+
+	client := NewClient(&config.Config{API: ts.URL, APIKey: APIKey})
+
+	err := client.Skip(language, problem)
+	assert.Error(t, err)
+}
+
 func TestGetSubmission(t *testing.T) {
 	var (
 		APIKey   = "mykey"
