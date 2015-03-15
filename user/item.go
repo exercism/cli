@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -73,4 +74,10 @@ func (it *Item) Save() error {
 		}
 	}
 	return nil
+}
+
+// Report outputs the line's string and path in the format of the passed in template.
+func (it *Item) Report(template string, max int) string {
+	padding := strings.Repeat(" ", max-len(it.String()))
+	return fmt.Sprintf(template, it.String(), padding, it.Path())
 }
