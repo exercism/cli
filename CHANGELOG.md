@@ -7,6 +7,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 
 * [#167](https://github.com/exercism/cli/pull/167): Fixes misspelling of exercism list command - [@queuebit](https://github.com/queuebit)
+* Tweak output from `fetch` so that languages are scannable.
 * **Your contribution here**
 
 ## v2.0.0 (2015-03-05)

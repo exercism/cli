@@ -14,5 +14,5 @@ type Problem struct {
 }
 
 func (p *Problem) String() string {
-	return fmt.Sprintf("%s (%s)", p.Name, p.Language)
+	return fmt.Sprintf("%s (%s)", p.Language, p.Name)
 }

@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
@@ -46,7 +47,7 @@ func NewHomework(problems []*api.Problem, c *config.Config) *Homework {
 		hw.Items = append(hw.Items, item)
 	}
 
-	hw.template = fmt.Sprintf("%%%ds %%s\n", hw.maxTitleWidth())
+	hw.template = "%s%s %s\n"
 	return &hw
 }
 
@@ -75,14 +76,18 @@ func (hw *Homework) ItemsMatching(filter HWFilter) []*Item {
 // It prints the track name, the problem name, and the full
 // path to the problem on the user's filesystem.
 func (hw *Homework) Report(filter HWFilter) {
+	if hw == nil {
+		return
+	}
+	width := hw.maxTitleWidth()
 	items := hw.ItemsMatching(filter)
-	hw.heading(filter, len(items))
+	hw.heading(filter, len(items), width)
 	for _, item := range items {
-		fmt.Printf(hw.template, item.String(), item.Path())
+		fmt.Print(item.Report(hw.template, width))
 	}
 }
 
-func (hw *Homework) heading(filter HWFilter, count int) {
+func (hw *Homework) heading(filter HWFilter, count, width int) {
 	if count == 0 {
 		return
 	}
@@ -107,17 +112,21 @@ func (hw *Homework) heading(filter HWFilter, count int) {
 		status = "Not Submitted:"
 	}
 	summary := fmt.Sprintf("%d %s", count, unit)
-	fmt.Printf(hw.template, status, summary)
+	padding := strings.Repeat(" ", width-len(status))
+	fmt.Printf(hw.template, status, padding, summary)
 }
 
 func (hw *Homework) maxTitleWidth() int {
-	var max int
+	if hw == nil {
+		return 0
+	}
+	var width int
 	for _, item := range hw.Items {
-		if len(item.String()) > max {
-			max = len(item.String())
+		if len(item.String()) > width {
+			width = len(item.String())
 		}
 	}
-	return max
+	return width
 }
 
 // Summarize prints a full report of new and updated items in the set.
