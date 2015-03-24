@@ -24,6 +24,7 @@ const (
 	descFetch     = "Fetches your current problems on exercism.io, as well as the next unstarted problem in each language."
 	descRestore   = "Restores completed and current problems on from exercism.io, along with your most recent iteration for each."
 	descSubmit    = "Submits a new iteration to a problem on exercism.io."
+	descSkip      = "Skips a problem given a language and slug."
 	descUnsubmit  = "Deletes the most recently submitted iteration."
 	descTracks    = "List the available language tracks"
 	descOpen      = "Opens the current submission of the specified exercise"
@@ -104,6 +105,11 @@ func main() {
 			Action:      cmd.Restore,
 		},
 		{
+			Name:   "skip",
+			Usage:  descSkip,
+			Action: cmd.Skip,
+		},
+		{
 			Name:      "submit",
 			ShortName: "s",
 			Usage:     descSubmit,
@@ -141,7 +147,6 @@ func main() {
 		},
 	}
 	if err := app.Run(os.Args); err != nil {
-
 		log.Fatal(err)
 	}
 }

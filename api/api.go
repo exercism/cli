@@ -264,3 +264,29 @@ func (c *Client) Tracks() ([]*Track, error) {
 
 	return payload.Tracks, nil
 }
+
+func (c *Client) Skip(language, slug string) error {
+	url := fmt.Sprintf("%s/api/v1/iterations/%s/%s/skip?key=%s", c.APIHost, language, slug, c.APIKey)
+
+	req, err := http.NewRequest("POST", url, nil)
+	if err != nil {
+		return err
+	}
+
+	res, err := c.Do(req, nil)
+	if err != nil {
+		return err
+	}
+
+	defer res.Body.Close()
+	if res.StatusCode == http.StatusNoContent {
+		return nil
+	}
+
+	var pe PayloadError
+	if err := json.NewDecoder(res.Body).Decode(&pe); err != nil {
+		return err
+	}
+
+	return errors.New(pe.Error)
+}
