@@ -22,11 +22,14 @@ Follow the directions on http://golang.org/doc/install
 1. `go get github.com/exercism/cli/exercism`
 1. `cd $GOPATH/src/github.com/exercism/cli`
 1. `git remote set-url origin https://github.com/<your-github-username>/cli`
-1. `go get`
+1. `go get -t ./...`*)
 1. Make sure $GOPATH/bin is on your path (you may need something like `export PATH=$PATH:/projects/goprojects/bin`)
 1. Open a separate terminal window to your project directory and run the command `glitch`
 1. Make the change.
 1. Submit a pull request.
+
+*) This assumes that you are on Go 1.4. If you have an older version of Go, then you will need to run `go get ./...`.
+The `-t` installs test dependencies.
 
 Please provide tests for the changes where possible.
 
