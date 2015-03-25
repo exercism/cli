@@ -6,11 +6,14 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## Next Release
 
+* **Your contribution here**
+
+## v2.0.1 (2015-25-05)
+
 * [#167](https://github.com/exercism/cli/pull/167): Fixes misspelling of exercism list command - [@queuebit](https://github.com/queuebit)
 * Tweak output from `fetch` so that languages are scannable.
 * [#35](https://github.com/exercism/cli/issues/35): Add support for submitting multiple-file solutions
 * [#171](https://github.com/exercism/cli/pull/171): Implement `skip` command to bypass individual exercises - [@Tonkpils](https://github.com/Tonkpils)
-* **Your contribution here**
 
 ## v2.0.0 (2015-03-05)
 
