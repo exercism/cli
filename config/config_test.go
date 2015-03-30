@@ -28,14 +28,12 @@ func TestLoad(t *testing.T) {
 	testCases := []struct {
 		desc                string
 		in                  string // the name of the file passed as a command line argument
-		env                 string // the name of the file stored in the environment variable
 		out                 string // the name of the file that the config will be written to
 		dir, key, api, xapi string // the actual config values
 	}{
 		{
 			desc: "defaults",
 			in:   "",
-			env:  "",
 			out:  filepath.Join(tmpDir, File),
 			dir:  filepath.Join(tmpDir, DirExercises),
 			key:  "",
@@ -45,7 +43,6 @@ func TestLoad(t *testing.T) {
 		{
 			desc: "no such file",
 			in:   filepath.Join(tmpDir, "no-such.json"),
-			env:  "",
 			out:  filepath.Join(tmpDir, "no-such.json"),
 			dir:  filepath.Join(tmpDir, DirExercises),
 			key:  "",
@@ -55,7 +52,6 @@ func TestLoad(t *testing.T) {
 		{
 			desc: "file exists",
 			in:   configPath,
-			env:  "",
 			out:  configPath,
 			dir:  "/a/b/c",
 			key:  "abc123",
@@ -65,47 +61,15 @@ func TestLoad(t *testing.T) {
 		{
 			desc: "unexpanded path",
 			in:   "~/config.json",
-			env:  "",
 			out:  configPath,
 			dir:  "/a/b/c",
 			key:  "abc123",
 			api:  "http://api.example.com",
 			xapi: "http://x.example.com",
-		},
-		{
-			desc: "file in env",
-			in:   "",
-			env:  configPath,
-			out:  configPath,
-			dir:  "/a/b/c",
-			key:  "abc123",
-			api:  "http://api.example.com",
-			xapi: "http://x.example.com",
-		},
-		{
-			desc: "unexpanded path in env",
-			in:   "",
-			env:  "~/env.json",
-			out:  filepath.Join(tmpDir, "env.json"),
-			dir:  filepath.Join(tmpDir, DirExercises),
-			key:  "",
-			api:  hostAPI,
-			xapi: hostXAPI,
-		},
-		{
-			desc: "command line argument overrides env",
-			in:   "~/arg.json",
-			env:  "~/env.json",
-			out:  filepath.Join(tmpDir, "arg.json"),
-			dir:  filepath.Join(tmpDir, DirExercises),
-			key:  "",
-			api:  hostAPI,
-			xapi: hostXAPI,
 		},
 		{
 			desc: "sanitizes whitespace",
 			in:   "~/dirty.json",
-			env:  "",
 			out:  filepath.Join(tmpDir, "dirty.json"),
 			dir:  "/a/b/c",
 			key:  "abc123",
@@ -117,7 +81,7 @@ func TestLoad(t *testing.T) {
 	for _, tc := range testCases {
 		c := &Config{home: tmpDir}
 
-		if err := c.load(tc.in, tc.env); err != nil {
+		if err := c.load(tc.in); err != nil {
 			t.Fatal(err)
 		}
 		assert.Equal(t, tc.out, c.File, tc.desc)
