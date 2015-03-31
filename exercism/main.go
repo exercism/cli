@@ -44,8 +44,9 @@ func main() {
 	app.HideVersion = true
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:  "config, c",
-			Usage: "path to config file",
+			Name:   "config, c",
+			Usage:  "path to config file",
+			EnvVar: "EXERCISM_CONFIG_FILE",
 		},
 		cli.BoolFlag{
 			Name:  "verbose, v",

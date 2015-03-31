@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	fileEnvKey = "EXERCISM_CONFIG_FILE"
 	// File is the default name of the JSON file where the config written.
 	// The user can pass an alternate filename when using the CLI.
 	File = ".exercism.json"
@@ -67,7 +66,7 @@ func Home() (string, error) {
 // New returns a configuration struct with content from the exercism.json file
 func New(path string) (*Config, error) {
 	c := &Config{}
-	err := c.load(path, os.Getenv(fileEnvKey))
+	err := c.load(path)
 	return c, err
 }
 
@@ -107,8 +106,8 @@ func (c *Config) Write() error {
 	return e.Encode(c)
 }
 
-func (c *Config) load(argPath, envPath string) error {
-	path, err := c.resolvePath(argPath, envPath)
+func (c *Config) load(argPath string) error {
+	path, err := c.resolvePath(argPath)
 	if err != nil {
 		return err
 	}
@@ -159,11 +158,8 @@ func (c *Config) homeDir() (string, error) {
 	return Home()
 }
 
-func (c *Config) resolvePath(argPath, envPath string) (string, error) {
+func (c *Config) resolvePath(argPath string) (string, error) {
 	path := argPath
-	if path == "" {
-		path = envPath
-	}
 	if path == "" {
 		path = filepath.Join("~", File)
 	}
