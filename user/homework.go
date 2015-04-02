@@ -112,7 +112,10 @@ func (hw *Homework) heading(filter HWFilter, count, width int) {
 		status = "Not Submitted:"
 	}
 	summary := fmt.Sprintf("%d %s", count, unit)
-	padding := strings.Repeat(" ", width-len(status))
+	var padding string
+	if width > len(status) {
+		padding = strings.Repeat(" ", width-len(status))
+	}
 	fmt.Printf(hw.template, status, padding, summary)
 }
 
