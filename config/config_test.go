@@ -92,6 +92,25 @@ func TestLoad(t *testing.T) {
 	}
 }
 
+func TestReadDirectory(t *testing.T) {
+	// if the provided path is a directory, append the default filename
+	tmpDir, err := ioutil.TempDir("", "")
+	assert.NoError(t, err)
+
+	myConfig, err := New(tmpDir)
+	assert.NoError(t, err)
+
+	expected := filepath.Join(tmpDir, File)
+	actual := myConfig.File
+	assert.Equal(t, expected, actual)
+
+	// if it can't determine if the provided path is a directory, don't modify
+	// the path
+	myConfig, err = New("badpath")
+	assert.NoError(t, err)
+	assert.Equal(t, "badpath", myConfig.File)
+}
+
 func TestReadingWritingConfig(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "")
 	filename := fmt.Sprintf("%s/%s", tmpDir, File)
