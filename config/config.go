@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -140,8 +141,15 @@ func (c *Config) read() error {
 	}
 	defer f.Close()
 
-	d := json.NewDecoder(f)
-	return d.Decode(&c)
+	if err := json.NewDecoder(f).Decode(&c); err != nil {
+		var extra string
+		if _, ok := err.(*json.SyntaxError); ok {
+			extra = ":\nThe file contains invalid JSON syntax"
+		}
+		return fmt.Errorf("error parsing JSON in the config file %s%s: %s", f.Name(), extra, err)
+	}
+
+	return nil
 }
 
 // IsAuthenticated returns true if the config contains an API key.
