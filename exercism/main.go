@@ -16,7 +16,7 @@ const (
 	// We try to follow Semantic Versioning (http://semver.org),
 	// but with the http://exercism.io app being a prototype, a
 	// lot of things get out of hand.
-	Version = "2.0.1"
+	Version = "2.0.2"
 
 	descDebug     = "Outputs useful debug information."
 	descConfigure = "Writes config values to a JSON file."

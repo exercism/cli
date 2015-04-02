@@ -6,10 +6,14 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## Next Release
 
-* [#174](https://github.com/exercism/cli/issues/174): Fix panic during fetch
 * **Your contribution here**
 
-## v2.0.1 (2015-25-05)
+## v2.0.2 (2015-04-01)
+
+* [#174](https://github.com/exercism/cli/issues/174): Fix panic during fetch - [@kytrinyx](https://github.com/kytrinyx)
+* Refactor handling of ENV vars - [@lcowell](https://github.com/lcowell)
+
+## v2.0.1 (2015-03-25)
 
 * [#167](https://github.com/exercism/cli/pull/167): Fixes misspelling of exercism list command - [@queuebit](https://github.com/queuebit)
 * Tweak output from `fetch` so that languages are scannable.
