@@ -6,6 +6,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## Next Release
 
+* [#174](https://github.com/exercism/cli/issues/174): Fix panic during fetch
 * **Your contribution here**
 
 ## v2.0.1 (2015-25-05)
