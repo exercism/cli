@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
@@ -39,13 +40,14 @@ func Download(ctx *cli.Context) {
 
 	for name, contents := range submission.ProblemFiles {
 		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s", path, name), []byte(contents), 0755); err != nil {
-			log.Fatal(err)
+			log.Fatalf("Unable to write file %s: %s", name, err)
 		}
 	}
 
 	for name, contents := range submission.SolutionFiles {
-		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s", path, name), []byte(contents), 0755); err != nil {
-			log.Fatal(err)
+		filename := strings.TrimPrefix(name, strings.ToLower("/"+submission.Language+"/"+submission.Slug+"/"))
+		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s", path, filename), []byte(contents), 0755); err != nil {
+			log.Fatalf("Unable to write file %s: %s", err)
 		}
 	}
 
