@@ -24,7 +24,6 @@ func TestLoad(t *testing.T) {
 	if err := os.Link(fixturePath(t, "dirty.json"), dirtyPath); err != nil {
 		t.Fatal(err)
 	}
-
 	testCases := []struct {
 		desc                string
 		in                  string // the name of the file passed as a command line argument
@@ -109,6 +108,23 @@ func TestReadDirectory(t *testing.T) {
 	myConfig, err = New("badpath")
 	assert.NoError(t, err)
 	assert.Equal(t, "badpath", myConfig.File)
+}
+
+func TestLoad_InvalidJSON(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	invalidPath := filepath.Join(tmpDir, "config_invalid.json")
+	if err := os.Link(fixturePath(t, "config_invalid.json"), invalidPath); err != nil {
+		t.Fatal(err)
+	}
+	c := &Config{home: tmpDir}
+
+	err = c.load("~/config_invalid.json")
+	if assert.Error(t, err) {
+		assert.Contains(t, err.Error(), "The file contains invalid JSON syntax")
+	}
 }
 
 func TestReadingWritingConfig(t *testing.T) {
