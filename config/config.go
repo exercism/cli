@@ -167,7 +167,14 @@ func (c *Config) resolvePath(argPath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return strings.Replace(path, "~", h, 1), nil
+	path = strings.Replace(path, "~", h, 1)
+
+	fi, _ := os.Stat(path)
+	if fi != nil && fi.IsDir() {
+		path = filepath.Join(path, File)
+	}
+
+	return path, nil
 }
 
 func (c *Config) setDefaults() error {

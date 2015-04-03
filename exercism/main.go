@@ -46,7 +46,7 @@ func main() {
 		cli.StringFlag{
 			Name:   "config, c",
 			Usage:  "path to config file",
-			EnvVar: "EXERCISM_CONFIG_FILE",
+			EnvVar: "XDG_CONFIG_HOME,EXERCISM_CONFIG_FILE",
 		},
 		cli.BoolFlag{
 			Name:  "verbose, v",
