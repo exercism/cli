@@ -1,15 +1,24 @@
 package api
 
 import (
+	"bytes"
 	"errors"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/net/html/charset"
+	"golang.org/x/text/transform"
+)
+
+const (
+	mimeType = "text/plain"
 )
 
 var (
 	errUnidentifiable = errors.New("unable to identify track and problem")
 	errNoFiles        = errors.New("no files submitted")
+	utf8BOM           = []byte{0xef, 0xbb, 0xbf}
 )
 
 // Iteration represents a version of a particular exercise.
@@ -53,12 +62,13 @@ func NewIteration(dir string, filenames []string) (*Iteration, error) {
 	iter.Problem = segments[2]
 
 	for _, filename := range filenames {
-		b, err := ioutil.ReadFile(filename)
+		fileContents, err := readFileAsUTF8String(filename)
 		if err != nil {
 			return nil, err
 		}
+
 		path := filename[len(iter.RelativePath()):]
-		iter.Solution[path] = string(b)
+		iter.Solution[path] = *fileContents
 	}
 	return iter, nil
 }
@@ -72,4 +82,30 @@ func (iter *Iteration) isValidFilepath(path string) bool {
 		return false
 	}
 	return strings.HasPrefix(strings.ToLower(path), strings.ToLower(iter.Dir))
+}
+
+
+func readFileAsUTF8String(filename string) (*string, error) {
+	b, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	encoding, _, _ := charset.DetermineEncoding(b, mimeType)
+	decoder := encoding.NewDecoder()
+	decodedBytes, _, err := transform.Bytes(decoder, b)
+	if err != nil {
+		return nil, err
+	}
+
+	// Drop the UTF-8 BOM that may have been added. This isn't necessary, and
+	// it's going to be written into another UTF-8 buffer anyway once it's JSON
+	// serialized.
+	//
+	// The standard recommends omitting the BOM. See
+	// http://www.unicode.org/versions/Unicode5.0.0/ch02.pdf
+	decodedBytes = bytes.TrimPrefix(decodedBytes, utf8BOM)
+
+	s := string(decodedBytes)
+	return &s, nil
 }
