@@ -1,6 +1,8 @@
 package config
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -105,8 +107,16 @@ func (c *Config) Write() error {
 	}
 	defer f.Close()
 
-	e := json.NewEncoder(f)
-	return e.Encode(c)
+	b, err := json.MarshalIndent(c, "", "\t")
+	if err != nil {
+		return err
+	}
+
+	if _, err := f.Write(b); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (c *Config) load(argPath string) error {
@@ -149,8 +159,9 @@ func (c *Config) read() error {
 			if _, serr := f.Seek(0, os.SEEK_SET); serr != nil {
 				log.Fatalf("seek error: %v", serr)
 			}
-			extra = fmt.Sprintf(":\nThe file contains invalid JSON syntax at '%s' <~",
-				findInvalidJSON(f, serr.Offset))
+			line, str := findInvalidJSON(f, serr.Offset)
+			extra = fmt.Sprintf(":\ninvalid JSON syntax at line %d:\n%s",
+				line, str)
 		}
 		return fmt.Errorf("error parsing JSON in the config file %s%s\n%s", f.Name(), extra, err)
 	}
@@ -158,13 +169,32 @@ func (c *Config) read() error {
 	return nil
 }
 
-func findInvalidJSON(f io.ReaderAt, pos int64) string {
-	buf := make([]byte, 13)
-	if _, err := f.ReadAt(buf, pos-13); err != nil {
-		log.Fatalf("read error: %v", err)
+func findInvalidJSON(f io.Reader, pos int64) (int, string) {
+	var (
+		col     int
+		line    int
+		errLine []byte
+	)
+	buf := new(bytes.Buffer)
+	fb := bufio.NewReader(f)
+
+	for c := int64(0); c < pos; {
+		b, err := fb.ReadBytes('\n')
+		if err != nil {
+			log.Fatalf("read error: %v", err)
+		}
+		c += int64(len(b))
+		col = len(b) - int(c-pos)
+
+		line++
+		errLine = b
 	}
 
-	return string(buf)
+	if len(errLine) != 0 {
+		buf.WriteString(fmt.Sprintf("%5d: %s <~", line, errLine[:col]))
+	}
+
+	return line, buf.String()
 }
 
 // IsAuthenticated returns true if the config contains an API key.

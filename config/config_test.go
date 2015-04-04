@@ -123,7 +123,7 @@ func TestLoad_InvalidJSON(t *testing.T) {
 
 	err = c.load("~/config_invalid.json")
 	if assert.Error(t, err) {
-		assert.Contains(t, err.Error(), "The file contains invalid JSON syntax")
+		assert.Contains(t, err.Error(), "invalid JSON syntax")
 	}
 }
 
