@@ -84,7 +84,6 @@ func (iter *Iteration) isValidFilepath(path string) bool {
 	return strings.HasPrefix(strings.ToLower(path), strings.ToLower(iter.Dir))
 }
 
-
 func readFileAsUTF8String(filename string) (*string, error) {
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {

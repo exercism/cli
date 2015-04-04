@@ -3,8 +3,8 @@ package api
 import (
 	"path/filepath"
 	"runtime"
-	"testing"
 	"strings"
+	"testing"
 	"unicode/utf8"
 )
 
@@ -37,11 +37,11 @@ func TestNewIteration(t *testing.T) {
 	}
 
 	expected := map[string]string{
-		"one.py":       "# one",
-		"two.py":       "# two",
+		"one.py": "# one",
+		"two.py": "# two",
 		filepath.Join("lib", "three.py"): "# three",
-		"utf16le.py":   "# utf16le",
-		"utf16be.py":   "# utf16be",
+		"utf16le.py":                     "# utf16le",
+		"utf16be.py":                     "# utf16be",
 	}
 
 	for filename, code := range expected {
@@ -92,4 +92,3 @@ func TestIterationValidFile(t *testing.T) {
 		}
 	}
 }
-
