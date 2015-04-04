@@ -3,7 +3,9 @@ package api
 import (
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
+	"unicode/utf8"
 )
 
 func TestNewIteration(t *testing.T) {
@@ -14,6 +16,8 @@ func TestNewIteration(t *testing.T) {
 		filepath.Join(dir, "python", "leap", "one.py"),
 		filepath.Join(dir, "python", "leap", "two.py"),
 		filepath.Join(dir, "python", "leap", "lib", "three.py"),
+		filepath.Join(dir, "python", "leap", "utf16le.py"),
+		filepath.Join(dir, "python", "leap", "utf16be.py"),
 	}
 
 	iter, err := NewIteration(dir, files)
@@ -28,18 +32,25 @@ func TestNewIteration(t *testing.T) {
 		t.Errorf("Expected problem to be leap, was %s", iter.Problem)
 	}
 
-	if len(iter.Solution) != 3 {
+	if len(iter.Solution) != 5 {
 		t.Fatalf("Expected solution to have 3 files, had %d", len(iter.Solution))
 	}
 
 	expected := map[string]string{
-		"one.py":       "# one\n",
-		"two.py":       "# two\n",
-		"lib/three.py": "# three\n",
+		"one.py": "# one",
+		"two.py": "# two",
+		filepath.Join("lib", "three.py"): "# three",
+		"utf16le.py":                     "# utf16le",
+		"utf16be.py":                     "# utf16be",
 	}
+
 	for filename, code := range expected {
-		if iter.Solution[filename] != code {
-			t.Errorf("Expected %s to contain %s, had %s", filename, code, iter.Solution[filename])
+		if !utf8.ValidString(iter.Solution[filename]) {
+			t.Errorf("Iteration content is not valid UTF-8 data: %s", iter.Solution[filename])
+		}
+
+		if !strings.HasPrefix(iter.Solution[filename], code) {
+			t.Errorf("Expected %s to contain `%s', had `%s'", filename, code, iter.Solution[filename])
 		}
 	}
 }
