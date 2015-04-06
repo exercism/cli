@@ -1,9 +1,0 @@
-#!/bin/bash
-
-LIBRARIES="\
-  github.com/codegangsta/cli \
-  github.com/stretchr/testify/assert \
-  golang.org/x/net/html/charset \
-  golang.org/x/text/transform"
-
-go get $LIBRARIES
