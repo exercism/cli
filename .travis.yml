@@ -7,7 +7,7 @@ go:
 install: true
 
 before_install:
-  bin/deps
+  - go get -t ./...
 
 script:
   - go test ./...
