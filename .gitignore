@@ -24,3 +24,6 @@ _testmain.go
 out/
 release/
 go-exercism
+
+# Intellij
+/.idea
