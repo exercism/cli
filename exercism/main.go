@@ -90,7 +90,13 @@ func main() {
 			Name:      "demo",
 			ShortName: "d",
 			Usage:     descDemo,
-			Action:    cmd.Demo,
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "dir, d",
+					Usage: "path to use for the demo exercises",
+				},
+			},
+			Action: cmd.Demo,
 		},
 		{
 			Name:      "fetch",
