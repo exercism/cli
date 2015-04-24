@@ -11,6 +11,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestSetDir(t *testing.T) {
+	testCases := []struct {
+		givenPath    string
+		expectedPath string
+	}{
+		{"", "/test/home/exercism"},
+		{"~/foobar", "/test/home/foobar"},
+		{"/foobar/~/noexpand", "/foobar/~/noexpand"},
+		{"/no/modification", "/no/modification"},
+		{"nomodification", "nomodification"},
+	}
+
+	for _, testCase := range testCases {
+		config := &Config{home: "/test/home"}
+		config.SetDir(testCase.givenPath)
+		assert.Equal(t, testCase.expectedPath, config.Dir)
+	}
+}
+
 func TestLoad(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "")
 	if err != nil {

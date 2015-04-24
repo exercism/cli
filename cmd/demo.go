@@ -24,6 +24,11 @@ func Demo(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
+	if dirOpt := ctx.String("dir"); dirOpt != "" {
+		c.SetDir(dirOpt)
+	}
+
+	fmt.Printf("Your exercises will be saved at: %s\n", c.Dir)
 	hw := user.NewHomework(problems, c)
 	if err := hw.Save(); err != nil {
 		log.Fatal(err)
