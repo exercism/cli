@@ -206,7 +206,7 @@ func (c *Config) IsAuthenticated() bool {
 // homeDir caches the lookup of the user's home directory.
 func (c *Config) homeDir() (string, error) {
 	if c.home != "" {
-		return c.home, nil
+		return c.home, nil // only set during testing
 	}
 	return Home()
 }
@@ -220,7 +220,7 @@ func (c *Config) resolvePath(argPath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	path = strings.Replace(path, "~", h, 1)
+	path = expandHome(path, h)
 
 	fi, _ := os.Stat(path)
 	if fi != nil && fi.IsDir() {
@@ -239,15 +239,33 @@ func (c *Config) setDefaults() error {
 		c.XAPI = hostXAPI
 	}
 
-	h, err := c.homeDir()
-	if err != nil {
+	if err := c.SetDir(c.Dir); err != nil {
 		return err
 	}
 
-	if c.Dir == "" {
-		c.Dir = filepath.Join(h, DirExercises)
-	}
-	c.Dir = strings.Replace(c.Dir, "~", h, 1)
-
 	return nil
+}
+
+// SetDir sets the configuration directory to the given path
+// or defaults to the home exercism directory
+func (c *Config) SetDir(path string) error {
+	home, err := c.homeDir()
+	if err != nil {
+		return err
+	}
+	if path == "" {
+		c.Dir = filepath.Join(home, DirExercises)
+	} else {
+		c.Dir = path
+	}
+
+	c.Dir = expandHome(c.Dir, home)
+	return nil
+}
+
+func expandHome(path, home string) string {
+	if path[:2] == "~/" {
+		return strings.Replace(path, "~", home, 1)
+	}
+	return path
 }
