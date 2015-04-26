@@ -121,6 +121,12 @@ func main() {
 			ShortName: "s",
 			Usage:     descSubmit,
 			Action:    cmd.Submit,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "test",
+					Usage: "submit a test file",
+				},
+			},
 		},
 		{
 			Name:      "unsubmit",
