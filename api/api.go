@@ -38,8 +38,9 @@ type SubmissionInfo struct {
 }
 
 // Fetch retrieves problems from the API.
-// In most cases these problems consist of a test suite and a README
-// from the x-api, but it is also used when restoring earlier iterations.
+// Most problems consist of a README, some sort of test suite, and
+// any supporting files (header files, test data, boilerplate, skeleton
+// files, etc).
 func (c *Client) Fetch(args []string) ([]*Problem, error) {
 	var url string
 	switch len(args) {
@@ -76,7 +77,7 @@ func (c *Client) Fetch(args []string) ([]*Problem, error) {
 
 // Restore fetches the latest revision of a solution and writes it to disk.
 func (c *Client) Restore() ([]*Problem, error) {
-	url := fmt.Sprintf("%s/api/v1/iterations/%s/restore", c.APIHost, c.APIKey)
+	url := fmt.Sprintf("%s/v2/exercises/restore?key=%s", c.XAPIHost, c.APIKey)
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
