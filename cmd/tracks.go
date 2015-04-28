@@ -33,7 +33,7 @@ func Tracks(ctx *cli.Context) {
 	msg := `
 Related commands:
     exercism fetch (see 'exercism help fetch')
-    exercism lisp (see 'exercism help list')
+    exercism list (see 'exercism help list')
 	`
 	fmt.Println(msg)
 }
