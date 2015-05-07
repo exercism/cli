@@ -4,8 +4,17 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ----------------
 
+
 ## Next Release
 
+* [1a2fd1b](https://github.com/exercism/cli/commit/1a2fd1bfb2dba358611a7c3266f935cccaf924b5): Handle config as either directory or file - [@lcowell](https://github.com/lcowell)
+* [#177](https://github.com/exercism/cli/pull/177): Improve JSON error handling and reporting - [@Tonkpils](https://github.com/Tonkpils)
+* [#178](https://github.com/exercism/cli/pull/178): Add support for $XDG_CONFIG_HOME - [@lcowell](https://github.com/lcowell)
+* [#184](https://github.com/exercism/cli/pull/184): Handle different file encodings in submissions - [@ambroff](https://github.com/ambroff)
+* [#179](https://github.com/exercism/cli/pull/179): Pretty print the JSON config - [@Tonkpils](https://github.com/Tonkpils)
+* [#181](https://github.com/exercism/cli/pull/181): Fix path issue when downloading problems - [@Tonkpils](https://github.com/Tonkpils)
+* [#186](https://github.com/exercism/cli/pull/186): Allow people to specify a target directory for the demo - [@Tonkpils](https://github.com/Tonkpils)
+* [#189](https://github.com/exercism/cli/pull/189): Implement `--test` flag to allow submitting a test file in the solution - [@pminten](https://github.com/pminten)
 * **Your contribution here**
 
 ## v2.0.2 (2015-04-01)
