@@ -264,7 +264,7 @@ func (c *Config) SetDir(path string) error {
 }
 
 func expandHome(path, home string) string {
-	if path[:2] == "~/" {
+	if path[:2] == "~"+string(os.PathSeparator) {
 		return strings.Replace(path, "~", home, 1)
 	}
 	return path
