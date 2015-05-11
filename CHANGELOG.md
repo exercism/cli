@@ -7,6 +7,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## Next Release
 
+* [#190](https://github.com/exercism/cli/pull/190): Fix bug in home directory expansion for Windows - [@Tonkpils](https://github.com/Tonkpils)
 * **Your contribution here**
 
 ## v2.1.0 (2015-05-08)
