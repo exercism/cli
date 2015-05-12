@@ -54,8 +54,6 @@ func Submit(ctx *cli.Context) {
 		if isTest(filename) && !ctx.Bool("test") {
 			log.Fatal("You're trying to submit a test file. If this is really what " +
 				"you want, please pass the --test flag to exercism submit.")
-		} else if !isTest(filename) && ctx.Bool("test") {
-			log.Fatal("You've passed the --test flag but you're not submitting a test file.")
 		}
 
 		file, err := filepath.Abs(filename)
