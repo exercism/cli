@@ -124,7 +124,7 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "test",
-					Usage: "allow submision of test files",
+					Usage: "allow submission of test files",
 				},
 			},
 		},
