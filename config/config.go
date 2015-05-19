@@ -89,7 +89,7 @@ func (c *Config) Update(key, host, dir, xapi string) {
 
 	dir = strings.TrimSpace(dir)
 	if dir != "" {
-		c.Dir = dir
+		c.SetDir(dir)
 	}
 
 	xapi = strings.TrimSpace(xapi)
