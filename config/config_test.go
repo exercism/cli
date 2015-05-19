@@ -171,7 +171,12 @@ func TestReadingWritingConfig(t *testing.T) {
 }
 
 func TestUpdateConfig(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "")
+	if err != nil {
+		t.Fatal(err)
+	}
 	c := &Config{
+		home:   tmpDir,
 		APIKey: "MyKey",
 		API:    "localhost",
 		Dir:    "/exercism/directory",
@@ -191,6 +196,10 @@ func TestUpdateConfig(t *testing.T) {
 	assert.Equal(t, "http://example.com", c.API)
 	assert.Equal(t, "/tmp/exercism", c.Dir)
 	assert.Equal(t, "http://x.example.org", c.XAPI)
+
+	// Test home is expanded on update
+	c.Update("", "", "~/myexercism", "")
+	assert.Equal(t, filepath.Join(tmpDir, "myexercism"), c.Dir)
 }
 
 func fixturePath(t *testing.T, filename string) string {
