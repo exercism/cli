@@ -7,6 +7,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 
 * **Your contribution here**
+* [#194](https://github.com/exercism/cli/pull/194): Fix home expansion on configure update - [@Tonkpils](https://github.com/Tonkpils)
 
 ## v2.1.1 (2015-05-13)
 
