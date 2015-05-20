@@ -1,23 +1,48 @@
 package cmd
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/config"
 )
 
+type release struct {
+	Location string `json:"html_url"`
+	TagName  string `json:"tag_name"`
+}
+
+func (r *release) Version() string {
+	return strings.TrimPrefix(r.TagName, "v")
+}
+
 // Debug provides information about the user's environment and configuration.
 func Debug(ctx *cli.Context) {
 	defer fmt.Printf("\nIf you are having trouble and need to file a GitHub issue (https://github.com/exercism/exercism.io/issues) please include this information (except your API key. Keep that private).\n")
 
+	client := http.Client{Timeout: 5 * time.Second}
+
 	fmt.Printf("\n**** Debug Information ****\n")
 	fmt.Printf("Exercism CLI Version: %s\n", ctx.App.Version)
+
+	rel, err := checkLatestRelease(client)
+	if err != nil {
+		log.Println(err)
+	} else {
+		if rel.Version() != ctx.App.Version {
+			defer fmt.Println("\nYour CLI is outdated. A new release can be found here:", rel.Location)
+		}
+		fmt.Printf("Exercism CLI Latest Release: %s\n", rel.Version())
+	}
+
 	fmt.Printf("OS/Architecture: %s/%s\n", runtime.GOOS, runtime.GOARCH)
 
 	dir, err := config.Home()
@@ -47,11 +72,24 @@ func Debug(ctx *cli.Context) {
 		fmt.Println("Config file: <not configured>")
 		fmt.Println("API Key: <not configured>")
 	}
-	client := http.Client{Timeout: 5 * time.Second}
 
 	fmt.Printf("API: %s [%s]\n", c.API, pingUrl(client, c.API))
 	fmt.Printf("XAPI: %s [%s]\n", c.XAPI, pingUrl(client, c.XAPI))
 	fmt.Printf("Exercises Directory: %s\n", c.Dir)
+}
+
+func checkLatestRelease(client http.Client) (*release, error) {
+	resp, err := client.Get("https://api.github.com/repos/exercism/cli/releases/latest")
+	if err != nil {
+		return nil, errors.New("unable to get latest CLI release: " + err.Error())
+	}
+
+	var rel release
+	if err := json.NewDecoder(resp.Body).Decode(&rel); err != nil {
+		return nil, errors.New("error decoding latest release response: " + err.Error())
+	}
+
+	return &rel, nil
 }
 
 func pingUrl(client http.Client, url string) string {
