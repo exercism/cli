@@ -38,7 +38,7 @@ func Debug(ctx *cli.Context) {
 		log.Println(err)
 	} else {
 		if rel.Version() != ctx.App.Version {
-			defer fmt.Println("\nYour CLI is outdated. A new release can be found here:", rel.Location)
+			defer fmt.Printf("\nA newer version of the CLI (%s) can be downloaded here: %s\n", rel.TagName, rel.Location)
 		}
 		fmt.Printf("Exercism CLI Latest Release: %s\n", rel.Version())
 	}
