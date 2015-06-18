@@ -19,6 +19,7 @@ import (
 	"github.com/kardianos/osext"
 )
 
+// Upgrade command allows the user to upgrade to the latest CLI version
 func Upgrade(ctx *cli.Context) {
 	client := http.Client{Timeout: 5 * time.Second}
 	rel, err := checkLatestRelease(client)

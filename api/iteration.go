@@ -73,6 +73,8 @@ func NewIteration(dir string, filenames []string) (*Iteration, error) {
 	return iter, nil
 }
 
+// RelativePath returns the iterations relative path
+// iter.Dir/iter.Language/iter.Problem/
 func (iter *Iteration) RelativePath() string {
 	return filepath.Join(iter.Dir, iter.Language, iter.Problem) + string(filepath.Separator)
 }

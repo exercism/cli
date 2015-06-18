@@ -9,6 +9,7 @@ import (
 	"github.com/exercism/cli/config"
 )
 
+// Skip command allows a user to skip a specific problem
 func Skip(ctx *cli.Context) {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {

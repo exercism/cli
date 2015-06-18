@@ -63,8 +63,8 @@ func Debug(ctx *cli.Context) {
 		fmt.Println("API Key: <not configured>")
 	}
 
-	fmt.Printf("API: %s [%s]\n", c.API, pingUrl(client, c.API))
-	fmt.Printf("XAPI: %s [%s]\n", c.XAPI, pingUrl(client, c.XAPI))
+	fmt.Printf("API: %s [%s]\n", c.API, pingURL(client, c.API))
+	fmt.Printf("XAPI: %s [%s]\n", c.XAPI, pingURL(client, c.XAPI))
 	fmt.Printf("Exercises Directory: %s\n", c.Dir)
 }
 
@@ -82,7 +82,7 @@ func checkLatestRelease(client http.Client) (*release, error) {
 	return &rel, nil
 }
 
-func pingUrl(client http.Client, url string) string {
+func pingURL(client http.Client, url string) string {
 	res, err := client.Get(url)
 	if err != nil {
 		return err.Error()
