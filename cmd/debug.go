@@ -8,21 +8,11 @@ import (
 	"net/http"
 	"os"
 	"runtime"
-	"strings"
 	"time"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/config"
 )
-
-type release struct {
-	Location string `json:"html_url"`
-	TagName  string `json:"tag_name"`
-}
-
-func (r *release) Version() string {
-	return strings.TrimPrefix(r.TagName, "v")
-}
 
 // Debug provides information about the user's environment and configuration.
 func Debug(ctx *cli.Context) {

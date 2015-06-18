@@ -26,6 +26,7 @@ const (
 	descSubmit    = "Submits a new iteration to a problem on exercism.io."
 	descSkip      = "Skips a problem given a language and slug."
 	descUnsubmit  = "Deletes the most recently submitted iteration."
+	descUpgrade   = "Upgrades the CLI to the latest released version."
 	descTracks    = "List the available language tracks"
 	descOpen      = "Opens the current submission of the specified exercise"
 
@@ -133,6 +134,11 @@ func main() {
 			ShortName: "u",
 			Usage:     descUnsubmit,
 			Action:    cmd.Unsubmit,
+		},
+		{
+			Name:   "upgrade",
+			Usage:  descUpgrade,
+			Action: cmd.Upgrade,
 		},
 		{
 			Name:      "tracks",
