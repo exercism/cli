@@ -19,6 +19,15 @@ import (
 	"github.com/kardianos/osext"
 )
 
+var (
+	// BuildOS is the GOOS used during the build process
+	BuildOS string
+	// Build ARMV is the GOARM used during the build process
+	BuildARM string
+	// BuildARCH is the GOARCH used during the build process
+	BuildARCH string
+)
+
 // Upgrade command allows the user to upgrade to the latest CLI version
 func Upgrade(ctx *cli.Context) {
 	client := http.Client{Timeout: 5 * time.Second}
@@ -42,19 +51,27 @@ func Upgrade(ctx *cli.Context) {
 		log.Fatalf("Unable to find current executable path: %s", err)
 	}
 
-	// TODO: we may have to set these during build
-	// and use them to select the correct asset...
-	// Also need GOARM
 	var (
 		OS   = osMap[runtime.GOOS]
 		ARCH = archMap[runtime.GOARCH]
 	)
 
+	if OS == "" || ARCH == "" {
+		log.Fatalf("unable to upgrade: OS %s ARCH %s", OS, ARCH)
+	}
+
+	buildName := fmt.Sprintf("%s-%s", OS, ARCH)
+	if BuildARCH == "arm" {
+		if BuildARM == "" {
+			log.Fatalf("unable to upgrade: arm version not found")
+		}
+		buildName = fmt.Sprintf("%s-v%s", buildName, BuildARM)
+	}
+
 	var downloadRC *bytes.Reader
 	for _, a := range rel.Assets {
-		if strings.Contains(a.Name, OS) && strings.Contains(a.Name, ARCH) {
-			// TODO: only display on debug
-			fmt.Println("Downloading", a.Name)
+		if strings.Contains(a.Name, buildName) {
+			fmt.Printf("Downloading %s\n", a.Name)
 			downloadRC, err = a.Download()
 			if err != nil {
 				log.Fatalf("error downloading executable: %s\n", err)
@@ -63,7 +80,7 @@ func Upgrade(ctx *cli.Context) {
 		}
 	}
 	if downloadRC == nil {
-		log.Fatal("Unable to find the correct executable for your OS and ARCH")
+		log.Fatalf("No executable found for %s/%s%s", BuildOS, BuildARCH, BuildARM)
 	}
 
 	if OS == "windows" {

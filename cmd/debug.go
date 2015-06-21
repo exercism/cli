@@ -34,6 +34,10 @@ func Debug(ctx *cli.Context) {
 	}
 
 	fmt.Printf("OS/Architecture: %s/%s\n", runtime.GOOS, runtime.GOARCH)
+	fmt.Printf("Build OS/Architecture %s/%s\n", BuildOS, BuildARCH)
+	if BuildARM != "" {
+		fmt.Printf("Build ARMv%s\n", BuildARM)
+	}
 
 	dir, err := config.Home()
 	if err != nil {
