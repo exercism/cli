@@ -8,21 +8,11 @@ import (
 	"net/http"
 	"os"
 	"runtime"
-	"strings"
 	"time"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/config"
 )
-
-type release struct {
-	Location string `json:"html_url"`
-	TagName  string `json:"tag_name"`
-}
-
-func (r *release) Version() string {
-	return strings.TrimPrefix(r.TagName, "v")
-}
 
 // Debug provides information about the user's environment and configuration.
 func Debug(ctx *cli.Context) {
@@ -44,6 +34,10 @@ func Debug(ctx *cli.Context) {
 	}
 
 	fmt.Printf("OS/Architecture: %s/%s\n", runtime.GOOS, runtime.GOARCH)
+	fmt.Printf("Build OS/Architecture %s/%s\n", BuildOS, BuildARCH)
+	if BuildARM != "" {
+		fmt.Printf("Build ARMv%s\n", BuildARM)
+	}
 
 	dir, err := config.Home()
 	if err != nil {
@@ -73,8 +67,8 @@ func Debug(ctx *cli.Context) {
 		fmt.Println("API Key: <not configured>")
 	}
 
-	fmt.Printf("API: %s [%s]\n", c.API, pingUrl(client, c.API))
-	fmt.Printf("XAPI: %s [%s]\n", c.XAPI, pingUrl(client, c.XAPI))
+	fmt.Printf("API: %s [%s]\n", c.API, pingURL(client, c.API))
+	fmt.Printf("XAPI: %s [%s]\n", c.XAPI, pingURL(client, c.XAPI))
 	fmt.Printf("Exercises Directory: %s\n", c.Dir)
 }
 
@@ -92,7 +86,7 @@ func checkLatestRelease(client http.Client) (*release, error) {
 	return &rel, nil
 }
 
-func pingUrl(client http.Client, url string) string {
+func pingURL(client http.Client, url string) string {
 	res, err := client.Get(url)
 	if err != nil {
 		return err.Error()

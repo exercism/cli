@@ -266,6 +266,7 @@ func (c *Client) Tracks() ([]*Track, error) {
 	return payload.Tracks, nil
 }
 
+// Skip sends a request to exercism to skip the exercise given language and slug
 func (c *Client) Skip(language, slug string) error {
 	url := fmt.Sprintf("%s/api/v1/iterations/%s/%s/skip?key=%s", c.APIHost, language, slug, c.APIKey)
 
