@@ -7,6 +7,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 
 * **Your contribution here**
+* [b3c3d6f](https://github.com/exercism/cli/commit/b3c3d6fe54c622fc0ee07fdd221c8e8e5b73c8cd): Improve error message on Internal Server Error - [@Tonkpils](https://github.com/Tonkpils)
 * [#196](https://github.com/exercism/cli/pull/196): Add upgrade command - [@Tonkpils](https://github.com/Tonkpils)
 * [#194](https://github.com/exercism/cli/pull/194): Fix home expansion on configure update - [@Tonkpils](https://github.com/Tonkpils)
 
