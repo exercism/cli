@@ -5,8 +5,14 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/exercism/cli/config"
+)
+
+const (
+	apiIssueTracker  = "https://github.com/exercism/exercism.io/issues"
+	xapiIssueTracker = "https://github.com/exercism/x-api/issues"
 )
 
 var (
@@ -53,14 +59,21 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 		return nil, err
 	}
 
-	if res.StatusCode == http.StatusNoContent {
+	switch res.StatusCode {
+	case http.StatusNoContent:
 		return res, nil
-	}
-
-	if v != nil {
-		defer res.Body.Close()
-		if err := json.NewDecoder(res.Body).Decode(v); err != nil {
-			return nil, fmt.Errorf("error parsing API response - %s", err)
+	case http.StatusInternalServerError:
+		issueTracker := apiIssueTracker
+		if strings.Contains(req.URL.Host, "x.exercism.io") {
+			issueTracker = xapiIssueTracker
+		}
+		return nil, fmt.Errorf("an internal server error was received.\nPlease file a bug report with the contents of 'exercism debug' at: %s ", issueTracker)
+	default:
+		if v != nil {
+			defer res.Body.Close()
+			if err := json.NewDecoder(res.Body).Decode(v); err != nil {
+				return nil, fmt.Errorf("error parsing API response - %s", err)
+			}
 		}
 	}
 
