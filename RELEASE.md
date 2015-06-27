@@ -19,9 +19,19 @@ $ sudo GCO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=6 ./make.bash --no-clean
 $ sudo GCO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=5 ./make.bash --no-clean
 ```
 
+## Update the Changelog
+
+Make sure all the recent changes are reflected in the "next release" section
+of the Changelog. Make this a separate commit from bumping the version.
+
 ## Bump the version
 
-Edit the `Version` constant in `exercism/main.go`.
+Edit the `Version` constant in `exercism/main.go`, and edit the Changelog.
+
+All the changes in the "next release" section should be moved to a new section
+that describes the version number, and gives it a date.
+
+The "next release" section should contain only "Your contribution here".
 
 ## Generate the Binaries
 
