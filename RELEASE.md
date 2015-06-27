@@ -53,13 +53,6 @@ Upload all the binaries from `release/*`.
 
 This is helpful for the (many) Mac OS X users.
 
-Calculate the `SHA1` checksum for the two mac builds:
-
-```plain
-$ openssl sha1 release/exercism-mac-32bit.tgz
-$ openssl sha1 release/exercism-mac-64bit.tgz
-```
-
 Fork and clone [homebrew/homebrew-binary](https://github.com/homebrew/homebrew-binary/fork).
 
 Add the upstream repository:
@@ -78,6 +71,13 @@ Check out a feature branch, where X.Y.Z is the actual version number.
 
 ```plain
 $ git checkout -b exercism-vX.Y.Z
+```
+
+Calculate the `SHA1` checksum for the two mac builds:
+
+```plain
+$ openssl sha1 release/exercism-mac-32bit.tgz
+$ openssl sha1 release/exercism-mac-64bit.tgz
 ```
 
 Update the homebrew-binary/exercism.rb formula.
