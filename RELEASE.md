@@ -97,6 +97,8 @@ commit history. If you made multiple commits, squash them. They don't merge usin
 GitHub, they merge by making sure that the branch is rebased on to the most recent master, and
 then they do a fast-forward merge. That means that the PR will be red when it's closed, not purple.
 
+Also, don't bother trying to DRY out the formula, they prefer having explicit, hard-coded values.
+
 ## Update the Docs Site
 
 If there are any significant changes, we should describe them on
