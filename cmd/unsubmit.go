@@ -9,10 +9,12 @@ import (
 	"github.com/exercism/cli/config"
 )
 
-// Unsubmit deletes an iteration from the api.
-// If no iteration is specified, the most recent iteration
-// is deleted.
+// Unsubmit deletes the most recent submission from the API.
 func Unsubmit(ctx *cli.Context) {
+	if len(ctx.Args()) > 0 {
+		log.Fatal("\nThe unsubmit command does not take any arguments, it deletes the most recent submission.\n\nTo delete a different submission, you'll need to do it from the website.")
+	}
+
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)

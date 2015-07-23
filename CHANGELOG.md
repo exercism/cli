@@ -6,6 +6,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## Next Release
 
+* [#200](https://github.com/exercism/cli/pull/200): Add guard to unsubmit command - [@kytrinyx](https://github.com/kytrinyx)
 * **Your contribution here**
 
 ## v2.2.0 (2015-06-27)
