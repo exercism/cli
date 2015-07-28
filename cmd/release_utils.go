@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -128,15 +127,15 @@ func installZip(source *bytes.Reader, dest string) error {
 	return nil
 }
 
-func checkLatestRelease(client http.Client) (*release, error) {
+func fetchLatestRelease(client http.Client) (*release, error) {
 	resp, err := client.Get("https://api.github.com/repos/exercism/cli/releases/latest")
 	if err != nil {
-		return nil, errors.New("unable to get latest CLI release: " + err.Error())
+		return nil, err
 	}
 
 	var rel release
 	if err := json.NewDecoder(resp.Body).Decode(&rel); err != nil {
-		return nil, errors.New("error decoding latest release response: " + err.Error())
+		return nil, err
 	}
 
 	return &rel, nil

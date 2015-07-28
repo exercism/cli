@@ -21,9 +21,9 @@ func Debug(ctx *cli.Context) {
 	fmt.Printf("\n**** Debug Information ****\n")
 	fmt.Printf("Exercism CLI Version: %s\n", ctx.App.Version)
 
-	rel, err := checkLatestRelease(client)
+	rel, err := fetchLatestRelease(client)
 	if err != nil {
-		log.Println(err)
+		log.Println("unable to fetch latest release: " + err.Error())
 	} else {
 		if rel.Version() != ctx.App.Version {
 			defer fmt.Printf("\nA newer version of the CLI (%s) can be downloaded here: %s\n", rel.TagName, rel.Location)

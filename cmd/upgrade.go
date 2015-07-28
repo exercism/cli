@@ -25,9 +25,9 @@ var (
 // Upgrade command allows the user to upgrade to the latest CLI version
 func Upgrade(ctx *cli.Context) {
 	client := http.Client{Timeout: 5 * time.Second}
-	rel, err := checkLatestRelease(client)
+	rel, err := fetchLatestRelease(client)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("unable to check latest release version: " + err.Error())
 	}
 
 	// TODO: This checks strings against string
