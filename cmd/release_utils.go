@@ -132,6 +132,7 @@ func fetchLatestRelease(client http.Client) (*release, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	var rel release
 	if err := json.NewDecoder(resp.Body).Decode(&rel); err != nil {
