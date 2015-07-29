@@ -22,7 +22,7 @@ func Submit(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
-	if ctx.GlobalBool("debug") {
+	if ctx.GlobalBool("verbose") {
 		log.Printf("Exercises dir: %s", c.Dir)
 		dir, err := os.Getwd()
 		if err != nil {
@@ -41,13 +41,13 @@ func Submit(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
-	if ctx.GlobalBool("debug") {
+	if ctx.GlobalBool("verbose") {
 		log.Printf("eval symlinks (dir): %s", dir)
 	}
 
 	files := []string{}
 	for _, filename := range ctx.Args() {
-		if ctx.GlobalBool("debug") {
+		if ctx.GlobalBool("verbose") {
 			log.Printf("file name: %s", filename)
 		}
 
@@ -61,7 +61,7 @@ func Submit(ctx *cli.Context) {
 			log.Fatal(err)
 		}
 
-		if ctx.GlobalBool("debug") {
+		if ctx.GlobalBool("verbose") {
 			log.Printf("absolute path: %s", file)
 		}
 
@@ -70,7 +70,7 @@ func Submit(ctx *cli.Context) {
 			log.Fatal(err)
 		}
 
-		if ctx.GlobalBool("debug") {
+		if ctx.GlobalBool("verbose") {
 			log.Printf("eval symlinks (file): %s", file)
 		}
 
