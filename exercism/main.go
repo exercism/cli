@@ -50,7 +50,7 @@ func main() {
 			EnvVar: "XDG_CONFIG_HOME,EXERCISM_CONFIG_FILE",
 		},
 		cli.BoolFlag{
-			Name:  "verbose, v",
+			Name:  "verbose",
 			Usage: "turn on verbose logging",
 		},
 		cli.BoolFlag{
