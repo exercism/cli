@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -23,9 +21,9 @@ func Debug(ctx *cli.Context) {
 	fmt.Printf("\n**** Debug Information ****\n")
 	fmt.Printf("Exercism CLI Version: %s\n", ctx.App.Version)
 
-	rel, err := checkLatestRelease(client)
+	rel, err := fetchLatestRelease(client)
 	if err != nil {
-		log.Println(err)
+		log.Println("unable to fetch latest release: " + err.Error())
 	} else {
 		if rel.Version() != ctx.App.Version {
 			defer fmt.Printf("\nA newer version of the CLI (%s) can be downloaded here: %s\n", rel.TagName, rel.Location)
@@ -70,20 +68,6 @@ func Debug(ctx *cli.Context) {
 	fmt.Printf("API: %s [%s]\n", c.API, pingURL(client, c.API))
 	fmt.Printf("XAPI: %s [%s]\n", c.XAPI, pingURL(client, c.XAPI))
 	fmt.Printf("Exercises Directory: %s\n", c.Dir)
-}
-
-func checkLatestRelease(client http.Client) (*release, error) {
-	resp, err := client.Get("https://api.github.com/repos/exercism/cli/releases/latest")
-	if err != nil {
-		return nil, errors.New("unable to get latest CLI release: " + err.Error())
-	}
-
-	var rel release
-	if err := json.NewDecoder(resp.Body).Decode(&rel); err != nil {
-		return nil, errors.New("error decoding latest release response: " + err.Error())
-	}
-
-	return &rel, nil
 }
 
 func pingURL(client http.Client, url string) string {
