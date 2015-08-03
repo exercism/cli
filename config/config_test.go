@@ -12,6 +12,9 @@ import (
 )
 
 func TestSetDir(t *testing.T) {
+	dir, err := os.Getwd()
+	assert.NoError(t, err)
+
 	testCases := []struct {
 		givenPath    string
 		expectedPath string
@@ -20,7 +23,7 @@ func TestSetDir(t *testing.T) {
 		{"~/foobar", "/test/home/foobar"},
 		{"/foobar/~/noexpand", "/foobar/~/noexpand"},
 		{"/no/modification", "/no/modification"},
-		{"nomodification", "nomodification"},
+		{"relativePath", filepath.Join(dir, "relativePath")},
 	}
 
 	for _, testCase := range testCases {
@@ -184,22 +187,25 @@ func TestUpdateConfig(t *testing.T) {
 	}
 
 	// Test the blank values don't overwrite existing values
-	c.Update("", "", "", "")
+	err = c.Update("", "", "", "")
 	assert.Equal(t, "MyKey", c.APIKey)
 	assert.Equal(t, "localhost", c.API)
 	assert.Equal(t, "/exercism/directory", c.Dir)
 	assert.Equal(t, "localhost", c.XAPI)
+	assert.NoError(t, err)
 
 	// Test that each value can be overwritten
-	c.Update("NewKey", "http://example.com", "/tmp/exercism", "http://x.example.org")
+	err = c.Update("NewKey", "http://example.com", "/tmp/exercism", "http://x.example.org")
 	assert.Equal(t, "NewKey", c.APIKey)
 	assert.Equal(t, "http://example.com", c.API)
 	assert.Equal(t, "/tmp/exercism", c.Dir)
 	assert.Equal(t, "http://x.example.org", c.XAPI)
+	assert.NoError(t, err)
 
 	// Test home is expanded on update
-	c.Update("", "", "~/myexercism", "")
+	err = c.Update("", "", "~/myexercism", "")
 	assert.Equal(t, filepath.Join(tmpDir, "myexercism"), c.Dir)
+	assert.NoError(t, err)
 }
 
 func fixturePath(t *testing.T, filename string) string {
