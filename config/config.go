@@ -77,7 +77,6 @@ func New(path string) (*Config, error) {
 
 // Update sets new values where given.
 func (c *Config) Update(key, host, dir, xapi string) error {
-	var err error
 	key = strings.TrimSpace(key)
 	if key != "" {
 		c.APIKey = key
@@ -90,8 +89,7 @@ func (c *Config) Update(key, host, dir, xapi string) error {
 
 	dir = strings.TrimSpace(dir)
 	if dir != "" {
-		err = c.SetDir(dir)
-		if err != nil {
+		if err := c.SetDir(dir); err != nil {
 			return err
 		}
 	}
@@ -259,13 +257,29 @@ func (c *Config) SetDir(path string) error {
 	if err != nil {
 		return err
 	}
+
+	var dir string
+
 	if path == "" {
-		c.Dir = filepath.Join(home, DirExercises)
+		dir = filepath.Join(home, DirExercises)
 	} else {
-		c.Dir = path
+		dir = path
 	}
 
-	c.Dir = expandHome(c.Dir, home)
+	dir = expandHome(dir, home)
+
+	// if the user has provided us with a relative path, make it absolute so
+	// it will always work
+	if !filepath.IsAbs(dir) {
+		wd, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+		dir = filepath.Join(wd, dir)
+	}
+
+	c.Dir = dir
+
 	return nil
 }
 

@@ -12,6 +12,9 @@ import (
 )
 
 func TestSetDir(t *testing.T) {
+	dir, err := os.Getwd()
+	assert.NoError(t, err)
+
 	testCases := []struct {
 		givenPath    string
 		expectedPath string
@@ -20,7 +23,7 @@ func TestSetDir(t *testing.T) {
 		{"~/foobar", "/test/home/foobar"},
 		{"/foobar/~/noexpand", "/foobar/~/noexpand"},
 		{"/no/modification", "/no/modification"},
-		{"nomodification", "nomodification"},
+		{"relativePath", filepath.Join(dir, "relativePath")},
 	}
 
 	for _, testCase := range testCases {
