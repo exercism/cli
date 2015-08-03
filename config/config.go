@@ -76,7 +76,8 @@ func New(path string) (*Config, error) {
 }
 
 // Update sets new values where given.
-func (c *Config) Update(key, host, dir, xapi string) {
+func (c *Config) Update(key, host, dir, xapi string) error {
+	var err error
 	key = strings.TrimSpace(key)
 	if key != "" {
 		c.APIKey = key
@@ -89,13 +90,18 @@ func (c *Config) Update(key, host, dir, xapi string) {
 
 	dir = strings.TrimSpace(dir)
 	if dir != "" {
-		c.SetDir(dir)
+		err = c.SetDir(dir)
+		if err != nil {
+			return err
+		}
 	}
 
 	xapi = strings.TrimSpace(xapi)
 	if xapi != "" {
 		c.XAPI = xapi
 	}
+
+	return nil
 }
 
 // Write saves the config as JSON.

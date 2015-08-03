@@ -22,7 +22,11 @@ func Configure(ctx *cli.Context) {
 	host := ctx.String("host")
 	dir := ctx.String("dir")
 	api := ctx.String("api")
-	c.Update(key, host, dir, api)
+
+	err = c.Update(key, host, dir, api)
+	if err != nil {
+		log.Fatalf("Error updating your configuration %s\n", err)
+	}
 
 	if err := os.MkdirAll(c.Dir, os.ModePerm); err != nil {
 		log.Fatalf("Error creating exercism directory %s\n", err)
