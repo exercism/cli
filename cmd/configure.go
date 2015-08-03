@@ -23,7 +23,7 @@ func Configure(ctx *cli.Context) {
 	dir := ctx.String("dir")
 	api := ctx.String("api")
 
-	if err = c.Update(key, host, dir, api); err != nil {
+	if err := c.Update(key, host, dir, api); err != nil {
 		log.Fatalf("Error updating your configuration %s\n", err)
 	}
 
