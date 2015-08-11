@@ -6,11 +6,14 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## Next Release
 
+* **Your contribution here**
+
+## v2.2.1 (2015-08-11)
+
 * [#200](https://github.com/exercism/cli/pull/200): Add guard to unsubmit command - [@kytrinyx](https://github.com/kytrinyx)
 * [#204](https://github.com/exercism/cli/pull/204): Improve upgrade failure messages and increase timeout - [@Tonkpils](https://github.com/Tonkpils)
 * [#206](https://github.com/exercism/cli/pull/207): Fix verbose flag and removed short `-v` - [@zabawaba99](https://github.com/zabawaba99)
 * [#208](https://github.com/exercism/cli/pull/208): avoid ambiguous or unresolvable exercism paths - [@lcowell](https://github.com/lcowell)
-* **Your contribution here**
 
 ## v2.2.0 (2015-06-27)
 
