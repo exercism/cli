@@ -10,7 +10,8 @@ that if you're doing the Haskell problems on exercism you don't need a working
 Python or Ruby environment simply to fetch and submit exercises.
 
 ## Dependencies
-Go version 1.3 or higher
+
+Go version 1.5 or higher
 
 ## Installing Go
 
@@ -22,14 +23,9 @@ Follow the directions on http://golang.org/doc/install
 1. `go get github.com/exercism/cli/exercism`
 1. `cd $GOPATH/src/github.com/exercism/cli`
 1. `git remote set-url origin https://github.com/<your-github-username>/cli`
-1. `go get -t ./...`*)
-1. Make sure $GOPATH/bin is on your path (you may need something like `export PATH=$PATH:/projects/goprojects/bin`)
-1. Open a separate terminal window to your project directory and run the command `glitch`
+1. `go get -t ./...`
 1. Make the change.
 1. Submit a pull request.
-
-*) This assumes that you are on Go 1.4. If you have an older version of Go, then you will need to run `go get ./...`.
-The `-t` installs test dependencies.
 
 Please provide tests for the changes where possible.
 
@@ -49,44 +45,7 @@ The resulting binary can be found in `out/exercism` (Linux, Mac OS X) or `out/ex
 In order to cross-compile for all platforms, run `bin/build-all`. The binaries
 will be built into the `release` directory.
 
-## Troubleshooting
+## Recomended development tools
 
-```plain
-app.Run(os.Args) used as value
-```
+- [Glitch](https://github.com/levicook/glitch) - Run lint, vet, and test on every change.
 
-This error is due to a breaking change between the 0.x version of the `codegangsta/cli` library and the `1.x` version of the library.
-
-To fix it update the `codegangsta/cli` dependency:
-
-```plain
-$ go get -u github.com/codegangsta/cli
-```
-
-## Using Glitch
-
-If you'd like to run lint, vet, and the tests on every change, install Levi Cook's `glitch` library:
-
-1. `go get github.com/levicook/glitch`
-1. `go install github.com/levicook/glitch`
-1. Ensure that you have `go vet`
-1. Run it with `glitch`.
-
-### Troubleshooting.
-
-When you `glitch`, do you get stymied like this?
-
-```shell
-# github.com/exercism/cli
-api_test.go:7:2: cannot find package "github.com/stretchr/testify/assert" in any of: ...
-FAIL	github.com/exercism/cli [setup failed]
-```
-
-You may need to
-
-```shell
-$ go get github.com/stretchr/testify/assert
-$ go install github.com/stretchr/testify/assert
-```
-
-Now you should be able to run `glitch`.
