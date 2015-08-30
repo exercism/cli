@@ -7,6 +7,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
+	"github.com/exercism/cli/paths"
 	"github.com/exercism/cli/user"
 )
 
@@ -25,7 +26,7 @@ func Demo(ctx *cli.Context) {
 	}
 
 	if dirOpt := ctx.String("dir"); dirOpt != "" {
-		c.SetDir(dirOpt)
+		c.Dir = paths.Exercises(dirOpt)
 	}
 
 	fmt.Printf("Your exercises will be saved at: %s\n", c.Dir)

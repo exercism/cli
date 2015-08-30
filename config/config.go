@@ -4,36 +4,20 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log"
 	"os"
-	"path/filepath"
-	"runtime"
 	"strings"
+
+	"github.com/exercism/cli/paths"
 )
 
 const (
-	// File is the default name of the JSON file where the config written.
-	// The user can pass an alternate filename when using the CLI.
-	File = ".exercism.json"
-	// LegacyFile is the name of the original config file.
-	// It is a misnomer, since the config was in json, not go.
-	LegacyFile = ".exercism.go"
-
 	// hostAPI is the endpoint to submit solutions to, and to get personalized data
 	hostAPI = "http://exercism.io"
 	// hostXAPI is the endpoint to fetch problems from
 	hostXAPI = "http://x.exercism.io"
-
-	// DirExercises is the default name of the directory for active users.
-	// Make this non-exported when handlers.Login is deleted.
-	DirExercises = "exercism"
-)
-
-var (
-	errHomeNotFound = errors.New("unable to locate home directory")
 )
 
 // Config represents the settings for particular user.
@@ -45,33 +29,12 @@ type Config struct {
 	API    string `json:"api"`
 	XAPI   string `json:"xapi"`
 	File   string `json:"-"` // full path to config file
-	home   string // cache user's home directory
-}
-
-// Home returns the user's canonical home directory.
-// See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
-// we can't cross compile using cgo and use user.Current()
-func Home() (string, error) {
-	var dir string
-	if runtime.GOOS == "windows" {
-		dir = os.Getenv("USERPROFILE")
-		if dir == "" {
-			dir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		}
-	} else {
-		dir = os.Getenv("HOME")
-	}
-
-	if dir == "" {
-		return dir, errHomeNotFound
-	}
-	return dir, nil
 }
 
 // New returns a configuration struct with content from the exercism.json file
 func New(path string) (*Config, error) {
 	c := &Config{}
-	err := c.load(path)
+	err := c.load(paths.Config(path))
 	return c, err
 }
 
@@ -87,11 +50,8 @@ func (c *Config) Update(key, host, dir, xapi string) error {
 		c.API = host
 	}
 
-	dir = strings.TrimSpace(dir)
 	if dir != "" {
-		if err := c.SetDir(dir); err != nil {
-			return err
-		}
+		c.Dir = paths.Exercises(dir)
 	}
 
 	xapi = strings.TrimSpace(xapi)
@@ -124,11 +84,8 @@ func (c *Config) Write() error {
 }
 
 func (c *Config) load(argPath string) error {
-	path, err := c.resolvePath(argPath)
-	if err != nil {
-		return err
-	}
-	c.File = path
+	fmt.Println("resolved path:", argPath)
+	c.File = argPath
 
 	if err := c.read(); err != nil {
 		return err
@@ -207,33 +164,6 @@ func (c *Config) IsAuthenticated() bool {
 	return c.APIKey != ""
 }
 
-// homeDir caches the lookup of the user's home directory.
-func (c *Config) homeDir() (string, error) {
-	if c.home != "" {
-		return c.home, nil // only set during testing
-	}
-	return Home()
-}
-
-func (c *Config) resolvePath(argPath string) (string, error) {
-	path := argPath
-	if path == "" {
-		path = filepath.Join("~", File)
-	}
-	h, err := c.homeDir()
-	if err != nil {
-		return "", err
-	}
-	path = expandHome(path, h)
-
-	fi, _ := os.Stat(path)
-	if fi != nil && fi.IsDir() {
-		path = filepath.Join(path, File)
-	}
-
-	return path, nil
-}
-
 func (c *Config) setDefaults() error {
 	if c.API == "" {
 		c.API = hostAPI
@@ -243,49 +173,7 @@ func (c *Config) setDefaults() error {
 		c.XAPI = hostXAPI
 	}
 
-	if err := c.SetDir(c.Dir); err != nil {
-		return err
-	}
+	c.Dir = paths.Exercises(c.Dir)
 
 	return nil
-}
-
-// SetDir sets the configuration directory to the given path
-// or defaults to the home exercism directory
-func (c *Config) SetDir(path string) error {
-	home, err := c.homeDir()
-	if err != nil {
-		return err
-	}
-
-	var dir string
-
-	if path == "" {
-		dir = filepath.Join(home, DirExercises)
-	} else {
-		dir = path
-	}
-
-	dir = expandHome(dir, home)
-
-	// if the user has provided us with a relative path, make it absolute so
-	// it will always work
-	if !filepath.IsAbs(dir) {
-		wd, err := os.Getwd()
-		if err != nil {
-			return err
-		}
-		dir = filepath.Join(wd, dir)
-	}
-
-	c.Dir = dir
-
-	return nil
-}
-
-func expandHome(path, home string) string {
-	if path[:2] == "~"+string(os.PathSeparator) {
-		return strings.Replace(path, "~", home, 1)
-	}
-	return path
 }
