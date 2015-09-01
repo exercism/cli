@@ -8,30 +8,9 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/exercism/cli/paths"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestSetDir(t *testing.T) {
-	dir, err := os.Getwd()
-	assert.NoError(t, err)
-
-	testCases := []struct {
-		givenPath    string
-		expectedPath string
-	}{
-		{"", "/test/home/exercism"},
-		{"~/foobar", "/test/home/foobar"},
-		{"/foobar/~/noexpand", "/foobar/~/noexpand"},
-		{"/no/modification", "/no/modification"},
-		{"relativePath", filepath.Join(dir, "relativePath")},
-	}
-
-	for _, testCase := range testCases {
-		config := &Config{home: "/test/home"}
-		config.SetDir(testCase.givenPath)
-		assert.Equal(t, testCase.expectedPath, config.Dir)
-	}
-}
 
 func TestLoad(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "")
@@ -46,6 +25,8 @@ func TestLoad(t *testing.T) {
 	if err := os.Link(fixturePath(t, "dirty.json"), dirtyPath); err != nil {
 		t.Fatal(err)
 	}
+	paths.Home = tmpDir
+
 	testCases := []struct {
 		desc                string
 		in                  string // the name of the file passed as a command line argument
@@ -55,17 +36,8 @@ func TestLoad(t *testing.T) {
 		{
 			desc: "defaults",
 			in:   "",
-			out:  filepath.Join(tmpDir, File),
-			dir:  filepath.Join(tmpDir, DirExercises),
-			key:  "",
-			api:  hostAPI,
-			xapi: hostXAPI,
-		},
-		{
-			desc: "no such file",
-			in:   filepath.Join(tmpDir, "no-such.json"),
-			out:  filepath.Join(tmpDir, "no-such.json"),
-			dir:  filepath.Join(tmpDir, DirExercises),
+			out:  paths.Config(""),
+			dir:  paths.Exercises(""),
 			key:  "",
 			api:  hostAPI,
 			xapi: hostXAPI,
@@ -100,9 +72,8 @@ func TestLoad(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		c := &Config{home: tmpDir}
-
-		if err := c.load(tc.in); err != nil {
+		c, err := New(tc.in)
+		if err != nil {
 			t.Fatal(err)
 		}
 		assert.Equal(t, tc.out, c.File, tc.desc)
@@ -121,15 +92,9 @@ func TestReadDirectory(t *testing.T) {
 	myConfig, err := New(tmpDir)
 	assert.NoError(t, err)
 
-	expected := filepath.Join(tmpDir, File)
+	expected := filepath.Join(tmpDir, paths.File)
 	actual := myConfig.File
 	assert.Equal(t, expected, actual)
-
-	// if it can't determine if the provided path is a directory, don't modify
-	// the path
-	myConfig, err = New("badpath")
-	assert.NoError(t, err)
-	assert.Equal(t, "badpath", myConfig.File)
 }
 
 func TestLoad_InvalidJSON(t *testing.T) {
@@ -141,9 +106,8 @@ func TestLoad_InvalidJSON(t *testing.T) {
 	if err := os.Link(fixturePath(t, "config_invalid.json"), invalidPath); err != nil {
 		t.Fatal(err)
 	}
-	c := &Config{home: tmpDir}
 
-	err = c.load("~/config_invalid.json")
+	_, err = New(invalidPath)
 	if assert.Error(t, err) {
 		assert.Contains(t, err.Error(), "invalid JSON syntax")
 	}
@@ -151,7 +115,7 @@ func TestLoad_InvalidJSON(t *testing.T) {
 
 func TestReadingWritingConfig(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "")
-	filename := fmt.Sprintf("%s/%s", tmpDir, File)
+	filename := fmt.Sprintf("%s/%s", tmpDir, paths.File)
 	assert.NoError(t, err)
 
 	c1 := &Config{
@@ -178,8 +142,9 @@ func TestUpdateConfig(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	paths.Home = tmpDir
+
 	c := &Config{
-		home:   tmpDir,
 		APIKey: "MyKey",
 		API:    "localhost",
 		Dir:    "/exercism/directory",

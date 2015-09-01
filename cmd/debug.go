@@ -10,6 +10,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/config"
+	"github.com/exercism/cli/paths"
 )
 
 // Debug provides information about the user's environment and configuration.
@@ -37,11 +38,7 @@ func Debug(ctx *cli.Context) {
 		fmt.Printf("Build ARMv%s\n", BuildARM)
 	}
 
-	dir, err := config.Home()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Home Dir: %s\n", dir)
+	fmt.Printf("Home Dir: %s\n", paths.Home)
 
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
