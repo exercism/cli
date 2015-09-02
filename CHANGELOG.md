@@ -5,7 +5,8 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
-
+* [#212](https://github.com/exercism/cli/pull/212) extract path related code from config - [@lcowell](https://github.com/lcowell)
+* [#215](https://github.com/exercism/cli/pull/215) use $XDG_CONFIG_HOME if available - [@lcowell](https://github.com/lcowell)
 * **Your contribution here**
 
 ## v2.2.1 (2015-08-11)
