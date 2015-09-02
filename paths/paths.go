@@ -19,12 +19,15 @@ const (
 
 var (
 	// Home by default will contact the location of your home directory
-	Home            string
+	Home string
+
+	// XdgConfigHome will contain $XDG_CONFIG_HOME if it exists
+	XdgConfigHome   string
 	errHomeNotFound = errors.New("unable to locate home directory")
 )
 
 func init() {
-	// on startup set default values for Home and Config
+	// on startup set default values
 	Recalculate()
 }
 
@@ -35,7 +38,11 @@ func init() {
 //  * the config file appended if we know the target is a directory
 func Config(path string) string {
 	if path == "" {
-		return filepath.Join(Home, File)
+		if XdgConfigHome == "" {
+			return filepath.Join(Home, File)
+		}
+
+		return filepath.Join(XdgConfigHome, File)
 	}
 
 	expandedPath := expandPath(path)
@@ -66,6 +73,7 @@ func Recalculate() {
 		}
 		Home = home
 	}
+	XdgConfigHome = os.Getenv("XDG_CONFIG_HOME")
 }
 
 // IsDir tells us if the path is valid and is a directory
