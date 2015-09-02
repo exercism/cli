@@ -84,7 +84,6 @@ func (c *Config) Write() error {
 }
 
 func (c *Config) load(argPath string) error {
-	fmt.Println("resolved path:", argPath)
 	c.File = argPath
 
 	if err := c.read(); err != nil {
