@@ -73,6 +73,7 @@ createRelease linux amd64
 # ARM Releases
 createRelease linux arm 5
 createRelease linux arm 6
+createRelease linux arm 7
 
 # Windows Releases
 createRelease windows 386
