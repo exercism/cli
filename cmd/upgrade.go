@@ -16,7 +16,7 @@ import (
 var (
 	// BuildOS is the GOOS used during the build process
 	BuildOS string
-	// Build ARMV is the GOARM used during the build process
+	// BuildARM is the GOARM used during the build process
 	BuildARM string
 	// BuildARCH is the GOARCH used during the build process
 	BuildARCH string
