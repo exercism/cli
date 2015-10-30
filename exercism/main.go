@@ -30,6 +30,7 @@ const (
 	descOpen      = "Opens exercism.io to your most recent iteration of a problem given the track ID and problem slug."
 	descDownload  = "Downloads a solution given the ID of the latest iteration."
 	descList      = "Lists the available problems for a language track, given its ID."
+	descStatus    = "Fetches information about your progress with a given language track."
 
 	descLongRestore  = "Restore will pull the latest revisions of exercises that have already been submitted. It will *not* overwrite existing files. If you have made changes to a file and have not submitted it, and you're trying to restore the last submitted version, first move that file out of the way, then call restore."
 	descLongDownload = "The submission ID is the last part of the URL when looking at a solution on exercism.io."
@@ -166,6 +167,12 @@ func main() {
 			ShortName: "li",
 			Usage:     descList,
 			Action:    cmd.List,
+		},
+		{
+			Name:      "status",
+			ShortName: "st",
+			Usage:     descStatus,
+			Action:    cmd.Status,
 		},
 	}
 	if err := app.Run(os.Args); err != nil {
