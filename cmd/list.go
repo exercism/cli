@@ -28,7 +28,7 @@ func List(ctx *cli.Context) {
 	client := api.NewClient(c)
 	problems, err := client.List(language)
 	if err != nil {
-		if err == api.ErrUnknownLanguage {
+		if err == api.ErrUnknownTrack {
 			log.Fatalf("There is no track with ID '%s'.", language)
 		}
 		log.Fatal(err)

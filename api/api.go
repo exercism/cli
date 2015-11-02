@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	// ErrUnknownLanguage represents an error returned when the language requested does not exist.
-	ErrUnknownLanguage = errors.New("the language is unknown")
+	// ErrUnknownTrack represents an error returned when the track requested does not exist.
+	ErrUnknownTrack = errors.New("no such track")
 )
 
 // PayloadError represents an error message from the API.
@@ -213,7 +213,7 @@ func (c *Client) List(language string) ([]string, error) {
 
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
-		return nil, ErrUnknownLanguage
+		return nil, ErrUnknownTrack
 	}
 
 	var payload struct {

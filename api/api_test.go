@@ -185,7 +185,7 @@ func TestListTrack(t *testing.T) {
 	assert.Equal(t, problems[0], "bob")
 }
 
-func TestUnknownLanguage(t *testing.T) {
+func TestUnknownTrack(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		http.NotFound(w, req)
 	}))
@@ -194,5 +194,5 @@ func TestUnknownLanguage(t *testing.T) {
 	client := NewClient(&config.Config{XAPI: ts.URL})
 
 	_, err := client.List("rubbbby")
-	assert.Equal(t, err, ErrUnknownLanguage)
+	assert.Equal(t, err, ErrUnknownTrack)
 }
