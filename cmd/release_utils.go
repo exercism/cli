@@ -34,7 +34,7 @@ type asset struct {
 	ContentType string `json:"content_type"`
 }
 
-func (a *asset) Download() (*bytes.Reader, error) {
+func (a *asset) download() (*bytes.Reader, error) {
 	downloadURL := fmt.Sprintf("https://api.github.com/repos/exercism/cli/releases/assets/%d", a.ID)
 	req, err := http.NewRequest("GET", downloadURL, nil)
 	if err != nil {
