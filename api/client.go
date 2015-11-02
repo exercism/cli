@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	apiIssueTracker  = "https://github.com/exercism/exercism.io/issues"
-	xapiIssueTracker = "https://github.com/exercism/x-api/issues"
+	urlTrackerAPI  = "https://github.com/exercism/exercism.io/issues"
+	urlTrackerXAPI = "https://github.com/exercism/x-api/issues"
 )
 
 var (
@@ -63,11 +63,11 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	case http.StatusNoContent:
 		return res, nil
 	case http.StatusInternalServerError:
-		issueTracker := apiIssueTracker
+		url := urlTrackerAPI
 		if strings.Contains(req.URL.Host, "x.exercism.io") {
-			issueTracker = xapiIssueTracker
+			url = urlTrackerXAPI
 		}
-		return nil, fmt.Errorf("an internal server error was received.\nPlease file a bug report with the contents of 'exercism debug' at: %s ", issueTracker)
+		return nil, fmt.Errorf("an internal server error was received.\nPlease file a bug report with the contents of 'exercism debug' at: %s ", url)
 	default:
 		if v != nil {
 			defer res.Body.Close()
