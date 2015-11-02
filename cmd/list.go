@@ -11,7 +11,7 @@ import (
 
 const msgExplainFetch = "In order to fetch a specific assignment, call the fetch command with a specific assignment.\n\nexercism fetch ruby matrix"
 
-// List returns the full list of assignments for a given language
+// List returns the full list of assignments for a given track.
 func List(ctx *cli.Context) {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {

@@ -11,7 +11,7 @@ import (
 	"github.com/exercism/cli/config"
 )
 
-// Submit posts an iteration to the api
+// Submit posts an iteration to the API.
 func Submit(ctx *cli.Context) {
 	if len(ctx.Args()) == 0 {
 		log.Fatal("Please enter a file name")

@@ -21,7 +21,7 @@ var (
 	UserAgent string
 )
 
-// Client contains the necessary information to contact the Exercism APIs
+// Client contains the necessary information to contact the Exercism APIs.
 type Client struct {
 	client   *http.Client
 	APIHost  string
@@ -29,7 +29,7 @@ type Client struct {
 	APIKey   string
 }
 
-// NewClient returns an Exercism API Client
+// NewClient returns an Exercism API Client.
 func NewClient(c *config.Config) *Client {
 	return &Client{
 		client:   http.DefaultClient,
@@ -39,7 +39,7 @@ func NewClient(c *config.Config) *Client {
 	}
 }
 
-// NewRequest returns an http.Request with information for the Exercism API
+// NewRequest returns an http.Request with information for the Exercism API.
 func (c *Client) NewRequest(method, url string, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
@@ -52,7 +52,7 @@ func (c *Client) NewRequest(method, url string, body io.Reader) (*http.Request, 
 	return req, nil
 }
 
-// Do performs an http.Request and optionally parses the response body into the given interface
+// Do performs an http.Request and optionally parses the response body into the given interface.
 func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	res, err := c.client.Do(req)
 	if err != nil {

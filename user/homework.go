@@ -11,21 +11,17 @@ import (
 // HWFilter is used to categorize homework items.
 type HWFilter int
 
-// SummaryOption is an alias of HWFilter that allows
-// selective display of summary items
+// SummaryOption allows selective display of summary items.
 type SummaryOption HWFilter
 
 const (
 	// HWAll represents all items in the collection.
 	HWAll = iota
-	// HWUpdated represents problems that were already on the
-	// user's filesystem, where one or more new files have been added.
+	// HWUpdated represents problems where files have been added.
 	HWUpdated
-	// HWNew represents problems that did not yet exist on the
-	// user's filesystem.
+	// HWNew represents newly fetched problems.
 	HWNew
-	// HWNotSubmitted represents problems that have not been submitted
-	// for review.
+	// HWNotSubmitted represents problems that have not yet been submitted for review.
 	HWNotSubmitted
 )
 

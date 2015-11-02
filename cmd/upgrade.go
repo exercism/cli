@@ -14,15 +14,15 @@ import (
 )
 
 var (
-	// BuildOS is the GOOS used during the build process
+	// BuildOS is the operating system (GOOS) used during the build process.
 	BuildOS string
-	// BuildARM is the GOARM used during the build process
+	// BuildARM is the ARM version (GOARM) used during the build process.
 	BuildARM string
-	// BuildARCH is the GOARCH used during the build process
+	// BuildARCH is the architecture (GOARCH) used during the build process.
 	BuildARCH string
 )
 
-// Upgrade command allows the user to upgrade to the latest CLI version
+// Upgrade allows the user to upgrade to the latest version of the CLI.
 func Upgrade(ctx *cli.Context) {
 	client := http.Client{Timeout: 10 * time.Second}
 	rel, err := fetchLatestRelease(client)
@@ -39,7 +39,7 @@ func Upgrade(ctx *cli.Context) {
 		return
 	}
 
-	// current executable path
+	// Locate the path to the current `exercism` executable.
 	dest, err := osext.Executable()
 	if err != nil {
 		log.Fatalf("Unable to find current executable path: %s", err)
