@@ -21,7 +21,7 @@ func Open(ctx *cli.Context) {
 
 	args := ctx.Args()
 	if len(args) != 2 {
-		msg := "Usage: exercism open LANGUAGE EXERCISE"
+		msg := "Usage: exercism open TRACK_ID PROBLEM"
 		log.Fatal(msg)
 	}
 

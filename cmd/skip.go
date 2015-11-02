@@ -18,7 +18,7 @@ func Skip(ctx *cli.Context) {
 	args := ctx.Args()
 
 	if len(args) != 2 {
-		msg := "Usage: exercism skip LANGUAGE SLUG"
+		msg := "Usage: exercism skip TRACK_ID PROBLEM"
 		log.Fatal(msg)
 	}
 

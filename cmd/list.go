@@ -20,7 +20,7 @@ func List(ctx *cli.Context) {
 	args := ctx.Args()
 
 	if len(args) != 1 {
-		msg := "Usage: exercism list LANGUAGE"
+		msg := "Usage: exercism list TRACK_ID"
 		log.Fatal(msg)
 	}
 
