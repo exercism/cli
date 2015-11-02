@@ -232,22 +232,6 @@ func (c *Client) List(language string) ([]string, error) {
 	return problems, nil
 }
 
-// Unsubmit deletes a submission.
-func (c *Client) Unsubmit() error {
-	url := fmt.Sprintf("%s/api/v1/user/assignments?key=%s", c.APIHost, c.APIKey)
-	req, err := c.NewRequest("DELETE", url, nil)
-	if err != nil {
-		return err
-	}
-
-	pe := &PayloadError{}
-	if _, err := c.Do(req, pe); err != nil {
-		return fmt.Errorf("failed to unsubmit - %s", pe.Error)
-	}
-
-	return nil
-}
-
 // Tracks gets the current list of active and inactive language tracks.
 func (c *Client) Tracks() ([]*Track, error) {
 	url := fmt.Sprintf("%s/tracks", c.XAPIHost)
