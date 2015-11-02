@@ -66,7 +66,7 @@ func Upgrade(ctx *cli.Context) {
 	for _, a := range rel.Assets {
 		if strings.Contains(a.Name, buildName) {
 			fmt.Printf("Downloading %s\n", a.Name)
-			downloadRC, err = a.Download()
+			downloadRC, err = a.download()
 			if err != nil {
 				log.Fatalf("error downloading executable: %s\n", err)
 			}
