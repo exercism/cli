@@ -52,7 +52,7 @@ func NewIteration(dir string, filenames []string) (*Iteration, error) {
 		}
 	}
 
-	// Identify language track and problem slug.
+	// Identify the language track and problem slug.
 	path := filenames[0][len(dir):]
 	segments := strings.Split(path, string(filepath.Separator))
 	if len(segments) < 4 {
@@ -73,8 +73,7 @@ func NewIteration(dir string, filenames []string) (*Iteration, error) {
 	return iter, nil
 }
 
-// RelativePath returns the iterations relative path
-// iter.Dir/iter.Language/iter.Problem/
+// RelativePath returns the iteration's relative path.
 func (iter *Iteration) RelativePath() string {
 	return filepath.Join(iter.Dir, iter.Language, iter.Problem) + string(filepath.Separator)
 }

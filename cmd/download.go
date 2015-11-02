@@ -13,7 +13,7 @@ import (
 	"github.com/exercism/cli/config"
 )
 
-// Download returns specified submissions and related problem.
+// Download returns specified iteration with its related problem.
 func Download(ctx *cli.Context) {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {

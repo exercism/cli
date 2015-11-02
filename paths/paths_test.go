@@ -75,9 +75,9 @@ func TestConfig(t *testing.T) {
 	}
 }
 
-func TestXdgConfig(t *testing.T) {
-	XdgConfigHome = "/home/user/.xdg_config"
+func TestXDGConfig(t *testing.T) {
+	XDGConfigHome = "/home/user/.xdg_config"
 
-	assert.Equal(t, filepath.Join(XdgConfigHome, File), Config(""))
+	assert.Equal(t, filepath.Join(XDGConfigHome, File), Config(""))
 
 }

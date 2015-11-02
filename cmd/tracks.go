@@ -29,7 +29,6 @@ func Tracks(ctx *cli.Context) {
 	fmt.Println("\nInactive language tracks:")
 	curr.Report(user.TrackInactive)
 
-	// TODO: implement `list` command to list problems in a track
 	msg := `
 Related commands:
     exercism fetch (see 'exercism help fetch')

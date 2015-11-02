@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	// ErrUnknownLanguage represents an error returned when the language requested does not exist
+	// ErrUnknownLanguage represents an error returned when the language requested does not exist.
 	ErrUnknownLanguage = errors.New("the language is unknown")
 )
 
@@ -96,7 +96,7 @@ func (c *Client) Restore() ([]*Problem, error) {
 	return payload.Problems, nil
 }
 
-// Submissions gets a list of submitted exercises and their current acceptance state.
+// Submissions gets a list of submitted exercises and their current state.
 func (c *Client) Submissions() (map[string][]SubmissionInfo, error) {
 	url := fmt.Sprintf("%s/api/v1/exercises?key=%s", c.APIHost, c.APIKey)
 	req, err := c.NewRequest("GET", url, nil)
@@ -112,7 +112,7 @@ func (c *Client) Submissions() (map[string][]SubmissionInfo, error) {
 	return payload, nil
 }
 
-// Submission get the latest submitted exercise for the given language and exercise
+// Submission get the latest submitted exercise for the given language and exercise.
 func (c *Client) Submission(language, excercise string) (*Submission, error) {
 	url := fmt.Sprintf("%s/api/v1/submissions/%s/%s?key=%s", c.APIHost, language, excercise, c.APIKey)
 	req, err := c.NewRequest("GET", url, nil)
@@ -171,7 +171,7 @@ func (c *Client) Demo() ([]*Problem, error) {
 	return payload.Problems, nil
 }
 
-// Submit posts code to the API
+// Submit posts an iteration to the API.
 func (c *Client) Submit(iter *Iteration) (*Submission, error) {
 	url := fmt.Sprintf("%s/api/v1/user/assignments", c.APIHost)
 	payload, err := json.Marshal(iter)
@@ -197,7 +197,7 @@ func (c *Client) Submit(iter *Iteration) (*Submission, error) {
 	return ps.Submission, nil
 }
 
-// List available problems for a language
+// List available problems for a language.
 func (c *Client) List(language string) ([]string, error) {
 	url := fmt.Sprintf("%s/tracks/%s", c.XAPIHost, language)
 
@@ -266,7 +266,7 @@ func (c *Client) Tracks() ([]*Track, error) {
 	return payload.Tracks, nil
 }
 
-// Skip sends a request to exercism to skip the exercise given language and slug
+// Skip marks the exercise in the given language as skipped.
 func (c *Client) Skip(language, slug string) error {
 	url := fmt.Sprintf("%s/api/v1/iterations/%s/%s/skip?key=%s", c.APIHost, language, slug, c.APIKey)
 

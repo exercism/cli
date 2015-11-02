@@ -11,7 +11,7 @@ import (
 	"github.com/exercism/cli/config"
 )
 
-// Open uses the given language and exercise and opens it in the browser
+// Open uses the given track and problem and opens it in the browser.
 func Open(ctx *cli.Context) {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
@@ -33,7 +33,7 @@ func Open(ctx *cli.Context) {
 	}
 
 	url := submission.URL
-	// Escape characters not allowed by cmd/bash
+	// Escape characters are not allowed by cmd/bash.
 	switch runtime.GOOS {
 	case "windows":
 		url = strings.Replace(url, "&", `^&`, -1)
@@ -41,7 +41,7 @@ func Open(ctx *cli.Context) {
 		url = strings.Replace(url, "&", `\&`, -1)
 	}
 
-	// setup command to open browser
+	// The command to open the browser is OS-dependent.
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
 	case "darwin":

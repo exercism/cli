@@ -18,11 +18,11 @@ const (
 )
 
 var (
-	// Home by default will contact the location of your home directory
+	// Home by default will contact the location of your home directory.
 	Home string
 
-	// XdgConfigHome will contain $XDG_CONFIG_HOME if it exists
-	XdgConfigHome   string
+	// XDGConfigHome will contain $XDG_CONFIG_HOME if it exists.
+	XDGConfigHome   string
 	errHomeNotFound = errors.New("unable to locate home directory")
 )
 
@@ -32,17 +32,17 @@ func init() {
 }
 
 // Config will return the correct input path given any input.
-//  blank input will return the default location for configuration
-//  non-blank input will have:
-//  * its home expanded and will be expanded to an absolute path
-//  * the config file appended if we know the target is a directory
+// Blank input will return the default configuration location.
+// Non-blank input will expand home to be an absolute path.
+// If the target is known to be a directory, the config filename
+// will be appended.
 func Config(path string) string {
 	if path == "" {
-		if XdgConfigHome == "" {
+		if XDGConfigHome == "" {
 			return filepath.Join(Home, File)
 		}
 
-		return filepath.Join(XdgConfigHome, File)
+		return filepath.Join(XDGConfigHome, File)
 	}
 
 	expandedPath := expandPath(path)
@@ -53,10 +53,8 @@ func Config(path string) string {
 }
 
 // Exercises will return the correct exercises path given any input.
-//  blank input will return the default location for exercises
-//  non-blank input will have:
-//  * its home expanded and will be expanded to an absolute path
-//  * the config file appended if we know the target is a directory
+// Blank input will return the default location for exercises.
+// Non-blank input will expand home to be an absolute path.
 func Exercises(path string) string {
 	if path == "" {
 		return filepath.Join(Home, DirExercises)
@@ -64,7 +62,7 @@ func Exercises(path string) string {
 	return expandPath(path)
 }
 
-// Recalculate sets exercism paths based on Home
+// Recalculate sets exercism paths based on Home.
 func Recalculate() {
 	if Home == "" {
 		home, err := findHome()
@@ -73,10 +71,10 @@ func Recalculate() {
 		}
 		Home = home
 	}
-	XdgConfigHome = os.Getenv("XDG_CONFIG_HOME")
+	XDGConfigHome = os.Getenv("XDG_CONFIG_HOME")
 }
 
-// IsDir tells us if the path is valid and is a directory
+// IsDir determines whether the given path is a valid directory path.
 func IsDir(path string) bool {
 	fi, _ := os.Stat(path)
 	return fi != nil && fi.IsDir()
