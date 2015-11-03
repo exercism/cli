@@ -54,7 +54,7 @@ func (c *Client) Fetch(args []string) ([]*Problem, error) {
 		slug := args[1]
 		url = fmt.Sprintf("%s/v2/exercises/%s/%s", c.XAPIHost, language, slug)
 	default:
-		return nil, fmt.Errorf("Usage: exercism fetch\n   or: exercism fetch LANGUAGE\n   or: exercism fetch LANGUAGE PROBLEM")
+		return nil, fmt.Errorf("Usage: exercism fetch\n   or: exercism fetch TRACK_ID\n   or: exercism fetch TRACK_ID PROBLEM")
 	}
 
 	req, err := c.NewRequest("GET", url, nil)
