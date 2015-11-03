@@ -45,6 +45,14 @@ The resulting binary can be found in `out/exercism` (Linux, Mac OS X) or `out/ex
 In order to cross-compile for all platforms, run `bin/build-all`. The binaries
 will be built into the `release` directory.
 
+## Domain Concepts
+
+- **Language** is the name of a programming language. E.g. C++ or Objective-C or JavaScript.
+- **Track ID** is a normalized, url-safe identifier for a language track. E.g. `cpp` or `objective-c` or `javascript`.
+- **Problem** is an exercism exercise.
+- **Problem Slug** is a normalized, url-safe identifier for a problem.
+- **Iteration** is a solution that a user has written for a particular problem in a particular language track. A user may have several iterations for the same problem.
+
 ## Recomended development tools
 
 - [Glitch](https://github.com/levicook/glitch) - Run lint, vet, and test on every change.
