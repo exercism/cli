@@ -25,8 +25,8 @@ func TestNewIteration(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if iter.Language != "python" {
-		t.Errorf("Expected language to be python, was %s", iter.Language)
+	if iter.TrackID != "python" {
+		t.Errorf("Expected language to be python, was %s", iter.TrackID)
 	}
 	if iter.Problem != "leap" {
 		t.Errorf("Expected problem to be leap, was %s", iter.Problem)

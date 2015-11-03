@@ -27,7 +27,7 @@ type Iteration struct {
 	Key      string            `json:"key"`
 	Code     string            `json:"code"`
 	Dir      string            `json:"dir"`
-	Language string            `json:"language"`
+	TrackID  string            `json:"language"`
 	Problem  string            `json:"problem"`
 	Solution map[string]string `json:"solution"`
 }
@@ -58,7 +58,7 @@ func NewIteration(dir string, filenames []string) (*Iteration, error) {
 	if len(segments) < 4 {
 		return nil, errUnidentifiable
 	}
-	iter.Language = segments[1]
+	iter.TrackID = segments[1]
 	iter.Problem = segments[2]
 
 	for _, filename := range filenames {
@@ -75,7 +75,7 @@ func NewIteration(dir string, filenames []string) (*Iteration, error) {
 
 // RelativePath returns the iteration's relative path.
 func (iter *Iteration) RelativePath() string {
-	return filepath.Join(iter.Dir, iter.Language, iter.Problem) + string(filepath.Separator)
+	return filepath.Join(iter.Dir, iter.TrackID, iter.Problem) + string(filepath.Separator)
 }
 
 func (iter *Iteration) isValidFilepath(path string) bool {
