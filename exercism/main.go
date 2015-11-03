@@ -21,17 +21,18 @@ const (
 	descDebug     = "Outputs useful debug information."
 	descConfigure = "Writes config values to a JSON file."
 	descDemo      = "Fetches a demo problem for each language track on exercism.io."
-	descFetch     = "Fetches your current problems on exercism.io, as well as the next unstarted problem in each language."
-	descRestore   = "Restores completed and current problems on from exercism.io, along with your most recent iteration for each."
+	descFetch     = "Fetches the next unsubmitted problem in each track."
+	descRestore   = "Downloads your the most recent iteration for each of your solutions on exercism.io."
 	descSubmit    = "Submits a new iteration to a problem on exercism.io."
-	descSkip      = "Skips a problem given a language and slug."
+	descSkip      = "Skips a problem given a track ID and problem slug."
 	descUpgrade   = "Upgrades the CLI to the latest released version."
-	descTracks    = "List the available language tracks"
-	descOpen      = "Opens the current submission of the specified exercise"
+	descTracks    = "Lists the available language tracks."
+	descOpen      = "Opens exercism.io to your most recent iteration of a problem given the track ID and problem slug."
+	descDownload  = "Downloads a solution given the ID of the latest iteration."
+	descList      = "Lists the available problems for a language track, given its ID."
 
-	descLongRestore = "Restore will pull the latest revisions of exercises that have already been submitted. It will *not* overwrite existing files. If you have made changes to a file and have not submitted it, and you're trying to restore the last submitted version, first move that file out of the way, then call restore."
-	descDownload    = "Downloads and saves a specified submission into the local system"
-	descList        = "Lists all available assignments for a given language"
+	descLongRestore  = "Restore will pull the latest revisions of exercises that have already been submitted. It will *not* overwrite existing files. If you have made changes to a file and have not submitted it, and you're trying to restore the last submitted version, first move that file out of the way, then call restore."
+	descLongDownload = "The submission ID is the last part of the URL when looking at a solution on exercism.io."
 )
 
 func main() {
@@ -154,10 +155,11 @@ func main() {
 			Action:    cmd.Open,
 		},
 		{
-			Name:      "download",
-			ShortName: "dl",
-			Usage:     descDownload,
-			Action:    cmd.Download,
+			Name:        "download",
+			ShortName:   "dl",
+			Usage:       descDownload,
+			Description: descLongDownload,
+			Action:      cmd.Download,
 		},
 		{
 			Name:      "list",
