@@ -68,10 +68,10 @@ func TestFetchASpecificProblem(t *testing.T) {
 	var (
 		APIKey   = "mykey"
 		language = "go"
-		problem  = "leap"
+		slug     = "leap"
 	)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		languageProblemsAPI := fmt.Sprintf("/v2/exercises/%s/%s", language, problem)
+		languageProblemsAPI := fmt.Sprintf("/v2/exercises/%s/%s", language, slug)
 		assert.Equal(t, languageProblemsAPI, req.RequestURI)
 
 		if err := respondWithFixture(w, "problems.json"); err != nil {
@@ -82,7 +82,7 @@ func TestFetchASpecificProblem(t *testing.T) {
 
 	client := NewClient(&config.Config{XAPI: ts.URL, APIKey: APIKey})
 
-	_, err := client.Fetch([]string{language, problem})
+	_, err := client.Fetch([]string{language, slug})
 	assert.NoError(t, err)
 }
 
@@ -90,10 +90,10 @@ func TestSkipProblem(t *testing.T) {
 	var (
 		APIKey   = "mykey"
 		language = "go"
-		problem  = "leap"
+		slug     = "leap"
 	)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		skipAPI := fmt.Sprintf("/api/v1/iterations/%s/%s/skip?key=%s", language, problem, APIKey)
+		skipAPI := fmt.Sprintf("/api/v1/iterations/%s/%s/skip?key=%s", language, slug, APIKey)
 		assert.Equal(t, skipAPI, req.RequestURI)
 
 		w.WriteHeader(http.StatusNoContent)
@@ -102,7 +102,7 @@ func TestSkipProblem(t *testing.T) {
 
 	client := NewClient(&config.Config{API: ts.URL, APIKey: APIKey})
 
-	err := client.Skip(language, problem)
+	err := client.Skip(language, slug)
 	assert.NoError(t, err)
 }
 
@@ -110,10 +110,10 @@ func TestSkipProblemErrorResponse(t *testing.T) {
 	var (
 		APIKey   = "mykey"
 		language = "go"
-		problem  = "leap"
+		slug     = "leap"
 	)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		skipAPI := fmt.Sprintf("/api/v1/iterations/%s/%s/skip?key=%s", language, problem, APIKey)
+		skipAPI := fmt.Sprintf("/api/v1/iterations/%s/%s/skip?key=%s", language, slug, APIKey)
 		assert.Equal(t, skipAPI, req.RequestURI)
 
 		w.Write([]byte(`{"error":"exercise skipped"}`))
@@ -122,7 +122,7 @@ func TestSkipProblemErrorResponse(t *testing.T) {
 
 	client := NewClient(&config.Config{API: ts.URL, APIKey: APIKey})
 
-	err := client.Skip(language, problem)
+	err := client.Skip(language, slug)
 	assert.Error(t, err)
 }
 
@@ -130,10 +130,10 @@ func TestGetSubmission(t *testing.T) {
 	var (
 		APIKey   = "mykey"
 		language = "go"
-		problem  = "leap"
+		slug     = "leap"
 	)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		languageProblemsAPI := fmt.Sprintf("/api/v1/submissions/%s/%s?key=%s", language, problem, APIKey)
+		languageProblemsAPI := fmt.Sprintf("/api/v1/submissions/%s/%s?key=%s", language, slug, APIKey)
 		assert.Equal(t, languageProblemsAPI, req.RequestURI)
 
 		if err := respondWithFixture(w, "submission.json"); err != nil {
@@ -143,7 +143,7 @@ func TestGetSubmission(t *testing.T) {
 	defer ts.Close()
 
 	client := NewClient(&config.Config{API: ts.URL, APIKey: APIKey})
-	_, err := client.Submission(language, problem)
+	_, err := client.Submission(language, slug)
 	assert.NoError(t, err)
 }
 

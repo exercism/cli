@@ -51,8 +51,8 @@ func (c *Client) Fetch(args []string) ([]*Problem, error) {
 		url = fmt.Sprintf("%s/v2/exercises/%s?key=%s", c.XAPIHost, language, c.APIKey)
 	case 2:
 		language := args[0]
-		problem := args[1]
-		url = fmt.Sprintf("%s/v2/exercises/%s/%s", c.XAPIHost, language, problem)
+		slug := args[1]
+		url = fmt.Sprintf("%s/v2/exercises/%s/%s", c.XAPIHost, language, slug)
 	default:
 		return nil, fmt.Errorf("Usage: exercism fetch\n   or: exercism fetch LANGUAGE\n   or: exercism fetch LANGUAGE PROBLEM")
 	}

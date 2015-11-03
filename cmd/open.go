@@ -26,8 +26,8 @@ func Open(ctx *cli.Context) {
 	}
 
 	language := args[0]
-	exercise := args[1]
-	submission, err := client.Submission(language, exercise)
+	slug := args[1]
+	submission, err := client.Submission(language, slug)
 	if err != nil {
 		log.Fatal(err)
 	}
