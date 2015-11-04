@@ -47,12 +47,9 @@ func (c *Client) Fetch(args []string) ([]*Problem, error) {
 	case 0:
 		url = fmt.Sprintf("%s/v2/exercises?key=%s", c.XAPIHost, c.APIKey)
 	case 1:
-		language := args[0]
-		url = fmt.Sprintf("%s/v2/exercises/%s?key=%s", c.XAPIHost, language, c.APIKey)
+		url = fmt.Sprintf("%s/v2/exercises/%s?key=%s", c.XAPIHost, args[0], c.APIKey)
 	case 2:
-		language := args[0]
-		slug := args[1]
-		url = fmt.Sprintf("%s/v2/exercises/%s/%s", c.XAPIHost, language, slug)
+		url = fmt.Sprintf("%s/v2/exercises/%s/%s", c.XAPIHost, args[0], args[1])
 	default:
 		return nil, fmt.Errorf("Usage: exercism fetch\n   or: exercism fetch TRACK_ID\n   or: exercism fetch TRACK_ID PROBLEM")
 	}
@@ -112,9 +109,9 @@ func (c *Client) Submissions() (map[string][]SubmissionInfo, error) {
 	return payload, nil
 }
 
-// Submission get the latest submitted exercise for the given language and exercise.
-func (c *Client) Submission(language, excercise string) (*Submission, error) {
-	url := fmt.Sprintf("%s/api/v1/submissions/%s/%s?key=%s", c.APIHost, language, excercise, c.APIKey)
+// Submission gets the latest submitted exercise for the given language track id and problem slug.
+func (c *Client) Submission(trackID, slug string) (*Submission, error) {
+	url := fmt.Sprintf("%s/api/v1/submissions/%s/%s?key=%s", c.APIHost, trackID, slug, c.APIKey)
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -197,9 +194,9 @@ func (c *Client) Submit(iter *Iteration) (*Submission, error) {
 	return ps.Submission, nil
 }
 
-// List available problems for a language.
-func (c *Client) List(language string) ([]string, error) {
-	url := fmt.Sprintf("%s/tracks/%s", c.XAPIHost, language)
+// List available problems for a language track.
+func (c *Client) List(trackID string) ([]string, error) {
+	url := fmt.Sprintf("%s/tracks/%s", c.XAPIHost, trackID)
 
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
@@ -223,7 +220,7 @@ func (c *Client) List(language string) ([]string, error) {
 		return nil, err
 	}
 	problems := make([]string, len(payload.Track.Problems))
-	prefix := language + "/"
+	prefix := trackID + "/"
 
 	for n, p := range payload.Track.Problems {
 		problems[n] = strings.TrimPrefix(p, prefix)
@@ -250,9 +247,9 @@ func (c *Client) Tracks() ([]*Track, error) {
 	return payload.Tracks, nil
 }
 
-// Skip marks the exercise in the given language as skipped.
-func (c *Client) Skip(language, slug string) error {
-	url := fmt.Sprintf("%s/api/v1/iterations/%s/%s/skip?key=%s", c.APIHost, language, slug, c.APIKey)
+// Skip marks the exercise in the given language track as skipped.
+func (c *Client) Skip(trackID, slug string) error {
+	url := fmt.Sprintf("%s/api/v1/iterations/%s/%s/skip?key=%s", c.APIHost, trackID, slug, c.APIKey)
 
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
