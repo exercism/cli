@@ -273,3 +273,28 @@ func (c *Client) Skip(trackID, slug string) error {
 
 	return errors.New(pe.Error)
 }
+
+// Status sends a request to exercism to fetch the user's
+// completion status for the given language track.
+func (c *Client) Status(trackID string) (*StatusInfo, error) {
+	url := fmt.Sprintf("%s/api/v1/tracks/%s/status?key=%s", c.APIHost, trackID, c.APIKey)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.Do(req, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+
+	var si StatusInfo
+	if err := json.NewDecoder(res.Body).Decode(&si); err != nil {
+		return nil, err
+	}
+
+	return &si, nil
+}
