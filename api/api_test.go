@@ -45,12 +45,12 @@ func TestFetchAllProblem(t *testing.T) {
 
 func TestFetchATrack(t *testing.T) {
 	var (
-		APIKey   = "mykey"
-		language = "go"
+		APIKey  = "mykey"
+		trackID = "go"
 	)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		languageProblemsAPI := fmt.Sprintf("/v2/exercises/%s?key=%s", language, APIKey)
-		assert.Equal(t, languageProblemsAPI, req.RequestURI)
+		trackProblemsAPI := fmt.Sprintf("/v2/exercises/%s?key=%s", trackID, APIKey)
+		assert.Equal(t, trackProblemsAPI, req.RequestURI)
 
 		if err := respondWithFixture(w, "problems.json"); err != nil {
 			t.Fatal(err)
@@ -60,19 +60,19 @@ func TestFetchATrack(t *testing.T) {
 
 	client := NewClient(&config.Config{XAPI: ts.URL, APIKey: APIKey})
 
-	_, err := client.Fetch([]string{language})
+	_, err := client.Fetch([]string{trackID})
 	assert.NoError(t, err)
 }
 
 func TestFetchASpecificProblem(t *testing.T) {
 	var (
-		APIKey   = "mykey"
-		language = "go"
-		slug     = "leap"
+		APIKey  = "mykey"
+		trackID = "go"
+		slug    = "leap"
 	)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		languageProblemsAPI := fmt.Sprintf("/v2/exercises/%s/%s", language, slug)
-		assert.Equal(t, languageProblemsAPI, req.RequestURI)
+		trackProblemsAPI := fmt.Sprintf("/v2/exercises/%s/%s", trackID, slug)
+		assert.Equal(t, trackProblemsAPI, req.RequestURI)
 
 		if err := respondWithFixture(w, "problems.json"); err != nil {
 			t.Fatal(err)
@@ -82,18 +82,18 @@ func TestFetchASpecificProblem(t *testing.T) {
 
 	client := NewClient(&config.Config{XAPI: ts.URL, APIKey: APIKey})
 
-	_, err := client.Fetch([]string{language, slug})
+	_, err := client.Fetch([]string{trackID, slug})
 	assert.NoError(t, err)
 }
 
 func TestSkipProblem(t *testing.T) {
 	var (
-		APIKey   = "mykey"
-		language = "go"
-		slug     = "leap"
+		APIKey  = "mykey"
+		trackID = "go"
+		slug    = "leap"
 	)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		skipAPI := fmt.Sprintf("/api/v1/iterations/%s/%s/skip?key=%s", language, slug, APIKey)
+		skipAPI := fmt.Sprintf("/api/v1/iterations/%s/%s/skip?key=%s", trackID, slug, APIKey)
 		assert.Equal(t, skipAPI, req.RequestURI)
 
 		w.WriteHeader(http.StatusNoContent)
@@ -102,18 +102,18 @@ func TestSkipProblem(t *testing.T) {
 
 	client := NewClient(&config.Config{API: ts.URL, APIKey: APIKey})
 
-	err := client.Skip(language, slug)
+	err := client.Skip(trackID, slug)
 	assert.NoError(t, err)
 }
 
 func TestSkipProblemErrorResponse(t *testing.T) {
 	var (
-		APIKey   = "mykey"
-		language = "go"
-		slug     = "leap"
+		APIKey  = "mykey"
+		trackID = "go"
+		slug    = "leap"
 	)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		skipAPI := fmt.Sprintf("/api/v1/iterations/%s/%s/skip?key=%s", language, slug, APIKey)
+		skipAPI := fmt.Sprintf("/api/v1/iterations/%s/%s/skip?key=%s", trackID, slug, APIKey)
 		assert.Equal(t, skipAPI, req.RequestURI)
 
 		w.Write([]byte(`{"error":"exercise skipped"}`))
@@ -122,19 +122,19 @@ func TestSkipProblemErrorResponse(t *testing.T) {
 
 	client := NewClient(&config.Config{API: ts.URL, APIKey: APIKey})
 
-	err := client.Skip(language, slug)
+	err := client.Skip(trackID, slug)
 	assert.Error(t, err)
 }
 
 func TestGetSubmission(t *testing.T) {
 	var (
-		APIKey   = "mykey"
-		language = "go"
-		slug     = "leap"
+		APIKey  = "mykey"
+		trackID = "go"
+		slug    = "leap"
 	)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		languageProblemsAPI := fmt.Sprintf("/api/v1/submissions/%s/%s?key=%s", language, slug, APIKey)
-		assert.Equal(t, languageProblemsAPI, req.RequestURI)
+		trackProblemsAPI := fmt.Sprintf("/api/v1/submissions/%s/%s?key=%s", trackID, slug, APIKey)
+		assert.Equal(t, trackProblemsAPI, req.RequestURI)
 
 		if err := respondWithFixture(w, "submission.json"); err != nil {
 			t.Fatal(err)
@@ -143,7 +143,7 @@ func TestGetSubmission(t *testing.T) {
 	defer ts.Close()
 
 	client := NewClient(&config.Config{API: ts.URL, APIKey: APIKey})
-	_, err := client.Submission(language, slug)
+	_, err := client.Submission(trackID, slug)
 	assert.NoError(t, err)
 }
 
