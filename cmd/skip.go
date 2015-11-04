@@ -23,14 +23,14 @@ func Skip(ctx *cli.Context) {
 	}
 
 	var (
-		language = args[0]
-		slug     = args[1]
+		trackID = args[0]
+		slug    = args[1]
 	)
 
 	client := api.NewClient(c)
-	if err := client.Skip(language, slug); err != nil {
+	if err := client.Skip(trackID, slug); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Exercise %q in %q has been skipped.\n", slug, language)
+	fmt.Printf("Exercise %q in %q has been skipped.\n", slug, trackID)
 }

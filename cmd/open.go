@@ -25,9 +25,9 @@ func Open(ctx *cli.Context) {
 		log.Fatal(msg)
 	}
 
-	language := args[0]
+	trackID := args[0]
 	slug := args[1]
-	submission, err := client.Submission(language, slug)
+	submission, err := client.Submission(trackID, slug)
 	if err != nil {
 		log.Fatal(err)
 	}
