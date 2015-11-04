@@ -41,7 +41,7 @@ func Fetch(ctx *cli.Context) {
 
 func setSubmissionState(problems []*api.Problem, submissionInfo map[string][]api.SubmissionInfo) error {
 	for _, problem := range problems {
-		langSubmissions := submissionInfo[problem.Language]
+		langSubmissions := submissionInfo[problem.TrackID]
 		for _, submission := range langSubmissions {
 			if submission.Slug == problem.Slug {
 				problem.Submitted = true
