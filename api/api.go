@@ -109,8 +109,8 @@ func (c *Client) Submissions() (map[string][]SubmissionInfo, error) {
 	return payload, nil
 }
 
-// Submission gets the latest submitted exercise for the given language track id and problem slug.
-func (c *Client) Submission(trackID, slug string) (*Submission, error) {
+// SubmissionURL gets the url of the latest iteration on the given language track id and problem slug.
+func (c *Client) SubmissionURL(trackID, slug string) (*Submission, error) {
 	url := fmt.Sprintf("%s/api/v1/submissions/%s/%s?key=%s", c.APIHost, trackID, slug, c.APIKey)
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
