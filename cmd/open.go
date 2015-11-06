@@ -27,7 +27,7 @@ func Open(ctx *cli.Context) {
 
 	trackID := args[0]
 	slug := args[1]
-	submission, err := client.Submission(trackID, slug)
+	submission, err := client.SubmissionURL(trackID, slug)
 	if err != nil {
 		log.Fatal(err)
 	}
