@@ -5,6 +5,8 @@
 The CLI provides a way to do the problems on
 [exercism.io](http://exercism.io).
 
+**Important**: If you're looking for instructions on how to install the CLI. Please read [CLI Installation](http://help.exercism.io/installing-the-cli.html)
+
 This CLI ships as a binary with no additional runtime requirements. This means
 that if you're doing the Haskell problems on exercism you don't need a working
 Python or Ruby environment simply to fetch and submit exercises.
