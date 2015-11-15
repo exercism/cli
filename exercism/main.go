@@ -9,6 +9,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/cmd"
+	"github.com/exercism/cli/debug"
 )
 
 const (
@@ -44,6 +45,12 @@ func main() {
 	app.Usage = "A command line tool to interact with http://exercism.io"
 	app.Version = Version
 	app.HideVersion = true
+	app.Before = func(ctx *cli.Context) error {
+		debug.Verbose = ctx.GlobalBool("verbose")
+		debug.Println("verbose logging enabled")
+
+		return nil
+	}
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "config, c",
