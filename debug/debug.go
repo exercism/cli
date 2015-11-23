@@ -14,7 +14,9 @@ var (
 
 // Println conditionally outputs a message to Stderr
 func Println(args ...interface{}) {
-	Printf("%s\n", args...)
+	if Verbose {
+		fmt.Fprintln(output, args...)
+	}
 }
 
 // Printf conditionally outputs a formatted message to Stderr

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/exercism/cli/config"
+	"github.com/exercism/cli/debug"
 )
 
 const (
@@ -54,10 +56,13 @@ func (c *Client) NewRequest(method, url string, body io.Reader) (*http.Request, 
 
 // Do performs an http.Request and optionally parses the response body into the given interface.
 func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
+	debug.Println("Request", req.Method, req.URL)
+
 	res, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
+	debug.Printf("Response StatusCode=%d\n", res.StatusCode)
 
 	switch res.StatusCode {
 	case http.StatusNoContent:
@@ -71,7 +76,13 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	default:
 		if v != nil {
 			defer res.Body.Close()
-			if err := json.NewDecoder(res.Body).Decode(v); err != nil {
+
+			var bodyCopy bytes.Buffer
+			body := io.TeeReader(res.Body, &bodyCopy)
+
+			err := json.NewDecoder(body).Decode(v)
+			debug.Printf("Response Body\n%s\n\n", bodyCopy.String())
+			if err != nil {
 				return nil, fmt.Errorf("error parsing API response - %s", err)
 			}
 		}
