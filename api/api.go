@@ -147,27 +147,6 @@ func (c *Client) Download(submissionID string) (*Submission, error) {
 	return payload.Submission, err
 }
 
-// Demo fetches the first problem in each language track.
-func (c *Client) Demo() ([]*Problem, error) {
-	url := fmt.Sprintf("%s/problems/demo?key=%s", c.XAPIHost, c.APIKey)
-	req, err := c.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	payload := &PayloadProblems{}
-	res, err := c.Do(req, payload)
-	if err != nil {
-		return nil, err
-	}
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unable to fetch problems (HTTP: %d) - %s", res.StatusCode, payload.Error)
-	}
-
-	return payload.Problems, nil
-}
-
 // Submit posts an iteration to the API.
 func (c *Client) Submit(iter *Iteration) (*Submission, error) {
 	url := fmt.Sprintf("%s/api/v1/user/assignments", c.APIHost)

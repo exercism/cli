@@ -21,7 +21,6 @@ const (
 
 	descDebug     = "Outputs useful debug information."
 	descConfigure = "Writes config values to a JSON file."
-	descDemo      = "Fetches a demo problem for each language track on exercism.io."
 	descFetch     = "Fetches the next unsubmitted problem in each track."
 	descRestore   = "Downloads your the most recent iteration for each of your solutions on exercism.io."
 	descSubmit    = "Submits a new iteration to a problem on exercism.io."
@@ -94,18 +93,6 @@ func main() {
 				},
 			},
 			Action: cmd.Configure,
-		},
-		{
-			Name:      "demo",
-			ShortName: "d",
-			Usage:     descDemo,
-			Flags: []cli.Flag{
-				cli.StringFlag{
-					Name:  "dir, d",
-					Usage: "path to use for the demo exercises",
-				},
-			},
-			Action: cmd.Demo,
 		},
 		{
 			Name:      "fetch",
