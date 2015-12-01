@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"log"
+	"path/filepath"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
@@ -31,7 +32,23 @@ func Fetch(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
+	dirs, err := filepath.Glob(filepath.Join(c.Dir, "*"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dirMap := make(map[string]bool)
+	for _, dir := range dirs {
+		dirMap[dir] = true
+	}
 	hw := user.NewHomework(problems, c)
+
+	if len(ctx.Args()) == 0 {
+		if err := hw.RejectMissingTracks(dirMap); err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	if err := hw.Save(); err != nil {
 		log.Fatal(err)
 	}

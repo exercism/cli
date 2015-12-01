@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/exercism/cli/api"
@@ -54,6 +55,27 @@ func (hw *Homework) Save() error {
 			return err
 		}
 	}
+	return nil
+}
+
+// RejectMissingTracks removes any items that are part of tracks the user
+// doesn't currently have a folder for on their local machine. This
+// only happens when a user calls `exercism fetch` without any arguments.
+func (hw *Homework) RejectMissingTracks(dirMap map[string]bool) error {
+	items := []*Item{}
+	for _, item := range hw.Items {
+		dir := filepath.Join(item.dir, item.TrackID)
+		if dirMap[dir] {
+			items = append(items, item)
+		}
+	}
+	if len(items) == 0 {
+		return fmt.Errorf(`
+You have yet to start a language track!
+View all available language tracks with "exercism tracks"
+Fetch exercises for your first track with "exercism fetch TRACK_ID"`)
+	}
+	hw.Items = items
 	return nil
 }
 
