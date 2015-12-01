@@ -40,7 +40,13 @@ command don't worry too hard about tests.
 To build the binary for your platform run
 
 ```
-bin/build
+go install github.com/exercism/cli/exercism
+```
+
+or
+
+```
+go build -o out/exercism exercism/main.go
 ```
 
 The resulting binary can be found in `out/exercism` (Linux, Mac OS X) or `out/exercism.exe` (Windows).
