@@ -92,8 +92,13 @@ func Submit(ctx *cli.Context) {
 	msg := `
 Submitted %s in %s.
 Your submission can be found online at %s
+`
 
+	if submission.Iteration == 1 {
+		msg += `
 To get the next exercise, run "exercism fetch" again.
 `
+	}
+
 	fmt.Printf(msg, submission.Name, submission.Language, submission.URL)
 }
