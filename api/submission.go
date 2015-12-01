@@ -10,4 +10,5 @@ type Submission struct {
 	Username      string            `json:"username"`
 	ProblemFiles  map[string]string `json:"problem_files"`
 	SolutionFiles map[string]string `json:"solution_files"`
+	Iteration     int               `json:"iteration"`
 }
