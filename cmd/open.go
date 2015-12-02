@@ -27,12 +27,12 @@ func Open(ctx *cli.Context) {
 
 	trackID := args[0]
 	slug := args[1]
-	submission, err := client.SubmissionURL(trackID, slug)
+	iteration, err := client.IterationURL(trackID, slug)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	url := submission.URL
+	url := iteration.URL
 	// Escape characters are not allowed by cmd/bash.
 	switch runtime.GOOS {
 	case "windows":

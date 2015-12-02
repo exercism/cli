@@ -25,9 +25,9 @@ type PayloadProblems struct {
 	PayloadError
 }
 
-// PayloadSubmission represents metadata about a successful submission.
-type PayloadSubmission struct {
-	*Submission
+// PayloadSubmittedIteration represents metadata about a submission of an iteration.
+type PayloadSubmittedIteration struct {
+	*SubmittedIteration
 	PayloadError
 }
 
@@ -109,15 +109,15 @@ func (c *Client) Submissions() (map[string][]SubmissionInfo, error) {
 	return payload, nil
 }
 
-// SubmissionURL gets the url of the latest iteration on the given language track id and problem slug.
-func (c *Client) SubmissionURL(trackID, slug string) (*Submission, error) {
+// IterationURL gets the url of the latest iteration on the given language track id and problem slug.
+func (c *Client) IterationURL(trackID, slug string) (*SubmittedIteration, error) {
 	url := fmt.Sprintf("%s/api/v1/submissions/%s/%s?key=%s", c.APIHost, trackID, slug, c.APIKey)
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	var payload Submission
+	var payload SubmittedIteration
 	if _, err := c.Do(req, &payload); err != nil {
 		return nil, err
 	}
@@ -125,16 +125,16 @@ func (c *Client) SubmissionURL(trackID, slug string) (*Submission, error) {
 	return &payload, nil
 }
 
-// Download fetches a solution by submission key and writes it to disk.
-func (c *Client) Download(submissionID string) (*Submission, error) {
-	url := fmt.Sprintf("%s/api/v1/submissions/%s", c.APIHost, submissionID)
+// Download fetches an iteration by iteration key and writes it to disk.
+func (c *Client) Download(iterationID string) (*SubmittedIteration, error) {
+	url := fmt.Sprintf("%s/api/v1/submissions/%s", c.APIHost, iterationID)
 
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	payload := &PayloadSubmission{}
+	payload := &PayloadSubmittedIteration{}
 	res, err := c.Do(req, payload)
 	if err != nil {
 		return nil, err
@@ -144,11 +144,11 @@ func (c *Client) Download(submissionID string) (*Submission, error) {
 		return nil, fmt.Errorf("unable to fetch Submission (HTTP: %d) - %s", res.StatusCode, payload.Error)
 	}
 
-	return payload.Submission, err
+	return payload.SubmittedIteration, err
 }
 
 // Submit posts an iteration to the API.
-func (c *Client) Submit(iter *Iteration) (*Submission, error) {
+func (c *Client) Submit(iter *Iteration) (*SubmittedIteration, error) {
 	url := fmt.Sprintf("%s/api/v1/user/assignments", c.APIHost)
 	payload, err := json.Marshal(iter)
 	if err != nil {
@@ -160,17 +160,17 @@ func (c *Client) Submit(iter *Iteration) (*Submission, error) {
 		return nil, err
 	}
 
-	ps := &PayloadSubmission{}
+	ps := &PayloadSubmittedIteration{}
 	res, err := c.Do(req, ps)
 	if err != nil {
-		return nil, fmt.Errorf("unable to submit solution - %s", err)
+		return nil, fmt.Errorf("unable to submit iteration - %s", err)
 	}
 
 	if res.StatusCode != http.StatusCreated {
 		return nil, fmt.Errorf("unable to submit (HTTP: %d) - %s", res.StatusCode, ps.Error)
 	}
 
-	return ps.Submission, nil
+	return ps.SubmittedIteration, nil
 }
 
 // List available problems for a language track.
