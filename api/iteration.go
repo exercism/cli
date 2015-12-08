@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/transform"
@@ -16,10 +18,47 @@ const (
 )
 
 var (
-	errUnidentifiable = errors.New("unable to identify track and problem")
-	errNoFiles        = errors.New("no files submitted")
-	utf8BOM           = []byte{0xef, 0xbb, 0xbf}
+	errNoFiles = errors.New("no files submitted")
+	utf8BOM    = []byte{0xef, 0xbb, 0xbf}
 )
+
+var msgSubmitCalledFromWrongDir = `Unable to identify track and file.
+
+It seems like you've tried to submit a solution file located outside of your
+configured exercises directory.
+
+Current directory:	{{ .Current }}
+Configured directory:	{{ .Configured }}
+
+Try re-running "exercism fetch". Then move your solution file to the correct
+exercise directory for the problem you're working on. It should be somewhere
+inside {{ .Configured }}
+
+For example, to submit the JavaScript "hello-world.js" problem, run
+"exercism submit hello-world.js" from this directory:
+
+{{ .Configured }}/javascript/helloworld
+
+You can see where exercism is looking for your files with "exercism debug".
+
+`
+
+var msgGenericPathError = `Bad path to exercise file.
+
+You're trying to submit a solution file from inside your exercises directory,
+but it looks like the directory structure is something that exercism doesn't
+recognize as a valid file path.
+
+First, make a copy of your solution file and save it outside of
+{{ .Configured }}
+
+Then, run "exercism fetch". Move your solution file back to the correct
+exercise directory for the problem you're working on. It should be somewhere
+inside {{ .Configured }}
+
+If you are having trouble, you can file a GitHub issue at (https://github.com/exercism/exercism.io/issues)
+
+`
 
 // Iteration represents a version of a particular exercise.
 // This gets submitted to the API.
@@ -32,10 +71,19 @@ type Iteration struct {
 	Solution map[string]string `json:"solution"`
 }
 
+type iterationError struct {
+	message string
+}
+
+func (i iterationError) Error() string {
+	return i.message
+}
+
 // NewIteration prepares an iteration of a problem in a track for submission to the API.
-// It takes a dir and a list of files which it will read from disk.
+// It takes a dir (from the global config) and a list of files which it will read from disk.
 // All paths are assumed to be absolute paths with symlinks resolved.
 func NewIteration(dir string, filenames []string) (*Iteration, error) {
+
 	if len(filenames) == 0 {
 		return nil, errNoFiles
 	}
@@ -48,15 +96,19 @@ func NewIteration(dir string, filenames []string) (*Iteration, error) {
 	// All the files should be within the exercism path.
 	for _, filename := range filenames {
 		if !iter.isValidFilepath(filename) {
-			return nil, errUnidentifiable
+			// User has run exercism submit in the wrong directory
+			return nil, newIterationError(msgSubmitCalledFromWrongDir, iter.Dir)
 		}
 	}
 
 	// Identify the language track and problem slug.
 	path := filenames[0][len(dir):]
+
 	segments := strings.Split(path, string(filepath.Separator))
 	if len(segments) < 4 {
-		return nil, errUnidentifiable
+		// Submit called from inside exercism directory, but the path
+		// is still bad. Has the user modified their path in some way?
+		return nil, newIterationError(msgGenericPathError, iter.Dir)
 	}
 	iter.TrackID = segments[1]
 	iter.Problem = segments[2]
@@ -78,6 +130,8 @@ func (iter *Iteration) RelativePath() string {
 	return filepath.Join(iter.Dir, iter.TrackID, iter.Problem) + string(filepath.Separator)
 }
 
+// isValidFilepath checks a files's absolute filepath and returns true if it is
+// within the configured exercise directory
 func (iter *Iteration) isValidFilepath(path string) bool {
 	if iter == nil {
 		return false
@@ -108,4 +162,31 @@ func readFileAsUTF8String(filename string) (*string, error) {
 
 	s := string(decodedBytes)
 	return &s, nil
+}
+
+// newIterationError executes an error message template to create a detailed
+// message for the end user. A custom error type is returned.
+func newIterationError(msgTemplate string, configured string) error {
+	buffer := bytes.NewBufferString("")
+	t, err := template.New("iterErr").Parse(msgTemplate)
+	if err != nil {
+		return iterationError{message: err.Error()}
+	}
+
+	current, err := os.Getwd()
+	if err != nil {
+		return iterationError{err.Error()}
+	}
+
+	var pathData = struct {
+		Current    string
+		Configured string
+	}{
+		current,
+		configured,
+	}
+
+	t.Execute(buffer, pathData)
+	msg := buffer.String()
+	return iterationError{message: msg}
 }
