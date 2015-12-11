@@ -7,6 +7,9 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * [#212](https://github.com/exercism/cli/pull/212) extract path related code from config - [@lcowell](https://github.com/lcowell)
 * [#215](https://github.com/exercism/cli/pull/215) use $XDG_CONFIG_HOME if available - [@lcowell](https://github.com/lcowell)
+* [#248](https://github.com/exercism/cli/pull/248) [#253](https://github.com/exercism/cli/pull/253) add debugging output - [@lcowell](https://github.com/lcowell)
+* [#256](https://github.com/exercism/cli/pull/256) clean up build scripts - [@lcowell](https://github.com/lcowell)
+* [#258](https://github.com/exercism/cli/pull/258) reduce filesystem noise on fetch [@devonestes](https://github.com/devonestes)
 * **Your contribution here**
 
 ## v2.2.1 (2015-08-11)
