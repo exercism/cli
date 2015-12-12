@@ -37,7 +37,7 @@ inside {{ .Configured }}
 For example, to submit the JavaScript "hello-world.js" problem, run
 "exercism submit hello-world.js" from this directory:
 
-{{ .Configured }}/javascript/hello-world
+{{ .Configured }}{{ .Separator }}javascript{{ .Separator }}hello-world
 
 You can see where exercism is looking for your files with "exercism debug".
 
@@ -173,9 +173,11 @@ func newIterationError(msgTemplate, configured string) error {
 	var pathData = struct {
 		Current    string
 		Configured string
+		Separator  string
 	}{
 		current,
 		configured,
+		string(filepath.Separator),
 	}
 
 	t.Execute(buffer, pathData)
