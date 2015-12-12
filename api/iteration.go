@@ -37,7 +37,7 @@ inside {{ .Configured }}
 For example, to submit the JavaScript "hello-world.js" problem, run
 "exercism submit hello-world.js" from this directory:
 
-{{ .Configured }}/javascript/helloworld
+{{ .Configured }}/javascript/hello-world
 
 You can see where exercism is looking for your files with "exercism debug".
 
@@ -71,14 +71,6 @@ type Iteration struct {
 	Solution map[string]string `json:"solution"`
 }
 
-type iterationError struct {
-	message string
-}
-
-func (i iterationError) Error() string {
-	return i.message
-}
-
 // NewIteration prepares an iteration of a problem in a track for submission to the API.
 // It takes a dir (from the global config) and a list of files which it will read from disk.
 // All paths are assumed to be absolute paths with symlinks resolved.
@@ -96,7 +88,7 @@ func NewIteration(dir string, filenames []string) (*Iteration, error) {
 	// All the files should be within the exercism path.
 	for _, filename := range filenames {
 		if !iter.isValidFilepath(filename) {
-			// User has run exercism submit in the wrong directory
+			// User has run exercism submit in the wrong directory.
 			return nil, newIterationError(msgSubmitCalledFromWrongDir, iter.Dir)
 		}
 	}
@@ -106,7 +98,7 @@ func NewIteration(dir string, filenames []string) (*Iteration, error) {
 
 	segments := strings.Split(path, string(filepath.Separator))
 	if len(segments) < 4 {
-		// Submit called from inside exercism directory, but the path
+		// Submit was called from inside exercism directory, but the path
 		// is still bad. Has the user modified their path in some way?
 		return nil, newIterationError(msgGenericPathError, iter.Dir)
 	}
@@ -131,7 +123,7 @@ func (iter *Iteration) RelativePath() string {
 }
 
 // isValidFilepath checks a files's absolute filepath and returns true if it is
-// within the configured exercise directory
+// within the configured exercise directory.
 func (iter *Iteration) isValidFilepath(path string) bool {
 	if iter == nil {
 		return false
@@ -165,17 +157,17 @@ func readFileAsUTF8String(filename string) (*string, error) {
 }
 
 // newIterationError executes an error message template to create a detailed
-// message for the end user. A custom error type is returned.
-func newIterationError(msgTemplate string, configured string) error {
+// message for the end user. An error type is returned.
+func newIterationError(msgTemplate, configured string) error {
 	buffer := bytes.NewBufferString("")
 	t, err := template.New("iterErr").Parse(msgTemplate)
 	if err != nil {
-		return iterationError{message: err.Error()}
+		return err
 	}
 
 	current, err := os.Getwd()
 	if err != nil {
-		return iterationError{err.Error()}
+		return err
 	}
 
 	var pathData = struct {
@@ -188,5 +180,5 @@ func newIterationError(msgTemplate string, configured string) error {
 
 	t.Execute(buffer, pathData)
 	msg := buffer.String()
-	return iterationError{message: msg}
+	return errors.New(msg)
 }
