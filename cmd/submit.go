@@ -97,6 +97,20 @@ Your submission can be found online at %s
 	if submission.Iteration == 1 {
 		msg += `
 To get the next exercise, run "exercism fetch" again.
+
+## For bonus points
+
+Did you get the tests passing and the code clean? If you want to, these are some
+additional things you could try:
+
+* Remove as much duplication as you possibly can.
+* Optimize for readability, even if it means introducing duplication.
+* If you've removed all the duplication, do you have a lot of conditionals? Try
+  replacing the conditionals with polymorphism, if it applies in this language.
+  How readable is it?
+
+Then please share your thoughts in a comment on the submission. Did this
+experiment make the code better? Worse? Did you learn anything from it?
 `
 	}
 
