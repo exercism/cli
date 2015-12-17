@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+  "math/rand"
+  "time"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
@@ -98,7 +100,15 @@ Your submission can be found online at %s
 		msg += `
 To get the next exercise, run "exercism fetch" again.
 
-## For bonus points
+`
+		rand.Seed( time.Now().UTC().UnixNano() )
+		phrases := []string{
+			"For bonus points",
+			"Don't stop now: The fun's just begun",
+			"Some tips to continue",
+		}
+		msg += fmt.Sprintf("## %s", phrases[rand.Intn(len(phrases))])
+		msg += `
 
 Did you get the tests passing and the code clean? If you want to, these are some
 additional things you could try:
