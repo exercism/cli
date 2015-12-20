@@ -3,10 +3,10 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"path/filepath"
-  "math/rand"
-  "time"
+	"time"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
@@ -99,30 +99,30 @@ Your submission can be found online at %s
 	if submission.Iteration == 1 {
 		msg += `
 To get the next exercise, run "exercism fetch" again.
-
 `
-		rand.Seed( time.Now().UTC().UnixNano() )
+		rand.Seed(time.Now().UTC().UnixNano())
 		phrases := []string{
 			"For bonus points",
 			"Don't stop now: The fun's just begun",
 			"Some tips to continue",
 		}
-		msg += fmt.Sprintf("## %s", phrases[rand.Intn(len(phrases))])
-		msg += `
+		msg += fmt.Sprintf("\n## %s\n", phrases[rand.Intn(len(phrases))])
+		msg += tips
+	}
 
+	fmt.Printf(msg, submission.Name, submission.Language, submission.URL)
+}
+
+const tips = `
 Did you get the tests passing and the code clean? If you want to, these are some
 additional things you could try:
 
 * Remove as much duplication as you possibly can.
 * Optimize for readability, even if it means introducing duplication.
 * If you've removed all the duplication, do you have a lot of conditionals? Try
-  replacing the conditionals with polymorphism, if it applies in this language.
-  How readable is it?
+  finding ways to reduce or remove them. How does this affect your code's
+  readability? It's performance?
 
 Then please share your thoughts in a comment on the submission. Did this
 experiment make the code better? Worse? Did you learn anything from it?
 `
-	}
-
-	fmt.Printf(msg, submission.Name, submission.Language, submission.URL)
-}
