@@ -6,6 +6,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## Next Release
 * **Your contribution here**
+* [#264](https://github.com/exercism/cli/pull/264) Fix version flag to use --version and --v - [@Tonkpils](https://github.com/Tonkpils)
 
 ## v2.2.2 (2015-12-26)
 
