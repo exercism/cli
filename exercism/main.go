@@ -43,7 +43,6 @@ func main() {
 	app.Name = "exercism"
 	app.Usage = "A command line tool to interact with http://exercism.io"
 	app.Version = Version
-	app.HideVersion = true
 	app.Before = func(ctx *cli.Context) error {
 		debug.Verbose = ctx.GlobalBool("verbose")
 		debug.Println("verbose logging enabled")
@@ -59,10 +58,6 @@ func main() {
 		cli.BoolFlag{
 			Name:  "verbose",
 			Usage: "turn on verbose logging",
-		},
-		cli.BoolFlag{
-			Name:  "version",
-			Usage: "print the version",
 		},
 	}
 	app.Commands = []cli.Command{
