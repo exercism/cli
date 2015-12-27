@@ -5,6 +5,10 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
+* **Your contribution here**
+
+## v2.2.2 (2015-12-26)
+
 * [#212](https://github.com/exercism/cli/pull/212) extract path related code from config - [@lcowell](https://github.com/lcowell)
 * [#215](https://github.com/exercism/cli/pull/215) use $XDG_CONFIG_HOME if available - [@lcowell](https://github.com/lcowell)
 * [#248](https://github.com/exercism/cli/pull/248) [#253](https://github.com/exercism/cli/pull/253) add debugging output - [@lcowell](https://github.com/lcowell)
@@ -12,7 +16,6 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 * [#258](https://github.com/exercism/cli/pull/258) reduce filesystem noise on fetch [@devonestes](https://github.com/devonestes)
 * [#261](https://github.com/exercism/cli/pull/261) improve error message when track and exercise can't be identified on submit - (@anxiousmodernman)[https://github.com/anxiousmodernman]
 * [#262](https://github.com/exercism/cli/pull/262) encourage iterating to improve after first submission on an exercise - (@eToThePiIPower)[https://github.com/eToThePiIPower]
-* **Your contribution here**
 
 ## v2.2.1 (2015-08-11)
 
