@@ -121,7 +121,7 @@ additional things you could try:
 * Optimize for readability, even if it means introducing duplication.
 * If you've removed all the duplication, do you have a lot of conditionals? Try
   finding ways to reduce or remove them. How does this affect your code's
-  readability? It's performance?
+  readability? Its performance?
 
 Then please share your thoughts in a comment on the submission. Did this
 experiment make the code better? Worse? Did you learn anything from it?
