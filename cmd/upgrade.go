@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/codegangsta/cli"
 	"github.com/kardianos/osext"
@@ -24,7 +23,7 @@ var (
 
 // Upgrade allows the user to upgrade to the latest version of the CLI.
 func Upgrade(ctx *cli.Context) {
-	client := http.Client{Timeout: 10 * time.Second}
+	client := http.Client{}
 	rel, err := fetchLatestRelease(client)
 	if err != nil {
 		log.Fatal("unable to check latest release version: " + err.Error())

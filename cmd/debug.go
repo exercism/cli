@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"runtime"
-	"time"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/config"
@@ -17,7 +16,7 @@ import (
 func Debug(ctx *cli.Context) {
 	defer fmt.Printf("\nIf you are having trouble and need to file a GitHub issue (https://github.com/exercism/exercism.io/issues) please include this information (except your API key. Keep that private).\n")
 
-	client := http.Client{Timeout: 5 * time.Second}
+	client := http.Client{}
 
 	fmt.Printf("\n**** Debug Information ****\n")
 	fmt.Printf("Exercism CLI Version: %s\n", ctx.App.Version)
