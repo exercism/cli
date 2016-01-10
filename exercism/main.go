@@ -80,7 +80,7 @@ func main() {
 				},
 				cli.StringFlag{
 					Name:  "key, k",
-					Usage: "exercism.io API key (see http://exercism.io/account)",
+					Usage: "exercism.io API key (see http://exercism.io/account/key)",
 				},
 				cli.StringFlag{
 					Name:  "api, a",
