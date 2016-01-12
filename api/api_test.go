@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -148,8 +149,19 @@ func TestGetSubmission(t *testing.T) {
 }
 
 func TestSubmitAssignment(t *testing.T) {
+	submissionComment := "hello world!"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusCreated)
+
+		var body map[string]string
+		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+			t.Fatal(err)
+		}
+
+		comment, ok := body["comment"]
+		if ok && comment != submissionComment {
+			t.Fatal("comment found and was empty")
+		}
 
 		if err := respondWithFixture(w, "submit.json"); err != nil {
 			t.Fatal(err)
@@ -163,6 +175,11 @@ func TestSubmitAssignment(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, sub.Language, "ruby")
+
+	// Test sending comment
+	iter.Comment = submissionComment
+	_, err = client.Submit(iter)
+	assert.NoError(t, err)
 }
 
 func TestListTrack(t *testing.T) {

@@ -69,13 +69,13 @@ type Iteration struct {
 	TrackID  string            `json:"language"`
 	Problem  string            `json:"problem"`
 	Solution map[string]string `json:"solution"`
+	Comment  string            `json:"comment,omitempty"`
 }
 
 // NewIteration prepares an iteration of a problem in a track for submission to the API.
 // It takes a dir (from the global config) and a list of files which it will read from disk.
 // All paths are assumed to be absolute paths with symlinks resolved.
 func NewIteration(dir string, filenames []string) (*Iteration, error) {
-
 	if len(filenames) == 0 {
 		return nil, errNoFiles
 	}

@@ -84,6 +84,7 @@ func Submit(ctx *cli.Context) {
 		log.Fatalf("Unable to submit - %s", err)
 	}
 	iteration.Key = c.APIKey
+	iteration.Comment = ctx.String("comment")
 
 	client := api.NewClient(c)
 	submission, err := client.Submit(iteration)
