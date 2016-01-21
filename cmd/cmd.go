@@ -17,8 +17,8 @@ func isTest(path string) bool {
 
 	file := filepath.Base(path)
 	name := file[:len(file)-len(ext)]
-	if name == "test" {
+	if name == "test" || name == "spec" {
 		return true
 	}
-	return regexp.MustCompile(`[\._-]?[tT]est`).MatchString(name)
+	return regexp.MustCompile(`[\._-]?([tT]est|[sS]pec)`).MatchString(name)
 }

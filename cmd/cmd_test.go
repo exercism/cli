@@ -43,6 +43,10 @@ func TestIsTest(t *testing.T) {
 			name:   "problem/Whatever.t", // perl
 			isTest: true,
 		},
+		{
+			name:   "whatever_spec.ext", // lua
+			isTest: true,
+		},
 	}
 
 	for _, tt := range testCases {
