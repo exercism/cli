@@ -3,6 +3,7 @@ package cmd
 import (
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 const (
@@ -21,4 +22,8 @@ func isTest(path string) bool {
 		return true
 	}
 	return regexp.MustCompile(`[\._-]?([tT]est|[sS]pec)`).MatchString(name)
+}
+
+func isREADME(path string) bool {
+	return strings.Contains(path, "README")
 }

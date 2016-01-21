@@ -58,6 +58,10 @@ func Submit(ctx *cli.Context) {
 				"you want, please pass the --test flag to exercism submit.")
 		}
 
+		if isREADME(filename) {
+			log.Fatal("You cannot submit the README as a solution.")
+		}
+
 		file, err := filepath.Abs(filename)
 		if err != nil {
 			log.Fatal(err)
