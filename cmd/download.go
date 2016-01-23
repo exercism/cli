@@ -46,6 +46,10 @@ func Download(ctx *cli.Context) {
 
 	for name, contents := range submission.SolutionFiles {
 		filename := strings.TrimPrefix(name, strings.ToLower("/"+submission.TrackID+"/"+submission.Slug+"/"))
+		dir := filepath.Dir(filename)
+		if err := os.MkdirAll(fmt.Sprintf("%s/%s", path, dir), 0755); err != nil {
+			log.Fatal(err)
+		}
 		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s", path, filename), []byte(contents), 0644); err != nil {
 			log.Fatalf("Unable to write file %s: %s", name, err)
 		}
