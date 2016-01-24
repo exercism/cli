@@ -39,7 +39,7 @@ func Download(ctx *cli.Context) {
 	}
 
 	for name, contents := range submission.ProblemFiles {
-		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s", path, name), []byte(contents), 0644); err != nil {
+		if err := writeFile(fmt.Sprintf("%s/%s", path, name), contents); err != nil {
 			log.Fatalf("Unable to write file %s: %s", name, err)
 		}
 	}
