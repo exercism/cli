@@ -35,6 +35,9 @@ func Configure(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("The configuration has been written to %s\n", c.File)
-	fmt.Printf("Your exercism directory can be found at %s\n", c.Dir)
+	fmt.Printf("\nConfiguration written to %s\n\n", c.File)
+	fmt.Printf("  --key=%s\n", c.APIKey)
+	fmt.Printf("  --dir=%s\n", c.Dir)
+	fmt.Printf("  --host=%s\n", c.API)
+	fmt.Printf("  --api=%s\n\n", c.XAPI)
 }
