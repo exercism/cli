@@ -73,31 +73,44 @@ Check out a feature branch, where X.Y.Z is the actual version number.
 $ git checkout -b exercism-vX.Y.Z
 ```
 
-Calculate the `SHA1` checksum for the two mac builds:
+## Update Homebrew
 
-```plain
-$ openssl sha1 release/exercism-mac-32bit.tgz
-$ openssl sha1 release/exercism-mac-64bit.tgz
+This is helpful for the (many) Mac OS X users.
+
+First, get a copy of the latest tarball of the source code:
+
+```
+cd ~/tmp && wget https://github.com/exercism/cli/archive/vX.Y.Z.tar.gz
 ```
 
-Update the homebrew-binary/exercism.rb formula.
+Get the SHA256 of the tarball:
 
-- version
-- urls
-- `SHA1` checksums
-
-If you are on a mac, you can test the formula by running:
-
-```plain
-$ brew unlink exercism && brew install ./exercism.rb
+```
+shasum -a 256 vX.Y.Z.tar.gz
 ```
 
-Then submit a pull request to homebrew-binary. Note that they're very, very careful about their
-commit history. If you made multiple commits, squash them. They don't merge using the button on
-GitHub, they merge by making sure that the branch is rebased on to the most recent master, and
-then they do a fast-forward merge. That means that the PR will be red when it's closed, not purple.
+Update the formula:
 
-Also, don't bother trying to DRY out the formula, they prefer having explicit, hard-coded values.
+```
+cd $(brew --repository)
+git checkout master
+git remote add YOUR_USERNAME git@github.com:YOUR_USERNAME/homebrew.git
+brew update
+git checkout -b exercism-vX.Y.Z
+brew edit exercism
+# update sha256 and tarball url
+brew audit exercism
+brew install exercism
+brew test exercism
+git commit -m "exercism X.Y.Z"
+git push --set-upstream YOUR_USERNAME exercism-vX.Y.Z
+```
+
+Then go to https://github.com/Homebrew/homebrew and create pull request.
+
+Note that they really don't want any verbose commit messages or PR descriptions when all you're doing is bumping a version.
+
+For more information see their [contribution guidelines](https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md#how-to-open-a-homebrew-pull-request-and-get-it-merged).
 
 ## Update the Docs Site
 
