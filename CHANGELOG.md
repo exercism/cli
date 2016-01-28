@@ -5,6 +5,10 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
+* **Your contribution here**
+
+## v2.2.4 (2016-01-28)
+
 * [#270](https://github.com/exercism/cli/pull/270) Allow commenting on submission with --comment - [@Tonkpils](https://github.com/Tonkpils)
 * [#271](https://github.com/exercism/cli/pull/271) Increase timeout to 20 seconds - [@Tonkpils](https://github.com/Tonkpils)
 * [#273](https://github.com/exercism/cli/pull/273) Guard against submitting spec files and README - [@daveyarwood](https://github.com/daveyarwood)
@@ -12,7 +16,6 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 * [#281](https://github.com/exercism/cli/pull/281) Create missing directories for downloaded problems - [@petertseng](https://github.com/petertseng)
 * [#282](https://github.com/exercism/cli/pull/282) Remove random encouragement after submitting - [@kytrinyx](https://github.com/kytrinyx)
 * [#283](https://github.com/exercism/cli/pull/283) Print current configuration after calling configure command - [@kytrinyx](https://github.com/kytrinyx)
-* **Your contribution here**
 
 ## v2.2.3 (2015-12-27)
 * [#264](https://github.com/exercism/cli/pull/264) Fix version flag to use --version and --v - [@Tonkpils](https://github.com/Tonkpils)
