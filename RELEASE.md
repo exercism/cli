@@ -51,7 +51,7 @@ VERSION matches the value of the `Version` constant.
 
 Upload all the binaries from `release/*`.
 
-Past the release text and describe the new changes:
+Paste the release text and describe the new changes:
 
 ```
 ### Exercism Command-Line Interface (CLI)
