@@ -33,6 +33,8 @@ that describes the version number, and gives it a date.
 
 The "next release" section should contain only "Your contribution here".
 
+_Note: It's useful to add the version to the commit message when you bump it: e.g. `Bump version to v2.3.4`.
+
 ## Generate the Binaries
 
 ```plain
@@ -49,28 +51,25 @@ VERSION matches the value of the `Version` constant.
 
 Upload all the binaries from `release/*`.
 
-## Update Homebrew
+Past the release text and describe the new changes:
 
-This is helpful for the (many) Mac OS X users.
-
-Fork and clone [homebrew/homebrew-binary](https://github.com/homebrew/homebrew-binary/fork).
-
-Add the upstream repository:
-
-```plain
-$ git remote add upstream git@github.com:Homebrew/homebrew-binary.git
 ```
+### Exercism Command-Line Interface (CLI)
 
-If you already had this cloned, ensure that you are entirely up-to-date with the upstream master:
+Exercism takes place in two places: the discussions happen on the website, and you work on exercises locally. The CLI bridges the gap, allowing you to fetch exercises and submit solutions to the site.
 
-```plain
-$ git fetch upstream && git checkout master && git reset upstream/master && git push -f origin master
-```
+This is a stand-alone binary, which means that you don't need to install any particular language or environment in order to use it.
 
-Check out a feature branch, where X.Y.Z is the actual version number.
+To install, download the archive that matches your operating system and architecture, unpack the archive, and put the binary somewhere on your path.
 
-```plain
-$ git checkout -b exercism-vX.Y.Z
+You will need to configure the CLI with your [Exercism API Key](http://exercism.io/account/key) before submitting.
+
+For more detailed instructions, see the [CLI page on Exercism](http://exercism.io/cli).
+
+#### Recent Changes
+
+* ABC...
+* XYZ...
 ```
 
 Calculate the `SHA1` checksum for the two mac builds:
