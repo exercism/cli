@@ -22,7 +22,7 @@ const (
 	descDebug     = "Outputs useful debug information."
 	descConfigure = "Writes config values to a JSON file."
 	descFetch     = "Fetches the next unsubmitted problem in each track."
-	descRestore   = "Downloads your the most recent iteration for each of your solutions on exercism.io."
+	descRestore   = "Downloads the most recent iteration for each of your solutions on exercism.io."
 	descSubmit    = "Submits a new iteration to a problem on exercism.io."
 	descSkip      = "Skips a problem given a track ID and problem slug."
 	descUpgrade   = "Upgrades the CLI to the latest released version."
