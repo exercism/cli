@@ -85,6 +85,11 @@ func installTgz(source *bytes.Reader, dest string) error {
 			return err
 		}
 
+		// Remove the file before overwriting it.
+		if _, err := os.Stat(dest); err == nil {
+			os.Remove(dest)
+		}
+
 		fileCopy, err := os.OpenFile(dest, installFlag, hdr.FileInfo().Mode())
 		if err != nil {
 			return err
