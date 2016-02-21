@@ -62,7 +62,4 @@ will be built into the `release` directory.
 - **Problem Slug** is a normalized, url-safe identifier for a problem.
 - **Iteration** is a solution that a user has written for a particular problem in a particular language track. A user may have several iterations for the same problem.
 
-## Recomended development tools
-
-- [Glitch](https://github.com/levicook/glitch) - Run lint, vet, and test on every change.
 
