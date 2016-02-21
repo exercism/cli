@@ -9,76 +9,76 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## v2.2.4 (2016-01-28)
 
-* [#270](https://github.com/exercism/cli/pull/270) Allow commenting on submission with --comment - [@Tonkpils](https://github.com/Tonkpils)
-* [#271](https://github.com/exercism/cli/pull/271) Increase timeout to 20 seconds - [@Tonkpils](https://github.com/Tonkpils)
-* [#273](https://github.com/exercism/cli/pull/273) Guard against submitting spec files and README - [@daveyarwood](https://github.com/daveyarwood)
-* [#278](https://github.com/exercism/cli/pull/278) Create files with 0644 mode, create missing directories for downloaded solutions - [@petertseng](https://github.com/petertseng)
-* [#281](https://github.com/exercism/cli/pull/281) Create missing directories for downloaded problems - [@petertseng](https://github.com/petertseng)
-* [#282](https://github.com/exercism/cli/pull/282) Remove random encouragement after submitting - [@kytrinyx](https://github.com/kytrinyx)
-* [#283](https://github.com/exercism/cli/pull/283) Print current configuration after calling configure command - [@kytrinyx](https://github.com/kytrinyx)
+* [#270](https://github.com/exercism/cli/pull/270) Allow commenting on submission with --comment - [@Tonkpils]
+* [#271](https://github.com/exercism/cli/pull/271) Increase timeout to 20 seconds - [@Tonkpils]
+* [#273](https://github.com/exercism/cli/pull/273) Guard against submitting spec files and README - [@daveyarwood]
+* [#278](https://github.com/exercism/cli/pull/278) Create files with 0644 mode, create missing directories for downloaded solutions - [@petertseng]
+* [#281](https://github.com/exercism/cli/pull/281) Create missing directories for downloaded problems - [@petertseng]
+* [#282](https://github.com/exercism/cli/pull/282) Remove random encouragement after submitting - [@kytrinyx]
+* [#283](https://github.com/exercism/cli/pull/283) Print current configuration after calling configure command - [@kytrinyx]
 
 ## v2.2.3 (2015-12-27)
-* [#264](https://github.com/exercism/cli/pull/264) Fix version flag to use --version and --v - [@Tonkpils](https://github.com/Tonkpils)
+* [#264](https://github.com/exercism/cli/pull/264) Fix version flag to use --version and --v - [@Tonkpils]
 
 ## v2.2.2 (2015-12-26)
 
-* [#212](https://github.com/exercism/cli/pull/212) extract path related code from config - [@lcowell](https://github.com/lcowell)
-* [#215](https://github.com/exercism/cli/pull/215) use $XDG_CONFIG_HOME if available - [@lcowell](https://github.com/lcowell)
-* [#248](https://github.com/exercism/cli/pull/248) [#253](https://github.com/exercism/cli/pull/253) add debugging output - [@lcowell](https://github.com/lcowell)
-* [#256](https://github.com/exercism/cli/pull/256) clean up build scripts - [@lcowell](https://github.com/lcowell)
-* [#258](https://github.com/exercism/cli/pull/258) reduce filesystem noise on fetch [@devonestes](https://github.com/devonestes)
-* [#261](https://github.com/exercism/cli/pull/261) improve error message when track and exercise can't be identified on submit - [@anxiousmodernman](https://github.com/anxiousmodernman)
-* [#262](https://github.com/exercism/cli/pull/262) encourage iterating to improve after first submission on an exercise - [@eToThePiIPower](https://github.com/eToThePiIPower)
+* [#212](https://github.com/exercism/cli/pull/212) extract path related code from config - [@lcowell]
+* [#215](https://github.com/exercism/cli/pull/215) use $XDG_CONFIG_HOME if available - [@lcowell]
+* [#248](https://github.com/exercism/cli/pull/248) [#253](https://github.com/exercism/cli/pull/253) add debugging output - [@lcowell]
+* [#256](https://github.com/exercism/cli/pull/256) clean up build scripts - [@lcowell]
+* [#258](https://github.com/exercism/cli/pull/258) reduce filesystem noise on fetch [@devonestes]
+* [#261](https://github.com/exercism/cli/pull/261) improve error message when track and exercise can't be identified on submit - [@anxiousmodernman]
+* [#262](https://github.com/exercism/cli/pull/262) encourage iterating to improve after first submission on an exercise - [@eToThePiIPower]
 
 ## v2.2.1 (2015-08-11)
 
-* [#200](https://github.com/exercism/cli/pull/200): Add guard to unsubmit command - [@kytrinyx](https://github.com/kytrinyx)
-* [#204](https://github.com/exercism/cli/pull/204): Improve upgrade failure messages and increase timeout - [@Tonkpils](https://github.com/Tonkpils)
-* [#206](https://github.com/exercism/cli/pull/207): Fix verbose flag and removed short `-v` - [@zabawaba99](https://github.com/zabawaba99)
-* [#208](https://github.com/exercism/cli/pull/208): avoid ambiguous or unresolvable exercism paths - [@lcowell](https://github.com/lcowell)
+* [#200](https://github.com/exercism/cli/pull/200): Add guard to unsubmit command - [@kytrinyx]
+* [#204](https://github.com/exercism/cli/pull/204): Improve upgrade failure messages and increase timeout - [@Tonkpils]
+* [#206](https://github.com/exercism/cli/pull/207): Fix verbose flag and removed short `-v` - [@zabawaba99]
+* [#208](https://github.com/exercism/cli/pull/208): avoid ambiguous or unresolvable exercism paths - [@lcowell]
 
 ## v2.2.0 (2015-06-27)
 
-* [b3c3d6f](https://github.com/exercism/cli/commit/b3c3d6fe54c622fc0ee07fdd221c8e8e5b73c8cd): Improve error message on Internal Server Error - [@Tonkpils](https://github.com/Tonkpils)
-* [#196](https://github.com/exercism/cli/pull/196): Add upgrade command - [@Tonkpils](https://github.com/Tonkpils)
-* [#194](https://github.com/exercism/cli/pull/194): Fix home expansion on configure update - [@Tonkpils](https://github.com/Tonkpils)
-* [523c5bd](https://github.com/exercism/cli/commit/523c5bdec5ef857f07b39de738a764589660cd5a): Document release process - [@kytrinyx](https://github.com/kytrinyx)
+* [b3c3d6f](https://github.com/exercism/cli/commit/b3c3d6fe54c622fc0ee07fdd221c8e8e5b73c8cd): Improve error message on Internal Server Error - [@Tonkpils]
+* [#196](https://github.com/exercism/cli/pull/196): Add upgrade command - [@Tonkpils]
+* [#194](https://github.com/exercism/cli/pull/194): Fix home expansion on configure update - [@Tonkpils]
+* [523c5bd](https://github.com/exercism/cli/commit/523c5bdec5ef857f07b39de738a764589660cd5a): Document release process - [@kytrinyx]
 
 ## v2.1.1 (2015-05-13)
 
-* [#192](https://github.com/exercism/cli/pull/192): Loosen up restrictions on --test flag for submissions - [@Tonkpils](https://github.com/Tonkpils)
-* [#190](https://github.com/exercism/cli/pull/190): Fix bug in home directory expansion for Windows - [@Tonkpils](https://github.com/Tonkpils)
+* [#192](https://github.com/exercism/cli/pull/192): Loosen up restrictions on --test flag for submissions - [@Tonkpils]
+* [#190](https://github.com/exercism/cli/pull/190): Fix bug in home directory expansion for Windows - [@Tonkpils]
 
 ## v2.1.0 (2015-05-08)
 
-* [1a2fd1b](https://github.com/exercism/cli/commit/1a2fd1bfb2dba358611a7c3266f935cccaf924b5): Handle config as either directory or file - [@lcowell](https://github.com/lcowell)
-* [#177](https://github.com/exercism/cli/pull/177): Improve JSON error handling and reporting - [@Tonkpils](https://github.com/Tonkpils)
-* [#178](https://github.com/exercism/cli/pull/178): Add support for $XDG_CONFIG_HOME - [@lcowell](https://github.com/lcowell)
-* [#184](https://github.com/exercism/cli/pull/184): Handle different file encodings in submissions - [@ambroff](https://github.com/ambroff)
-* [#179](https://github.com/exercism/cli/pull/179): Pretty print the JSON config - [@Tonkpils](https://github.com/Tonkpils)
-* [#181](https://github.com/exercism/cli/pull/181): Fix path issue when downloading problems - [@Tonkpils](https://github.com/Tonkpils)
-* [#186](https://github.com/exercism/cli/pull/186): Allow people to specify a target directory for the demo - [@Tonkpils](https://github.com/Tonkpils)
-* [#189](https://github.com/exercism/cli/pull/189): Implement `--test` flag to allow submitting a test file in the solution - [@pminten](https://github.com/pminten)
+* [1a2fd1b](https://github.com/exercism/cli/commit/1a2fd1bfb2dba358611a7c3266f935cccaf924b5): Handle config as either directory or file - [@lcowell]
+* [#177](https://github.com/exercism/cli/pull/177): Improve JSON error handling and reporting - [@Tonkpils]
+* [#178](https://github.com/exercism/cli/pull/178): Add support for $XDG_CONFIG_HOME - [@lcowell]
+* [#184](https://github.com/exercism/cli/pull/184): Handle different file encodings in submissions - [@ambroff]
+* [#179](https://github.com/exercism/cli/pull/179): Pretty print the JSON config - [@Tonkpils]
+* [#181](https://github.com/exercism/cli/pull/181): Fix path issue when downloading problems - [@Tonkpils]
+* [#186](https://github.com/exercism/cli/pull/186): Allow people to specify a target directory for the demo - [@Tonkpils]
+* [#189](https://github.com/exercism/cli/pull/189): Implement `--test` flag to allow submitting a test file in the solution - [@pminten]
 
 ## v2.0.2 (2015-04-01)
 
-* [#174](https://github.com/exercism/cli/issues/174): Fix panic during fetch - [@kytrinyx](https://github.com/kytrinyx)
-* Refactor handling of ENV vars - [@lcowell](https://github.com/lcowell)
+* [#174](https://github.com/exercism/cli/issues/174): Fix panic during fetch - [@kytrinyx]
+* Refactor handling of ENV vars - [@lcowell]
 
 ## v2.0.1 (2015-03-25)
 
-* [#167](https://github.com/exercism/cli/pull/167): Fixes misspelling of exercism list command - [@queuebit](https://github.com/queuebit)
+* [#167](https://github.com/exercism/cli/pull/167): Fixes misspelling of exercism list command - [@queuebit]
 * Tweak output from `fetch` so that languages are scannable.
 * [#35](https://github.com/exercism/cli/issues/35): Add support for submitting multiple-file solutions
-* [#171](https://github.com/exercism/cli/pull/171): Implement `skip` command to bypass individual exercises - [@Tonkpils](https://github.com/Tonkpils)
+* [#171](https://github.com/exercism/cli/pull/171): Implement `skip` command to bypass individual exercises - [@Tonkpils]
 
 ## v2.0.0 (2015-03-05)
 
 Added:
 
-* [#154](https://github.com/exercism/cli/pull/154): Add 'list' command to list available exercises for a language - [@lcowell](https://github.com/lcowell)
-* [3551884](https://github.com/exercism/cli/commit/3551884e9f38d6e563b99dae7b28a18d4525455d): Add host connectivity status to debug output. - [@lcowell](https://github.com/lcowell)
-* [#162](https://github.com/exercism/cli/pull/162): Allow users to open the browser from the terminal. - [@zabawaba99](https://github.com/zabawaba99)
+* [#154](https://github.com/exercism/cli/pull/154): Add 'list' command to list available exercises for a language - [@lcowell]
+* [3551884](https://github.com/exercism/cli/commit/3551884e9f38d6e563b99dae7b28a18d4525455d): Add host connectivity status to debug output. - [@lcowell]
+* [#162](https://github.com/exercism/cli/pull/162): Allow users to open the browser from the terminal. - [@zabawaba99]
 
 Removed:
 
@@ -88,16 +88,16 @@ Removed:
 
 Fixed:
 
-* [#151](https://github.com/exercism/cli/pull/151): Expand '~' in config path to home directory - [@lcowell](https://github.com/lcowell)
-* [#155](https://github.com/exercism/cli/pull/155): Display problems not yet submitted on fetch API - [@Tonkpils](https://github.com/Tonkpils)
-* [f999e69](https://github.com/exercism/cli/commit/f999e69e5290cec6c5c9933aecc6fddfad8cf019): Disambiguate debug and verbose flags. - [@lcowell](https://github.com/lcowell)
+* [#151](https://github.com/exercism/cli/pull/151): Expand '~' in config path to home directory - [@lcowell]
+* [#155](https://github.com/exercism/cli/pull/155): Display problems not yet submitted on fetch API - [@Tonkpils]
+* [f999e69](https://github.com/exercism/cli/commit/f999e69e5290cec6c5c9933aecc6fddfad8cf019): Disambiguate debug and verbose flags. - [@lcowell]
 * Report 'new' at the bottom after fetching, it's going to be more relevant than 'unchanged', which includes all the languages they don't care about.
 
 Tweaked:
 
 * Set environment variable in build script
-* [#153](https://github.com/exercism/cli/pull/153): Refactored configuration package - [@kytrinyx](https://github.com/kytrinyx)
-* [#157](https://github.com/exercism/cli/pull/157): Refactored API package - [@Tonkpils](https://github.com/Tonkpils)
+* [#153](https://github.com/exercism/cli/pull/153): Refactored configuration package - [@kytrinyx]
+* [#157](https://github.com/exercism/cli/pull/157): Refactored API package - [@Tonkpils]
 
 ## v1.9.2 (2015-01-11)
 
@@ -106,12 +106,12 @@ Tweaked:
 
 ## v1.9.1 (2015-01-10)
 
-* [#147](https://github.com/exercism/cli/pull/147): added `--api` option to exercism configure - [@morphatic](https://github.com/morphatic)
+* [#147](https://github.com/exercism/cli/pull/147): added `--api` option to exercism configure - [@morphatic]
 
 ## v1.9.0 (2014-11-27)
 
-* [#143](https://github.com/exercism/cli/pull/143): added command for downloading a specific solution - [@harimp](https://github.com/harimp)
-* [#142](https://github.com/exercism/cli/pull/142): fixed command name to be `exercism` rather than `cli` on `go get` - [@Tonkpils](https://github.com/Tonkpils)
+* [#143](https://github.com/exercism/cli/pull/143): added command for downloading a specific solution - [@harimp]
+* [#142](https://github.com/exercism/cli/pull/142): fixed command name to be `exercism` rather than `cli` on `go get` - [@Tonkpils]
 
 ## v1.8.2 (2014-10-24)
 
@@ -123,23 +123,23 @@ Tweaked:
 
 ## v1.8.0 (2014-10-15)
 
-* [#138](https://github.com/exercism/cli/pull/138): Added conversion to line endings for submissions on Windows - [@rprouse](https://github.com/rprouse)
+* [#138](https://github.com/exercism/cli/pull/138): Added conversion to line endings for submissions on Windows - [@rprouse]
 * [#116](https://github.com/exercism/cli/issues/116): Added support for setting name of config file in an environment variable
 * [47d6fd4](https://github.com/exercism/cli/commit/47d6fd407fd0410f5c81d60172e01e8624608f53): Added a `track` command to list the problems in a given language
 * [#126](https://github.com/exercism/cli/issues/126): Added explanation in `submit` response about fetching the next problems
-* [#133](https://github.com/exercism/cli/pull/133): Changed config command to create the exercism directory, rather than waiting until the first time problems are fetched - [@Tonkpils](https://github.com/Tonkpils)
+* [#133](https://github.com/exercism/cli/pull/133): Changed config command to create the exercism directory, rather than waiting until the first time problems are fetched - [@Tonkpils]
 
 ## v1.7.5 (2014-10-5)
 
 * [88cf1a1fbc884545dfc10e98535f667e4a43e693](https://github.com/exercism/cli/commit/88cf1a1fbc884545dfc10e98535f667e4a43e693): Added ARMv6 to build
 * [12672c4](https://github.com/exercism/cli/commit/12672c4f695cfe3891f96467619a3615e6d57c34): Added an error message when people submit a file that is not within the exercism directory tree
-* [#128](https://github.com/exercism/cli/pull/128): Made paths os-agnostic in tests - [@ccnp123](https://github.com/ccnp123)
+* [#128](https://github.com/exercism/cli/pull/128): Made paths os-agnostic in tests - [@ccnp123]
 
 ## v1.7.4 (2014-09-27)
 
 * [4ca3e97](https://github.com/exercism/cli/commit/4ca3e9743f6d421903c91dfa27f4747fb1081392): Fixed incorrect HOME directory on Windows
 * [8bd1a25](https://github.com/exercism/cli/commit/4ca3e9743f6d421903c91dfa27f4747fb1081392): Added ARMv5 to build
-* [#117](https://github.com/exercism/cli/pull/117): Archive windows binaries using zip rather than tar and gzip - [@LegalizeAdulthood](https://github.com/LegalizeAdulthood)
+* [#117](https://github.com/exercism/cli/pull/117): Archive windows binaries using zip rather than tar and gzip - [@LegalizeAdulthood]
 
 ## v1.7.3 (2014-09-26)
 
@@ -147,7 +147,7 @@ Tweaked:
 
 ## v1.7.2 (2014-09-24)
 
-* [#111](https://github.com/exercism/cli/pull/111): Don't clobber existing config values when adding more - [@jish](https://github.com/jish)
+* [#111](https://github.com/exercism/cli/pull/111): Don't clobber existing config values when adding more - [@jish]
 
 ## v1.7.1 (2014-09-19)
 
@@ -160,7 +160,7 @@ Tweaked:
 
 * [ac6dbfd](https://github.com/exercism/cli/commit/ac6dbfd81a86e7a9a5a9b68521b0226c40d8e813): Added os and architecture to the user agent
 * [5d58fd1](https://github.com/exercism/cli/commit/5d58fd14b9db84fb752b3bf6112123cd6f04c532): Fixed bug in detecting user's home directory
-* [#100](https://github.com/exercism/cli/pull/100): Added 'debug' command, which supersedes the 'info' command - [@Tonkpils](https://github.com/Tonkpils)
+* [#100](https://github.com/exercism/cli/pull/100): Added 'debug' command, which supersedes the 'info' command - [@Tonkpils]
 * Extracted a couple of commands into separate handlers
 * [6ec5876](https://github.com/exercism/cli/commit/6ec5876bde0b02206cacbe685bb8aedcbdba25d4): Added a hack to rename old config files to the new default name
 * [bb7d0d6](https://github.com/exercism/cli/commit/bb7d0d6151a950c92590dc771ec3ff5fdd1c83b0): Rename 'home' command to 'info'
@@ -168,14 +168,14 @@ Tweaked:
 * Deprecate login/logout commands
 * [1a39134](https://github.com/exercism/cli/commit/1a391342da93aa32ae398f1500a3981aa65b9f41): Changed demo to write exercises to the default exercism problems directory
 * [07cc334](https://github.com/exercism/cli/commit/07cc334739465b21d6eb5d973e16e1c88f67758e): Deleted the whoami command, we weren't using github usernames for anything
-* [#97](https://github.com/exercism/cli/pull/97): Changed default exercism directory to ~/exercism - [@lcowell](https://github.com/lcowell)
-* [#94](https://github.com/exercism/cli/pull/94): Updated language detection to handle C++ - [@LegalizeAdulthood](https://github.com/LegalizeAdulthood)
-* [#92](https://github.com/exercism/cli/pull/92): Renamed config json file to .exercism.json instead of .exercism.go - [@lcowell](https://github.com/lcowell)
+* [#97](https://github.com/exercism/cli/pull/97): Changed default exercism directory to ~/exercism - [@lcowell]
+* [#94](https://github.com/exercism/cli/pull/94): Updated language detection to handle C++ - [@LegalizeAdulthood]
+* [#92](https://github.com/exercism/cli/pull/92): Renamed config json file to .exercism.json instead of .exercism.go - [@lcowell]
 * [f55653f](https://github.com/exercism/cli/commit/f55653f35863914086a54375afb0898e142c1638): Deleted go vet from travis build temporarily until the codebase can be cleaned up
-* [#91](https://github.com/exercism/cli/pull/91): Replaced temp file usage with encode/decode - [@lcowell](https://github.com/lcowell)
-* [#90](https://github.com/exercism/cli/pull/90): Added sanitization to config values to trim whitespace before writing it - [@lcowell](https://github.com/lcowell)
+* [#91](https://github.com/exercism/cli/pull/91): Replaced temp file usage with encode/decode - [@lcowell]
+* [#90](https://github.com/exercism/cli/pull/90): Added sanitization to config values to trim whitespace before writing it - [@lcowell]
 * Did a fair amount of cleanup to make code a bit more idiomatic
-* [#86](https://github.com/exercism/cli/pull/86): Triggered interactive login command for commands that require auth - [@Tonkpils](https://github.com/Tonkpils)
+* [#86](https://github.com/exercism/cli/pull/86): Triggered interactive login command for commands that require auth - [@Tonkpils]
 
 ## v1.6.2 (2014-06-02)
 
@@ -183,19 +183,19 @@ Tweaked:
 
 ## v1.6.1 (2014-05-16)
 
-* [#84](https://github.com/exercism/cli/pull/84): Change hard-coded filepath so that it will work on any platform - [@simonjefford](https://github.com/simonjefford)
+* [#84](https://github.com/exercism/cli/pull/84): Change hard-coded filepath so that it will work on any platform - [@simonjefford]
 
 ## v1.6.0 (2014-05-10)
 
-* [#82](https://github.com/exercism/cli/pull/82): Fixed typo in tests - [@srt32](https://github.com/srt32)
+* [#82](https://github.com/exercism/cli/pull/82): Fixed typo in tests - [@srt32]
 * [aa7446d](https://github.com/exercism/cli/commit/aa7446d598fc894ef329756555c48ef358baf676): Clarified output to user after they fetch
-* [#79](https://github.com/exercism/cli/pull/79): Updated development instructions to fix permissions problem - [@andrewsardone](https://github.com/andrewsardone)
-* [#78](https://github.com/exercism/cli/pull/78): Deleted deprecated action `peek` - [@djquan](https://github.com/djquan)
-* [#74](https://github.com/exercism/cli/pull/74): Implemented new option on `fetch` to get a single language - [@Tonkpils](https://github.com/Tonkpils)
-* [#75](https://github.com/exercism/cli/pull/75): Improved feedback to user after logging in - [@Tonkpils](https://github.com/Tonkpils)
-* [#72](https://github.com/exercism/cli/pull/72): Optimized use of temp file - [@Dparker1990](https://github.com/Dparker1990)
-* [#70](https://github.com/exercism/cli/pull/70): Fixed a panic - [@Tonkpils](https://github.com/Tonkpils)
-* [#68](https://github.com/exercism/cli/pull/68): Fixed how user input is read so that it doesn't stop at the first space - [@Tonkpils](https://github.com/Tonkpils)
+* [#79](https://github.com/exercism/cli/pull/79): Updated development instructions to fix permissions problem - [@andrewsardone]
+* [#78](https://github.com/exercism/cli/pull/78): Deleted deprecated action `peek` - [@djquan]
+* [#74](https://github.com/exercism/cli/pull/74): Implemented new option on `fetch` to get a single language - [@Tonkpils]
+* [#75](https://github.com/exercism/cli/pull/75): Improved feedback to user after logging in - [@Tonkpils]
+* [#72](https://github.com/exercism/cli/pull/72): Optimized use of temp file - [@Dparker1990]
+* [#70](https://github.com/exercism/cli/pull/70): Fixed a panic - [@Tonkpils]
+* [#68](https://github.com/exercism/cli/pull/68): Fixed how user input is read so that it doesn't stop at the first space - [@Tonkpils]
 
 ## v1.5.1 (2014-03-14)
 
@@ -203,16 +203,16 @@ Tweaked:
 
 ## v1.5.0 (2014-02-28)
 
-* [#63](https://github.com/exercism/cli/pull/63): Implemeted `fetch` for a single language - [@Tonkpils](https://github.com/Tonkpils)
-* [#62](https://github.com/exercism/cli/pull/62): Expose error message from API to user on `fetch` - [@Tonkpils](https://github.com/Tonkpils)
-* [#59](https://github.com/exercism/cli/pull/59): Added global flag to pass the path to the config file instead of relying on default - [@isbadawi](https://github.com/isbadawi)
-* [#57](https://github.com/exercism/cli/pull/57): Added description to the restore command - [@rcode5](https://github.com/rcode5)
-* [#56](https://github.com/exercism/cli/pull/56): Updated developer instructions in README based on real-life experience - [@rcode5](https://github.com/rcode5)
+* [#63](https://github.com/exercism/cli/pull/63): Implemeted `fetch` for a single language - [@Tonkpils]
+* [#62](https://github.com/exercism/cli/pull/62): Expose error message from API to user on `fetch` - [@Tonkpils]
+* [#59](https://github.com/exercism/cli/pull/59): Added global flag to pass the path to the config file instead of relying on default - [@isbadawi]
+* [#57](https://github.com/exercism/cli/pull/57): Added description to the restore command - [@rcode5]
+* [#56](https://github.com/exercism/cli/pull/56): Updated developer instructions in README based on real-life experience - [@rcode5]
 
 ## v1.4.0 (2014-01-13)
 
-* [#47](https://github.com/exercism/cli/pull/47): Added 'restore' command to download all of a user's existing solutions with their corresponding problems - [@ebautistabar](https://github.com/ebautistabar)
-* Numerous small fixes and cleanup to code and documentation - [@dpritchett](https://github.com/dpritchett), [@TrevorBramble](https://github.com/TrevorBramble), [@elimisteve](https://github.com/elimisteve)
+* [#47](https://github.com/exercism/cli/pull/47): Added 'restore' command to download all of a user's existing solutions with their corresponding problems - [@ebautistabar]
+* Numerous small fixes and cleanup to code and documentation - [@dpritchett], [@TrevorBramble], [@elimisteve]
 
 ## v1.3.2 (2013-12-14)
 
@@ -252,35 +252,35 @@ Tweaked:
 
 * Refactor to extract config package
 * Delete stray binary **TODO** we might rewrite history on this one, see [#102](https://github.com/exercism/xgo/issues/102).
-* [#22](https://github.com/exercism/cli/pull/22): Display submission url after submitting solution - [@Tonkpils](https://github.com/Tonkpils)
-* [#21](https://github.com/exercism/cli/pull/21): Add unsubmit command - [@Tonkpils](https://github.com/Tonkpils)
-* [#20](https://github.com/exercism/cli/pull/20): Add current command - [@Tonkpils](https://github.com/Tonkpils)
+* [#22](https://github.com/exercism/cli/pull/22): Display submission url after submitting solution - [@Tonkpils]
+* [#21](https://github.com/exercism/cli/pull/21): Add unsubmit command - [@Tonkpils]
+* [#20](https://github.com/exercism/cli/pull/20): Add current command - [@Tonkpils]
 * Inline refactoring experiment, various cleanup
 
 ## v1.0.1 (2013-09-27)
 
-* [#11](https://github.com/exercism/cli/pull/11): Don't require authentication for demo - [@msgehard](https://github.com/mshegard)
-* [#14](https://github.com/exercism/cli/pull/14): Print out fetched assignments - [@Tonkpils](https://github.com/Tonkpils)
-* [#16](https://github.com/exercism/cli/pull/16): Fix broken submit for relative path names - [@nf](https://github.com/nf)
+* [#11](https://github.com/exercism/cli/pull/11): Don't require authentication for demo - [@msgehard]
+* [#14](https://github.com/exercism/cli/pull/14): Print out fetched assignments - [@Tonkpils]
+* [#16](https://github.com/exercism/cli/pull/16): Fix broken submit for relative path names - [@nf]
 * Create a separate demo directory if there's no configured exercism directory
 
 ## v1.0.0 (2013-09-22)
 
 * [#7](https://github.com/exercism/cli/pull/7): Recognize haskell test files
-* [#5](https://github.com/exercism/cli/pull/5): Fix typo - [@simonjefford](https://github.com/simonjefford)
-* [#1](https://github.com/exercism/cli/pull/1): Output the location of the config file - [@msgehard](https://github.com/msgehard)
-* Recognize more language test files - [@msgehard](https://github.com/msgehard)
+* [#5](https://github.com/exercism/cli/pull/5): Fix typo - [@simonjefford]
+* [#1](https://github.com/exercism/cli/pull/1): Output the location of the config file - [@msgehard]
+* Recognize more language test files - [@msgehard]
 
 ## v0.0.27.beta (2013-08-25)
 
-All changes by [@msgehard](https://github.com/msgehard)
+All changes by [@msgehard]
 
 * Clean up homedir
 * Add dev instructions to README
 
 ## v0.0.26.beta (2013-08-24)
 
-All changes by [@msgehard](https://github.com/msgehard)
+All changes by [@msgehard]
 
 * Ensure that ruby gem's config file doesn't get clobbered
 * Add cross-compilation
@@ -294,3 +294,35 @@ All changes by [@msgehard](https://github.com/msgehard)
 * Implement `whoami`
 * Implement login and logout
 * Build on Travis
+
+[@ambroff]: https://github.com/ambroff
+[@andrewsardone]: https://github.com/andrewsardone
+[@anxiousmodernman]: https://github.com/anxiousmodernman
+[@ccnp123]: https://github.com/ccnp123
+[@Dparker1990]: https://github.com/Dparker1990
+[@daveyarwood]: https://github.com/daveyarwood
+[@devonestes]: https://github.com/devonestes
+[@djquan]: https://github.com/djquan
+[@dpritchett]: https://github.com/dpritchett
+[@eToThePiIPower]: https://github.com/eToThePiIPower
+[@ebautistabar]: https://github.com/ebautistabar
+[@elimisteve]: https://github.com/elimisteve
+[@harimp]: https://github.com/harimp
+[@isbadawi]: https://github.com/isbadawi
+[@jish]: https://github.com/jish
+[@kytrinyx]: https://github.com/kytrinyx
+[@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
+[@lcowell]: https://github.com/lcowell
+[@msgehard]: https://github.com/msgehard
+[@morphatic]: https://github.com/morphatic
+[@nf]: https://github.com/nf
+[@petertseng]: https://github.com/petertseng
+[@pminten]: https://github.com/pminten
+[@queuebit]: https://github.com/queuebit
+[@rcode5]: https://github.com/rcode5
+[@rprouse]: https://github.com/rprouse
+[@simonjefford]: https://github.com/simonjefford
+[@srt32]: https://github.com/srt32
+[@Tonkpils]: https://github.com/Tonkpils
+[@TrevorBramble]: https://github.com/TrevorBramble
+[@zabawaba99]: https://github.com/zabawaba99
