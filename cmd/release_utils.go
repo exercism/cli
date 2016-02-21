@@ -85,14 +85,25 @@ func installTgz(source *bytes.Reader, dest string) error {
 			return err
 		}
 
+		// Move the old version to a backup path that we can recover from
+		// in case the upgrade fails
+		destBackup := dest + ".bak"
+		if _, err := os.Stat(dest); err == nil {
+			os.Rename(dest, destBackup)
+		}
+
 		fileCopy, err := os.OpenFile(dest, installFlag, hdr.FileInfo().Mode())
 		if err != nil {
+			os.Rename(destBackup, dest)
 			return err
 		}
 		defer fileCopy.Close()
 
 		if _, err = io.Copy(fileCopy, tr); err != nil {
+			os.Rename(destBackup, dest)
 			return err
+		} else {
+			os.Remove(destBackup)
 		}
 	}
 
