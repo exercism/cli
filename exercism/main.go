@@ -19,21 +19,21 @@ const (
 	// lot of things get out of hand.
 	Version = "2.2.4"
 
-	descDebug     = "Outputs useful debug information."
 	descConfigure = "Writes config values to a JSON file."
-	descFetch     = "Fetches the next unsubmitted problem in each track."
-	descRestore   = "Downloads the most recent iteration for each of your solutions on exercism.io."
-	descSubmit    = "Submits a new iteration to a problem on exercism.io."
-	descSkip      = "Skips a problem given a track ID and problem slug."
-	descUpgrade   = "Upgrades the CLI to the latest released version."
-	descTracks    = "Lists the available language tracks."
-	descOpen      = "Opens exercism.io to your most recent iteration of a problem given the track ID and problem slug."
+	descDebug     = "Outputs useful debug information."
 	descDownload  = "Downloads a solution given the ID of the latest iteration."
+	descFetch     = "Fetches the next unsubmitted problem in each track."
 	descList      = "Lists the available problems for a language track, given its ID."
+	descOpen      = "Opens exercism.io to your most recent iteration of a problem given the track ID and problem slug."
+	descRestore   = "Downloads the most recent iteration for each of your solutions on exercism.io."
+	descSkip      = "Skips a problem given a track ID and problem slug."
 	descStatus    = "Fetches information about your progress with a given language track."
+	descSubmit    = "Submits a new iteration to a problem on exercism.io."
+	descTracks    = "Lists the available language tracks."
+	descUpgrade   = "Upgrades the CLI to the latest released version."
 
-	descLongRestore  = "Restore will pull the latest revisions of exercises that have already been submitted. It will *not* overwrite existing files. If you have made changes to a file and have not submitted it, and you're trying to restore the last submitted version, first move that file out of the way, then call restore."
 	descLongDownload = "The submission ID is the last part of the URL when looking at a solution on exercism.io."
+	descLongRestore  = "Restore will pull the latest revisions of exercises that have already been submitted. It will *not* overwrite existing files. If you have made changes to a file and have not submitted it, and you're trying to restore the last submitted version, first move that file out of the way, then call restore."
 )
 
 func main() {
@@ -62,11 +62,6 @@ func main() {
 	}
 	app.Commands = []cli.Command{
 		{
-			Name:   "debug",
-			Usage:  descDebug,
-			Action: cmd.Debug,
-		},
-		{
 			Name:  "configure",
 			Usage: descConfigure,
 			Flags: []cli.Flag{
@@ -90,10 +85,34 @@ func main() {
 			Action: cmd.Configure,
 		},
 		{
+			Name:   "debug",
+			Usage:  descDebug,
+			Action: cmd.Debug,
+		},
+		{
+			Name:        "download",
+			ShortName:   "dl",
+			Usage:       descDownload,
+			Description: descLongDownload,
+			Action:      cmd.Download,
+		},
+		{
 			Name:      "fetch",
 			ShortName: "f",
 			Usage:     descFetch,
 			Action:    cmd.Fetch,
+		},
+		{
+			Name:      "list",
+			ShortName: "li",
+			Usage:     descList,
+			Action:    cmd.List,
+		},
+		{
+			Name:      "open",
+			ShortName: "op",
+			Usage:     descOpen,
+			Action:    cmd.Open,
 		},
 		{
 			Name:        "restore",
@@ -106,6 +125,12 @@ func main() {
 			Name:   "skip",
 			Usage:  descSkip,
 			Action: cmd.Skip,
+		},
+		{
+			Name:      "status",
+			ShortName: "st",
+			Usage:     descStatus,
+			Action:    cmd.Status,
 		},
 		{
 			Name:      "submit",
@@ -124,6 +149,12 @@ func main() {
 			},
 		},
 		{
+			Name:      "tracks",
+			ShortName: "t",
+			Usage:     descTracks,
+			Action:    cmd.Tracks,
+		},
+		{
 			Name:      "unsubmit",
 			ShortName: "u",
 			Usage:     "REMOVED",
@@ -135,37 +166,6 @@ func main() {
 			Name:   "upgrade",
 			Usage:  descUpgrade,
 			Action: cmd.Upgrade,
-		},
-		{
-			Name:      "tracks",
-			ShortName: "t",
-			Usage:     descTracks,
-			Action:    cmd.Tracks,
-		},
-		{
-			Name:      "open",
-			ShortName: "op",
-			Usage:     descOpen,
-			Action:    cmd.Open,
-		},
-		{
-			Name:        "download",
-			ShortName:   "dl",
-			Usage:       descDownload,
-			Description: descLongDownload,
-			Action:      cmd.Download,
-		},
-		{
-			Name:      "list",
-			ShortName: "li",
-			Usage:     descList,
-			Action:    cmd.List,
-		},
-		{
-			Name:      "status",
-			ShortName: "st",
-			Usage:     descStatus,
-			Action:    cmd.Status,
 		},
 	}
 	if err := app.Run(os.Args); err != nil {
