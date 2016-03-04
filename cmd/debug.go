@@ -64,10 +64,14 @@ func Debug(ctx *cli.Context) {
 
 	if configured {
 		fmt.Printf("Config file: %s\n", c.File)
-		fmt.Printf("API Key: %s\n", c.APIKey)
+		if c.APIKey != "" {
+			fmt.Printf("API Key: %s\n", c.APIKey)
+		} else {
+			fmt.Println("API Key: Please set your API Key to access all of the CLI features")
+		}
 	} else {
 		fmt.Println("Config file: <not configured>")
-		fmt.Println("API Key: <not configured>")
+		fmt.Println("API Key: Please set your API Key to access all of the CLI features")
 	}
 	fmt.Printf("Exercises Directory: %s\n", c.Dir)
 
