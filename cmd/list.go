@@ -9,7 +9,7 @@ import (
 	"github.com/exercism/cli/config"
 )
 
-const msgExplainFetch = "In order to fetch a specific assignment, call the fetch command with a specific assignment.\n\nexercism fetch ruby matrix"
+const msgExplainFetch = "In order to fetch a specific assignment, call the fetch command with a specific assignment.\n\nexercism fetch %s %s\n\n"
 
 // List returns the full list of assignments for a given track.
 func List(ctx *cli.Context) {
@@ -37,5 +37,6 @@ func List(ctx *cli.Context) {
 	for _, p := range problems {
 		fmt.Printf("%s\n", p)
 	}
-	fmt.Printf("\n%s\n\n", msgExplainFetch)
+	fmt.Println()
+	fmt.Printf(msgExplainFetch, trackID, problems[0])
 }
