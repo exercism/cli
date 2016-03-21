@@ -6,6 +6,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## Next Release
 * **Your contribution here**
+* [#299](https://github.com/exercism/cli/pull/299) List output uses track ID and problem from list - [@Tonkpils]
 
 ## v2.2.4 (2016-01-28)
 
