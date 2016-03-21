@@ -23,9 +23,14 @@ func Status(ctx *cli.Context) {
 	}
 
 	client := api.NewClient(c)
-	status, err := client.Status(args[0])
+	trackID := args[0]
+	status, err := client.Status(trackID)
 	if err != nil {
-		log.Fatal(err)
+		if err == api.ErrUnknownTrack {
+			log.Fatalf("There is no track with ID '%s'.", trackID)
+		} else {
+			log.Fatal(err)
+		}
 	}
 
 	fmt.Println(status)
