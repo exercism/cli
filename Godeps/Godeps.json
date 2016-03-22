@@ -1,0 +1,51 @@
+{
+	"ImportPath": "github.com/exercism/cli",
+	"GoVersion": "go1.6",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-187-gc31a797",
+			"Rev": "c31a7975863e7810c92e2e288a9ab074f9a88f29"
+		},
+		{
+			"ImportPath": "github.com/kardianos/osext",
+			"Rev": "29ae4ffbc9a6fe9fb2bc5029050ce6996ea1d3bc"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Comment": "v1.0-51-gf3960ab",
+			"Rev": "f3960ab1f9664ecc4e27c78af27cc9063d745a43"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html",
+			"Rev": "5d0a0f8cd486626821d2ba44d471ab1c9271d38f"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding",
+			"Rev": "cf4986612c83df6c55578ba198316d1684a9a287"
+		},
+		{
+			"ImportPath": "golang.org/x/text/internal/tag",
+			"Rev": "cf4986612c83df6c55578ba198316d1684a9a287"
+		},
+		{
+			"ImportPath": "golang.org/x/text/internal/utf8internal",
+			"Rev": "cf4986612c83df6c55578ba198316d1684a9a287"
+		},
+		{
+			"ImportPath": "golang.org/x/text/language",
+			"Rev": "cf4986612c83df6c55578ba198316d1684a9a287"
+		},
+		{
+			"ImportPath": "golang.org/x/text/runes",
+			"Rev": "cf4986612c83df6c55578ba198316d1684a9a287"
+		},
+		{
+			"ImportPath": "golang.org/x/text/transform",
+			"Rev": "cf4986612c83df6c55578ba198316d1684a9a287"
+		}
+	]
+}

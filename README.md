@@ -14,7 +14,7 @@ Python or Ruby environment simply to fetch and submit exercises.
 
 ## Dependencies
 
-Go version 1.5 or higher
+Go version 1.6 or higher
 
 ## Installing Go
 

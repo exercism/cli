@@ -3,13 +3,10 @@ language: go
 sudo: false
 
 go:
-  - 1.5
+  - 1.6
   - tip
 
 install: true
 
-before_install:
-  - go get -t ./...
-
 script:
-  - go test ./...
+  - go test $(go list ./... | grep -v /vendor/)
