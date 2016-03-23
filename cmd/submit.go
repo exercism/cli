@@ -9,6 +9,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
+	"github.com/exercism/cli/paths"
 )
 
 // Submit posts an iteration to the API.
@@ -58,6 +59,10 @@ func Submit(ctx *cli.Context) {
 
 		if isREADME(filename) {
 			log.Fatal("You cannot submit the README as a solution.")
+		}
+
+		if paths.IsDir(filename) {
+			log.Fatal("Please specify each file that should be submitted, e.g. `exercism submit file1 file2 file3`.")
 		}
 
 		file, err := filepath.Abs(filename)
