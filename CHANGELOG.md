@@ -6,7 +6,9 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## Next Release
 * **Your contribution here**
+* [#301](https://github.com/exercism/cli/pull/301) Return error message for unknown track status - [@neslom]
 * [#299](https://github.com/exercism/cli/pull/299) List output uses track ID and problem from list - [@Tonkpils]
+
 
 ## v2.2.4 (2016-01-28)
 
@@ -314,6 +316,7 @@ All changes by [@msgehard]
 [@kytrinyx]: https://github.com/kytrinyx
 [@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
 [@lcowell]: https://github.com/lcowell
+[@neslom]: https://github.com/neslom
 [@msgehard]: https://github.com/msgehard
 [@morphatic]: https://github.com/morphatic
 [@nf]: https://github.com/nf
