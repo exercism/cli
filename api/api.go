@@ -270,6 +270,10 @@ func (c *Client) Status(trackID string) (*StatusInfo, error) {
 
 	defer res.Body.Close()
 
+	if res.StatusCode == http.StatusNotFound {
+		return nil, ErrUnknownTrack
+	}
+
 	var si StatusInfo
 	if err := json.NewDecoder(res.Body).Decode(&si); err != nil {
 		return nil, err
