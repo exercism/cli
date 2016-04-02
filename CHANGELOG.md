@@ -5,6 +5,10 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
+* **Your contribution here**
+
+## v2.2.5 (2016-04-02)
+
 * [#284](https://github.com/exercism/cli/pull/284) Update release instructions - [@kytrinyx]
 * [#285](https://github.com/exercism/cli/pull/285) Create a copy/pastable release text - [@kytrinyx]
 * [#289](https://github.com/exercism/cli/pull/289) Fix a typo in the usage statement - [@AlexWheeler]
@@ -16,8 +20,6 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 * [#299](https://github.com/exercism/cli/pull/299) List output uses track ID and problem from list - [@Tonkpils]
 * [#301](https://github.com/exercism/cli/pull/301) Return error message for unknown track status - [@neslom]
 * [#302](https://github.com/exercism/cli/pull/302) Add helpful error message when user tries to submit a directory - [@alebaffa]
-* **Your contribution here**
-
 
 ## v2.2.4 (2016-01-28)
 
