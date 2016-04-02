@@ -5,9 +5,18 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
-* **Your contribution here**
-* [#301](https://github.com/exercism/cli/pull/301) Return error message for unknown track status - [@neslom]
+* [#284](https://github.com/exercism/cli/pull/284) Update release instructions - [@kytrinyx]
+* [#285](https://github.com/exercism/cli/pull/285) Create a copy/pastable release text - [@kytrinyx]
+* [#289](https://github.com/exercism/cli/pull/289) Fix a typo in the usage statement - [@AlexWheeler]
+* [#290](https://github.com/exercism/cli/pull/290) Fix upgrade command for Linux systems - [@jbaiter]
+* [#292](https://github.com/exercism/cli/pull/292) Vendor dependencies - [@Tonkpils]
+* [#293](https://github.com/exercism/cli/pull/293) Remove extraneous/distracting details from README - [@Tonkpils]
+* [#294](https://github.com/exercism/cli/pull/294) Improve usage statement: alphabetize commands - [@beanieboi]
+* [#297](https://github.com/exercism/cli/pull/297) Improve debug output when API key is unconfigured - [@mrageh]
 * [#299](https://github.com/exercism/cli/pull/299) List output uses track ID and problem from list - [@Tonkpils]
+* [#301](https://github.com/exercism/cli/pull/301) Return error message for unknown track status - [@neslom]
+* [#302](https://github.com/exercism/cli/pull/302) Add helpful error message when user tries to submit a directory - [@alebaffa]
+* **Your contribution here**
 
 
 ## v2.2.4 (2016-01-28)
