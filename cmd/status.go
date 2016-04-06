@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
@@ -19,7 +20,8 @@ func Status(ctx *cli.Context) {
 	args := ctx.Args()
 
 	if len(args) != 1 {
-		log.Fatal("Usage: exercism status TRACK_ID")
+		fmt.Fprintf(os.Stderr, "Usage: exercism status TRACK_ID")
+		os.Exit(1)
 	}
 
 	client := api.NewClient(c)

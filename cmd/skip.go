@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
@@ -18,8 +19,8 @@ func Skip(ctx *cli.Context) {
 	args := ctx.Args()
 
 	if len(args) != 2 {
-		msg := "Usage: exercism skip TRACK_ID PROBLEM"
-		log.Fatal(msg)
+		fmt.Fprintf(os.Stderr, "Usage: exercism skip TRACK_ID PROBLEM")
+		os.Exit(1)
 	}
 
 	var (

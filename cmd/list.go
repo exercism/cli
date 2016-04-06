@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/codegangsta/cli"
 	"github.com/exercism/cli/api"
@@ -20,8 +21,8 @@ func List(ctx *cli.Context) {
 	args := ctx.Args()
 
 	if len(args) != 1 {
-		msg := "Usage: exercism list TRACK_ID"
-		log.Fatal(msg)
+		fmt.Fprintf(os.Stderr, "Usage: exercism list TRACK_ID")
+		os.Exit(1)
 	}
 
 	trackID := args[0]

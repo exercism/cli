@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -21,8 +23,8 @@ func Open(ctx *cli.Context) {
 
 	args := ctx.Args()
 	if len(args) != 2 {
-		msg := "Usage: exercism open TRACK_ID PROBLEM"
-		log.Fatal(msg)
+		fmt.Fprintf(os.Stderr, "Usage: exercism open TRACK_ID PROBLEM")
+		os.Exit(1)
 	}
 
 	trackID := args[0]
