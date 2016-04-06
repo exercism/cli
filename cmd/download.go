@@ -23,8 +23,8 @@ func Download(ctx *cli.Context) {
 
 	args := ctx.Args()
 	if len(args) != 1 {
-		msg := "Usage: exercism download SUBMISSION_ID"
-		log.Fatal(msg)
+		fmt.Fprintf(os.Stderr, "Usage: exercism download SUBMISSION_ID")
+		os.Exit(1)
 	}
 
 	submission, err := client.Download(args[0])
