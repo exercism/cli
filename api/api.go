@@ -50,6 +50,9 @@ func (c *Client) Fetch(args []string) ([]*Problem, error) {
 		url = fmt.Sprintf("%s/v2/exercises/%s?key=%s", c.XAPIHost, args[0], c.APIKey)
 	case 2:
 		url = fmt.Sprintf("%s/v2/exercises/%s/%s", c.XAPIHost, args[0], args[1])
+		if c.APIKey != "" {
+			url = fmt.Sprintf("%s?key=%s", url, c.APIKey)
+		}
 	default:
 		return nil, fmt.Errorf("Usage: exercism fetch\n   or: exercism fetch TRACK_ID\n   or: exercism fetch TRACK_ID PROBLEM")
 	}
