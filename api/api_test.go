@@ -66,25 +66,29 @@ func TestFetchATrack(t *testing.T) {
 }
 
 func TestFetchASpecificProblem(t *testing.T) {
-	var (
-		APIKey  = "mykey"
-		trackID = "go"
-		slug    = "leap"
-	)
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		trackProblemsAPI := fmt.Sprintf("/v2/exercises/%s/%s", trackID, slug)
-		assert.Equal(t, trackProblemsAPI, req.RequestURI)
+	tests := []struct {
+		key, url string
+	}{
+		{"", "/v2/exercises/go/leap"},
+		{"mykey", "/v2/exercises/go/leap?key=mykey"},
+	}
 
-		if err := respondWithFixture(w, "problems.json"); err != nil {
-			t.Fatal(err)
-		}
-	}))
-	defer ts.Close()
+	for _, test := range tests {
 
-	client := NewClient(&config.Config{XAPI: ts.URL, APIKey: APIKey})
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			assert.Equal(t, test.url, req.RequestURI)
 
-	_, err := client.Fetch([]string{trackID, slug})
-	assert.NoError(t, err)
+			if err := respondWithFixture(w, "problems.json"); err != nil {
+				t.Fatal(err)
+			}
+		}))
+		defer ts.Close()
+
+		client := NewClient(&config.Config{XAPI: ts.URL, APIKey: test.key})
+
+		_, err := client.Fetch([]string{"go", "leap"})
+		assert.NoError(t, err)
+	}
 }
 
 func TestSkipProblem(t *testing.T) {
