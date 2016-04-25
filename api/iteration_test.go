@@ -18,6 +18,7 @@ func TestNewIteration(t *testing.T) {
 		filepath.Join(dir, "python", "leap", "lib", "three.py"),
 		filepath.Join(dir, "python", "leap", "utf16le.py"),
 		filepath.Join(dir, "python", "leap", "utf16be.py"),
+		filepath.Join(dir, "python", "leap", "long-utf8.py"),
 	}
 
 	iter, err := NewIteration(dir, files)
@@ -32,8 +33,8 @@ func TestNewIteration(t *testing.T) {
 		t.Errorf("Expected problem to be leap, was %s", iter.Problem)
 	}
 
-	if len(iter.Solution) != 5 {
-		t.Fatalf("Expected solution to have 5 files, had %d", len(iter.Solution))
+	if len(iter.Solution) != 6 {
+		t.Fatalf("Expected solution to have 6 files, had %d", len(iter.Solution))
 	}
 
 	expected := map[string]struct {
@@ -45,6 +46,7 @@ func TestNewIteration(t *testing.T) {
 		filepath.Join("lib", "three.py"): {prefix: "# three"},
 		"utf16le.py":                     {prefix: "# utf16le"},
 		"utf16be.py":                     {prefix: "# utf16be"},
+		"long-utf8.py":                   {prefix: "# The first 1024", suffix: "👍\n"},
 	}
 
 	for filename, code := range expected {
