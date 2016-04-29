@@ -21,7 +21,7 @@ func List(ctx *cli.Context) {
 	args := ctx.Args()
 
 	if len(args) != 1 {
-		fmt.Fprintf(os.Stderr, "Usage: exercism list TRACK_ID")
+		fmt.Fprintf(os.Stderr, "Usage: exercism list TRACK_ID\n")
 		os.Exit(1)
 	}
 
