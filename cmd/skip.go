@@ -11,7 +11,7 @@ import (
 )
 
 // Skip allows a user to skip a specific problem.
-func Skip(ctx *cli.Context) {
+func Skip(ctx *cli.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
@@ -34,4 +34,6 @@ func Skip(ctx *cli.Context) {
 	}
 
 	fmt.Printf("Exercise %q in %q has been skipped.\n", slug, trackID)
+
+	return nil
 }

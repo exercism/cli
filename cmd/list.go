@@ -13,7 +13,7 @@ import (
 const msgExplainFetch = "In order to fetch a specific assignment, call the fetch command with a specific assignment.\n\nexercism fetch %s %s\n\n"
 
 // List returns the full list of assignments for a given track.
-func List(ctx *cli.Context) {
+func List(ctx *cli.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
@@ -40,4 +40,6 @@ func List(ctx *cli.Context) {
 	}
 	fmt.Println()
 	fmt.Printf(msgExplainFetch, trackID, problems[0])
+
+	return nil
 }

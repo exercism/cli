@@ -11,7 +11,7 @@ import (
 )
 
 // Fetch downloads exercism problems and writes them to disk.
-func Fetch(ctx *cli.Context) {
+func Fetch(ctx *cli.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
@@ -54,6 +54,9 @@ func Fetch(ctx *cli.Context) {
 	}
 
 	hw.Summarize(user.HWAll)
+
+	return nil
+	// return cli.NewExitError("no good", 10)
 }
 
 func setSubmissionState(problems []*api.Problem, submissionInfo map[string][]api.SubmissionInfo) error {

@@ -14,7 +14,7 @@ import (
 )
 
 // Open uses the given track and problem and opens it in the browser.
-func Open(ctx *cli.Context) {
+func Open(ctx *cli.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
@@ -57,4 +57,6 @@ func Open(ctx *cli.Context) {
 	if err := cmd.Run(); err != nil {
 		log.Fatal(err)
 	}
+
+	return nil
 }

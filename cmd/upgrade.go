@@ -23,7 +23,7 @@ var (
 )
 
 // Upgrade allows the user to upgrade to the latest version of the CLI.
-func Upgrade(ctx *cli.Context) {
+func Upgrade(ctx *cli.Context) error {
 	client := http.Client{Timeout: 10 * time.Second}
 	rel, err := fetchLatestRelease(client)
 	if err != nil {
@@ -36,7 +36,7 @@ func Upgrade(ctx *cli.Context) {
 	// should probably parse semver and compare
 	if rel.Version() == ctx.App.Version {
 		fmt.Println("Your CLI is up to date!")
-		return
+		return nil
 	}
 
 	// Locate the path to the current `exercism` executable.
@@ -87,4 +87,6 @@ func Upgrade(ctx *cli.Context) {
 	}
 
 	fmt.Println("Successfully upgraded!")
+
+	return nil
 }

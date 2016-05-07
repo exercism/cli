@@ -12,7 +12,7 @@ import (
 // Configure stores settings in a JSON file.
 // If a setting is not passed as an argument, default
 // values are used.
-func Configure(ctx *cli.Context) {
+func Configure(ctx *cli.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
@@ -40,4 +40,6 @@ func Configure(ctx *cli.Context) {
 	fmt.Printf("  --dir=%s\n", c.Dir)
 	fmt.Printf("  --host=%s\n", c.API)
 	fmt.Printf("  --api=%s\n\n", c.XAPI)
+
+	return nil
 }
