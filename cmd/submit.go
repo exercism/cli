@@ -100,5 +100,5 @@ func Submit(ctx *cli.Context) {
 	}
 
 	fmt.Printf("Your %s solution for %s has been submitted. View it here:\n%s\n\n", submission.Language, submission.Name, submission.URL)
-	fmt.Printf("See related solutions and get involved here:\n%stracks/%s/exercises/%s\n\n", c.API, iteration.TrackID, iteration.Problem)
+	fmt.Printf("See related solutions and get involved here:\n/%stracks/%s/exercises/%s\n\n", c.API, iteration.TrackID, iteration.Problem)
 }
