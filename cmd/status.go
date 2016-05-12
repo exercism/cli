@@ -12,7 +12,7 @@ import (
 
 // Status is a command that allows a user to view their progress in a given
 // language track.
-func Status(ctx *cli.Context) {
+func Status(ctx *cli.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
@@ -36,4 +36,6 @@ func Status(ctx *cli.Context) {
 	}
 
 	fmt.Println(status)
+
+	return nil
 }

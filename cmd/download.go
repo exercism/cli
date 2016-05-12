@@ -14,7 +14,7 @@ import (
 )
 
 // Download returns specified iteration with its related problem.
-func Download(ctx *cli.Context) {
+func Download(ctx *cli.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
@@ -52,6 +52,8 @@ func Download(ctx *cli.Context) {
 	}
 
 	fmt.Printf("Successfully downloaded submission.\n\nThe submission can be viewed at:\n %s\n\n", path)
+
+	return nil
 
 }
 

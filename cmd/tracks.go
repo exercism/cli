@@ -11,7 +11,7 @@ import (
 )
 
 // Tracks lists available tracks.
-func Tracks(ctx *cli.Context) {
+func Tracks(ctx *cli.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
@@ -35,4 +35,6 @@ Related commands:
     exercism list (see 'exercism help list')
 	`
 	fmt.Println(msg)
+
+	return nil
 }

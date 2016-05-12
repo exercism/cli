@@ -22,7 +22,7 @@ type pingResult struct {
 }
 
 // Debug provides information about the user's environment and configuration.
-func Debug(ctx *cli.Context) {
+func Debug(ctx *cli.Context) error {
 	defer fmt.Printf("\nIf you are having trouble and need to file a GitHub issue (https://github.com/exercism/exercism.io/issues) please include this information (except your API key. Keep that private).\n")
 
 	client := &http.Client{Timeout: 20 * time.Second}
@@ -128,4 +128,6 @@ func Debug(ctx *cli.Context) {
 	}()
 
 	wg.Wait()
+
+	return nil
 }

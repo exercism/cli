@@ -1,14 +1,15 @@
 {
 	"ImportPath": "github.com/exercism/cli",
 	"GoVersion": "go1.6",
+	"GodepVersion": "v63",
 	"Packages": [
 		"./..."
 	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/codegangsta/cli",
-			"Comment": "1.2.0-187-gc31a797",
-			"Rev": "c31a7975863e7810c92e2e288a9ab074f9a88f29"
+			"Comment": "v1.17.0-16-g7f0ca9a",
+			"Rev": "7f0ca9a34958d6702ac8f38530d19001fa5b1560"
 		},
 		{
 			"ImportPath": "github.com/kardianos/osext",

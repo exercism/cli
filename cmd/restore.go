@@ -10,7 +10,7 @@ import (
 )
 
 // Restore returns a user's solved problems.
-func Restore(ctx *cli.Context) {
+func Restore(ctx *cli.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
@@ -28,4 +28,6 @@ func Restore(ctx *cli.Context) {
 		log.Fatal(err)
 	}
 	hw.Summarize(user.HWNotSubmitted)
+
+	return nil
 }
