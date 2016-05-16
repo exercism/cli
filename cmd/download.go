@@ -23,7 +23,7 @@ func Download(ctx *cli.Context) error {
 
 	args := ctx.Args()
 	if len(args) != 1 {
-		fmt.Fprintf(os.Stderr, "Usage: exercism download SUBMISSION_ID")
+		fmt.Fprintf(os.Stderr, "Usage: exercism download SUBMISSION_ID\n")
 		os.Exit(1)
 	}
 

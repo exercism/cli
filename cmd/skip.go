@@ -19,7 +19,7 @@ func Skip(ctx *cli.Context) error {
 	args := ctx.Args()
 
 	if len(args) != 2 {
-		fmt.Fprintf(os.Stderr, "Usage: exercism skip TRACK_ID PROBLEM")
+		fmt.Fprintf(os.Stderr, "Usage: exercism skip TRACK_ID PROBLEM\n")
 		os.Exit(1)
 	}
 
