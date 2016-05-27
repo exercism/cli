@@ -6,7 +6,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/cmd"
 	"github.com/exercism/cli/debug"
