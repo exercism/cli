@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/url"
 	"os"
 	"strings"
 
@@ -170,6 +171,14 @@ func (c *Config) setDefaults() error {
 
 	if c.XAPI == "" {
 		c.XAPI = hostXAPI
+	}
+
+	if _, err := url.Parse(c.API); err != nil {
+		return fmt.Errorf("invalid API URL %s", err)
+	}
+
+	if _, err := url.Parse(c.XAPI); err != nil {
+		return fmt.Errorf("invalid xAPI URL %s", err)
 	}
 
 	c.Dir = paths.Exercises(c.Dir)
