@@ -28,11 +28,11 @@ createRelease() {
 		osarch=32bit
 	fi
 
-	ldflags="-X $OSVAR $os -X $ARCHVAR $arch"
+	ldflags="-X $OSVAR=$os -X $ARCHVAR=$arch"
 	if [ "$arm" ]
 	then
 		osarch=arm-v$arm
-		ldflags="$ldflags -X $ARMVAR $arm"
+		ldflags="$ldflags -X $ARMVAR=$arm"
 	fi
 
 	binname=exercism
