@@ -5,6 +5,14 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
+* [#306](https://github.com/exercism/cli/pull/306) Don't use Fatal to print usage - [@broady]
+* [#307](https://github.com/exercism/cli/pull/307) Pass API key when fetching individual exercises - [@kytrinyx]
+* [#312](https://github.com/exercism/cli/pull/312) Add missing newline on usage string - [@jppunnett]
+* [#318](https://github.com/exercism/cli/pull/318) Show activity stream URL after submitting - [@lcowell]
+* [4710640](https://github.com/exercism/cli/commit/4710640751c7a01deb1b5bf8a9a65b611b078c05) - [@lcowell]
+* Update codegangsta/cli dependency - [@manusajith], [@lcowell]
+* [#320](https://github.com/exercism/cli/pull/320) Add missing newlines to usage strings - [@hjljo]
+* [#328](https://github.com/exercism/cli/pull/328) Append solution URL path consistently - [@Tonkpils]
 * **Your contribution here**
 
 ## v2.2.5 (2016-04-02)
@@ -312,24 +320,28 @@ All changes by [@msgehard]
 [@ambroff]: https://github.com/ambroff
 [@andrewsardone]: https://github.com/andrewsardone
 [@anxiousmodernman]: https://github.com/anxiousmodernman
+[@broady]: https://github.com/broady
 [@ccnp123]: https://github.com/ccnp123
-[@Dparker1990]: https://github.com/Dparker1990
 [@daveyarwood]: https://github.com/daveyarwood
 [@devonestes]: https://github.com/devonestes
 [@djquan]: https://github.com/djquan
+[@Dparker1990]: https://github.com/Dparker1990
 [@dpritchett]: https://github.com/dpritchett
-[@eToThePiIPower]: https://github.com/eToThePiIPower
 [@ebautistabar]: https://github.com/ebautistabar
 [@elimisteve]: https://github.com/elimisteve
+[@eToThePiIPower]: https://github.com/eToThePiIPower
 [@harimp]: https://github.com/harimp
+[@hjljo]: https://github.com/hjljo
 [@isbadawi]: https://github.com/isbadawi
 [@jish]: https://github.com/jish
+[@jppunnett]: https://github.com/jppunnett
 [@kytrinyx]: https://github.com/kytrinyx
-[@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
 [@lcowell]: https://github.com/lcowell
-[@neslom]: https://github.com/neslom
-[@msgehard]: https://github.com/msgehard
+[@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
+[@manusajith]: https://github.com/manusajith
 [@morphatic]: https://github.com/morphatic
+[@msgehard]: https://github.com/msgehard
+[@neslom]: https://github.com/neslom
 [@nf]: https://github.com/nf
 [@petertseng]: https://github.com/petertseng
 [@pminten]: https://github.com/pminten
