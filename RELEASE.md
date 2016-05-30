@@ -51,7 +51,7 @@ VERSION matches the value of the `Version` constant.
 
 Upload all the binaries from `release/*`.
 
-Paste the release text and describe the new changes:
+Paste the release text and describe the new changes (`tail -n +57 RELEASE.md | head -n 16 | pbcopy`):
 
 ```
 ### Exercism Command-Line Interface (CLI)
