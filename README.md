@@ -32,6 +32,8 @@ Follow the directions on http://golang.org/doc/install
 
 Please provide tests for the changes where possible.
 
+To run the tests locally, use `go test ./...`
+
 At the moment the CLI commands are not tested, so if you're adding a new
 command don't worry too hard about tests.
 
