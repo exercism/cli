@@ -5,6 +5,10 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
+* **Your contribution here**
+
+## v2.2.6 (2016-05-30)
+
 * [#306](https://github.com/exercism/cli/pull/306) Don't use Fatal to print usage - [@broady]
 * [#307](https://github.com/exercism/cli/pull/307) Pass API key when fetching individual exercises - [@kytrinyx]
 * [#312](https://github.com/exercism/cli/pull/312) Add missing newline on usage string - [@jppunnett]
@@ -13,7 +17,6 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 * Update codegangsta/cli dependency - [@manusajith], [@lcowell]
 * [#320](https://github.com/exercism/cli/pull/320) Add missing newlines to usage strings - [@hjljo]
 * [#328](https://github.com/exercism/cli/pull/328) Append solution URL path consistently - [@Tonkpils]
-* **Your contribution here**
 
 ## v2.2.5 (2016-04-02)
 
