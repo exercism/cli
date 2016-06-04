@@ -137,6 +137,7 @@ func main() {
 			ShortName: "s",
 			Usage:     descSubmit,
 			Action:    cmd.Submit,
+			ArgsUsage: "file1 [file2, etc...]",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "test",
