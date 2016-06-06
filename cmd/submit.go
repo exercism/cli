@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/paths"
