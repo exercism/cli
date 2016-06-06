@@ -7,9 +7,9 @@
 	],
 	"Deps": [
 		{
-			"ImportPath": "github.com/codegangsta/cli",
-			"Comment": "v1.17.0-16-g7f0ca9a",
-			"Rev": "7f0ca9a34958d6702ac8f38530d19001fa5b1560"
+			"ImportPath": "github.com/urfave/cli",
+			"Comment": "v1.17.0-57-gedb24d0",
+			"Rev": "edb24d02aa3cea2319c33f2836d4a5133907fe4c"
 		},
 		{
 			"ImportPath": "github.com/kardianos/osext",
