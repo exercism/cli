@@ -100,7 +100,13 @@ func main() {
 			Name:      "fetch",
 			ShortName: "f",
 			Usage:     descFetch,
-			Action:    cmd.Fetch,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "all",
+					Usage: "fetch all exercises for a given track",
+				},
+			},
+			Action: cmd.Fetch,
 		},
 		{
 			Name:      "list",
