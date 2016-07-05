@@ -19,19 +19,25 @@ func Fetch(ctx *cli.Context) error {
 	client := api.NewClient(c)
 
 	args := ctx.Args()
-	problems, err := client.Fetch(args)
+	var problems []*api.Problem
 
 	if ctx.Bool("all") {
 		if len(args) > 0 {
 			trackID := args[0]
-			problems = fetchAll(trackID, client)
+			p, err := client.FetchAll(trackID)
+			if err != nil {
+				log.Fatal(err)
+			}
+			problems = p
 		} else {
 			log.Fatalf("You must supply a track to fetch all exercises")
 		}
-	}
-
-	if err != nil {
-		log.Fatal(err)
+	} else {
+		p, err := client.Fetch(args)
+		if err != nil {
+			log.Fatal(err)
+		}
+		problems = p
 	}
 
 	submissionInfo, err := client.Submissions()
@@ -81,21 +87,4 @@ func setSubmissionState(problems []*api.Problem, submissionInfo map[string][]api
 	}
 
 	return nil
-}
-
-func fetchAll(trackID string, client *api.Client) []*api.Problem {
-	list, err := client.List(trackID)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	problems := make([]*api.Problem, len(list))
-	for i, prob := range list {
-		p, err := client.Fetch([]string{trackID, prob})
-		if err != nil {
-			log.Fatal(err)
-		}
-		problems[i] = p[0]
-	}
-	return problems
 }
