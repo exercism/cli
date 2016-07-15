@@ -65,6 +65,38 @@ func TestFetchATrack(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestFetchAll(t *testing.T) {
+	var (
+		trackID     = "go"
+		fetchedList bool
+		fetchCount  int
+	)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		trackProblemsAPI := fmt.Sprintf("/tracks/%s", trackID)
+		if req.RequestURI == trackProblemsAPI {
+			if err := respondWithFixture(w, "fetch_all_tracks.json"); err != nil {
+				t.Fatal(err)
+			}
+			fetchedList = true
+		} else {
+			if err := respondWithFixture(w, "problems.json"); err != nil {
+				t.Fatal(err)
+			}
+			fetchCount++
+		}
+	}))
+	defer ts.Close()
+
+	client := NewClient(&config.Config{XAPI: ts.URL})
+
+	all, err := client.FetchAll(trackID)
+
+	assert.NoError(t, err)
+	assert.Equal(t, len(all), 3)
+	assert.Equal(t, fetchedList, true)
+	assert.Equal(t, fetchCount, 3)
+}
+
 func TestFetchASpecificProblem(t *testing.T) {
 	tests := []struct {
 		key, url string
