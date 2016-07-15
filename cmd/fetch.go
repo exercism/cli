@@ -18,9 +18,26 @@ func Fetch(ctx *cli.Context) error {
 	}
 	client := api.NewClient(c)
 
-	problems, err := client.Fetch(ctx.Args())
-	if err != nil {
-		log.Fatal(err)
+	args := ctx.Args()
+	var problems []*api.Problem
+
+	if ctx.Bool("all") {
+		if len(args) > 0 {
+			trackID := args[0]
+			p, err := client.FetchAll(trackID)
+			if err != nil {
+				log.Fatal(err)
+			}
+			problems = p
+		} else {
+			log.Fatalf("You must supply a track to fetch all exercises")
+		}
+	} else {
+		p, err := client.Fetch(args)
+		if err != nil {
+			log.Fatal(err)
+		}
+		problems = p
 	}
 
 	submissionInfo, err := client.Submissions()

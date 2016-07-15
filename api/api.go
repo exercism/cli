@@ -75,6 +75,24 @@ func (c *Client) Fetch(args []string) ([]*Problem, error) {
 	return payload.Problems, nil
 }
 
+// FetchAll retrieves all problems for a given language track from the API
+func (c *Client) FetchAll(trackID string) ([]*Problem, error) {
+	list, err := c.List(trackID)
+	if err != nil {
+		return nil, err
+	}
+
+	problems := make([]*Problem, len(list))
+	for i, prob := range list {
+		p, err := c.Fetch([]string{trackID, prob})
+		if err != nil {
+			return nil, err
+		}
+		problems[i] = p[0]
+	}
+	return problems, nil
+}
+
 // Restore fetches the latest revision of a solution and writes it to disk.
 func (c *Client) Restore() ([]*Problem, error) {
 	url := fmt.Sprintf("%s/v2/exercises/restore?key=%s", c.XAPIHost, c.APIKey)
