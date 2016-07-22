@@ -24,6 +24,10 @@ func Status(ctx *cli.Context) error {
 		os.Exit(1)
 	}
 
+	if !c.IsAuthenticated() {
+		log.Fatal(msgPleaseAuthenticate)
+	}
+
 	client := api.NewClient(c)
 	trackID := args[0]
 	status, err := client.Status(trackID)
