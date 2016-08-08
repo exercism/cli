@@ -6,6 +6,9 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## Next Release
 * **Your contribution here**
+
+## v2.3.0 (2016-08-07)
+
 * [#339](https://github.com/exercism/cli/pull/339) Don't run status command if API key is missing - [@ests]
 * [#336](https://github.com/exercism/cli/pull/336) Add '--all' flag to fetch command - [@neslom]
 * [#333](https://github.com/exercism/cli/pull/333) Update references of codegangsta/cli -> urfave/cli - [@manusajith], [@blackerby]
