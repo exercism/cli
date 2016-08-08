@@ -330,6 +330,7 @@ All changes by [@msgehard]
 [@ambroff]: https://github.com/ambroff
 [@andrewsardone]: https://github.com/andrewsardone
 [@anxiousmodernman]: https://github.com/anxiousmodernman
+[@blackerby]: https://github.com/blackerby
 [@broady]: https://github.com/broady
 [@ccnp123]: https://github.com/ccnp123
 [@daveyarwood]: https://github.com/daveyarwood
@@ -339,6 +340,7 @@ All changes by [@msgehard]
 [@dpritchett]: https://github.com/dpritchett
 [@ebautistabar]: https://github.com/ebautistabar
 [@elimisteve]: https://github.com/elimisteve
+[@ests]: https://github.com/ests
 [@eToThePiIPower]: https://github.com/eToThePiIPower
 [@harimp]: https://github.com/harimp
 [@hjljo]: https://github.com/hjljo
