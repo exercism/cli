@@ -70,7 +70,7 @@ func Debug(ctx *cli.Context) error {
 			fmt.Println("API Key: Please set your API Key to access all of the CLI features")
 		}
 	} else {
-		fmt.Println("Config file: <not configured>")
+		fmt.Printf("Config file: %s (not configured)\n", c.File)
 		fmt.Println("API Key: Please set your API Key to access all of the CLI features")
 	}
 	fmt.Printf("Exercises Directory: %s\n", c.Dir)

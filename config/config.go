@@ -34,8 +34,20 @@ type Config struct {
 
 // New returns a configuration struct with content from the exercism.json file
 func New(path string) (*Config, error) {
-	c := &Config{}
-	err := c.load(paths.Config(path))
+	configPath := paths.Config(path)
+	_, err := os.Stat(configPath)
+	if err != nil && os.IsNotExist(err) {
+		if path == "" {
+			configPath = paths.DefaultConfig
+		}
+	} else if err != nil {
+		return nil, err
+	}
+
+	c := &Config{
+		File: configPath,
+	}
+	err = c.load()
 	return c, err
 }
 
@@ -84,9 +96,7 @@ func (c *Config) Write() error {
 	return nil
 }
 
-func (c *Config) load(argPath string) error {
-	c.File = argPath
-
+func (c *Config) load() error {
 	if err := c.read(); err != nil {
 		return err
 	}

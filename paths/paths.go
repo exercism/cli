@@ -11,7 +11,7 @@ import (
 const (
 	// File is the default name of the JSON file where the config written.
 	// The user can pass an alternate filename when using the CLI.
-	File = ".exercism.json"
+	File = "exercism.json"
 	// DirExercises is the default name of the directory for active users.
 	// Make this non-exported when handlers.Login is deleted.
 	DirExercises = "exercism"
@@ -20,31 +20,37 @@ const (
 var (
 	// Home by default will contact the location of your home directory.
 	Home string
+	// ConfigHome will contain $XDG_CONFIG_HOME if it is set or default config home directory.
+	ConfigHome string
+	// DefaultConfig will contain default path to config, according to Home
+	DefaultConfig string
 
-	// XDGConfigHome will contain $XDG_CONFIG_HOME if it exists.
-	XDGConfigHome   string
 	errHomeNotFound = errors.New("unable to locate home directory")
 )
 
 func init() {
-	// on startup set default values
-	Recalculate()
+	var err error
+	Home, err = findHome()
+	if err != nil {
+		panic(err)
+	}
+	ConfigHome = os.Getenv("XDG_CONFIG_HOME")
+	if ConfigHome == "" {
+		ConfigHome = filepath.Join(Home, ".config")
+	}
+	DefaultConfig = filepath.Join(Home, "." + File)
 }
 
 // Config will return the correct input path given any input.
-// Blank input will return the default configuration location.
+// Blank input will return the default configuration location based
+// on ConfigHome.
 // Non-blank input will expand home to be an absolute path.
 // If the target is known to be a directory, the config filename
 // will be appended.
 func Config(path string) string {
 	if path == "" {
-		if XDGConfigHome == "" {
-			return filepath.Join(Home, File)
-		}
-
-		return filepath.Join(XDGConfigHome, File)
+		return filepath.Join(ConfigHome, File)
 	}
-
 	expandedPath := expandPath(path)
 	if IsDir(path) {
 		expandedPath = filepath.Join(expandedPath, File)
@@ -60,18 +66,6 @@ func Exercises(path string) string {
 		return filepath.Join(Home, DirExercises)
 	}
 	return expandPath(path)
-}
-
-// Recalculate sets exercism paths based on Home.
-func Recalculate() {
-	if Home == "" {
-		home, err := findHome()
-		if err != nil {
-			panic(err)
-		}
-		Home = home
-	}
-	XDGConfigHome = os.Getenv("XDG_CONFIG_HOME")
 }
 
 // IsDir determines whether the given path is a valid directory path.
@@ -114,7 +108,7 @@ func makeAbsolute(path string) string {
 }
 
 func expandHome(path string) string {
-	if path[:2] == "~"+string(os.PathSeparator) {
+	if strings.HasPrefix(path, "~"+string(os.PathSeparator)) {
 		return strings.Replace(path, "~", Home, 1)
 	}
 	return path
