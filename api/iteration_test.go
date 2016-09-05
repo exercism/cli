@@ -33,7 +33,7 @@ func TestNewIteration(t *testing.T) {
 	}
 
 	if len(iter.Solution) != 5 {
-		t.Fatalf("Expected solution to have 3 files, had %d", len(iter.Solution))
+		t.Fatalf("Expected solution to have 5 files, had %d", len(iter.Solution))
 	}
 
 	expected := map[string]string{
