@@ -12,11 +12,19 @@ func TestHome(t *testing.T) {
 	assert.Equal(t, os.Getenv("HOME"), Home)
 }
 
+func TestConfigHome(t *testing.T) {
+	xdgConfigHome := os.Getenv("XDG_CONFIG_HOME")
+	if xdgConfigHome == "" {
+		assert.Equal(t, filepath.Join(Home, ".config"), ConfigHome)
+	} else {
+		assert.Equal(t, xdgConfigHome, ConfigHome)
+	}
+}
+
 func TestExercises(t *testing.T) {
 	dir, err := os.Getwd()
 	assert.NoError(t, err)
 	Home = "/test/home"
-	Recalculate()
 
 	testCases := []struct {
 		givenPath    string
@@ -40,7 +48,7 @@ func TestConfig(t *testing.T) {
 	assert.NoError(t, err)
 
 	Home = dir
-	Recalculate()
+	ConfigHome = dir
 
 	testCases := []struct {
 		desc         string
@@ -50,7 +58,7 @@ func TestConfig(t *testing.T) {
 		{
 			"blank path",
 			"",
-			filepath.Join(Home, ".exercism.json"),
+			filepath.Join(ConfigHome, File),
 		},
 		{
 			"unknown path is expanded, but not modified",
@@ -73,11 +81,4 @@ func TestConfig(t *testing.T) {
 		actual := Config(tc.givenPath)
 		assert.Equal(t, tc.expectedPath, actual, tc.desc)
 	}
-}
-
-func TestXDGConfig(t *testing.T) {
-	XDGConfigHome = "/home/user/.xdg_config"
-
-	assert.Equal(t, filepath.Join(XDGConfigHome, File), Config(""))
-
 }

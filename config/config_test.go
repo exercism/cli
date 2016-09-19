@@ -17,15 +17,19 @@ func TestLoad(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	configPath := filepath.Join(tmpDir, "config.json")
+
+	paths.Home = tmpDir
+	paths.ConfigHome = tmpDir
+	paths.DefaultConfig = filepath.Join(tmpDir, "default.json")
+
+	configPath := filepath.Join(paths.ConfigHome, "config.json")
 	if err := os.Link(fixturePath(t, "config.json"), configPath); err != nil {
 		t.Fatal(err)
 	}
-	dirtyPath := filepath.Join(tmpDir, "dirty.json")
+	dirtyPath := filepath.Join(paths.ConfigHome, "dirty.json")
 	if err := os.Link(fixturePath(t, "dirty.json"), dirtyPath); err != nil {
 		t.Fatal(err)
 	}
-	paths.Home = tmpDir
 
 	testCases := []struct {
 		desc                string
@@ -36,7 +40,7 @@ func TestLoad(t *testing.T) {
 		{
 			desc: "defaults",
 			in:   "",
-			out:  paths.Config(""),
+			out:  paths.DefaultConfig,
 			dir:  paths.Exercises(""),
 			key:  "",
 			api:  hostAPI,
