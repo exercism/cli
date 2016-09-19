@@ -5,6 +5,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
+* [#344](https://github.com/exercism/cli/pull/344) Make the CLI config paths more XDG friendly - [@narqo]
 * **Your contribution here**
 
 ## v2.3.0 (2016-08-07)
@@ -353,6 +354,7 @@ All changes by [@msgehard]
 [@manusajith]: https://github.com/manusajith
 [@morphatic]: https://github.com/morphatic
 [@msgehard]: https://github.com/msgehard
+[@narqo]: https://github.com/narqo
 [@neslom]: https://github.com/neslom
 [@nf]: https://github.com/nf
 [@petertseng]: https://github.com/petertseng
