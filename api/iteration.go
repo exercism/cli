@@ -137,7 +137,16 @@ func readFileAsUTF8String(filename string) (*string, error) {
 		return nil, err
 	}
 
-	encoding, _, _ := charset.DetermineEncoding(b, mimeType)
+	encoding, _, certain := charset.DetermineEncoding(b, mimeType)
+	if !certain {
+		// We don't want to use an uncertain encoding.
+		// In particular, doing that may mangle UTF-8 files
+		// that have only ASCII in their first 1024 bytes.
+		// See https://github.com/exercism/cli/issues/309.
+		// So if we're unsure, use UTF-8 (no transformation).
+		s := string(b)
+		return &s, nil
+	}
 	decoder := encoding.NewDecoder()
 	decodedBytes, _, err := transform.Bytes(decoder, b)
 	if err != nil {
