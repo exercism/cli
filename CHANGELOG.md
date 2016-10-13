@@ -5,6 +5,8 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
+* [#350](https://github.com/exercism/cli/pull/350) Add ARMv8 binaries to CLI releases - [@Tonkpils]
+* [#346](https://github.com/exercism/cli/pull/346) Fallback to UTF-8 if encoding is uncertain - [@petertseng]
 * [#344](https://github.com/exercism/cli/pull/344) Make the CLI config paths more XDG friendly - [@narqo]
 * **Your contribution here**
 
