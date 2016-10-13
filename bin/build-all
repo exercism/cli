@@ -33,6 +33,10 @@ createRelease() {
 	then
 		osarch=arm-v$arm
 		ldflags="$ldflags -X $ARMVAR=$arm"
+	elif [ "$arch" = arm64 ]
+	then
+		osarch=arm-v8
+		ldflags="$ldflags -X $ARMVAR=8"
 	fi
 
 	binname=exercism
@@ -74,6 +78,7 @@ createRelease linux amd64
 createRelease linux arm 5
 createRelease linux arm 6
 createRelease linux arm 7
+createRelease linux arm64
 
 # Windows Releases
 createRelease windows 386
