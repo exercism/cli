@@ -7,10 +7,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/urfave/cli"
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/paths"
+	"github.com/urfave/cli"
 )
 
 // Submit posts an iteration to the API.
@@ -89,7 +89,7 @@ func Submit(ctx *cli.Context) error {
 
 	iteration, err := api.NewIteration(dir, files)
 	if err != nil {
-		log.Fatalf("Unable to submit - %s", err)
+		log.Fatalf("unable to submit - %s", err)
 	}
 	iteration.Key = c.APIKey
 	iteration.Comment = ctx.String("comment")
