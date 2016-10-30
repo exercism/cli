@@ -102,8 +102,8 @@ func NewIteration(dir string, filenames []string) (*Iteration, error) {
 		// is still bad. Has the user modified their path in some way?
 		return nil, newIterationError(msgGenericPathError, iter.Dir)
 	}
-	iter.TrackID = segments[1]
-	iter.Problem = segments[2]
+	iter.TrackID = strings.ToLower(segments[1])
+	iter.Problem = strings.ToLower(segments[2])
 
 	for _, filename := range filenames {
 		fileContents, err := readFileAsUTF8String(filename)
