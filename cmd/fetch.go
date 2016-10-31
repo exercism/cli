@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"path/filepath"
 
@@ -24,6 +25,7 @@ func Fetch(ctx *cli.Context) error {
 	if ctx.Bool("all") {
 		if len(args) > 0 {
 			trackID := args[0]
+			fmt.Printf("\nFetching all problems for the %s track...\n\n", trackID)
 			p, err := client.FetchAll(trackID)
 			if err != nil {
 				log.Fatal(err)
