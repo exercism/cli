@@ -74,16 +74,6 @@ func Submit(ctx *cli.Context) error {
 		if ctx.GlobalBool("verbose") {
 			log.Printf("absolute path: %s", file)
 		}
-
-		file, err = filepath.EvalSymlinks(file)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		if ctx.GlobalBool("verbose") {
-			log.Printf("eval symlinks (file): %s", file)
-		}
-
 		files = append(files, file)
 	}
 
