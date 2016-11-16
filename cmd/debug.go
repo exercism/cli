@@ -6,12 +6,13 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 
-	"github.com/urfave/cli"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/paths"
+	"github.com/urfave/cli"
 )
 
 type pingResult struct {
@@ -53,27 +54,9 @@ func Debug(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	configured := true
-	if _, err = os.Stat(c.File); err != nil {
-		if os.IsNotExist(err) {
-			configured = false
-		} else {
-			log.Fatal(err)
-		}
+	if err := printConfigFileData(ctx, c); err != nil {
+		log.Fatal(err)
 	}
-
-	if configured {
-		fmt.Printf("Config file: %s\n", c.File)
-		if c.APIKey != "" {
-			fmt.Printf("API Key: %s\n", c.APIKey)
-		} else {
-			fmt.Println("API Key: Please set your API Key to access all of the CLI features")
-		}
-	} else {
-		fmt.Printf("Config file: %s (not configured)\n", c.File)
-		fmt.Println("API Key: Please set your API Key to access all of the CLI features")
-	}
-	fmt.Printf("Exercises Directory: %s\n", c.Dir)
 
 	fmt.Println("Testing API endpoints reachability")
 
@@ -130,4 +113,41 @@ func Debug(ctx *cli.Context) error {
 	wg.Wait()
 
 	return nil
+}
+
+func printConfigFileData(ctx *cli.Context, cfg *config.Config) error {
+	configured := true
+	if _, err := os.Stat(cfg.File); err != nil {
+		if os.IsNotExist(err) {
+			configured = false
+		} else {
+			return err
+		}
+	}
+
+	apiKey := "Please set your API key to access all of the CLI features"
+	configFile := fmt.Sprintf("%s (not configured)", cfg.File)
+
+	if configured {
+		configFile = cfg.File
+		if cfg.APIKey != "" {
+			if ctx.Bool("full-api-key") {
+				apiKey = cfg.APIKey
+			} else {
+				apiKey = redactAPIKey(cfg.APIKey)
+			}
+		}
+	}
+
+	fmt.Printf("Config File: %s\n", configFile)
+	fmt.Printf("API Key: %s\n", apiKey)
+	fmt.Printf("Exercises Directory: %s\n", cfg.Dir)
+
+	return nil
+}
+
+func redactAPIKey(apiKey string) string {
+	str := apiKey[4 : len(apiKey)-3]
+	redaction := strings.Repeat("*", len(str))
+	return string(apiKey[:4]) + redaction + string(apiKey[len(apiKey)-3:])
 }
