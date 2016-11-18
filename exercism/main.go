@@ -150,7 +150,7 @@ func main() {
 					Usage: "allow submission of test files",
 				},
 				cli.StringFlag{
-					Name:  "comment",
+					Name:  "comment, m",
 					Usage: "includes a comment with the submission",
 				},
 			},
