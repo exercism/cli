@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/urfave/cli"
 	"github.com/exercism/cli/config"
+	"github.com/urfave/cli"
 )
 
 // Configure stores settings in a JSON file.

@@ -5,9 +5,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/urfave/cli"
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
+	"github.com/urfave/cli"
 )
 
 const msgExplainFetch = "In order to fetch a specific assignment, call the fetch command with a specific assignment.\n\nexercism fetch %s %s\n\n"

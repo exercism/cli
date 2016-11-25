@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/urfave/cli"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/paths"
+	"github.com/urfave/cli"
 )
 
 type pingResult struct {
