@@ -85,8 +85,14 @@ func main() {
 			Action: cmd.Configure,
 		},
 		{
-			Name:   "debug",
-			Usage:  descDebug,
+			Name:  "debug",
+			Usage: descDebug,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "full-api-key",
+					Usage: "Displays the full API key without obfuscating it",
+				},
+			},
 			Action: cmd.Debug,
 		},
 		{
