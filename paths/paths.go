@@ -38,7 +38,7 @@ func init() {
 	if ConfigHome == "" {
 		ConfigHome = filepath.Join(Home, ".config")
 	}
-	DefaultConfig = filepath.Join(Home, "." + File)
+	DefaultConfig = filepath.Join(Home, "."+File)
 }
 
 // Config will return the correct input path given any input.

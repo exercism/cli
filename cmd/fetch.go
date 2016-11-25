@@ -5,10 +5,10 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/urfave/cli"
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/user"
+	"github.com/urfave/cli"
 )
 
 // Fetch downloads exercism problems and writes them to disk.

@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/urfave/cli"
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
+	"github.com/urfave/cli"
 )
 
 // Download returns specified iteration with its related problem.

@@ -5,9 +5,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/urfave/cli"
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
+	"github.com/urfave/cli"
 )
 
 // Status is a command that allows a user to view their progress in a given
