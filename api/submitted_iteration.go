@@ -1,7 +1,7 @@
 package api
 
-// Submission is an iteration that has been submitted to the API.
-type Submission struct {
+// SubmittedIteration is an iteration that has been submitted to the API.
+type SubmittedIteration struct {
 	URL           string            `json:"url"`
 	TrackID       string            `json:"track_id"`
 	Language      string            `json:"language"`

@@ -180,7 +180,7 @@ func TestGetSubmission(t *testing.T) {
 	defer ts.Close()
 
 	client := NewClient(&config.Config{API: ts.URL, APIKey: APIKey})
-	_, err := client.SubmissionURL(trackID, slug)
+	_, err := client.IterationURL(trackID, slug)
 	assert.NoError(t, err)
 }
 
