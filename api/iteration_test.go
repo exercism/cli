@@ -8,6 +8,32 @@ import (
 	"unicode/utf8"
 )
 
+func TestFollowSymlink(t *testing.T) {
+	_, path, _, _ := runtime.Caller(0)
+	dir := filepath.Join(path, "..", "..", "fixtures", "iteration")
+
+	files := []string{
+		filepath.Join(dir, "python", "leap", "symlink.py"),
+	}
+
+	iter, err := NewIteration(dir, files)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for name, contents := range iter.Solution {
+		expected_contents := "# two\n"
+		expected_name := "symlink.py"
+
+		if expected_contents != contents {
+			t.Errorf("Expected contents to be %s, but got %s", expected_contents, contents)
+		}
+		if name != expected_name {
+			t.Errorf("bad name. expected: %s, got %s", expected_name, name)
+		}
+	}
+}
+
 func TestNewIteration(t *testing.T) {
 	_, path, _, _ := runtime.Caller(0)
 	dir := filepath.Join(path, "..", "..", "fixtures", "iteration")

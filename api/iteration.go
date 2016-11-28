@@ -74,7 +74,7 @@ type Iteration struct {
 
 // NewIteration prepares an iteration of a problem in a track for submission to the API.
 // It takes a dir (from the global config) and a list of files which it will read from disk.
-// All paths are assumed to be absolute paths with symlinks resolved.
+// Paths can point to regular files or to symlinks.
 func NewIteration(dir string, filenames []string) (*Iteration, error) {
 	if len(filenames) == 0 {
 		return nil, errNoFiles
