@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/exercism/cli/api"
@@ -27,7 +28,8 @@ func Download(ctx *cli.Context) error {
 		os.Exit(1)
 	}
 
-	submission, err := client.Download(args[0])
+	submissionKey := submissionKeyFromURL(args[0])
+	submission, err := client.Download(submissionKey)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -65,4 +67,9 @@ func writeFile(path, contents string) error {
 		return err
 	}
 	return ioutil.WriteFile(path, []byte(contents), 0644)
+}
+
+func submissionKeyFromURL(submission string) string {
+	re := regexp.MustCompile(".*(https*://)?exercism.io/submissions/")
+	return re.ReplaceAllString(submission, "")
 }
