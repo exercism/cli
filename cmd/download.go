@@ -70,6 +70,6 @@ func writeFile(path, contents string) error {
 }
 
 func submissionKeyFromURL(submission string) string {
-	re := regexp.MustCompile(".*(https*://)?exercism.io/submissions/")
+	re := regexp.MustCompile(".*(https?://)?exercism.io/submissions/")
 	return re.ReplaceAllString(submission, "")
 }
