@@ -81,6 +81,10 @@ func main() {
 					Name:  "api, a",
 					Usage: "exercism xapi host",
 				},
+				cli.BoolFlag{
+					Name:  "silent, s",
+					Usage: "Obfuscates configuration options from output",
+				},
 			},
 			Action: cmd.Configure,
 		},
