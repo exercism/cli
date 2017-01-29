@@ -22,6 +22,7 @@ func Configure(ctx *cli.Context) error {
 	host := ctx.String("host")
 	dir := ctx.String("dir")
 	api := ctx.String("api")
+	silent := ctx.Bool("silent")
 
 	if err := c.Update(key, host, dir, api); err != nil {
 		log.Fatalf("Error updating your configuration %s\n", err)
@@ -35,11 +36,13 @@ func Configure(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("\nConfiguration written to %s\n\n", c.File)
-	fmt.Printf("  --key=%s\n", c.APIKey)
-	fmt.Printf("  --dir=%s\n", c.Dir)
-	fmt.Printf("  --host=%s\n", c.API)
-	fmt.Printf("  --api=%s\n\n", c.XAPI)
+	if !silent {
+		fmt.Printf("\nConfiguration written to %s\n\n", c.File)
+		fmt.Printf("  --key=%s\n", c.APIKey)
+		fmt.Printf("  --dir=%s\n", c.Dir)
+		fmt.Printf("  --host=%s\n", c.API)
+		fmt.Printf("  --api=%s\n\n", c.XAPI)
+	}
 
 	return nil
 }
