@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
+	"github.com/robphoenix/cli/api"
+	"github.com/robphoenix/cli/config"
 	"github.com/urfave/cli"
 )
 

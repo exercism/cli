@@ -31,10 +31,10 @@ Current directory:	{{ .Current }}
 Configured directory:	{{ .Configured }}
 
 Try re-running "exercism fetch". Then move your solution file to the correct
-exercise directory for the problem you're working on. It should be somewhere
+exercise directory for the exercise you're working on. It should be somewhere
 inside {{ .Configured }}
 
-For example, to submit the JavaScript "hello-world.js" problem, run
+For example, to submit the JavaScript "hello-world.js" exercise, run
 "exercism submit hello-world.js" from this directory:
 
 {{ .Configured }}{{ .Separator }}javascript{{ .Separator }}hello-world
@@ -53,7 +53,7 @@ First, make a copy of your solution file and save it outside of
 {{ .Configured }}
 
 Then, run "exercism fetch". Move your solution file back to the correct
-exercise directory for the problem you're working on. It should be somewhere
+exercise directory for the exercise you're working on. It should be somewhere
 inside {{ .Configured }}
 
 If you are having trouble, you can file a GitHub issue at (https://github.com/exercism/exercism.io/issues)
@@ -67,12 +67,12 @@ type Iteration struct {
 	Code     string            `json:"code"`
 	Dir      string            `json:"dir"`
 	TrackID  string            `json:"language"`
-	Problem  string            `json:"problem"`
+	Exercise string            `json:"exercise"`
 	Solution map[string]string `json:"solution"`
 	Comment  string            `json:"comment,omitempty"`
 }
 
-// NewIteration prepares an iteration of a problem in a track for submission to the API.
+// NewIteration prepares an iteration of an exercise in a track for submission to the API.
 // It takes a dir (from the global config) and a list of files which it will read from disk.
 // Paths can point to regular files or to symlinks.
 func NewIteration(dir string, filenames []string) (*Iteration, error) {
@@ -93,7 +93,7 @@ func NewIteration(dir string, filenames []string) (*Iteration, error) {
 		}
 	}
 
-	// Identify the language track and problem slug.
+	// Identify the language track and exercise slug.
 	path := filenames[0][len(dir):]
 
 	segments := strings.Split(path, string(filepath.Separator))
@@ -103,7 +103,7 @@ func NewIteration(dir string, filenames []string) (*Iteration, error) {
 		return nil, newIterationError(msgGenericPathError, iter.Dir)
 	}
 	iter.TrackID = strings.ToLower(segments[1])
-	iter.Problem = strings.ToLower(segments[2])
+	iter.Exercise = strings.ToLower(segments[2])
 
 	for _, filename := range filenames {
 		fileContents, err := readFileAsUTF8String(filename)
@@ -119,7 +119,7 @@ func NewIteration(dir string, filenames []string) (*Iteration, error) {
 
 // RelativePath returns the iteration's relative path.
 func (iter *Iteration) RelativePath() string {
-	return filepath.Join(iter.Dir, iter.TrackID, iter.Problem) + string(filepath.Separator)
+	return filepath.Join(iter.Dir, iter.TrackID, iter.Exercise) + string(filepath.Separator)
 }
 
 // isValidFilepath checks a files's absolute filepath and returns true if it is

@@ -22,14 +22,14 @@ func TestFollowSymlink(t *testing.T) {
 	}
 
 	for name, contents := range iter.Solution {
-		expected_contents := "# two\n"
-		expected_name := "symlink.py"
+		expectedContents := "# two\n"
+		expectedName := "symlink.py"
 
-		if expected_contents != contents {
-			t.Errorf("Expected contents to be %s, but got %s", expected_contents, contents)
+		if expectedContents != contents {
+			t.Errorf("Expected contents to be %s, but got %s", expectedContents, contents)
 		}
-		if name != expected_name {
-			t.Errorf("bad name. expected: %s, got %s", expected_name, name)
+		if name != expectedName {
+			t.Errorf("bad name. expected: %s, got %s", expectedName, name)
 		}
 	}
 }
@@ -55,8 +55,8 @@ func TestNewIteration(t *testing.T) {
 	if iter.TrackID != "python" {
 		t.Errorf("Expected language to be python, was %s", iter.TrackID)
 	}
-	if iter.Problem != "leap" {
-		t.Errorf("Expected problem to be leap, was %s", iter.Problem)
+	if iter.Exercise != "leap" {
+		t.Errorf("Expected exercise to be leap, was %s", iter.Exercise)
 	}
 
 	if len(iter.Solution) != 6 {

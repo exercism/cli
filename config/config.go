@@ -11,19 +11,19 @@ import (
 	"os"
 	"strings"
 
-	"github.com/exercism/cli/paths"
+	"github.com/robphoenix/cli/paths"
 )
 
 const (
 	// hostAPI is the endpoint to submit solutions to, and to get personalized data
 	hostAPI = "http://exercism.io"
-	// hostXAPI is the endpoint to fetch problems from
+	// hostXAPI is the endpoint to fetch exercises from
 	hostXAPI = "http://x.exercism.io"
 )
 
 // Config represents the settings for particular user.
 // This defines both the auth for talking to the API, as well as
-// where to put problems that get downloaded.
+// where to put exercises that get downloaded.
 type Config struct {
 	APIKey string `json:"apiKey"`
 	Dir    string `json:"dir"`

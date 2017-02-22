@@ -11,15 +11,15 @@ const dateFormat = "January 2, 2006"
 
 // StatusInfo contains information about a user's status on a particular language track.
 type StatusInfo struct {
-	TrackID         string `json:"track_id"`
-	Recent          *Recent
-	FetchedProblems *Slugs `json:"fetched"`
-	SkippedProblems *Slugs `json:"skipped"`
+	TrackID          string `json:"track_id"`
+	Recent           *Recent
+	FetchedExercises *Slugs `json:"fetched"`
+	SkippedExercises *Slugs `json:"skipped"`
 }
 
 // Recent contains information about the user's most recently submitted exercise on a particular language track.
 type Recent struct {
-	Problem     string `json:"problem"`
+	Exercise    string `json:"exercise"`
 	SubmittedAt string `json:"submitted_at"`
 }
 
@@ -32,11 +32,11 @@ func (r *Recent) String() string {
 		log.Fatal(err)
 	}
 
-	return fmt.Sprintf(" - %s (submitted on %s)", r.Problem, submittedAt.Format(dateFormat))
+	return fmt.Sprintf(" - %s (submitted on %s)", r.Exercise, submittedAt.Format(dateFormat))
 }
 
 func (s *StatusInfo) String() string {
-	if len(*s.FetchedProblems) == 0 && s.Recent.Problem == "" {
+	if len(*s.FetchedExercises) == 0 && s.Recent.Exercise == "" {
 		return fmt.Sprintf("\nYou have yet to begin the %s track!\n", s.TrackID)
 	}
 
@@ -53,12 +53,12 @@ Exercises skipped:
 %s
 `
 
-	return fmt.Sprintf(msg, s.TrackID, s.Recent, s.FetchedProblems, s.SkippedProblems)
+	return fmt.Sprintf(msg, s.TrackID, s.Recent, s.FetchedExercises, s.SkippedExercises)
 }
 
 func (s Slugs) String() string {
-	for i, problem := range s {
-		s[i] = fmt.Sprintf(" - %s", problem)
+	for i, exercise := range s {
+		s[i] = fmt.Sprintf(" - %s", exercise)
 	}
 	return strings.Join(s, "\n")
 }

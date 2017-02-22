@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
+	"github.com/robphoenix/cli/api"
+	"github.com/robphoenix/cli/config"
 )
 
 // HWFilter is used to categorize homework items.
@@ -18,28 +18,28 @@ type SummaryOption HWFilter
 const (
 	// HWAll represents all items in the collection.
 	HWAll = iota
-	// HWUpdated represents problems where files have been added.
+	// HWUpdated represents exercises where files have been added.
 	HWUpdated
-	// HWNew represents newly fetched problems.
+	// HWNew represents newly fetched exercises.
 	HWNew
-	// HWNotSubmitted represents problems that have not yet been submitted for review.
+	// HWNotSubmitted represents exercises that have not yet been submitted for review.
 	HWNotSubmitted
 )
 
-// Homework is a collection of problems that were fetched from the APIs.
+// Homework is a collection of exercises that were fetched from the APIs.
 type Homework struct {
 	Items    []*Item
 	template string
 }
 
-// NewHomework decorates a problem set with some additional data based on the
+// NewHomework decorates an exercise set with some additional data based on the
 // user's system.
-func NewHomework(problems []*api.Problem, c *config.Config) *Homework {
+func NewHomework(exercises []*api.Exercise, c *config.Config) *Homework {
 	hw := Homework{}
-	for _, problem := range problems {
+	for _, exercise := range exercises {
 		item := &Item{
-			Problem: problem,
-			dir:     c.Dir,
+			Exercise: exercise,
+			dir:      c.Dir,
 		}
 		hw.Items = append(hw.Items, item)
 	}
@@ -48,7 +48,7 @@ func NewHomework(problems []*api.Problem, c *config.Config) *Homework {
 	return &hw
 }
 
-// Save saves all problems in the problem set.
+// Save saves all exercises in the exercise set.
 func (hw *Homework) Save() error {
 	for _, item := range hw.Items {
 		if err := item.Save(); err != nil {
@@ -79,7 +79,7 @@ Fetch exercises for your first track with "exercism fetch TRACK_ID"`)
 	return nil
 }
 
-// ItemsMatching returns a subset of the set of problems.
+// ItemsMatching returns a subset of the set of exercises.
 func (hw *Homework) ItemsMatching(filter HWFilter) []*Item {
 	items := []*Item{}
 	for _, item := range hw.Items {
@@ -90,9 +90,9 @@ func (hw *Homework) ItemsMatching(filter HWFilter) []*Item {
 	return items
 }
 
-// Report outputs a list of the problems in the set.
-// It prints the track name, the problem name, and the full
-// path to the problem on the user's filesystem.
+// Report outputs a list of the exercises in the set.
+// It prints the track name, the exercise name, and the full
+// path to the exercise on the user's filesystem.
 func (hw *Homework) Report(filter HWFilter) {
 	if hw == nil {
 		return
@@ -115,9 +115,9 @@ func (hw *Homework) heading(filter HWFilter, count, width int) {
 		return
 	}
 
-	unit := "problems"
+	unit := "exercises"
 	if count == 1 {
-		unit = "problem"
+		unit = "exercise"
 	}
 
 	var status string

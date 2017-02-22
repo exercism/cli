@@ -9,7 +9,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/exercism/cli/config"
+	"github.com/robphoenix/cli/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,13 +24,14 @@ func respondWithFixture(w http.ResponseWriter, name string) error {
 
 	return nil
 }
-func TestFetchAllProblem(t *testing.T) {
+
+func TestFetchAllExercises(t *testing.T) {
 	APIKey := "mykey"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		allProblemsAPI := fmt.Sprintf("/v2/exercises?key=%s", APIKey)
-		assert.Equal(t, allProblemsAPI, req.RequestURI)
+		allExercisesAPI := fmt.Sprintf("/v2/exercises?key=%s", APIKey)
+		assert.Equal(t, allExercisesAPI, req.RequestURI)
 
-		if err := respondWithFixture(w, "problems.json"); err != nil {
+		if err := respondWithFixture(w, "exercises.json"); err != nil {
 			t.Fatal(err)
 		}
 	}))
@@ -38,10 +39,10 @@ func TestFetchAllProblem(t *testing.T) {
 
 	client := NewClient(&config.Config{XAPI: ts.URL, APIKey: APIKey})
 
-	problems, err := client.Fetch([]string{})
+	exercises, err := client.Fetch([]string{})
 	assert.NoError(t, err)
 
-	assert.Equal(t, len(problems), 3)
+	assert.Equal(t, 3, len(exercises))
 }
 
 func TestFetchATrack(t *testing.T) {
@@ -50,10 +51,10 @@ func TestFetchATrack(t *testing.T) {
 		trackID = "go"
 	)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		trackProblemsAPI := fmt.Sprintf("/v2/exercises/%s?key=%s", trackID, APIKey)
-		assert.Equal(t, trackProblemsAPI, req.RequestURI)
+		trackExercisesAPI := fmt.Sprintf("/v2/exercises/%s?key=%s", trackID, APIKey)
+		assert.Equal(t, trackExercisesAPI, req.RequestURI)
 
-		if err := respondWithFixture(w, "problems.json"); err != nil {
+		if err := respondWithFixture(w, "exercises.json"); err != nil {
 			t.Fatal(err)
 		}
 	}))
@@ -72,14 +73,14 @@ func TestFetchAll(t *testing.T) {
 		fetchCount  int
 	)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		trackProblemsAPI := fmt.Sprintf("/tracks/%s", trackID)
-		if req.RequestURI == trackProblemsAPI {
+		trackExercisesAPI := fmt.Sprintf("/tracks/%s", trackID)
+		if req.RequestURI == trackExercisesAPI {
 			if err := respondWithFixture(w, "fetch_all_tracks.json"); err != nil {
 				t.Fatal(err)
 			}
 			fetchedList = true
 		} else {
-			if err := respondWithFixture(w, "problems.json"); err != nil {
+			if err := respondWithFixture(w, "exercises.json"); err != nil {
 				t.Fatal(err)
 			}
 			fetchCount++
@@ -97,7 +98,7 @@ func TestFetchAll(t *testing.T) {
 	assert.Equal(t, fetchCount, 3)
 }
 
-func TestFetchASpecificProblem(t *testing.T) {
+func TestFetchASpecificExercise(t *testing.T) {
 	tests := []struct {
 		key, url string
 	}{
@@ -110,7 +111,7 @@ func TestFetchASpecificProblem(t *testing.T) {
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			assert.Equal(t, test.url, req.RequestURI)
 
-			if err := respondWithFixture(w, "problems.json"); err != nil {
+			if err := respondWithFixture(w, "exercises.json"); err != nil {
 				t.Fatal(err)
 			}
 		}))
@@ -123,7 +124,7 @@ func TestFetchASpecificProblem(t *testing.T) {
 	}
 }
 
-func TestSkipProblem(t *testing.T) {
+func TestSkipExercise(t *testing.T) {
 	var (
 		APIKey  = "mykey"
 		trackID = "go"
@@ -143,7 +144,7 @@ func TestSkipProblem(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestSkipProblemErrorResponse(t *testing.T) {
+func TestSkipExerciseErrorResponse(t *testing.T) {
 	var (
 		APIKey  = "mykey"
 		trackID = "go"
@@ -170,8 +171,8 @@ func TestGetSubmission(t *testing.T) {
 		slug    = "leap"
 	)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		trackProblemsAPI := fmt.Sprintf("/api/v1/submissions/%s/%s?key=%s", trackID, slug, APIKey)
-		assert.Equal(t, trackProblemsAPI, req.RequestURI)
+		trackExercisesAPI := fmt.Sprintf("/api/v1/submissions/%s/%s?key=%s", trackID, slug, APIKey)
+		assert.Equal(t, trackExercisesAPI, req.RequestURI)
 
 		if err := respondWithFixture(w, "submission.json"); err != nil {
 			t.Fatal(err)
@@ -231,11 +232,11 @@ func TestListTrack(t *testing.T) {
 
 	client := NewClient(&config.Config{XAPI: ts.URL})
 
-	problems, err := client.List("clojure")
+	exercises, err := client.List("clojure")
 	assert.NoError(t, err)
 
-	assert.Equal(t, len(problems), 34)
-	assert.Equal(t, problems[0], "bob")
+	assert.Equal(t, len(exercises), 34)
+	assert.Equal(t, exercises[0], "bob")
 }
 
 func TestListUnknownTrack(t *testing.T) {
