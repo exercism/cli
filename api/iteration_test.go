@@ -55,8 +55,8 @@ func TestNewIteration(t *testing.T) {
 	if iter.TrackID != "python" {
 		t.Errorf("Expected language to be python, was %s", iter.TrackID)
 	}
-	if iter.Problem != "leap" {
-		t.Errorf("Expected problem to be leap, was %s", iter.Problem)
+	if iter.Exercise != "leap" {
+		t.Errorf("Expected exercise to be leap, was %s", iter.Exercise)
 	}
 
 	if len(iter.Solution) != 6 {

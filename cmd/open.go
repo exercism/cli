@@ -8,12 +8,12 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
+	"github.com/robphoenix/cli/api"
+	"github.com/robphoenix/cli/config"
 	"github.com/urfave/cli"
 )
 
-// Open uses the given track and problem and opens it in the browser.
+// Open uses the given track and exercise and opens it in the browser.
 func Open(ctx *cli.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
@@ -23,7 +23,7 @@ func Open(ctx *cli.Context) error {
 
 	args := ctx.Args()
 	if len(args) != 2 {
-		fmt.Fprintf(os.Stderr, "Usage: exercism open TRACK_ID PROBLEM\n")
+		fmt.Fprintf(os.Stderr, "Usage: exercism open TRACK_ID EXERCISE\n")
 		os.Exit(1)
 	}
 

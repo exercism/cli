@@ -8,12 +8,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
+	"github.com/robphoenix/cli/api"
+	"github.com/robphoenix/cli/config"
 	"github.com/urfave/cli"
 )
 
-// Download returns specified iteration with its related problem.
+// Download returns specified iteration with its related exercise.
 func Download(ctx *cli.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
@@ -38,7 +38,7 @@ func Download(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	for name, contents := range submission.ProblemFiles {
+	for name, contents := range submission.ExerciseFiles {
 		if err := writeFile(fmt.Sprintf("%s/%s", path, name), contents); err != nil {
 			log.Fatalf("Unable to write file %s: %s", name, err)
 		}
@@ -58,7 +58,7 @@ func Download(ctx *cli.Context) error {
 }
 
 // writeFile writes the given contents to the given path, creating any necessary parent directories.
-// This is useful because both problem files and solution files may have directory structures.
+// This is useful because both exercise files and solution files may have directory structures.
 func writeFile(path, contents string) error {
 	dir := filepath.Dir(path)
 	if err := os.MkdirAll(dir, 0755); err != nil {

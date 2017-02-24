@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
+	"github.com/robphoenix/cli/api"
+	"github.com/robphoenix/cli/config"
 	"github.com/urfave/cli"
 )
 
@@ -27,7 +27,7 @@ func List(ctx *cli.Context) error {
 
 	trackID := args[0]
 	client := api.NewClient(c)
-	problems, err := client.List(trackID)
+	exercises, err := client.List(trackID)
 	if err != nil {
 		if err == api.ErrUnknownTrack {
 			log.Fatalf("There is no track with ID '%s'.", trackID)
@@ -35,11 +35,11 @@ func List(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	for _, p := range problems {
+	for _, p := range exercises {
 		fmt.Printf("%s\n", p)
 	}
 	fmt.Println()
-	fmt.Printf(msgExplainFetch, trackID, problems[0])
+	fmt.Printf(msgExplainFetch, trackID, exercises[0])
 
 	return nil
 }

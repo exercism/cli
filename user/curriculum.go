@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/exercism/cli/api"
+	"github.com/robphoenix/cli/api"
 )
 
 // Status is the status of a track (active/inactive).
@@ -12,10 +12,10 @@ type Status bool
 
 const (
 	// TrackActive represents an active track.
-	// Problems from active tracks will be delivered with the `fetch` command.
+	// Exercises from active tracks will be delivered with the `fetch` command.
 	TrackActive Status = true
 	// TrackInactive represents an inactive track.
-	// It is possible to fetch problems from an inactive track, and
+	// It is possible to fetch exercises from an inactive track, and
 	// submit them to the website, but these will not automatically be
 	// delivered in the global `fetch` command.
 	TrackInactive Status = false
@@ -44,7 +44,7 @@ func (cur *Curriculum) Report(status Status) {
 				track.ID,
 				strings.Repeat(" ", cur.lenID()-len(track.ID)+1),
 				track.Len(),
-				"problems",
+				"exercises",
 			)
 		}
 	}

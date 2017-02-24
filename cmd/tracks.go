@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/user"
+	"github.com/robphoenix/cli/api"
+	"github.com/robphoenix/cli/config"
+	"github.com/robphoenix/cli/user"
 	"github.com/urfave/cli"
 )
 

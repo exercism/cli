@@ -3,13 +3,13 @@ package cmd
 import (
 	"log"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/user"
+	"github.com/robphoenix/cli/api"
+	"github.com/robphoenix/cli/config"
+	"github.com/robphoenix/cli/user"
 	"github.com/urfave/cli"
 )
 
-// Restore returns a user's solved problems.
+// Restore returns a user's solved exercises.
 func Restore(ctx *cli.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
@@ -18,12 +18,12 @@ func Restore(ctx *cli.Context) error {
 
 	client := api.NewClient(c)
 
-	problems, err := client.Restore()
+	exercises, err := client.Restore()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	hw := user.NewHomework(problems, c)
+	hw := user.NewHomework(exercises, c)
 	if err := hw.Save(); err != nil {
 		log.Fatal(err)
 	}

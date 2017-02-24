@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/exercism/cli/paths"
+	"github.com/robphoenix/cli/paths"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,11 +23,11 @@ func TestLoad(t *testing.T) {
 	paths.DefaultConfig = filepath.Join(tmpDir, "default.json")
 
 	configPath := filepath.Join(paths.ConfigHome, "config.json")
-	if err := os.Link(fixturePath(t, "config.json"), configPath); err != nil {
+	if err := os.Symlink(fixturePath(t, "config.json"), configPath); err != nil {
 		t.Fatal(err)
 	}
 	dirtyPath := filepath.Join(paths.ConfigHome, "dirty.json")
-	if err := os.Link(fixturePath(t, "dirty.json"), dirtyPath); err != nil {
+	if err := os.Symlink(fixturePath(t, "dirty.json"), dirtyPath); err != nil {
 		t.Fatal(err)
 	}
 
@@ -107,7 +107,7 @@ func TestLoad_InvalidJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 	invalidPath := filepath.Join(tmpDir, "config_invalid.json")
-	if err := os.Link(fixturePath(t, "config_invalid.json"), invalidPath); err != nil {
+	if err := os.Symlink(fixturePath(t, "config_invalid.json"), invalidPath); err != nil {
 		t.Fatal(err)
 	}
 

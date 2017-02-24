@@ -8,7 +8,7 @@ type Submission struct {
 	Slug          string            `json:"slug"`
 	Name          string            `json:"name"`
 	Username      string            `json:"username"`
-	ProblemFiles  map[string]string `json:"problem_files"`
+	ExerciseFiles map[string]string `json:"exercise_files"`
 	SolutionFiles map[string]string `json:"solution_files"`
 	Iteration     int               `json:"iteration"`
 }

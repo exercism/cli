@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/debug"
+	"github.com/robphoenix/cli/config"
+	"github.com/robphoenix/cli/debug"
 )
 
 const (

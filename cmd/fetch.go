@@ -5,13 +5,13 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/user"
+	"github.com/robphoenix/cli/api"
+	"github.com/robphoenix/cli/config"
+	"github.com/robphoenix/cli/user"
 	"github.com/urfave/cli"
 )
 
-// Fetch downloads exercism problems and writes them to disk.
+// Fetch downloads exercism exercises and writes them to disk.
 func Fetch(ctx *cli.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
@@ -20,17 +20,17 @@ func Fetch(ctx *cli.Context) error {
 	client := api.NewClient(c)
 
 	args := ctx.Args()
-	var problems []*api.Problem
+	var exercises []*api.Exercise
 
 	if ctx.Bool("all") {
 		if len(args) > 0 {
 			trackID := args[0]
-			fmt.Printf("\nFetching all problems for the %s track...\n\n", trackID)
+			fmt.Printf("\nFetching all exercises for the %s track...\n\n", trackID)
 			p, err := client.FetchAll(trackID)
 			if err != nil {
 				log.Fatal(err)
 			}
-			problems = p
+			exercises = p
 		} else {
 			log.Fatalf("You must supply a track to fetch all exercises")
 		}
@@ -39,7 +39,7 @@ func Fetch(ctx *cli.Context) error {
 		if err != nil {
 			log.Fatal(err)
 		}
-		problems = p
+		exercises = p
 	}
 
 	submissionInfo, err := client.Submissions()
@@ -47,7 +47,7 @@ func Fetch(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	if err := setSubmissionState(problems, submissionInfo); err != nil {
+	if err := setSubmissionState(exercises, submissionInfo); err != nil {
 		log.Fatal(err)
 	}
 
@@ -60,7 +60,7 @@ func Fetch(ctx *cli.Context) error {
 	for _, dir := range dirs {
 		dirMap[dir] = true
 	}
-	hw := user.NewHomework(problems, c)
+	hw := user.NewHomework(exercises, c)
 
 	if len(ctx.Args()) == 0 {
 		if err := hw.RejectMissingTracks(dirMap); err != nil {
@@ -78,12 +78,12 @@ func Fetch(ctx *cli.Context) error {
 	// return cli.NewExitError("no good", 10)
 }
 
-func setSubmissionState(problems []*api.Problem, submissionInfo map[string][]api.SubmissionInfo) error {
-	for _, problem := range problems {
-		langSubmissions := submissionInfo[problem.TrackID]
+func setSubmissionState(exercises []*api.Exercise, submissionInfo map[string][]api.SubmissionInfo) error {
+	for _, exercise := range exercises {
+		langSubmissions := submissionInfo[exercise.TrackID]
 		for _, submission := range langSubmissions {
-			if submission.Slug == problem.Slug {
-				problem.Submitted = true
+			if submission.Slug == exercise.Slug {
+				exercise.Submitted = true
 			}
 		}
 	}

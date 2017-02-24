@@ -2,8 +2,8 @@ package api
 
 import "fmt"
 
-// Problem represents a specific problem in a given language track.
-type Problem struct {
+// Problem represents a specific exercise in a given language track.
+type Exercise struct {
 	ID        string            `json:"id"`
 	TrackID   string            `json:"track_id"`
 	Language  string            `json:"language"`
@@ -13,6 +13,6 @@ type Problem struct {
 	Submitted bool
 }
 
-func (p *Problem) String() string {
+func (p *Exercise) String() string {
 	return fmt.Sprintf("%s (%s)", p.Language, p.Name)
 }

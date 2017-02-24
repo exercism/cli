@@ -8,39 +8,39 @@ func TestIsTest(t *testing.T) {
 		isTest bool
 	}{
 		{
-			name:   "problem/whatever-test.ext",
+			name:   "exercise/whatever-test.ext",
 			isTest: true,
 		},
 		{
-			name:   "problem/whatever.ext",
+			name:   "exercise/whatever.ext",
 			isTest: false,
 		},
 		{
-			name:   "problem/whatever_test.spec.ext",
+			name:   "exercise/whatever_test.spec.ext",
 			isTest: true,
 		},
 		{
-			name:   "problem/WhateverTest.ext",
+			name:   "exercise/WhateverTest.ext",
 			isTest: true,
 		},
 		{
-			name:   "problem/Whatever.ext",
+			name:   "exercise/Whatever.ext",
 			isTest: false,
 		},
 		{
-			name:   "problem/whatever_test.ext",
+			name:   "exercise/whatever_test.ext",
 			isTest: true,
 		},
 		{
-			name:   "problem/whatever.ext",
+			name:   "exercise/whatever.ext",
 			isTest: false,
 		},
 		{
-			name:   "problem/test.ext",
+			name:   "exercise/test.ext",
 			isTest: true,
 		},
 		{
-			name:   "problem/Whatever.t", // perl
+			name:   "exercise/Whatever.t", // perl
 			isTest: true,
 		},
 		{
@@ -62,27 +62,27 @@ func TestIsREADME(t *testing.T) {
 		isREADME bool
 	}{
 		{
-			name:     "problem/README.md",
+			name:     "exercise/README.md",
 			isREADME: true,
 		},
 		{
-			name:     "problem/README",
+			name:     "exercise/README",
 			isREADME: true,
 		},
 		{
-			name:     "problem/README.txt",
+			name:     "exercise/README.txt",
 			isREADME: true,
 		},
 		{
-			name:     "problem/some_problem.py",
+			name:     "exercise/some_exercise.py",
 			isREADME: false,
 		},
 		{
-			name:     "problem/readme.lua",
+			name:     "exercise/readme.lua",
 			isREADME: false,
 		},
 		{
-			name:     "problem/readme_spec.lua",
+			name:     "exercise/readme_spec.lua",
 			isREADME: false,
 		},
 	}

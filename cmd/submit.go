@@ -7,9 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/paths"
+	"github.com/robphoenix/cli/api"
+	"github.com/robphoenix/cli/config"
+	"github.com/robphoenix/cli/paths"
 	"github.com/urfave/cli"
 )
 
@@ -91,7 +91,7 @@ func Submit(ctx *cli.Context) error {
 	}
 
 	solutionURL, _ := url.Parse(c.API)
-	solutionURL.Path += fmt.Sprintf("tracks/%s/exercises/%s", iteration.TrackID, iteration.Problem)
+	solutionURL.Path += fmt.Sprintf("tracks/%s/exercises/%s", iteration.TrackID, iteration.Exercise)
 	fmt.Printf("Your %s solution for %s has been submitted. View it here:\n%s\n\n", submission.Language, submission.Name, submission.URL)
 	fmt.Printf("See related solutions and get involved here:\n%s\n\n", solutionURL)
 

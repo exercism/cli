@@ -6,9 +6,9 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/cmd"
-	"github.com/exercism/cli/debug"
+	"github.com/robphoenix/cli/api"
+	"github.com/robphoenix/cli/cmd"
+	"github.com/robphoenix/cli/debug"
 	"github.com/urfave/cli"
 )
 
@@ -22,13 +22,13 @@ const (
 	descConfigure = "Writes config values to a JSON file."
 	descDebug     = "Outputs useful debug information."
 	descDownload  = "Downloads a solution given the ID of the latest iteration."
-	descFetch     = "Fetches the next unsubmitted problem in each track."
-	descList      = "Lists the available problems for a language track, given its ID."
-	descOpen      = "Opens exercism.io to your most recent iteration of a problem given the track ID and problem slug."
+	descFetch     = "Fetches the next unsubmitted exercise in each track."
+	descList      = "Lists the available exercises for a language track, given its ID."
+	descOpen      = "Opens exercism.io to your most recent iteration of an exercise given the track ID and exercise slug."
 	descRestore   = "Downloads the most recent iteration for each of your solutions on exercism.io."
-	descSkip      = "Skips a problem given a track ID and problem slug."
+	descSkip      = "Skips an exercise given a track ID and exercise slug."
 	descStatus    = "Fetches information about your progress with a given language track."
-	descSubmit    = "Submits a new iteration to a problem on exercism.io."
+	descSubmit    = "Submits a new iteration to an exercise on exercism.io."
 	descTracks    = "Lists the available language tracks."
 	descUpgrade   = "Upgrades the CLI to the latest released version."
 

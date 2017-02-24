@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/exercism/cli/config"
+	"github.com/robphoenix/cli/config"
 	"github.com/stretchr/testify/assert"
 )
 

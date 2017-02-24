@@ -5,12 +5,12 @@ import (
 	"log"
 	"os"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
+	"github.com/robphoenix/cli/api"
+	"github.com/robphoenix/cli/config"
 	"github.com/urfave/cli"
 )
 
-// Skip allows a user to skip a specific problem.
+// Skip allows a user to skip a specific exercise.
 func Skip(ctx *cli.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
@@ -19,7 +19,7 @@ func Skip(ctx *cli.Context) error {
 	args := ctx.Args()
 
 	if len(args) != 2 {
-		fmt.Fprintf(os.Stderr, "Usage: exercism skip TRACK_ID PROBLEM\n")
+		fmt.Fprintf(os.Stderr, "Usage: exercism skip TRACK_ID EXERCISE\n")
 		os.Exit(1)
 	}
 

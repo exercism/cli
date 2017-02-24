@@ -3,13 +3,13 @@
 
 # Exercism Command-Line Client
 
-The CLI provides a way to do the problems on
+The CLI provides a way to do the exercises on
 [exercism.io](http://exercism.io).
 
 **Important**: If you're looking for instructions on how to install the CLI. Please read [Installing the CLI](http://exercism.io/cli)
 
 This CLI ships as a binary with no additional runtime requirements. This means
-that if you're doing the Haskell problems on exercism you don't need a working
+that if you're doing the Haskell exercises on exercism you don't need a working
 Python or Ruby environment simply to fetch and submit exercises.
 
 ## Dependencies
@@ -60,8 +60,8 @@ will be built into the `release` directory.
 
 - **Language** is the name of a programming language. E.g. C++ or Objective-C or JavaScript.
 - **Track ID** is a normalized, url-safe identifier for a language track. E.g. `cpp` or `objective-c` or `javascript`.
-- **Problem** is an exercism exercise.
-- **Problem Slug** is a normalized, url-safe identifier for a problem.
-- **Iteration** is a solution that a user has written for a particular problem in a particular language track. A user may have several iterations for the same problem.
+- **Exercise** is an exercism exercise.
+- **Exercise Slug** is a normalized, url-safe identifier for an exercise.
+- **Iteration** is a solution that a user has written for a particular exercise in a particular language track. A user may have several iterations for the same exercise.
 
 

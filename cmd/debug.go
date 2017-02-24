@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/paths"
+	"github.com/robphoenix/cli/config"
+	"github.com/robphoenix/cli/paths"
 	"github.com/urfave/cli"
 )
 

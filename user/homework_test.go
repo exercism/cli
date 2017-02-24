@@ -3,18 +3,18 @@ package user
 import (
 	"testing"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
+	"github.com/robphoenix/cli/api"
+	"github.com/robphoenix/cli/config"
 )
 
 func TestRejectMissingtracks(t *testing.T) {
-	problem1 := &api.Problem{
+	exercise1 := &api.Exercise{
 		TrackID:  "go",
 		Slug:     "clock",
 		Language: "Go",
 		Name:     "Clock",
 	}
-	problem2 := &api.Problem{
+	exercise2 := &api.Exercise{
 		TrackID:  "ruby",
 		Slug:     "clock",
 		Language: "Ruby",
@@ -26,7 +26,7 @@ func TestRejectMissingtracks(t *testing.T) {
 	}
 	emptyDirMap := make(map[string]bool)
 
-	hw := NewHomework([]*api.Problem{problem1, problem2}, &config.Config{Dir: "/tmp"})
+	hw := NewHomework([]*api.Exercise{exercise1, exercise2}, &config.Config{Dir: "/tmp"})
 	err := hw.RejectMissingTracks(dirMap)
 
 	if err != nil {
@@ -34,11 +34,11 @@ func TestRejectMissingtracks(t *testing.T) {
 	}
 
 	if len(hw.Items) == 2 {
-		t.Error("Should have rejected the Ruby problem but did not reject any problems!")
+		t.Error("Should have rejected the Ruby exercise but did not reject any exercises!")
 	}
 
 	if len(hw.Items) == 1 && hw.Items[0].TrackID == "ruby" {
-		t.Error("Should have rejected the Ruby problem and rejected the Go problem instead!")
+		t.Error("Should have rejected the Ruby exercise and rejected the Go exercise instead!")
 	}
 
 	if err := hw.RejectMissingTracks(emptyDirMap); err == nil {

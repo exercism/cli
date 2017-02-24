@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
+	"github.com/robphoenix/cli/api"
+	"github.com/robphoenix/cli/config"
 )
 
 func TestItemReport(t *testing.T) {
@@ -19,14 +19,14 @@ func TestItemReport(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		problem1 := &api.Problem{
+		exercise1 := &api.Exercise{
 			TrackID:  "go",
 			Slug:     "clock",
 			Language: "Go",
 			Name:     "Clock",
 		}
 
-		hw := NewHomework([]*api.Problem{problem1}, &config.Config{Dir: "/tmp"})
+		hw := NewHomework([]*api.Exercise{exercise1}, &config.Config{Dir: "/tmp"})
 		if len(hw.Items) == 0 {
 			t.Fatal(errors.New("failed to initialize homework correctly"))
 		}

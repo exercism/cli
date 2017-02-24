@@ -19,9 +19,10 @@ type PayloadError struct {
 	Error string `json:"error"`
 }
 
-// PayloadProblems represents a response containing problems.
-type PayloadProblems struct {
-	Problems []*Problem
+// PayloadExercises represents a response containing exercises.
+type PayloadExercises struct {
+	Exercises []*Exercise `json:"problems"`
+
 	PayloadError
 }
 
@@ -37,11 +38,11 @@ type SubmissionInfo struct {
 	State string `json:"state"`
 }
 
-// Fetch retrieves problems from the API.
-// Most problems consist of a README, some sort of test suite, and
+// Fetch retrieves exercises from the API.
+// Most exercises consist of a README, some sort of test suite, and
 // any supporting files (header files, test data, boilerplate, skeleton
 // files, etc).
-func (c *Client) Fetch(args []string) ([]*Problem, error) {
+func (c *Client) Fetch(args []string) ([]*Exercise, error) {
 	var url string
 	switch len(args) {
 	case 0:
@@ -54,7 +55,7 @@ func (c *Client) Fetch(args []string) ([]*Problem, error) {
 			url = fmt.Sprintf("%s?key=%s", url, c.APIKey)
 		}
 	default:
-		return nil, fmt.Errorf("Usage: exercism fetch\n   or: exercism fetch TRACK_ID\n   or: exercism fetch TRACK_ID PROBLEM")
+		return nil, fmt.Errorf("Usage: exercism fetch\n   or: exercism fetch TRACK_ID\n   or: exercism fetch TRACK_ID EXERCISE")
 	}
 
 	req, err := c.NewRequest("GET", url, nil)
@@ -62,56 +63,55 @@ func (c *Client) Fetch(args []string) ([]*Problem, error) {
 		return nil, err
 	}
 
-	payload := &PayloadProblems{}
+	payload := &PayloadExercises{}
 	res, err := c.Do(req, payload)
 	if err != nil {
 		return nil, err
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unable to fetch problems (HTTP: %d) - %s", res.StatusCode, payload.Error)
+		return nil, fmt.Errorf("unable to fetch exercises (HTTP: %d) - %s", res.StatusCode, payload.Error)
 	}
-
-	return payload.Problems, nil
+	return payload.Exercises, nil
 }
 
-// FetchAll retrieves all problems for a given language track from the API
-func (c *Client) FetchAll(trackID string) ([]*Problem, error) {
+// FetchAll retrieves all exercises for a given language track from the API
+func (c *Client) FetchAll(trackID string) ([]*Exercise, error) {
 	list, err := c.List(trackID)
 	if err != nil {
 		return nil, err
 	}
 
-	problems := make([]*Problem, len(list))
-	for i, prob := range list {
-		p, err := c.Fetch([]string{trackID, prob})
+	exercises := make([]*Exercise, len(list))
+	for i, exercise := range list {
+		p, err := c.Fetch([]string{trackID, exercise})
 		if err != nil {
 			return nil, err
 		}
-		problems[i] = p[0]
+		exercises[i] = p[0]
 	}
-	return problems, nil
+	return exercises, nil
 }
 
 // Restore fetches the latest revision of a solution and writes it to disk.
-func (c *Client) Restore() ([]*Problem, error) {
+func (c *Client) Restore() ([]*Exercise, error) {
 	url := fmt.Sprintf("%s/v2/exercises/restore?key=%s", c.XAPIHost, c.APIKey)
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	payload := &PayloadProblems{}
+	payload := &PayloadExercises{}
 	res, err := c.Do(req, payload)
 	if err != nil {
 		return nil, err
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unable to fetch problems (HTTP: %d) - %s", res.StatusCode, payload.Error)
+		return nil, fmt.Errorf("unable to fetch exercises (HTTP: %d) - %s", res.StatusCode, payload.Error)
 	}
 
-	return payload.Problems, nil
+	return payload.Exercises, nil
 }
 
 // Submissions gets a list of submitted exercises and their current state.
@@ -130,7 +130,7 @@ func (c *Client) Submissions() (map[string][]SubmissionInfo, error) {
 	return payload, nil
 }
 
-// SubmissionURL gets the url of the latest iteration on the given language track id and problem slug.
+// SubmissionURL gets the url of the latest iteration on the given language track id and exercise slug.
 func (c *Client) SubmissionURL(trackID, slug string) (*Submission, error) {
 	url := fmt.Sprintf("%s/api/v1/submissions/%s/%s?key=%s", c.APIHost, trackID, slug, c.APIKey)
 	req, err := c.NewRequest("GET", url, nil)
@@ -194,7 +194,7 @@ func (c *Client) Submit(iter *Iteration) (*Submission, error) {
 	return ps.Submission, nil
 }
 
-// List available problems for a language track.
+// List available exercises for a language track.
 func (c *Client) List(trackID string) ([]string, error) {
 	url := fmt.Sprintf("%s/tracks/%s", c.XAPIHost, trackID)
 
@@ -219,14 +219,14 @@ func (c *Client) List(trackID string) ([]string, error) {
 	if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
 		return nil, err
 	}
-	problems := make([]string, len(payload.Track.Problems))
+	exercises := make([]string, len(payload.Track.Exercises))
 	prefix := trackID + "/"
 
-	for n, p := range payload.Track.Problems {
-		problems[n] = strings.TrimPrefix(p, prefix)
+	for n, p := range payload.Track.Exercises {
+		exercises[n] = strings.TrimPrefix(p, prefix)
 	}
 
-	return problems, nil
+	return exercises, nil
 }
 
 // Tracks gets the current list of active and inactive language tracks.
