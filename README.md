@@ -37,6 +37,15 @@ To run the tests locally, use `go test ./...`
 At the moment the CLI commands are not tested, so if you're adding a new
 command don't worry too hard about tests.
 
+## Testing against exercism.io
+
+If you want to test a change by using your own fork to try `exercism` commands,
+such as `exercism fetch` or `exercism submit`, against the exercism.io site, it
+is advisable that you set up and run a [local development environment](https://github.com/exercism/exercism.io/blob/master/docs/setting-up-local-development.md),
+and configure the CLI to submit to your local machine, which would let you
+easily delete and recreate submissions, without fear of breaking the exercism.io
+site.
+
 ## Building
 
 To build the binary for your platform run
