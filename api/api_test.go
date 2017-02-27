@@ -41,7 +41,7 @@ func TestFetchAllProblem(t *testing.T) {
 	problems, err := client.Fetch([]string{})
 	assert.NoError(t, err)
 
-	assert.Equal(t, len(problems), 3)
+	assert.Equal(t, 3, len(problems))
 }
 
 func TestFetchATrack(t *testing.T) {
@@ -92,9 +92,9 @@ func TestFetchAll(t *testing.T) {
 	all, err := client.FetchAll(trackID)
 
 	assert.NoError(t, err)
-	assert.Equal(t, len(all), 3)
-	assert.Equal(t, fetchedList, true)
-	assert.Equal(t, fetchCount, 3)
+	assert.Equal(t, 3, len(all))
+	assert.Equal(t, true, fetchedList)
+	assert.Equal(t, 3, fetchCount)
 }
 
 func TestFetchASpecificProblem(t *testing.T) {
@@ -210,7 +210,7 @@ func TestSubmitAssignment(t *testing.T) {
 	sub, err := client.Submit(iter)
 	assert.NoError(t, err)
 
-	assert.Equal(t, sub.Language, "ruby")
+	assert.Equal(t, "ruby", sub.Language)
 
 	// Test sending comment
 	iter.Comment = submissionComment
@@ -234,8 +234,8 @@ func TestListTrack(t *testing.T) {
 	problems, err := client.List("clojure")
 	assert.NoError(t, err)
 
-	assert.Equal(t, len(problems), 34)
-	assert.Equal(t, problems[0], "bob")
+	assert.Equal(t, 34, len(problems))
+	assert.Equal(t, "bob", problems[0])
 }
 
 func TestListUnknownTrack(t *testing.T) {
@@ -247,7 +247,7 @@ func TestListUnknownTrack(t *testing.T) {
 	client := NewClient(&config.Config{XAPI: ts.URL})
 
 	_, err := client.List("rubbbby")
-	assert.Equal(t, err, ErrUnknownTrack)
+	assert.Equal(t, ErrUnknownTrack, err)
 }
 
 func TestStatusUnknownTrack(t *testing.T) {
@@ -259,5 +259,5 @@ func TestStatusUnknownTrack(t *testing.T) {
 	client := NewClient(&config.Config{API: ts.URL})
 
 	_, err := client.Status("rubbbby")
-	assert.Equal(t, err, ErrUnknownTrack)
+	assert.Equal(t, ErrUnknownTrack, err)
 }
