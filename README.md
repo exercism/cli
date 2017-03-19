@@ -1,10 +1,9 @@
-[![Build Status](https://travis-ci.org/exercism/cli.png?branch=master)](https://travis-ci.org/exercism/cli)
-[![Supporting 24 Pull Requests](https://img.shields.io/badge/Supporting-24%20Pull%20Requests-red.svg?style=flat)](http://24pullrequests.com)
+# Exercism Command-line Interface
 
-# Exercism Command-Line Client
+[![Build Status](https://travis-ci.org/exercism/cli.svg?branch=master)](https://travis-ci.org/exercism/cli)
+[![Supporting 24 Pull Requests](https://img.shields.io/badge/Supporting-24%20Pull%20Requests-red.svg)](http://24pullrequests.com)
 
-The CLI provides a way to do the problems on
-[exercism.io](http://exercism.io).
+The CLI provides a way to do the problems on [exercism.io](http://exercism.io).
 
 **Important**: If you're looking for instructions on how to install the CLI. Please read [Installing the CLI](http://exercism.io/cli)
 
