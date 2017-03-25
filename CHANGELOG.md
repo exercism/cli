@@ -5,11 +5,20 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
-* [#350](https://github.com/exercism/cli/pull/350) Add ARMv8 binaries to CLI releases - [@Tonkpils]
-* [#346](https://github.com/exercism/cli/pull/346) Fallback to UTF-8 if encoding is uncertain - [@petertseng]
-* [#344](https://github.com/exercism/cli/pull/344) Make the CLI config paths more XDG friendly - [@narqo]
-* [#344](https://github.com/exercism/cli/pull/359) Add short flag `-m` for submit comment flag  - [@jgsqware]
 * **Your contribution here**
+
+## v2.4.0 (2017-03-24)
+
+* [#344](https://github.com/exercism/cli/pull/344) Make the CLI config paths more XDG friendly - [@narqo]
+* [#346](https://github.com/exercism/cli/pull/346) Fallback to UTF-8 if encoding is uncertain - [@petertseng]
+* [#350](https://github.com/exercism/cli/pull/350) Add ARMv8 binaries to CLI releases - [@Tonkpils]
+* [#352](https://github.com/exercism/cli/pull/352) Fix case sensitivity on slug and track ID - [@Tonkpils]
+* [#353](https://github.com/exercism/cli/pull/353) Print confirmation when fetching --all - [@neslom]
+* [#356](https://github.com/exercism/cli/pull/356) Resolve symlinks before attempting to read files - [@lcowell]
+* [#358](https://github.com/exercism/cli/pull/358) Redact API key from debug output - [@Tonkpils]
+* [#359](https://github.com/exercism/cli/pull/359) Add short flag `-m` for submit comment flag  - [@jgsqware]
+* [#366](https://github.com/exercism/cli/pull/366) Allow obfuscation on configure command - [@dmmulroy]
+* [#367](https://github.com/exercism/cli/pull/367) Use supplied confirmation text from API on submit - [@nilbus]
 
 ## v2.3.0 (2016-08-07)
 
@@ -331,6 +340,10 @@ All changes by [@msgehard]
 * Implement login and logout
 * Build on Travis
 
+[@Dparker1990]: https://github.com/Dparker1990
+[@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
+[@Tonkpils]: https://github.com/Tonkpils
+[@TrevorBramble]: https://github.com/TrevorBramble
 [@ambroff]: https://github.com/ambroff
 [@andrewsardone]: https://github.com/andrewsardone
 [@anxiousmodernman]: https://github.com/anxiousmodernman
@@ -340,26 +353,27 @@ All changes by [@msgehard]
 [@daveyarwood]: https://github.com/daveyarwood
 [@devonestes]: https://github.com/devonestes
 [@djquan]: https://github.com/djquan
-[@Dparker1990]: https://github.com/Dparker1990
+[@dmmulroy]: https://github.com/dmmulroy
 [@dpritchett]: https://github.com/dpritchett
+[@eToThePiIPower]: https://github.com/eToThePiIPower
 [@ebautistabar]: https://github.com/ebautistabar
 [@elimisteve]: https://github.com/elimisteve
 [@ests]: https://github.com/ests
-[@eToThePiIPower]: https://github.com/eToThePiIPower
 [@harimp]: https://github.com/harimp
 [@hjljo]: https://github.com/hjljo
 [@isbadawi]: https://github.com/isbadawi
+[@jgsqware]: https://github.com/jgsqware
 [@jish]: https://github.com/jish
 [@jppunnett]: https://github.com/jppunnett
 [@kytrinyx]: https://github.com/kytrinyx
 [@lcowell]: https://github.com/lcowell
-[@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
 [@manusajith]: https://github.com/manusajith
 [@morphatic]: https://github.com/morphatic
 [@msgehard]: https://github.com/msgehard
 [@narqo]: https://github.com/narqo
 [@neslom]: https://github.com/neslom
 [@nf]: https://github.com/nf
+[@nilbus]: https://github.com/nilbus
 [@petertseng]: https://github.com/petertseng
 [@pminten]: https://github.com/pminten
 [@queuebit]: https://github.com/queuebit
@@ -367,6 +381,4 @@ All changes by [@msgehard]
 [@rprouse]: https://github.com/rprouse
 [@simonjefford]: https://github.com/simonjefford
 [@srt32]: https://github.com/srt32
-[@Tonkpils]: https://github.com/Tonkpils
-[@TrevorBramble]: https://github.com/TrevorBramble
 [@zabawaba99]: https://github.com/zabawaba99
