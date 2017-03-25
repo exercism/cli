@@ -90,10 +90,14 @@ func Submit(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	solutionURL, _ := url.Parse(c.API)
-	solutionURL.Path += fmt.Sprintf("tracks/%s/exercises/%s", iteration.TrackID, iteration.Problem)
-	fmt.Printf("Your %s solution for %s has been submitted. View it here:\n%s\n\n", submission.Language, submission.Name, submission.URL)
-	fmt.Printf("See related solutions and get involved here:\n%s\n\n", solutionURL)
+	if len(submission.WhatNextInstructions) > 0 {
+		fmt.Print(submission.WhatNextInstructions)
+	} else {
+		solutionURL, _ := url.Parse(c.API)
+		solutionURL.Path += fmt.Sprintf("tracks/%s/exercises/%s", iteration.TrackID, iteration.Problem)
+		fmt.Printf("Your %s solution for %s has been submitted. View it here:\n%s\n\n", submission.Language, submission.Name, submission.URL)
+		fmt.Printf("See related solutions and get involved here:\n%s\n\n", solutionURL)
+	}
 
 	return nil
 }
