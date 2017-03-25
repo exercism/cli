@@ -33,7 +33,7 @@ that describes the version number, and gives it a date.
 
 The "next release" section should contain only "Your contribution here".
 
-_Note: It's useful to add the version to the commit message when you bump it: e.g. `Bump version to v2.3.4`.
+_Note: It's useful to add the version to the commit message when you bump it: e.g. `Bump version to v2.3.4`._
 
 ## Generate the Binaries
 
