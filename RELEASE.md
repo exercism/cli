@@ -88,31 +88,14 @@ Get the SHA256 of the tarball:
 shasum -a 256 vX.Y.Z.tar.gz
 ```
 
-Update the formula. You will need to fork https://github.com/Homebrew/homebrew-core.
+Update the homebrew formula:
 
 ```
-cd $(brew --repository)/Library/Formula
-git checkout master
-
 cd $(brew --repository)
 git checkout master
-
 brew update
-brew edit exercism # update sha256 and tarball url
-brew install exercism
-brew audit --strict --online exercism
-brew test exercism
-
-cd /Library/Formula
-git remote add YOUR_USERNAME git@github.com:YOUR_USERNAME/homebrew-core.git
-git checkout -b exercism-vX.Y.Z
-git commit -m "exercism X.Y.Z"
-git push --set-upstream YOUR_USERNAME exercism-vX.Y.Z
+brew bump-formula-pr --strict exercism --url=https://github.com/exercism/cli/archive/vX.Y.Z.tar.gz --sha256=$SHA
 ```
-
-Then go to https://github.com/Homebrew/homebrew-core and create pull request.
-
-Note that they really don't want any verbose commit messages or PR descriptions when all you're doing is bumping a version.
 
 For more information see their [contribution guidelines](https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md#how-to-open-a-homebrew-pull-request-and-get-it-merged).
 
