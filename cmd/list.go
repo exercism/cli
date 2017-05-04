@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
@@ -36,7 +37,12 @@ func List(ctx *cli.Context) error {
 	}
 
 	for _, p := range problems {
-		fmt.Printf("%s\n", p)
+		dir := filepath.Join(c.Dir, trackID, p)
+		if _, err := os.Stat(dir); err == nil {
+			fmt.Printf("\x1b[1;32m%s\x1b[0m\n", p)
+		} else {
+			fmt.Printf("\x1b[1;31m%s\x1b[0m\n", p)
+		}
 	}
 	fmt.Println()
 	fmt.Printf(msgExplainFetch, trackID, problems[0])
