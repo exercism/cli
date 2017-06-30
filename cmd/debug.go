@@ -31,11 +31,15 @@ func Debug(ctx *cli.Context) error {
 	fmt.Printf("\n**** Debug Information ****\n")
 	fmt.Printf("Exercism CLI Version: %s\n", ctx.App.Version)
 
-	rel, err := fetchLatestRelease(*client)
+	u, err := NewUpgrader(client)
 	if err != nil {
 		log.Println("unable to fetch latest release: " + err.Error())
 	} else {
-		if rel.Version() != ctx.App.Version {
+		rel := u.release
+		needed, err := u.IsUpgradeNeeded(ctx.App.Version)
+		if err != nil {
+			log.Printf("unable to check semver: %s\n", err)
+		} else if needed {
 			defer fmt.Printf("\nA newer version of the CLI (%s) can be downloaded here: %s\n", rel.TagName, rel.Location)
 		}
 		fmt.Printf("Exercism CLI Latest Release: %s\n", rel.Version())
