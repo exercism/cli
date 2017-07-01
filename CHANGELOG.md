@@ -5,6 +5,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
+* [#385](https://github.com/exercism/cli/pull/385) Fix broken upgrades for Windows - [@Tonkpils]
 * **Your contribution here**
 
 ## v2.4.0 (2017-03-24)
