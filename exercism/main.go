@@ -136,6 +136,13 @@ func main() {
 			Usage:       descRestore,
 			Description: descLongRestore,
 			Action:      cmd.Restore,
+			ArgsUsage:   "exercise1 [exercise2, etc...]",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "force",
+					Usage: "forces restore of all exercises",
+				},
+			},
 		},
 		{
 			Name:   "skip",
