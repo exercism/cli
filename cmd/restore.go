@@ -22,6 +22,12 @@ func Restore(ctx *cli.Context) error {
 	var problems []*api.Problem
 
 	switch {
+	case len(ctx.Args()) >= 2:
+		track := ctx.Args()[0]
+		exercises := ctx.Args()[1:]
+		if problems, err = client.Restore(track, exercises...); err != nil {
+			log.Fatal(err)
+		}
 	case len(ctx.Args()) == 1:
 		log.Fatalf("You only specified the track '%s' but no exercise(s)", ctx.Args()[0])
 	case len(ctx.Args()) == 0 && ctx.Bool("force"):
