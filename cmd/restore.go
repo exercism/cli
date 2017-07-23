@@ -22,6 +22,8 @@ func Restore(ctx *cli.Context) error {
 	var problems []*api.Problem
 
 	switch {
+	case len(ctx.Args()) == 1:
+		log.Fatalf("You only specified the track '%s' but no exercise(s)", ctx.Args()[0])
 	case len(ctx.Args()) == 0 && ctx.Bool("force"):
 		fmt.Printf("You are trying to restore all exercises at once, this can take a while, please stay patient")
 		if problems, err = client.RestoreAll(); err != nil {
