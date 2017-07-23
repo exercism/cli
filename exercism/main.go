@@ -25,7 +25,7 @@ const (
 	descFetch     = "Fetches the next unsubmitted problem in each track."
 	descList      = "Lists the available problems for a language track, given its ID."
 	descOpen      = "Opens exercism.io to your most recent iteration of a problem given the track ID and problem slug."
-	descRestore   = "Downloads the most recent iteration for each of your solutions on exercism.io."
+	descRestore   = "Downloads the most recent iteration for your specified solutions on exercism.io."
 	descSkip      = "Skips a problem given a track ID and problem slug."
 	descStatus    = "Fetches information about your progress with a given language track."
 	descSubmit    = "Submits a new iteration to a problem on exercism.io."
@@ -33,7 +33,8 @@ const (
 	descUpgrade   = "Upgrades the CLI to the latest released version."
 
 	descLongDownload = "The submission ID is the last part of the URL when looking at a solution on exercism.io."
-	descLongRestore  = "Restore will pull the latest revisions of exercises that have already been submitted. It will *not* overwrite existing files. If you have made changes to a file and have not submitted it, and you're trying to restore the last submitted version, first move that file out of the way, then call restore."
+	// TODO: find proper wording
+	descLongRestore = "Restore will pull the latest revisions of exercises that have already been submitted. It will *not* overwrite existing files. If you have made changes to a file and have not submitted it, and you're trying to restore the last submitted version, first move that file out of the way, then call restore."
 )
 
 func main() {
@@ -136,7 +137,7 @@ func main() {
 			Usage:       descRestore,
 			Description: descLongRestore,
 			Action:      cmd.Restore,
-			ArgsUsage:   "exercise1 [exercise2, etc...]",
+			ArgsUsage:   "track exercise1 [exercise2, etc...]",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "force",
