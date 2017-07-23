@@ -24,7 +24,7 @@ func Restore(ctx *cli.Context) error {
 	switch {
 	case len(ctx.Args()) == 0 && ctx.Bool("force"):
 		fmt.Printf("You are trying to restore all exercises at once, this can take a while, please stay patient")
-		if problems, err = client.Restore(); err != nil {
+		if problems, err = client.RestoreAll(); err != nil {
 			log.Fatal(err)
 		}
 	case len(ctx.Args()) == 0:

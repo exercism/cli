@@ -93,8 +93,8 @@ func (c *Client) FetchAll(trackID string) ([]*Problem, error) {
 	return problems, nil
 }
 
-// Restore fetches the latest revision of a solution and writes it to disk.
-func (c *Client) Restore() ([]*Problem, error) {
+// RestoreAll fetches the latest revisions of all solutions and writes them to disk.
+func (c *Client) RestoreAll() ([]*Problem, error) {
 	url := fmt.Sprintf("%s/v2/exercises/restore?key=%s", c.XAPIHost, c.APIKey)
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
