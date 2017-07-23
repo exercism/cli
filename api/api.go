@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -93,8 +94,8 @@ func (c *Client) FetchAll(trackID string) ([]*Problem, error) {
 	return problems, nil
 }
 
-// Restore fetches the latest revision of a solution and writes it to disk.
-func (c *Client) Restore() ([]*Problem, error) {
+// RestoreAll fetches the latest revisions of all solutions and writes them to disk.
+func (c *Client) RestoreAll() ([]*Problem, error) {
 	url := fmt.Sprintf("%s/v2/exercises/restore?key=%s", c.XAPIHost, c.APIKey)
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
@@ -112,6 +113,33 @@ func (c *Client) Restore() ([]*Problem, error) {
 	}
 
 	return payload.Problems, nil
+}
+
+// Restore fetches the latest revision of specified solutions and writes them to disk.
+func (c *Client) Restore(track string, exercises ...string) ([]*Problem, error) {
+	result := make([]*Problem, 0, len(exercises))
+
+	for _, exercise := range exercises {
+		url := fmt.Sprintf("%s/api/v2/exercises/%s/%s?key=%s", c.XAPIHost, track, exercise, c.APIKey)
+		req, err := c.NewRequest("GET", url, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		payload := &PayloadProblems{}
+		res, err := c.Do(req, payload)
+		if err != nil {
+			return nil, err
+		}
+
+		if res.StatusCode != http.StatusOK {
+			log.Printf("unable to fetch problem %s/%s (HTTP: %d) - %s", track, exercise, res.StatusCode, payload.Error)
+		} else {
+			result = append(result, payload.Problems...)
+		}
+	}
+
+	return result, nil
 }
 
 // Submissions gets a list of submitted exercises and their current state.

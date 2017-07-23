@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/exercism/cli/api"
@@ -18,9 +19,24 @@ func Restore(ctx *cli.Context) error {
 
 	client := api.NewClient(c)
 
-	problems, err := client.Restore()
-	if err != nil {
-		log.Fatal(err)
+	var problems []*api.Problem
+
+	switch {
+	case len(ctx.Args()) >= 2:
+		track := ctx.Args()[0]
+		exercises := ctx.Args()[1:]
+		if problems, err = client.Restore(track, exercises...); err != nil {
+			log.Fatal(err)
+		}
+	case len(ctx.Args()) == 1:
+		log.Fatalf("You only specified the track '%s' but no exercise(s)", ctx.Args()[0])
+	case len(ctx.Args()) == 0 && ctx.Bool("force"):
+		fmt.Printf("You are trying to restore all exercises at once, this can take a while, please stay patient")
+		if problems, err = client.RestoreAll(); err != nil {
+			log.Fatal(err)
+		}
+	case len(ctx.Args()) == 0:
+		log.Fatalf("Restoring everything could take quite a while, please use `--force` if you are sure.")
 	}
 
 	hw := user.NewHomework(problems, c)
