@@ -43,21 +43,26 @@ var (
 )
 
 var (
-	HTTPClient       = &http.Client{Timeout: 10 * time.Second}
+	// HTTPClient is the client used to make HTTP calls in the cli package.
+	HTTPClient = &http.Client{Timeout: 10 * time.Second}
+	// LatestReleaseURL is the endpoint that provides information about the latest release.
 	LatestReleaseURL = "https://api.github.com/repos/exercism/cli/releases/latest"
 )
 
+// CLI is information about the CLI itself.
 type CLI struct {
 	Version       string
 	LatestRelease *Release
 }
 
+// New creates a CLI, setting it to a particular version.
 func New(version string) *CLI {
 	return &CLI{
 		Version: version,
 	}
 }
 
+// IsUpgradeNeeded compares the current version to that of the latest release.
 func (c *CLI) IsUpgradeNeeded() (bool, error) {
 	if c.LatestRelease == nil {
 		resp, err := HTTPClient.Get(LatestReleaseURL)
@@ -162,13 +167,12 @@ func extractBinary(source *bytes.Reader, os string) (binary io.ReadCloser, err e
 
 			if _, err = io.Copy(tmpfile, tr); err != nil {
 				return nil, err
-			} else {
-				if _, err := tmpfile.Seek(0, 0); err != nil {
-					return nil, err
-				}
-
-				binary = tmpfile
 			}
+			if _, err := tmpfile.Seek(0, 0); err != nil {
+				return nil, err
+			}
+
+			binary = tmpfile
 		}
 	}
 

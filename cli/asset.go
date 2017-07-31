@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// Asset is a build for a particular system, uploaded to a GitHub release.
 type Asset struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
