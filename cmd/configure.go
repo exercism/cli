@@ -6,13 +6,13 @@ import (
 	"os"
 
 	"github.com/exercism/cli/config"
-	"github.com/urfave/cli"
+	app "github.com/urfave/cli"
 )
 
 // Configure stores settings in a JSON file.
 // If a setting is not passed as an argument, default
 // values are used.
-func Configure(ctx *cli.Context) error {
+func Configure(ctx *app.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)

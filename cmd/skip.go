@@ -7,11 +7,11 @@ import (
 
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
-	"github.com/urfave/cli"
+	app "github.com/urfave/cli"
 )
 
 // Skip allows a user to skip a specific problem.
-func Skip(ctx *cli.Context) error {
+func Skip(ctx *app.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)

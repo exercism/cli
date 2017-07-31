@@ -7,12 +7,12 @@ import (
 
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
-	"github.com/urfave/cli"
+	app "github.com/urfave/cli"
 )
 
 // Status is a command that allows a user to view their progress in a given
 // language track.
-func Status(ctx *cli.Context) error {
+func Status(ctx *app.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)

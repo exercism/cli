@@ -17,7 +17,7 @@ import (
 
 	"github.com/blang/semver"
 	"github.com/inconshreveable/go-update"
-	"github.com/urfave/cli"
+	app "github.com/urfave/cli"
 )
 
 var (
@@ -184,7 +184,7 @@ func (u *upgrader) extractBinary(source *bytes.Reader, os string) (binary io.Rea
 }
 
 // Upgrade allows the user to upgrade to the latest version of the CLI.
-func Upgrade(ctx *cli.Context) error {
+func Upgrade(ctx *app.Context) error {
 	u, err := NewUpgrader(nil)
 	if err != nil {
 		log.Fatal(err)

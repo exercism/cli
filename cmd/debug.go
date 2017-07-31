@@ -12,7 +12,7 @@ import (
 
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/paths"
-	"github.com/urfave/cli"
+	app "github.com/urfave/cli"
 )
 
 type pingResult struct {
@@ -23,7 +23,7 @@ type pingResult struct {
 }
 
 // Debug provides information about the user's environment and configuration.
-func Debug(ctx *cli.Context) error {
+func Debug(ctx *app.Context) error {
 	defer fmt.Printf("\nIf you are having trouble and need to file a GitHub issue (https://github.com/exercism/exercism.io/issues) please include this information (except your API key. Keep that private).\n")
 
 	client := &http.Client{Timeout: 20 * time.Second}
@@ -119,7 +119,7 @@ func Debug(ctx *cli.Context) error {
 	return nil
 }
 
-func printConfigFileData(ctx *cli.Context, cfg *config.Config) error {
+func printConfigFileData(ctx *app.Context, cfg *config.Config) error {
 	configured := true
 	if _, err := os.Stat(cfg.File); err != nil {
 		if os.IsNotExist(err) {
