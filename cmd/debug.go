@@ -2,155 +2,38 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"net/http"
-	"os"
-	"runtime"
-	"strings"
-	"sync"
 	"time"
 
 	"github.com/exercism/cli/cli"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/paths"
+	"github.com/exercism/cli/user"
 	app "github.com/urfave/cli"
 )
 
-type pingResult struct {
-	URL     string
-	Service string
-	Status  string
-	Latency time.Duration
-}
-
 // Debug provides information about the user's environment and configuration.
 func Debug(ctx *app.Context) error {
-	defer fmt.Printf("\nIf you are having trouble and need to file a GitHub issue (https://github.com/exercism/exercism.io/issues) please include this information (except your API key. Keep that private).\n")
+	cli.HTTPClient = &http.Client{Timeout: 20 * time.Second}
+	c := cli.New(ctx.App.Version)
 
-	client := &http.Client{Timeout: 20 * time.Second}
-	cli.HTTPClient = client
-
-	fmt.Printf("\n**** Debug Information ****\n")
-	fmt.Printf("Exercism CLI Version: %s\n", ctx.App.Version)
-
-	self := cli.New(ctx.App.Version)
-	ok, err := self.IsUpToDate()
+	cfg, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
-		log.Println("unable to fetch latest release: " + err.Error())
-	} else {
-		if !ok {
-			defer fmt.Printf("\nA newer version of the CLI (%s) can be downloaded here: %s\n", self.LatestRelease.TagName, self.LatestRelease.Location)
-		}
-		fmt.Printf("Exercism CLI Latest Release: %s\n", self.LatestRelease.Version())
+		return err
+	}
+	uc := user.Config{
+		Path:      cfg.File,
+		Home:      paths.Home,
+		Workspace: cfg.Dir,
+		Token:     cfg.APIKey,
 	}
 
-	fmt.Printf("OS/Architecture: %s/%s\n", runtime.GOOS, runtime.GOARCH)
-	fmt.Printf("Build OS/Architecture %s/%s\n", cli.BuildOS, cli.BuildARCH)
-	if cli.BuildARM != "" {
-		fmt.Printf("Build ARMv%s\n", cli.BuildARM)
-	}
-
-	fmt.Printf("Home Dir: %s\n", paths.Home)
-
-	c, err := config.New(ctx.GlobalString("config"))
+	status := cli.NewStatus(c, uc)
+	status.Censor = !ctx.Bool("full-api-key")
+	s, err := status.Check()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-
-	if err := printConfigFileData(ctx, c); err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Testing API endpoints reachability")
-
-	endpoints := map[string]string{
-		"API":        c.API,
-		"XAPI":       c.XAPI,
-		"GitHub API": "https://api.github.com/",
-	}
-
-	var wg sync.WaitGroup
-	results := make(chan pingResult)
-	defer close(results)
-
-	wg.Add(len(endpoints))
-
-	for service, url := range endpoints {
-		go func(service, url string) {
-			now := time.Now()
-			res, err := client.Get(url)
-			delta := time.Since(now)
-			if err != nil {
-				results <- pingResult{
-					URL:     url,
-					Service: service,
-					Status:  err.Error(),
-					Latency: delta,
-				}
-				return
-			}
-			defer res.Body.Close()
-
-			results <- pingResult{
-				URL:     url,
-				Service: service,
-				Status:  "connected",
-				Latency: delta,
-			}
-		}(service, url)
-	}
-
-	go func() {
-		for r := range results {
-			fmt.Printf(
-				"\t* %s: %s [%s] %s\n",
-				r.Service,
-				r.URL,
-				r.Status,
-				r.Latency,
-			)
-			wg.Done()
-		}
-	}()
-
-	wg.Wait()
-
+	fmt.Println(s)
 	return nil
-}
-
-func printConfigFileData(ctx *app.Context, cfg *config.Config) error {
-	configured := true
-	if _, err := os.Stat(cfg.File); err != nil {
-		if os.IsNotExist(err) {
-			configured = false
-		} else {
-			return err
-		}
-	}
-
-	apiKey := "Please set your API key to access all of the CLI features"
-	configFile := fmt.Sprintf("%s (not configured)", cfg.File)
-
-	if configured {
-		configFile = cfg.File
-		if cfg.APIKey != "" {
-			if ctx.Bool("full-api-key") {
-				apiKey = cfg.APIKey
-			} else {
-				apiKey = redactAPIKey(cfg.APIKey)
-			}
-		}
-	}
-
-	fmt.Printf("Config File: %s\n", configFile)
-	fmt.Printf("API Key: %s\n", apiKey)
-	fmt.Printf("Exercises Directory: %s\n", cfg.Dir)
-
-	return nil
-}
-
-func redactAPIKey(apiKey string) string {
-	str := apiKey[4 : len(apiKey)-3]
-	redaction := strings.Repeat("*", len(str))
-	return string(apiKey[:4]) + redaction + string(apiKey[len(apiKey)-3:])
 }

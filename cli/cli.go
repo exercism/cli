@@ -65,17 +65,9 @@ func New(version string) *CLI {
 // IsUpToDate compares the current version to that of the latest release.
 func (c *CLI) IsUpToDate() (bool, error) {
 	if c.LatestRelease == nil {
-		resp, err := HTTPClient.Get(LatestReleaseURL)
-		if err != nil {
+		if err := c.fetchLatestRelease(); err != nil {
 			return false, err
 		}
-		defer resp.Body.Close()
-
-		var rel Release
-		if err := json.NewDecoder(resp.Body).Decode(&rel); err != nil {
-			return false, err
-		}
-		c.LatestRelease = &rel
 	}
 
 	rv, err := semver.Make(c.LatestRelease.Version())
@@ -132,6 +124,29 @@ func (c *CLI) Upgrade() error {
 	defer bin.Close()
 
 	return update.Apply(bin, update.Options{})
+}
+
+func (c *CLI) fetchLatestRelease() error {
+	resp, err := HTTPClient.Get(LatestReleaseURL)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode > 399 {
+		msg := "failed to get the latest release\n"
+		for k, v := range resp.Header {
+			msg += fmt.Sprintf("\n  %s:\n    %s", k, v)
+		}
+		return fmt.Errorf(msg)
+	}
+
+	var rel Release
+	if err := json.NewDecoder(resp.Body).Decode(&rel); err != nil {
+		return err
+	}
+	c.LatestRelease = &rel
+	return nil
 }
 
 func extractBinary(source *bytes.Reader, os string) (binary io.ReadCloser, err error) {
