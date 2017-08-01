@@ -62,8 +62,8 @@ func New(version string) *CLI {
 	}
 }
 
-// IsUpgradeNeeded compares the current version to that of the latest release.
-func (c *CLI) IsUpgradeNeeded() (bool, error) {
+// IsUpToDate compares the current version to that of the latest release.
+func (c *CLI) IsUpToDate() (bool, error) {
 	if c.LatestRelease == nil {
 		resp, err := HTTPClient.Get(LatestReleaseURL)
 		if err != nil {
@@ -87,7 +87,7 @@ func (c *CLI) IsUpgradeNeeded() (bool, error) {
 		return false, fmt.Errorf("unable to parse current version (%s): %s", c.Version, err)
 	}
 
-	return rv.GT(cv), nil
+	return rv.EQ(cv), nil
 }
 
 // Upgrade allows the user to upgrade to the latest version of the CLI.

@@ -9,14 +9,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestIsUpgradeNeeded(t *testing.T) {
+func TestIsUpToDate(t *testing.T) {
 	tests := []struct {
 		cliVersion string
 		releaseTag string
-		needed     bool
+		ok         bool
 	}{
-		{"1.0.0", "v1.0.1", true},
-		{"2.0.1", "v2.0.1", false},
+		{"1.0.0", "v1.0.1", false},
+		{"2.0.1", "v2.0.1", true},
 	}
 
 	for _, test := range tests {
@@ -25,13 +25,13 @@ func TestIsUpgradeNeeded(t *testing.T) {
 			LatestRelease: &Release{TagName: test.releaseTag},
 		}
 
-		needed, err := c.IsUpgradeNeeded()
+		ok, err := c.IsUpToDate()
 		assert.NoError(t, err)
-		assert.Equal(t, test.needed, needed, test.cliVersion)
+		assert.Equal(t, test.ok, ok, test.cliVersion)
 	}
 }
 
-func TestIsUpgradeNeededWithoutRelease(t *testing.T) {
+func TestIsUpToDateWithoutRelease(t *testing.T) {
 	fakeEndpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `{"tag_name": "v2.0.0"}`)
 	})
@@ -43,8 +43,8 @@ func TestIsUpgradeNeededWithoutRelease(t *testing.T) {
 		Version: "1.0.0",
 	}
 
-	needed, err := c.IsUpgradeNeeded()
+	ok, err := c.IsUpToDate()
 	assert.NoError(t, err)
-	assert.True(t, needed)
+	assert.False(t, ok)
 	assert.NotNil(t, c.LatestRelease)
 }

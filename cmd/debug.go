@@ -34,11 +34,11 @@ func Debug(ctx *app.Context) error {
 	fmt.Printf("Exercism CLI Version: %s\n", ctx.App.Version)
 
 	self := cli.New(ctx.App.Version)
-	needed, err := self.IsUpgradeNeeded()
+	ok, err := self.IsUpToDate()
 	if err != nil {
 		log.Println("unable to fetch latest release: " + err.Error())
 	} else {
-		if needed {
+		if !ok {
 			defer fmt.Printf("\nA newer version of the CLI (%s) can be downloaded here: %s\n", self.LatestRelease.TagName, self.LatestRelease.Location)
 		}
 		fmt.Printf("Exercism CLI Latest Release: %s\n", self.LatestRelease.Version())

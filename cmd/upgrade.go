@@ -10,11 +10,11 @@ import (
 // Upgrade allows the user to upgrade to the latest version of the CLI.
 func Upgrade(ctx *app.Context) error {
 	c := cli.New(ctx.App.Version)
-	needed, err := c.IsUpgradeNeeded()
+	ok, err := c.IsUpToDate()
 	if err != nil {
 		return err
 	}
-	if needed {
+	if !ok {
 		if err := c.Upgrade(); err != nil {
 			return err
 		}
