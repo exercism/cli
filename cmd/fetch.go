@@ -8,11 +8,11 @@ import (
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/user"
-	"github.com/urfave/cli"
+	app "github.com/urfave/cli"
 )
 
 // Fetch downloads exercism problems and writes them to disk.
-func Fetch(ctx *cli.Context) error {
+func Fetch(ctx *app.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)
@@ -75,7 +75,6 @@ func Fetch(ctx *cli.Context) error {
 	hw.Summarize(user.HWAll)
 
 	return nil
-	// return cli.NewExitError("no good", 10)
 }
 
 func setSubmissionState(problems []*api.Problem, submissionInfo map[string][]api.SubmissionInfo) error {

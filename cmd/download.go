@@ -10,11 +10,11 @@ import (
 
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
-	"github.com/urfave/cli"
+	app "github.com/urfave/cli"
 )
 
 // Download returns specified iteration with its related problem.
-func Download(ctx *cli.Context) error {
+func Download(ctx *app.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)

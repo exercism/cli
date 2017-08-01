@@ -10,9 +10,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/exercism/cli/cli"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/paths"
-	"github.com/urfave/cli"
+	app "github.com/urfave/cli"
 )
 
 type pingResult struct {
@@ -23,32 +24,30 @@ type pingResult struct {
 }
 
 // Debug provides information about the user's environment and configuration.
-func Debug(ctx *cli.Context) error {
+func Debug(ctx *app.Context) error {
 	defer fmt.Printf("\nIf you are having trouble and need to file a GitHub issue (https://github.com/exercism/exercism.io/issues) please include this information (except your API key. Keep that private).\n")
 
 	client := &http.Client{Timeout: 20 * time.Second}
+	cli.HTTPClient = client
 
 	fmt.Printf("\n**** Debug Information ****\n")
 	fmt.Printf("Exercism CLI Version: %s\n", ctx.App.Version)
 
-	u, err := NewUpgrader(client)
+	self := cli.New(ctx.App.Version)
+	ok, err := self.IsUpToDate()
 	if err != nil {
 		log.Println("unable to fetch latest release: " + err.Error())
 	} else {
-		rel := u.release
-		needed, err := u.IsUpgradeNeeded(ctx.App.Version)
-		if err != nil {
-			log.Printf("unable to check semver: %s\n", err)
-		} else if needed {
-			defer fmt.Printf("\nA newer version of the CLI (%s) can be downloaded here: %s\n", rel.TagName, rel.Location)
+		if !ok {
+			defer fmt.Printf("\nA newer version of the CLI (%s) can be downloaded here: %s\n", self.LatestRelease.TagName, self.LatestRelease.Location)
 		}
-		fmt.Printf("Exercism CLI Latest Release: %s\n", rel.Version())
+		fmt.Printf("Exercism CLI Latest Release: %s\n", self.LatestRelease.Version())
 	}
 
 	fmt.Printf("OS/Architecture: %s/%s\n", runtime.GOOS, runtime.GOARCH)
-	fmt.Printf("Build OS/Architecture %s/%s\n", BuildOS, BuildARCH)
-	if BuildARM != "" {
-		fmt.Printf("Build ARMv%s\n", BuildARM)
+	fmt.Printf("Build OS/Architecture %s/%s\n", cli.BuildOS, cli.BuildARCH)
+	if cli.BuildARM != "" {
+		fmt.Printf("Build ARMv%s\n", cli.BuildARM)
 	}
 
 	fmt.Printf("Home Dir: %s\n", paths.Home)
@@ -119,7 +118,7 @@ func Debug(ctx *cli.Context) error {
 	return nil
 }
 
-func printConfigFileData(ctx *cli.Context, cfg *config.Config) error {
+func printConfigFileData(ctx *app.Context, cfg *config.Config) error {
 	configured := true
 	if _, err := os.Stat(cfg.File); err != nil {
 		if os.IsNotExist(err) {

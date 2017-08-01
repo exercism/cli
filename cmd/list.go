@@ -7,13 +7,13 @@ import (
 
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
-	"github.com/urfave/cli"
+	app "github.com/urfave/cli"
 )
 
 const msgExplainFetch = "In order to fetch a specific assignment, call the fetch command with a specific assignment.\n\nexercism fetch %s %s\n\n"
 
 // List returns the full list of assignments for a given track.
-func List(ctx *cli.Context) error {
+func List(ctx *app.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)

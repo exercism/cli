@@ -7,11 +7,11 @@ import (
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/user"
-	"github.com/urfave/cli"
+	app "github.com/urfave/cli"
 )
 
 // Tracks lists available tracks.
-func Tracks(ctx *cli.Context) error {
+func Tracks(ctx *app.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
 		log.Fatal(err)

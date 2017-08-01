@@ -10,11 +10,11 @@ import (
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/paths"
-	"github.com/urfave/cli"
+	app "github.com/urfave/cli"
 )
 
 // Submit posts an iteration to the API.
-func Submit(ctx *cli.Context) error {
+func Submit(ctx *app.Context) error {
 	if len(ctx.Args()) == 0 {
 		log.Fatal("Please enter a file name")
 	}
