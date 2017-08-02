@@ -4,16 +4,14 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
-	"runtime"
-	"strings"
 
 	"github.com/exercism/cli/api"
+	"github.com/exercism/cli/browser"
 	"github.com/exercism/cli/config"
 	app "github.com/urfave/cli"
 )
 
-// Open uses the given track and problem and opens it in the browser.
+// Open opens the user's latest iteration of the exercise on the given track.
 func Open(ctx *app.Context) error {
 	c, err := config.New(ctx.GlobalString("config"))
 	if err != nil {
@@ -31,32 +29,8 @@ func Open(ctx *app.Context) error {
 	slug := args[1]
 	submission, err := client.SubmissionURL(trackID, slug)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	url := submission.URL
-	// Escape characters are not allowed by cmd/bash.
-	switch runtime.GOOS {
-	case "windows":
-		url = strings.Replace(url, "&", `^&`, -1)
-	default:
-		url = strings.Replace(url, "&", `\&`, -1)
-	}
-
-	// The command to open the browser is OS-dependent.
-	var cmd *exec.Cmd
-	switch runtime.GOOS {
-	case "darwin":
-		cmd = exec.Command("open", url)
-	case "freebsd", "linux", "netbsd", "openbsd":
-		cmd = exec.Command("xdg-open", url)
-	case "windows":
-		cmd = exec.Command("cmd", "/c", "start", url)
-	}
-
-	if err := cmd.Run(); err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
+	return browser.Open(submission.URL)
 }
