@@ -200,9 +200,9 @@ API Reachability
 ----------------
 {{ range .APIReachability.Services }}
 {{ .Service }}:
-          {{ .URL }}
-          [{{ .Status }}]
-          {{ .Latency }}
+    * {{ .URL }}
+    * [{{ .Status }}]
+    * {{ .Latency }}
 {{ end }}
 
 If you are having trouble please file a GitHub issue at
