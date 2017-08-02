@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/exercism/cli/user"
+	"github.com/exercism/cli/config"
 )
 
 // Status represents the results of a CLI self test.
@@ -20,7 +20,7 @@ type Status struct {
 	Configuration   configurationStatus
 	APIReachability apiReachabilityStatus
 	cli             *CLI
-	cfg             user.Config
+	cfg             config.UserConfig
 }
 
 type versionStatus struct {
@@ -56,7 +56,7 @@ type apiPing struct {
 	Latency time.Duration
 }
 
-func NewStatus(c *CLI, uc user.Config) Status {
+func NewStatus(c *CLI, uc config.UserConfig) Status {
 	status := Status{
 		cli: c,
 		cfg: uc,

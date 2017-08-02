@@ -8,7 +8,6 @@ import (
 	"github.com/exercism/cli/cli"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/paths"
-	"github.com/exercism/cli/user"
 	app "github.com/urfave/cli"
 )
 
@@ -21,7 +20,7 @@ func Debug(ctx *app.Context) error {
 	if err != nil {
 		return err
 	}
-	uc := user.Config{
+	uc := config.UserConfig{
 		Path:      cfg.File,
 		Home:      paths.Home,
 		Workspace: cfg.Dir,
