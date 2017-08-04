@@ -2,67 +2,31 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
-	"os"
-	"path/filepath"
-	"strings"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
-	app "github.com/urfave/cli"
+	"github.com/spf13/cobra"
 )
 
-// Download returns specified iteration with its related problem.
-func Download(ctx *app.Context) error {
-	c, err := config.New(ctx.GlobalString("config"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	client := api.NewClient(c)
+// downloadCmd lets people download exercises and associated solutions.
+var downloadCmd = &cobra.Command{
+	Use:     "download",
+	Aliases: []string{"d"},
+	Short:   "Download an exercise.",
+	Long: `Download an Exercism exercise to work on.
 
-	args := ctx.Args()
-	if len(args) != 1 {
-		fmt.Fprintf(os.Stderr, "Usage: exercism download SUBMISSION_ID\n")
-		os.Exit(1)
-	}
+If you've already started working on the exercise, the command will
+also download your most recent solution.
 
-	submission, err := client.Download(args[0])
-	if err != nil {
-		log.Fatal(err)
-	}
+This does not automatically overwrite identically named files.
+If it finds a file with the same name, it will ask if you want to overwrite it.
+Or you can overwrite files automatically by passing the --force flag.
 
-	path := filepath.Join(c.Dir, "solutions", submission.Username, submission.TrackID, submission.Slug, args[0])
-
-	if err := os.MkdirAll(path, 0755); err != nil {
-		log.Fatal(err)
-	}
-
-	for name, contents := range submission.ProblemFiles {
-		if err := writeFile(fmt.Sprintf("%s/%s", path, name), contents); err != nil {
-			log.Fatalf("Unable to write file %s: %s", name, err)
-		}
-	}
-
-	for name, contents := range submission.SolutionFiles {
-		filename := strings.TrimPrefix(name, strings.ToLower("/"+submission.TrackID+"/"+submission.Slug+"/"))
-		if err := writeFile(fmt.Sprintf("%s/%s", path, filename), contents); err != nil {
-			log.Fatalf("Unable to write file %s: %s", name, err)
-		}
-	}
-
-	fmt.Printf("Successfully downloaded submission.\n\nThe submission can be viewed at:\n %s\n\n", path)
-
-	return nil
-
+Download other people's solution by providing the UUID.
+`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("download called")
+	},
 }
 
-// writeFile writes the given contents to the given path, creating any necessary parent directories.
-// This is useful because both problem files and solution files may have directory structures.
-func writeFile(path, contents string) error {
-	dir := filepath.Dir(path)
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return err
-	}
-	return ioutil.WriteFile(path, []byte(contents), 0644)
+func init() {
+	RootCmd.AddCommand(downloadCmd)
 }

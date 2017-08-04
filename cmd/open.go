@@ -2,35 +2,25 @@ package cmd
 
 import (
 	"fmt"
-	"log"
-	"os"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/browser"
-	"github.com/exercism/cli/config"
-	app "github.com/urfave/cli"
+	"github.com/spf13/cobra"
 )
 
-// Open opens the user's latest iteration of the exercise on the given track.
-func Open(ctx *app.Context) error {
-	c, err := config.New(ctx.GlobalString("config"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	client := api.NewClient(c)
+// openCmd opens the designated exercise in the browser.
+var openCmd = &cobra.Command{
+	Use:     "open",
+	Aliases: []string{"o"},
+	Short:   "Open an exercise on the website.",
+	Long: `Open the specified exercise to the solution page on the Exercism website.
 
-	args := ctx.Args()
-	if len(args) != 2 {
-		fmt.Fprintf(os.Stderr, "Usage: exercism open TRACK_ID PROBLEM\n")
-		os.Exit(1)
-	}
+Pass either the name of an exercise, or the path to the directory that contains
+the solution you want to see on the website.
+	`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("open called")
+	},
+}
 
-	trackID := args[0]
-	slug := args[1]
-	submission, err := client.SubmissionURL(trackID, slug)
-	if err != nil {
-		return err
-	}
-
-	return browser.Open(submission.URL)
+func init() {
+	RootCmd.AddCommand(openCmd)
 }
