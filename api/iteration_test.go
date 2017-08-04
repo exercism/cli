@@ -9,120 +9,44 @@ import (
 )
 
 func TestFollowSymlink(t *testing.T) {
-	_, path, _, _ := runtime.Caller(0)
-	dir := filepath.Join(path, "..", "..", "fixtures", "iteration")
-
-	files := []string{
-		filepath.Join(dir, "python", "leap", "symlink.py"),
-	}
-
-	iter, err := NewIteration(dir, files)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for name, contents := range iter.Solution {
-		expectedContents := "# two\n"
-		expectedName := "symlink.py"
-
-		if expectedContents != contents {
-			t.Errorf("Expected contents to be %s, but got %s", expectedContents, contents)
-		}
-		if name != expectedName {
-			t.Errorf("bad name. expected: %s, got %s", expectedName, name)
-		}
-	}
+	// TODO: when we figure out where to deal with solutions
+	// make sure we handle symlinks.
+	t.Skip()
 }
 
-func TestNewIteration(t *testing.T) {
+func TestHandleEncoding(t *testing.T) {
+	// TODO: when we figure out where to deal with solutions
+	// make sure we handle encoding properly.
+	t.Skip()
 	_, path, _, _ := runtime.Caller(0)
-	dir := filepath.Join(path, "..", "..", "fixtures", "iteration")
+	dir := filepath.Join(path, "..", "..", "fixtures")
 
-	files := []string{
-		filepath.Join(dir, "python", "leap", "one.py"),
-		filepath.Join(dir, "python", "leap", "two.py"),
-		filepath.Join(dir, "python", "leap", "lib", "three.py"),
-		filepath.Join(dir, "python", "leap", "utf16le.py"),
-		filepath.Join(dir, "python", "leap", "utf16be.py"),
-		filepath.Join(dir, "python", "leap", "long-utf8.py"),
-	}
-
-	iter, err := NewIteration(dir, files)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if iter.TrackID != "python" {
-		t.Errorf("Expected language to be python, was %s", iter.TrackID)
-	}
-	if iter.Problem != "leap" {
-		t.Errorf("Expected problem to be leap, was %s", iter.Problem)
-	}
-
-	if len(iter.Solution) != 6 {
-		t.Fatalf("Expected solution to have 6 files, had %d", len(iter.Solution))
+	_ = []string{
+		filepath.Join(dir, "utf16le.py"),
+		filepath.Join(dir, "utf16be.py"),
+		filepath.Join(dir, "long-utf8.py"),
 	}
 
 	expected := map[string]struct {
 		prefix string
 		suffix string
 	}{
-		"one.py": {prefix: "# one"},
-		"two.py": {prefix: "# two"},
-		filepath.Join("lib", "three.py"): {prefix: "# three"},
-		"utf16le.py":                     {prefix: "# utf16le"},
-		"utf16be.py":                     {prefix: "# utf16be"},
-		"long-utf8.py":                   {prefix: "# The first 1024", suffix: "👍\n"},
+		"utf16le.py":   {prefix: "# utf16le"},
+		"utf16be.py":   {prefix: "# utf16be"},
+		"long-utf8.py": {prefix: "# The first 1024", suffix: "👍\n"},
 	}
 
+	var solutions map[string]string
 	for filename, code := range expected {
-		if !utf8.ValidString(iter.Solution[filename]) {
-			t.Errorf("Iteration content is not valid UTF-8 data: %s", iter.Solution[filename])
+		if !utf8.ValidString(solutions[filename]) {
+			t.Errorf("Iteration content is not valid UTF-8 data: %s", solutions[filename])
 		}
 
-		if !strings.HasPrefix(iter.Solution[filename], code.prefix) {
-			t.Errorf("Expected %s to start with `%s', had `%s'", filename, code.prefix, iter.Solution[filename])
+		if !strings.HasPrefix(solutions[filename], code.prefix) {
+			t.Errorf("Expected %s to start with `%s', had `%s'", filename, code.prefix, solutions[filename])
 		}
-		if !strings.HasSuffix(iter.Solution[filename], code.suffix) {
-			t.Errorf("Expected %s to end with `%s', had `%s'", filename, code.suffix, iter.Solution[filename])
-		}
-	}
-}
-
-func TestIterationValidFile(t *testing.T) {
-	testCases := []struct {
-		file string
-		ok   bool
-	}{
-		{
-			file: "/Users/me/exercism/ruby/bob/totally/fine/deep/path/src/bob.rb",
-			ok:   true,
-		},
-		{
-			file: "/Users/me/exercism/ruby/bob/bob.rb",
-			ok:   true,
-		},
-		{
-			file: "/users/me/exercism/ruby/bob/bob.rb",
-			ok:   true,
-		},
-		{
-			file: "/Users/me/bob.rb",
-			ok:   false,
-		},
-		{
-			file: "/tmp/bob.rb",
-			ok:   false,
-		},
-	}
-
-	for _, tt := range testCases {
-		iter := &Iteration{
-			Dir: "/Users/me/exercism",
-		}
-		ok := iter.isValidFilepath(tt.file)
-		if ok && !tt.ok {
-			t.Errorf("Expected %s to be invalid.", tt.file)
+		if !strings.HasSuffix(solutions[filename], code.suffix) {
+			t.Errorf("Expected %s to end with `%s', had `%s'", filename, code.suffix, solutions[filename])
 		}
 	}
 }

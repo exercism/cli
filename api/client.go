@@ -6,50 +6,67 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
+	"time"
 
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/debug"
 )
 
-const (
-	urlTrackerAPI  = "https://github.com/exercism/exercism.io/issues"
-	urlTrackerXAPI = "https://github.com/exercism/x-api/issues"
-)
-
 var (
 	// UserAgent lets the API know where the call is being made from.
-	// It's set from main() so that we have access to the version.
-	UserAgent string
+	// It's overridden from the root command so that we can set the version.
+	UserAgent = "github.com/exercism/cli"
+
+	// DefaultHTTPClient configures a timeout to use by default.
+	DefaultHTTPClient = &http.Client{Timeout: 10 * time.Second}
 )
 
-// Client contains the necessary information to contact the Exercism APIs.
+// Client is an http client that is configured for Exercism.
 type Client struct {
-	client   *http.Client
-	APIHost  string
-	XAPIHost string
-	APIKey   string
+	*http.Client
+	APIConfig   *config.APIConfig
+	UserConfig  *config.UserConfig
+	ContentType string
 }
 
-// NewClient returns an Exercism API Client.
-func NewClient(c *config.Config) *Client {
-	return &Client{
-		client:   http.DefaultClient,
-		APIHost:  c.API,
-		XAPIHost: c.XAPI,
-		APIKey:   c.APIKey,
+// NewClient returns an Exercism API client.
+func NewClient() (*Client, error) {
+	apiCfg, err := config.NewAPIConfig()
+	if err != nil {
+		return nil, err
 	}
+	userCfg, err := config.NewUserConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	return &Client{
+		Client:     DefaultHTTPClient,
+		APIConfig:  apiCfg,
+		UserConfig: userCfg,
+	}, nil
 }
 
 // NewRequest returns an http.Request with information for the Exercism API.
 func (c *Client) NewRequest(method, url string, body io.Reader) (*http.Request, error) {
+	if c.Client == nil {
+		c.Client = DefaultHTTPClient
+	}
+
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set("User-Agent", UserAgent)
-	req.Header.Set("Content-Type", "application/json")
+	if c.ContentType == "" {
+		req.Header.Set("Content-Type", "application/json")
+	} else {
+		req.Header.Set("Content-Type", c.ContentType)
+	}
+	if c.UserConfig != nil && c.UserConfig.Token != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.UserConfig.Token))
+	}
 
 	return req, nil
 }
@@ -58,7 +75,7 @@ func (c *Client) NewRequest(method, url string, body io.Reader) (*http.Request, 
 func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	debug.Println("Request", req.Method, req.URL)
 
-	res, err := c.client.Do(req)
+	res, err := c.Client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -68,22 +85,18 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	case http.StatusNoContent:
 		return res, nil
 	case http.StatusInternalServerError:
-		url := urlTrackerAPI
-		if strings.Contains(req.URL.Host, "x.exercism.io") {
-			url = urlTrackerXAPI
-		}
-		return nil, fmt.Errorf("an internal server error was received.\nPlease file a bug report with the contents of 'exercism debug' at: %s ", url)
+		// TODO: if it's json, and it has an error key, print the message.
+		return nil, fmt.Errorf("%s", res.Status)
 	default:
 		if v != nil {
 			defer res.Body.Close()
 
 			var bodyCopy bytes.Buffer
 			body := io.TeeReader(res.Body, &bodyCopy)
-
-			err := json.NewDecoder(body).Decode(v)
 			debug.Printf("Response Body\n%s\n\n", bodyCopy.String())
-			if err != nil {
-				return nil, fmt.Errorf("error parsing API response - %s", err)
+
+			if err := json.NewDecoder(body).Decode(v); err != nil {
+				return nil, fmt.Errorf("unable to parse API response - %s", err)
 			}
 		}
 	}

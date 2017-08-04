@@ -2,47 +2,28 @@ package cmd
 
 import (
 	"fmt"
-	"log"
-	"os"
 
-	"github.com/exercism/cli/config"
-	app "github.com/urfave/cli"
+	"github.com/spf13/cobra"
 )
 
-// Configure stores settings in a JSON file.
-// If a setting is not passed as an argument, default
-// values are used.
-func Configure(ctx *app.Context) error {
-	c, err := config.New(ctx.GlobalString("config"))
-	if err != nil {
-		log.Fatal(err)
-	}
+// configureCmd configures the command-line client with user-specific settings.
+var configureCmd = &cobra.Command{
+	Use:     "configure",
+	Aliases: []string{"c"},
+	Short:   "Configure the command-line client.",
+	Long: `Configure the command-line client to customize it to your needs.
 
-	key := ctx.String("key")
-	host := ctx.String("host")
-	dir := ctx.String("dir")
-	api := ctx.String("api")
-	silent := ctx.Bool("silent")
+This lets you set up the CLI to talk to the API on your behalf,
+and tells the CLI about your setup so it puts things in the right
+places.
 
-	if err := c.Update(key, host, dir, api); err != nil {
-		log.Fatalf("Error updating your configuration %s\n", err)
-	}
+You can also override certain default settings to suit your preferences.
+`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("configure called")
+	},
+}
 
-	if err := os.MkdirAll(c.Dir, os.ModePerm); err != nil {
-		log.Fatalf("Error creating exercism directory %s\n", err)
-	}
-
-	if err := c.Write(); err != nil {
-		log.Fatal(err)
-	}
-
-	if !silent {
-		fmt.Printf("\nConfiguration written to %s\n\n", c.File)
-		fmt.Printf("  --key=%s\n", c.APIKey)
-		fmt.Printf("  --dir=%s\n", c.Dir)
-		fmt.Printf("  --host=%s\n", c.API)
-		fmt.Printf("  --api=%s\n\n", c.XAPI)
-	}
-
-	return nil
+func init() {
+	RootCmd.AddCommand(configureCmd)
 }

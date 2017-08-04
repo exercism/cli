@@ -56,6 +56,7 @@ type apiPing struct {
 	Latency time.Duration
 }
 
+// NewStatus prepares a value to perform a diagnostic self-check.
 func NewStatus(c *CLI, uc config.UserConfig) Status {
 	status := Status{
 		cli: c,
@@ -64,6 +65,7 @@ func NewStatus(c *CLI, uc config.UserConfig) Status {
 	return status
 }
 
+// Check runs the CLI's diagnostic self-check.
 func (status *Status) Check() (string, error) {
 	status.Version = newVersionStatus(status.cli)
 	status.System = newSystemStatus()
@@ -132,7 +134,7 @@ func newConfigurationStatus(status *Status) configurationStatus {
 	cs := configurationStatus{
 		Home:      status.cfg.Home,
 		Workspace: status.cfg.Workspace,
-		File:      status.cfg.Path,
+		File:      status.cfg.File(),
 		Token:     status.cfg.Token,
 		TokenURL:  "http://exercism.io/account/key",
 	}

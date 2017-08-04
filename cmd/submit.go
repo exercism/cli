@@ -2,102 +2,33 @@ package cmd
 
 import (
 	"fmt"
-	"log"
-	"net/url"
-	"os"
-	"path/filepath"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/paths"
-	app "github.com/urfave/cli"
+	"github.com/spf13/cobra"
 )
 
-// Submit posts an iteration to the API.
-func Submit(ctx *app.Context) error {
-	if len(ctx.Args()) == 0 {
-		log.Fatal("Please enter a file name")
-	}
+// submitCmd lets people upload a solution to the website.
+var submitCmd = &cobra.Command{
+	Use:     "submit",
+	Aliases: []string{"s"},
+	Short:   "Submit your solution to an exercise.",
+	Long: `Submit your solution to an Exercism exercise.
 
-	c, err := config.New(ctx.GlobalString("config"))
-	if err != nil {
-		log.Fatal(err)
-	}
+The CLI will do its best to figure out what to submit.
 
-	if ctx.GlobalBool("verbose") {
-		log.Printf("Exercises dir: %s", c.Dir)
-		dir, err := os.Getwd()
-		if err != nil {
-			log.Printf("Unable to get current working directory - %s", err)
-		} else {
-			log.Printf("Current dir: %s", dir)
-		}
-	}
+If you call the command without any arguments, it will check
+if the current directory is an exercise, and if so, submit that.
 
-	if !c.IsAuthenticated() {
-		log.Fatal(msgPleaseAuthenticate)
-	}
+If called with the path to a directory, it will submit it.
 
-	dir, err := filepath.EvalSymlinks(c.Dir)
-	if err != nil {
-		log.Fatal(err)
-	}
+If called with the name of an exercise, it will work out which
+track it is on and submit it. The command will ask for help
+figuring things out if necessary.
+	`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("submit called")
+	},
+}
 
-	if ctx.GlobalBool("verbose") {
-		log.Printf("eval symlinks (dir): %s", dir)
-	}
-
-	files := []string{}
-	for _, filename := range ctx.Args() {
-		if ctx.GlobalBool("verbose") {
-			log.Printf("file name: %s", filename)
-		}
-
-		if isTest(filename) && !ctx.Bool("test") {
-			log.Fatal("You're trying to submit a test file. If this is really what " +
-				"you want, please pass the --test flag to exercism submit.")
-		}
-
-		if isREADME(filename) {
-			log.Fatal("You cannot submit the README as a solution.")
-		}
-
-		if paths.IsDir(filename) {
-			log.Fatal("Please specify each file that should be submitted, e.g. `exercism submit file1 file2 file3`.")
-		}
-
-		file, err := filepath.Abs(filename)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		if ctx.GlobalBool("verbose") {
-			log.Printf("absolute path: %s", file)
-		}
-		files = append(files, file)
-	}
-
-	iteration, err := api.NewIteration(dir, files)
-	if err != nil {
-		log.Fatalf("unable to submit - %s", err)
-	}
-	iteration.Key = c.APIKey
-	iteration.Comment = ctx.String("comment")
-
-	client := api.NewClient(c)
-	submission, err := client.Submit(iteration)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if len(submission.WhatNextInstructions) > 0 {
-		fmt.Print(submission.WhatNextInstructions)
-	} else {
-		solutionURL, _ := url.Parse(c.API)
-		solutionURL.Path += fmt.Sprintf("tracks/%s/exercises/%s", iteration.TrackID, iteration.Problem)
-		fmt.Printf("Your %s solution for %s has been submitted. View it here:\n%s\n\n", submission.Language, submission.Name, submission.URL)
-		fmt.Printf("See related solutions and get involved here:\n%s\n\n", solutionURL)
-	}
-
-	return nil
+func init() {
+	RootCmd.AddCommand(submitCmd)
 }
