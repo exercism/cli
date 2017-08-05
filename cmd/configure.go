@@ -1,9 +1,14 @@
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+)
+
+var (
+	viperUserConfig *viper.Viper
+	viperAPIConfig  *viper.Viper
 )
 
 // configureCmd configures the command-line client with user-specific settings.
@@ -20,10 +25,41 @@ places.
 You can also override certain default settings to suit your preferences.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("configure called")
+		usrCfg := config.NewEmptyUserConfig()
+		if err := usrCfg.Load(viperUserConfig); err != nil {
+			Bail(err)
+		}
+		if err := usrCfg.Write(); err != nil {
+			Bail(err)
+		}
+
+		apiCfg := config.NewEmptyAPIConfig()
+		if err := apiCfg.Load(viperAPIConfig); err != nil {
+			Bail(err)
+		}
+		if err := apiCfg.Write(); err != nil {
+			Bail(err)
+		}
+
+		return
 	},
+}
+
+func initConfigureCfg() {
+	configureCmd.Flags().StringP("token", "t", "", "authentication token used to connect to exercism.io")
+	configureCmd.Flags().StringP("workspace", "w", "", "directory for exercism exercises")
+	configureCmd.Flags().StringP("api", "a", "", "API base url")
+
+	viperUserConfig = viper.New()
+	viperUserConfig.BindPFlag("token", configureCmd.Flags().Lookup("token"))
+	viperUserConfig.BindPFlag("workspace", configureCmd.Flags().Lookup("workspace"))
+
+	viperAPIConfig = viper.New()
+	viperAPIConfig.BindPFlag("baseurl", configureCmd.Flags().Lookup("api"))
 }
 
 func init() {
 	RootCmd.AddCommand(configureCmd)
+
+	initConfigureCfg()
 }
