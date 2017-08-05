@@ -3,6 +3,7 @@ package config
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -25,9 +26,12 @@ func (cfg *fakeConfig) load(v *viper.Viper) error {
 }
 
 func TestFakeConfig(t *testing.T) {
-	dir, err := ioutil.TempDir("", "fake-config")
+	tmpDir, err := ioutil.TempDir("", "fake-config")
 	assert.NoError(t, err)
-	defer os.RemoveAll(dir)
+	defer os.RemoveAll(tmpDir)
+
+	// Set the config directory to a directory that doesn't exist.
+	dir := filepath.Join(tmpDir, "exercism")
 
 	// It has access to the embedded fields.
 	cfg := &fakeConfig{
