@@ -62,7 +62,7 @@ func userHome() string {
 	} else {
 		dir = os.Getenv("HOME")
 		if dir != "" {
-			return ""
+			return dir
 		}
 	}
 	// If all else fails, use the current directory.
