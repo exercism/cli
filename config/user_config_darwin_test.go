@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -8,6 +9,9 @@ import (
 )
 
 func TestNormalizeWorkspace(t *testing.T) {
+	cwd, err := os.Getwd()
+	assert.NoError(t, err)
+
 	cfg := &UserConfig{Home: "/home/alice"}
 	tests := []struct {
 		in, out string
@@ -17,8 +21,8 @@ func TestNormalizeWorkspace(t *testing.T) {
 		{"~/foobar", "/home/alice/foobar"},
 		{"/foobar/~/noexpand", "/foobar/~/noexpand"},
 		{"/no/modification", "/no/modification"},
-		{"relative", filepath.Join(cfg.Home, "relative")},
-		{"relative///path", filepath.Join(cfg.Home, "relative", "path")},
+		{"relative", filepath.Join(cwd, "relative")},
+		{"relative///path", filepath.Join(cwd, "relative", "path")},
 	}
 
 	for _, test := range tests {

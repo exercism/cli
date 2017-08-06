@@ -87,5 +87,9 @@ func (cfg *UserConfig) resolve(path string) string {
 	if filepath.IsAbs(path) {
 		return filepath.Clean(path)
 	}
-	return filepath.Join(cfg.Home, path)
+	cwd, err := os.Getwd()
+	if err != nil {
+		return path
+	}
+	return filepath.Join(cwd, path)
 }
