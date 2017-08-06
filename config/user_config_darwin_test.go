@@ -12,6 +12,7 @@ func TestNormalizeWorkspace(t *testing.T) {
 	tests := []struct {
 		in, out string
 	}{
+		{"", ""}, // don't make wild guesses
 		{"/home/alice///foobar", "/home/alice/foobar"},
 		{"~/foobar", "/home/alice/foobar"},
 		{"/foobar/~/noexpand", "/foobar/~/noexpand"},
@@ -21,6 +22,8 @@ func TestNormalizeWorkspace(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.out, cfg.resolve(test.in))
+		cfg.Workspace = test.in
+		cfg.Normalize()
+		assert.Equal(t, test.out, cfg.Workspace)
 	}
 }
