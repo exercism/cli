@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/exercism/cli/visibility"
@@ -37,6 +38,13 @@ func NewSolution(dir string) (Solution, error) {
 	}
 	s.Dir = dir
 	return s, nil
+}
+
+// Suffix is the serial numeric value appended to an exercise directory.
+// This is appended to avoid name conflicts, and does not indicate a particular
+// iteration.
+func (s Solution) Suffix() string {
+	return strings.Trim(strings.Replace(filepath.Base(s.Dir), s.Exercise, "", 1), "-.")
 }
 
 // Write stores solution metadata to a file.
