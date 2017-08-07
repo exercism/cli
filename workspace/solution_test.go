@@ -21,6 +21,7 @@ func TestSolution(t *testing.T) {
 		URL:         "http://example.com",
 		Handle:      "alice",
 		IsRequester: true,
+		Dir:         dir,
 	}
 	err = s1.Write(dir)
 	assert.NoError(t, err)
