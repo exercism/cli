@@ -21,6 +21,7 @@ type Solution struct {
 	Handle      string     `json:"handle"`
 	IsRequester bool       `json:"is_requester"`
 	SubmittedAt *time.Time `json:"submitted_at,omitempty"`
+	Dir         string     `json:"-"`
 }
 
 // NewSolution reads solution metadata from a file in the given directory.
@@ -34,6 +35,7 @@ func NewSolution(dir string) (Solution, error) {
 	if err := json.Unmarshal(b, &s); err != nil {
 		return Solution{}, err
 	}
+	s.Dir = dir
 	return s, nil
 }
 
