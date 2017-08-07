@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -45,6 +46,17 @@ func NewSolution(dir string) (Solution, error) {
 // iteration.
 func (s Solution) Suffix() string {
 	return strings.Trim(strings.Replace(filepath.Base(s.Dir), s.Exercise, "", 1), "-.")
+}
+
+func (s Solution) String() string {
+	str := fmt.Sprintf("%s/%s", s.Track, s.Exercise)
+	if s.Suffix() != "" {
+		str = fmt.Sprintf("%s (%s)", str, s.Suffix())
+	}
+	if !s.IsRequester && s.Handle != "" {
+		str = fmt.Sprintf("%s by @%s", str, s.Handle)
+	}
+	return str
 }
 
 // Write stores solution metadata to a file.
