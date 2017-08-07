@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/exercism/cli/visibility"
 )
 
 const solutionFilename = ".solution.json"
@@ -42,5 +44,8 @@ func (s Solution) Write(dir string) error {
 		return err
 	}
 	path := filepath.Join(dir, solutionFilename)
-	return ioutil.WriteFile(path, b, os.FileMode(0644))
+	if err := ioutil.WriteFile(path, b, os.FileMode(0644)); err != nil {
+		return err
+	}
+	return visibility.HideFile(path)
 }
