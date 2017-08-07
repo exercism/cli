@@ -28,10 +28,16 @@ If you care about the details, check out the blog post [Contributing to Open Sou
 
 ## Running the Tests
 
-To run the tests locally, use
+To run the tests locally on Linux or MacOS, use
 
 ```
 go test $(go list ./... | grep -v vendor)
+```
+
+On Windows, the command is more painful (sorry!):
+
+```
+for /f "" %G in ('go list ./... ^| find /i /v "/vendor/"') do @go test %G
 ```
 
 As of Go 1.9 this is simplified to `go test ./...`.
