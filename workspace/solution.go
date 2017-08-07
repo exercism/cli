@@ -12,13 +12,13 @@ const solutionFilename = ".solution.json"
 
 // Solution contains metadata about a user's solution.
 type Solution struct {
-	Track       string    `json:"track"`
-	Exercise    string    `json:"exercise"`
-	ID          string    `json:"id"`
-	URL         string    `json:"url"`
-	Handle      string    `json:"handle"`
-	IsRequester bool      `json:"is_requester"`
-	SubmittedAt time.Time `json:"submitted_at"`
+	Track       string     `json:"track"`
+	Exercise    string     `json:"exercise"`
+	ID          string     `json:"id"`
+	URL         string     `json:"url"`
+	Handle      string     `json:"handle"`
+	IsRequester bool       `json:"is_requester"`
+	SubmittedAt *time.Time `json:"submitted_at,omitempty"`
 }
 
 // NewSolution reads solution metadata from a file in the given directory.

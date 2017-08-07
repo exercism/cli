@@ -21,13 +21,22 @@ func TestSolution(t *testing.T) {
 		URL:         "http://example.com",
 		Handle:      "alice",
 		IsRequester: true,
-		SubmittedAt: time.Date(2000, 1, 2, 3, 4, 5, 6, time.UTC),
 	}
 	err = s1.Write(dir)
 	assert.NoError(t, err)
 
 	s2, err := NewSolution(dir)
 	assert.NoError(t, err)
-
+	assert.Nil(t, s2.SubmittedAt)
 	assert.Equal(t, s1, s2)
+
+	ts := time.Date(2000, 1, 2, 3, 4, 5, 6, time.UTC)
+	s2.SubmittedAt = &ts
+
+	err = s2.Write(dir)
+	assert.NoError(t, err)
+
+	s3, err := NewSolution(dir)
+	assert.NoError(t, err)
+	assert.Equal(t, s2, s3)
 }
