@@ -41,3 +41,43 @@ func TestSolution(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, s2, s3)
 }
+
+func TestSuffix(t *testing.T) {
+	tests := []struct {
+		solution Solution
+		suffix   string
+	}{
+		{
+			solution: Solution{
+				Exercise: "bat",
+				Dir:      "",
+			},
+			suffix: "",
+		},
+		{
+			solution: Solution{
+				Exercise: "bat",
+				Dir:      "/path/to/bat",
+			},
+			suffix: "",
+		},
+		{
+			solution: Solution{
+				Exercise: "bat",
+				Dir:      "/path/to/bat-2",
+			},
+			suffix: "2",
+		},
+		{
+			solution: Solution{
+				Exercise: "bat",
+				Dir:      "/path/to/bat-200",
+			},
+			suffix: "200",
+		},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.suffix, test.solution.Suffix())
+	}
+}
