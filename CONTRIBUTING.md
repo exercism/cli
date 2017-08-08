@@ -37,7 +37,7 @@ go test $(go list ./... | grep -v vendor)
 On Windows, the command is more painful (sorry!):
 
 ```
-for /f "" %G in ('go list ./... ^| find /i /v "/vendor/"') do @go test %G
+for /f "" %%G in ('go list ./... ^| find /i /v "/vendor/"') do (go test %%G & IF ERRORLEVEL == 1 EXIT 1)
 ```
 
 As of Go 1.9 this is simplified to `go test ./...`.
