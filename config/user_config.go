@@ -81,11 +81,16 @@ func (cfg *UserConfig) resolve(path string) string {
 	if path == "" {
 		return ""
 	}
-	if strings.HasPrefix(path, "~"+string(os.PathSeparator)) {
-		return strings.Replace(path, "~", cfg.Home, 1)
+	if strings.HasPrefix(path, "~/") {
+		path = strings.Replace(path, "~/", "", 1)
+		return filepath.Join(cfg.Home, path)
 	}
 	if filepath.IsAbs(path) {
 		return filepath.Clean(path)
+	}
+	// if using "/dir" on Windows
+	if strings.HasPrefix(path, "/") {
+		return filepath.Join(cfg.Home, filepath.Clean(path))
 	}
 	cwd, err := os.Getwd()
 	if err != nil {
