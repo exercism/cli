@@ -2,8 +2,17 @@ package config
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/viper"
+)
+
+var (
+	defaultBaseURL   = "https://api.exercism.com/v1"
+	defaultEndpoints = map[string]string{
+		"download": "/solutions/%s",
+		"submit":   "/solutions/%s",
+	}
 )
 
 // APIConfig provides API-specific configuration values.
@@ -17,18 +26,31 @@ type APIConfig struct {
 func NewAPIConfig() (*APIConfig, error) {
 	cfg := NewEmptyAPIConfig()
 
-	// Set defaults.
-	cfg.BaseURL = "https://api.exercism.com/v1"
-	cfg.Endpoints = map[string]string{
-		"download": "/solutions/%s",
-		"submit":   "/solutions/%s",
-	}
-
 	if err := cfg.Load(viper.New()); err != nil {
 		return nil, err
 	}
 
+	cfg.SetDefaults()
+
 	return cfg, nil
+}
+
+// SetDefaults ensures that we have all the necessary settings for the API.
+func (cfg *APIConfig) SetDefaults() {
+	if cfg.BaseURL == "" {
+		cfg.BaseURL = "https://api.exercism.com/v1"
+	}
+
+	if cfg.Endpoints == nil {
+		cfg.Endpoints = defaultEndpoints
+		return
+	}
+
+	for key, endpoint := range defaultEndpoints {
+		if cfg.Endpoints[key] == "" {
+			cfg.Endpoints[key] = endpoint
+		}
+	}
 }
 
 // URL provides the API URL for a given endpoint key.
@@ -45,6 +67,9 @@ func NewEmptyAPIConfig() *APIConfig {
 
 // Write stores the config to disk.
 func (cfg *APIConfig) Write() error {
+	cfg.BaseURL = strings.Trim(cfg.BaseURL, "/")
+	cfg.SetDefaults()
+
 	return Write(cfg)
 }
 
