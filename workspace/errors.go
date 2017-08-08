@@ -9,11 +9,11 @@ type ErrNotInWorkspace string
 type ErrNotExist string
 
 func (err ErrNotInWorkspace) Error() string {
-	return fmt.Sprintf("%s not within workspace", err)
+	return fmt.Sprintf("%s not within workspace", string(err))
 }
 
 func (err ErrNotExist) Error() string {
-	return fmt.Sprintf("%s not found", err)
+	return fmt.Sprintf("%s not found", string(err))
 }
 
 // IsNotInWorkspace checks if this is an ErrNotInWorkspace error.
