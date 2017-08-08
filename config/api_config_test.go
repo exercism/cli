@@ -37,3 +37,32 @@ func TestAPIConfig(t *testing.T) {
 	assert.Equal(t, "/a", cfg.Endpoints["a"])
 	assert.Equal(t, "/b", cfg.Endpoints["b"])
 }
+
+func TestAPIConfigSetDefaults(t *testing.T) {
+	// All defaults.
+	cfg := &APIConfig{}
+	cfg.SetDefaults()
+	assert.Equal(t, "https://api.exercism.com/v1", cfg.BaseURL)
+	assert.Equal(t, "/solutions/%s", cfg.Endpoints["download"])
+	assert.Equal(t, "/solutions/%s", cfg.Endpoints["submit"])
+
+	// Override just the base url.
+	cfg = &APIConfig{
+		BaseURL: "http://example.com/v1",
+	}
+	cfg.SetDefaults()
+	assert.Equal(t, "http://example.com/v1", cfg.BaseURL)
+	assert.Equal(t, "/solutions/%s", cfg.Endpoints["download"])
+	assert.Equal(t, "/solutions/%s", cfg.Endpoints["submit"])
+
+	// Override just one of the endpoints.
+	cfg = &APIConfig{
+		Endpoints: map[string]string{
+			"download": "/download/%d",
+		},
+	}
+	cfg.SetDefaults()
+	assert.Equal(t, "https://api.exercism.com/v1", cfg.BaseURL)
+	assert.Equal(t, "/download/%d", cfg.Endpoints["download"])
+	assert.Equal(t, "/solutions/%s", cfg.Endpoints["submit"])
+}
