@@ -20,7 +20,6 @@ type UserConfig struct {
 // NewUserConfig loads a user configuration if it exists.
 func NewUserConfig() (*UserConfig, error) {
 	cfg := NewEmptyUserConfig()
-	cfg.Home = userHome()
 
 	if err := cfg.Load(viper.New()); err != nil {
 		return nil, err
@@ -36,9 +35,17 @@ func NewEmptyUserConfig() *UserConfig {
 	}
 }
 
+// Normalize ensures that we have proper values where possible.
+func (cfg *UserConfig) Normalize() {
+	if cfg.Home == "" {
+		cfg.Home = userHome()
+	}
+	cfg.Workspace = cfg.resolve(cfg.Workspace)
+}
+
 // Write stores the config to disk.
 func (cfg *UserConfig) Write() error {
-	cfg.Workspace = cfg.resolve(cfg.Workspace)
+	cfg.Normalize()
 	return Write(cfg)
 }
 
@@ -62,7 +69,7 @@ func userHome() string {
 	} else {
 		dir = os.Getenv("HOME")
 		if dir != "" {
-			return ""
+			return dir
 		}
 	}
 	// If all else fails, use the current directory.
@@ -71,11 +78,18 @@ func userHome() string {
 }
 
 func (cfg *UserConfig) resolve(path string) string {
+	if path == "" {
+		return ""
+	}
 	if strings.HasPrefix(path, "~"+string(os.PathSeparator)) {
 		return strings.Replace(path, "~", cfg.Home, 1)
 	}
 	if filepath.IsAbs(path) {
 		return filepath.Clean(path)
 	}
-	return filepath.Join(cfg.Home, path)
+	cwd, err := os.Getwd()
+	if err != nil {
+		return path
+	}
+	return filepath.Join(cwd, path)
 }
