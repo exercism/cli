@@ -86,7 +86,7 @@ func TestConfigure(t *testing.T) {
 		// Re-initialize the command so it picks up the fake environment.
 		configureCmd.ResetFlags()
 		// Rerun the config initialization so that the flags get bound properly.
-		initConfigureCfg()
+		initConfigureCmd()
 
 		// Finally. Execute the configure command.
 		fakeCmd.Execute()
