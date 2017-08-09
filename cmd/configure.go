@@ -26,20 +26,20 @@ You can also override certain default settings to suit your preferences.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		usrCfg := config.NewEmptyUserConfig()
-		if err := usrCfg.Load(viperUserConfig); err != nil {
-			Bail(err)
-		}
-		if err := usrCfg.Write(); err != nil {
-			Bail(err)
-		}
+
+		err := usrCfg.Load(viperUserConfig)
+		BailOnError(err)
+
+		err = usrCfg.Write()
+		BailOnError(err)
 
 		apiCfg := config.NewEmptyAPIConfig()
-		if err := apiCfg.Load(viperAPIConfig); err != nil {
-			Bail(err)
-		}
-		if err := apiCfg.Write(); err != nil {
-			Bail(err)
-		}
+
+		err = apiCfg.Load(viperAPIConfig)
+		BailOnError(err)
+
+		err = apiCfg.Write()
+		BailOnError(err)
 
 		return
 	},
