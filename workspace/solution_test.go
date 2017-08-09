@@ -14,7 +14,7 @@ func TestSolution(t *testing.T) {
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
 
-	s1 := Solution{
+	s1 := &Solution{
 		Track:       "a-track",
 		Exercise:    "bogus-exercise",
 		ID:          "abc",
