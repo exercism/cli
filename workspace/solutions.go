@@ -11,10 +11,10 @@ import (
 )
 
 // Solutions is a collection of solutions to interactively choose from.
-type Solutions []Solution
+type Solutions []*Solution
 
 // Pick lets a user interactively select a solution from a list.
-func (sx Solutions) Pick(prompt string) (Solution, error) {
+func (sx Solutions) Pick(prompt string) (*Solution, error) {
 	// If there's just one, then we're done here.
 	if len(sx) == 1 {
 		return sx[0], nil
@@ -24,12 +24,12 @@ func (sx Solutions) Pick(prompt string) (Solution, error) {
 
 	n, err := sx.ReadSelection(os.Stdin)
 	if err != nil {
-		return Solution{}, err
+		return &Solution{}, err
 	}
 
 	s, err := sx.Get(n)
 	if err != nil {
-		return Solution{}, err
+		return &Solution{}, err
 	}
 	return s, nil
 }
@@ -57,9 +57,9 @@ func (sx Solutions) ReadSelection(r io.Reader) (int, error) {
 
 // Get returns the solution corresponding to the number.
 // The list starts at 1, since that seems better in a user interface.
-func (sx Solutions) Get(n int) (Solution, error) {
+func (sx Solutions) Get(n int) (*Solution, error) {
 	if n <= 0 || n > len(sx) {
-		return Solution{}, errors.New("can't do that")
+		return &Solution{}, errors.New("can't do that")
 	}
 	return sx[n-1], nil
 }
