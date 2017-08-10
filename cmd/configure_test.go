@@ -1,33 +1,13 @@
 package cmd
 
 import (
-	"fmt"
-	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/exercism/cli/config"
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestConfigure(t *testing.T) {
-	// Make sure we put back the config env var.
-	cfgHomeKey := "EXERCISM_CONFIG_HOME"
-	cfgHome := os.Getenv(cfgHomeKey)
-	defer os.Setenv(cfgHomeKey, cfgHome)
-
-	// Make sure we put back the real command-line arguments.
-	osArgs := os.Args
-	defer func() {
-		os.Args = osArgs
-	}()
-
-	// Set up a bogus root command.
-	fakeCmd := &cobra.Command{}
-	// Add the real configureCmd to it.
-	fakeCmd.AddCommand(configureCmd)
-
 	tests := []struct {
 		desc           string
 		args           []string
@@ -53,7 +33,7 @@ func TestConfigure(t *testing.T) {
 			expectedAPICfg: &config.APIConfig{BaseURL: "http://example.com/v2"},
 		},
 		{
-			desc:           "It overwrites the flags that are passed without losing the ones that are not.",
+			desc:           "It overwrites the flags that are passed, without losing the ones that are not.",
 			args:           []string{"fakeapp", "configure", "--token", "c"},
 			existingUsrCfg: &config.UserConfig{Token: "token-c", Workspace: "/workspace-c"},
 			expectedUsrCfg: &config.UserConfig{Token: "c", Workspace: "/workspace-c"},
@@ -66,34 +46,25 @@ func TestConfigure(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
-		// Create a fake config dir.
-		dir, err := ioutil.TempDir("", fmt.Sprintf("user-config-%d", i))
-		assert.NoError(t, err, test.desc)
-		defer os.RemoveAll(dir)
-
-		// Override the environment to use the fake config dir.
-		os.Setenv(cfgHomeKey, dir)
+	for _, test := range tests {
+		cmdTest := &CommandTest{
+			Cmd:    configureCmd,
+			InitFn: initConfigureCmd,
+			Args:   test.args,
+		}
+		cmdTest.Setup(t)
+		defer cmdTest.Teardown(t)
 
 		if test.existingUsrCfg != nil {
 			// Write a fake config.
 			cfg := config.NewEmptyUserConfig()
 			cfg.Token = test.existingUsrCfg.Token
 			cfg.Workspace = test.existingUsrCfg.Workspace
-			err = cfg.Write()
+			err := cfg.Write()
 			assert.NoError(t, err, test.desc)
 		}
 
-		// Fake out the command-line arguments with the correct subcommand.
-		os.Args = test.args
-
-		// Re-initialize the command so it picks up the fake environment.
-		configureCmd.ResetFlags()
-		// Rerun the config initialization so that the flags get bound properly.
-		initConfigureCmd()
-
-		// Finally. Execute the configure command.
-		fakeCmd.Execute()
+		cmdTest.App.Execute()
 
 		if test.expectedUsrCfg != nil {
 			usrCfg, err := config.NewUserConfig()
