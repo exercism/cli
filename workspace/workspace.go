@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -101,4 +102,63 @@ func (ws Workspace) Locate(exercise string) ([]string, error) {
 		return nil, ErrNotExist(exercise)
 	}
 	return paths, nil
+}
+
+// SolutionPath returns the full path where the exercise will be stored.
+// By default this the directory name matches that of the exercise, but if
+// a different solution already exists, then a numeric suffix will be added
+// to the name.
+func (ws Workspace) SolutionPath(exercise, solutionID string) (string, error) {
+	paths, err := ws.Locate(exercise)
+	if !IsNotExist(err) && err != nil {
+		return "", err
+	}
+
+	return ws.ResolveSolutionPath(paths, exercise, solutionID, IsSolutionPath)
+}
+
+// IsSolutionPath checks whether the given path contains the solution with the given ID.
+func IsSolutionPath(solutionID, path string) (bool, error) {
+	s, err := NewSolution(path)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return s.ID == solutionID, nil
+}
+
+// ResolveSolutionPath determines the path for the given exercise solution.
+// It will locate an existing path, or indicate the name of a new path, if this is a new solution.
+func (ws Workspace) ResolveSolutionPath(paths []string, exercise, solutionID string, existsFn func(string, string) (bool, error)) (string, error) {
+	// Do we already have a directory for this solution?
+	for _, path := range paths {
+		ok, err := existsFn(solutionID, path)
+		if err != nil {
+			return "", err
+		}
+		if ok {
+			return path, nil
+		}
+	}
+	// If we didn't find the solution in one of the paths that
+	// were passed in, we're going to construct some new ones
+	// using a numeric suffix. Create a lookup table so we can
+	// reject constructed paths if they match existing ones.
+	m := map[string]bool{}
+	for _, path := range paths {
+		m[path] = true
+	}
+	suffix := 1
+	root := filepath.Join(ws.Dir, exercise)
+	path := root
+	for {
+		exists := m[path]
+		if !exists {
+			return path, nil
+		}
+		suffix++
+		path = fmt.Sprintf("%s-%d", root, suffix)
+	}
 }
