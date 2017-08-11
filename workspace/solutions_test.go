@@ -7,7 +7,7 @@ import (
 )
 
 func TestSolutions(t *testing.T) {
-	solutions := []Solution{
+	solutions := []*Solution{
 		{Track: "a", Exercise: "foo"},
 		{Track: "b", Exercise: "foo"},
 		{Track: "c", Exercise: "foo"},

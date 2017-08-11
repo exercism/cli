@@ -33,7 +33,7 @@ the solution you want to see on the website.
 		paths, err := ws.Locate(args[0])
 		BailOnError(err)
 
-		var solutions []workspace.Solution
+		var solutions []*workspace.Solution
 
 		for _, path := range paths {
 			solution, err := workspace.NewSolution(path)
@@ -49,7 +49,7 @@ the solution you want to see on the website.
 		}
 
 		if len(solutions) > 1 {
-			var mine []workspace.Solution
+			var mine []*workspace.Solution
 			for _, s := range solutions {
 				if s.IsRequester {
 					mine = append(mine, s)
