@@ -77,6 +77,11 @@ func prepareTrack(id string) error {
 	if !ok {
 		t = config.NewTrack(id)
 	}
+	// TODO: remove this when backend is fixed.
+	if payload.Track.TestPattern == "(?i-mx:test)" {
+		t.IgnorePatterns = append(t.IgnorePatterns, "[tT]est")
+		payload.Track.TestPattern = ""
+	}
 	if payload.Track.TestPattern != "" {
 		t.IgnorePatterns = append(t.IgnorePatterns, payload.Track.TestPattern)
 	}
