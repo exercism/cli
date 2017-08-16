@@ -39,7 +39,7 @@ func NewAPIConfig() (*APIConfig, error) {
 // SetDefaults ensures that we have all the necessary settings for the API.
 func (cfg *APIConfig) SetDefaults() {
 	if cfg.BaseURL == "" {
-		cfg.BaseURL = "https://api.exercism.com/v1"
+		cfg.BaseURL = defaultBaseURL
 	}
 
 	if cfg.Endpoints == nil {
