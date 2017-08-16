@@ -140,6 +140,8 @@ var submitCmd = &cobra.Command{
 		bb := &bytes.Buffer{}
 		_, err = bb.ReadFrom(resp.Body)
 		BailOnError(err)
+
+		fmt.Printf("Submitted. View at %s\n", solution.URL)
 	},
 }
 
