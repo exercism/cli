@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/exercism/cli/browser"
 	"github.com/exercism/cli/config"
@@ -33,16 +32,8 @@ the solution you want to see on the website.
 		paths, err := ws.Locate(args[0])
 		BailOnError(err)
 
-		var solutions []*workspace.Solution
-
-		for _, path := range paths {
-			solution, err := workspace.NewSolution(path)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, err.Error())
-				continue
-			}
-			solutions = append(solutions, solution)
-		}
+		solutions, err := workspace.NewSolutions(paths)
+		BailOnError(err)
 
 		if len(solutions) == 0 {
 			return
