@@ -279,3 +279,53 @@ func TestResolveSolutionPath(t *testing.T) {
 		assert.Equal(t, test.expected, path, test.desc)
 	}
 }
+
+func TestSolutionDir(t *testing.T) {
+	_, cwd, _, _ := runtime.Caller(0)
+	root := filepath.Join(cwd, "..", "..", "fixtures", "solution-dir")
+
+	ws := New(filepath.Join(root, "workspace"))
+
+	tests := []struct {
+		path string
+		ok   bool
+	}{
+		{
+			path: filepath.Join(ws.Dir, "exercise"),
+			ok:   true,
+		},
+		{
+			path: filepath.Join(ws.Dir, "exercise", "file.txt"),
+			ok:   true,
+		},
+		{
+			path: filepath.Join(ws.Dir, "exercise", "in", "a", "subdir", "file.txt"),
+			ok:   true,
+		},
+		{
+			path: filepath.Join(ws.Dir, "exercise", "in", "a"),
+			ok:   true,
+		},
+		{
+			path: filepath.Join(ws.Dir, "not-exercise", "file.txt"),
+			ok:   false,
+		},
+		{
+			path: filepath.Join(root, "file.txt"),
+			ok:   false,
+		},
+		{
+			path: filepath.Join(ws.Dir, "exercise", "no-such-file.txt"),
+			ok:   false,
+		},
+	}
+
+	for _, test := range tests {
+		dir, err := ws.SolutionDir(test.path)
+		if !test.ok {
+			assert.Error(t, err, test.path)
+			continue
+		}
+		assert.Equal(t, filepath.Join(ws.Dir, "exercise"), dir, test.path)
+	}
+}
