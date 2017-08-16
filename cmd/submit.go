@@ -14,6 +14,7 @@ import (
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/workspace"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // submitCmd lets people upload a solution to the website.
@@ -74,6 +75,8 @@ var submitCmd = &cobra.Command{
 		if track == nil {
 			err := prepareTrack(solution.Track)
 			BailOnError(err)
+			cliCfg.Load(viper.New())
+			track = cliCfg.Tracks[solution.Track]
 		}
 
 		paths := tx.Files
