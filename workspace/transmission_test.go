@@ -1,6 +1,8 @@
 package workspace
 
 import (
+	"io/ioutil"
+	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -75,5 +77,20 @@ func TestNewTransmission(t *testing.T) {
 			assert.Equal(t, test.tx.Files, tx.Files, test.desc)
 			assert.Equal(t, test.tx.Dir, tx.Dir, test.desc)
 		}
+	}
+}
+
+func TestTransmissionWithRelativePath(t *testing.T) {
+	// This is really dirty, but I need to make sure that we turn relative paths into absolute paths.
+	err := ioutil.WriteFile(".solution.json", []byte("{}"), os.FileMode(0755))
+	assert.NoError(t, err)
+	defer os.Remove(".solution.json")
+
+	_, cwd, _, _ := runtime.Caller(0)
+	dir := filepath.Dir(filepath.Dir(cwd))
+	file := filepath.Base(cwd)
+	tx, err := NewTransmission(dir, []string{file})
+	if assert.NoError(t, err) {
+		assert.Equal(t, cwd, tx.Files[0])
 	}
 }

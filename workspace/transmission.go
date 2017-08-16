@@ -1,6 +1,9 @@
 package workspace
 
-import "errors"
+import (
+	"errors"
+	"path/filepath"
+)
 
 // Transmission as the data necessary to submit a solution.
 type Transmission struct {
@@ -18,6 +21,10 @@ func NewTransmission(root string, args []string) (*Transmission, error) {
 			return nil, err
 		}
 		if pt == TypeFile {
+			arg, err = filepath.Abs(arg)
+			if err != nil {
+				return nil, err
+			}
 			tx.Files = append(tx.Files, arg)
 			continue
 		}
