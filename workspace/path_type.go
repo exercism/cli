@@ -24,7 +24,7 @@ func DetectPathType(path string) (PathType, error) {
 		var err error
 		path, err = filepath.Abs(path)
 		if err != nil {
-			return 0, err
+			return -1, err
 		}
 	}
 
@@ -37,20 +37,20 @@ func DetectPathType(path string) (PathType, error) {
 	// We found it. It's an actual path of some sort.
 	info, err := os.Lstat(path)
 	if err != nil {
-		return 0, err
+		return -1, err
 	}
 
 	// If it's a symlink, resolve it.
 	if info.Mode()&os.ModeSymlink == os.ModeSymlink {
 		src, err := filepath.EvalSymlinks(path)
 		if err != nil {
-			return 0, err
+			return -1, err
 		}
 		path = src
 		// Overwrite the symlinked info with the source info.
 		info, err = os.Lstat(path)
 		if err != nil {
-			return 0, err
+			return -1, err
 		}
 	}
 
