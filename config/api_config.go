@@ -12,7 +12,7 @@ var (
 	defaultEndpoints = map[string]string{
 		"download":      "/solutions/%s",
 		"submit":        "/solutions/%s",
-		"prepare-track": "/tracks/%s/settings",
+		"prepare-track": "/tracks/%s",
 	}
 )
 
