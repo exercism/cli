@@ -89,6 +89,11 @@ var submitCmd = &cobra.Command{
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
 
+		if len(paths) == 0 {
+			fmt.Fprintf(os.Stderr, "No files found to submit.")
+			os.Exit(1)
+		}
+
 		for _, path := range paths {
 			file, err := os.Open(path)
 			BailOnError(err)
