@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -55,7 +56,7 @@ Download other people's solutions by providing the UUID.
 		req, err := client.NewRequest("GET", url, nil)
 		BailOnError(err)
 
-		if uuid != "" {
+		if uuid == "" {
 			q := req.URL.Query()
 			q.Add("exercise_id", exercise)
 			if track != "" {
@@ -69,7 +70,7 @@ Download other people's solutions by providing the UUID.
 		BailOnError(err)
 
 		if res.StatusCode != http.StatusOK {
-			// TODO: deal with it
+			BailOnError(errors.New("failed to call API"))
 		}
 
 		solution := workspace.Solution{
