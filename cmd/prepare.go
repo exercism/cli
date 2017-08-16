@@ -75,12 +75,11 @@ func prepareTrack(id string) error {
 
 	t, ok := cliCfg.Tracks[id]
 	if !ok {
-		t = &config.Track{
-			ID:             id,
-			IgnorePatterns: []string{},
-		}
+		t = config.NewTrack(id)
 	}
-	t.IgnorePatterns = append(t.IgnorePatterns, payload.Track.Settings.TestPattern)
+	if payload.Track.TestPattern != "" {
+		t.IgnorePatterns = append(t.IgnorePatterns, payload.Track.TestPattern)
+	}
 	cliCfg.Tracks[id] = t
 
 	return cliCfg.Write()
@@ -88,10 +87,9 @@ func prepareTrack(id string) error {
 
 type prepareTrackPayload struct {
 	Track struct {
-		ID       string `json:"id"`
-		Settings struct {
-			TestPattern string `json:"test_pattern"`
-		} `json:"settings"`
+		ID          string `json:"id"`
+		Language    string `json:"language"`
+		TestPattern string `json:"test_pattern"`
 	} `json:"track"`
 }
 
@@ -101,4 +99,5 @@ func initPrepareCmd() {
 
 func init() {
 	RootCmd.AddCommand(prepareCmd)
+	initPrepareCmd()
 }

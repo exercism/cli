@@ -24,9 +24,8 @@ func TestPrepareTrack(t *testing.T) {
 		{
 			"track": {
 				"id": "bogus",
-				"settings": {
-					"test_pattern": "_spec[.]ext$"
-				}
+				"language": "Bogus",
+				"test_pattern": "_spec[.]ext$"
 			}
 		}
 		`
