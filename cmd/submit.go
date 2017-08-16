@@ -33,6 +33,13 @@ var submitCmd = &cobra.Command{
 			args = []string{"."}
 		}
 
+		// TODO: make sure we get the workspace configured.
+		if usrCfg.Workspace == "" {
+			cwd, err := os.Getwd()
+			BailOnError(err)
+			usrCfg.Workspace = filepath.Dir(filepath.Dir(cwd))
+		}
+
 		ws := workspace.New(usrCfg.Workspace)
 		tx, err := workspace.NewTransmission(ws.Dir, args)
 		BailOnError(err)
