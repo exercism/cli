@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -35,14 +34,7 @@ Download other people's solutions by providing the UUID.
 			fmt.Fprintf(os.Stderr, "need an exercise name or a solution --uuid")
 			return
 		}
-		track, err := cmd.Flags().GetString("track")
-		BailOnError(err)
-		exercise := args[0]
-
 		apiCfg, err := config.NewAPIConfig()
-		BailOnError(err)
-
-		client, err := api.NewClient()
 		BailOnError(err)
 
 		var slug string
@@ -53,8 +45,18 @@ Download other people's solutions by providing the UUID.
 		}
 		url := fmt.Sprintf(apiCfg.URL("download"), slug)
 
+		client, err := api.NewClient()
+		BailOnError(err)
+
 		req, err := client.NewRequest("GET", url, nil)
 		BailOnError(err)
+
+		track, err := cmd.Flags().GetString("track")
+		BailOnError(err)
+		var exercise string
+		if len(args) > 0 {
+			exercise = args[0]
+		}
 
 		if uuid == "" {
 			q := req.URL.Query()
@@ -70,14 +72,19 @@ Download other people's solutions by providing the UUID.
 		BailOnError(err)
 
 		if res.StatusCode != http.StatusOK {
-			BailOnError(errors.New("failed to call API"))
+			switch payload.Error.Type {
+			case "track_ambiguous":
+			default:
+				fmt.Println(payload.Error.Message)
+				os.Exit(1)
+			}
 		}
 
 		solution := workspace.Solution{
 			Track:       payload.Solution.Exercise.Track.ID,
 			Exercise:    payload.Solution.Exercise.ID,
 			ID:          payload.Solution.ID,
-			URL:         payload.Solution.Exercise.InstructionsURL,
+			URL:         payload.Solution.URL,
 			Handle:      payload.Solution.User.Handle,
 			IsRequester: payload.Solution.User.IsRequester,
 		}
@@ -125,13 +132,14 @@ Download other people's solutions by providing the UUID.
 type downloadPayload struct {
 	Solution struct {
 		ID   string `json:"id"`
+		URL  string `json:"url"`
 		User struct {
 			Handle      string `json:"handle"`
 			IsRequester bool   `json:"is_requester"`
 		} `json:"user"`
 		Exercise struct {
-			ID              string
-			InstructionsURL string
+			ID              string `json:"id"`
+			InstructionsURL string `json:"instructions_url"`
 			Track           struct {
 				ID       string `json:"id"`
 				Language string `json:"language"`
@@ -143,6 +151,11 @@ type downloadPayload struct {
 			SubmittedAt *string `json:"submitted_at"`
 		}
 	} `json:"solution"`
+	Error struct {
+		Type             string   `json:"type"`
+		Message          string   `json:"message"`
+		PossibleTrackIDs []string `json:"possible_track_ids"`
+	} `json:"error,omitempty"`
 }
 
 func initDownloadCmd() {
