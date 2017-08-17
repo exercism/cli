@@ -66,3 +66,16 @@ func TestAPIConfigSetDefaults(t *testing.T) {
 	assert.Equal(t, "/download/%d", cfg.Endpoints["download"])
 	assert.Equal(t, "/solutions/%s", cfg.Endpoints["submit"])
 }
+
+func TestAPIConfigURL(t *testing.T) {
+	cfg := &APIConfig{
+		Endpoints: map[string]string{
+			"a": "a/%s/a",
+			"b": "b/%s/%d",
+			"c": "c/%s/%s/%s",
+		},
+	}
+	assert.Equal(t, "a/apple/a", cfg.URL("a", "apple"))
+	assert.Equal(t, "b/banana/2", cfg.URL("b", "banana", 2))
+	assert.Equal(t, "c/cherry/coca/cola", cfg.URL("c", "cherry", "coca", "cola"))
+}
