@@ -55,8 +55,9 @@ func (cfg *APIConfig) SetDefaults() {
 }
 
 // URL provides the API URL for a given endpoint key.
-func (cfg *APIConfig) URL(key string) string {
-	return fmt.Sprintf("%s%s", cfg.BaseURL, cfg.Endpoints[key])
+func (cfg *APIConfig) URL(key string, args ...interface{}) string {
+	pattern := fmt.Sprintf("%s%s", cfg.BaseURL, cfg.Endpoints[key])
+	return fmt.Sprintf(pattern, args...)
 }
 
 // NewEmptyAPIConfig doesn't load the config from file or set default values.
