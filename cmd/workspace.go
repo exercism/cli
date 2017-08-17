@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
 )
 
@@ -10,21 +11,24 @@ import (
 var workspaceCmd = &cobra.Command{
 	Use:     "workspace",
 	Aliases: []string{"w"},
-	Short:   "Output the path to your workspace.",
-	Long: `Output the path to your workspace.
+	Short:   "Print out the path to your Exercism workspace.",
+	Long: `Print out the path to your Exercism workspace.
 
-This command can be combined with shell commands to take you there.
+This command can be used for scripting, or it can be combined with shell
+commands to take you to your workspace.
 
-For example, on Linux or MacOS you can run:
+For example you can run:
 
     cd $(exercism workspace)
 
-On Windows, the equivalent command is:
-
-    TODO ask @exercism/windows for help
+On Windows, this will work only with Powershell, however you would
+need to be on the same drive as your workspace directory. Otherwise
+nothing will happen.
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("workspace called")
+		usrCfg, err := config.NewUserConfig()
+		BailOnError(err)
+		fmt.Println(usrCfg.Workspace)
 	},
 }
 
