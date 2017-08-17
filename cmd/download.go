@@ -131,6 +131,7 @@ Download other people's solutions by providing the UUID.
 			_, err = io.Copy(f, res.Body)
 			BailOnError(err)
 		}
+		fmt.Printf("\nDownloaded to\n%s\n", solution.Dir)
 	},
 }
 
