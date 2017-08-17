@@ -89,7 +89,12 @@ Download other people's solutions by providing the UUID.
 			IsRequester: payload.Solution.User.IsRequester,
 		}
 
-		ws := workspace.New(filepath.Join(client.UserConfig.Workspace, solution.Track))
+		var ws workspace.Workspace
+		if solution.IsRequester {
+			ws = workspace.New(filepath.Join(client.UserConfig.Workspace, solution.Track))
+		} else {
+			ws = workspace.New(filepath.Join(client.UserConfig.Workspace, "users", solution.Handle, solution.Track))
+		}
 		os.MkdirAll(ws.Dir, os.FileMode(0755))
 
 		dir, err := ws.SolutionPath(solution.Exercise, solution.ID)
