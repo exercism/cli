@@ -46,8 +46,8 @@ func TestPrepareTrack(t *testing.T) {
 	assert.NoError(t, err)
 
 	expected := []string{
-		".solution.json",
-		"README.md",
+		".*[.]md",
+		"[.]solution[.]json",
 		"_spec[.]ext$",
 	}
 	track := cliCfg.Tracks["bogus"]
