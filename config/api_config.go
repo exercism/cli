@@ -13,6 +13,7 @@ var (
 		"download":      "/solutions/%s",
 		"submit":        "/solutions/%s",
 		"prepare-track": "/tracks/%s/settings",
+		"ping":          "/ping",
 	}
 )
 
@@ -41,7 +42,6 @@ func (cfg *APIConfig) SetDefaults() {
 	if cfg.BaseURL == "" {
 		cfg.BaseURL = defaultBaseURL
 	}
-
 	if cfg.Endpoints == nil {
 		cfg.Endpoints = defaultEndpoints
 		return
