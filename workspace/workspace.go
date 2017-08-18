@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -161,4 +162,27 @@ func (ws Workspace) ResolveSolutionPath(paths []string, exercise, solutionID str
 		suffix++
 		path = fmt.Sprintf("%s-%d", root, suffix)
 	}
+}
+
+// SolutionDir determines the root directory of a solution.
+// This is the directory that contains the solution metadata file.
+func (ws Workspace) SolutionDir(s string) (string, error) {
+	if !strings.HasPrefix(s, ws.Dir) {
+		return "", errors.New("not in workspace")
+	}
+
+	path := s
+	for {
+		if path == ws.Dir {
+			return "", errors.New("couldn't find it")
+		}
+		if _, err := os.Lstat(path); os.IsNotExist(err) {
+			return "", err
+		}
+		if _, err := os.Lstat(filepath.Join(path, solutionFilename)); err == nil {
+			return path, nil
+		}
+		path = filepath.Dir(path)
+	}
+	return "", nil
 }
