@@ -8,7 +8,7 @@ This CLI ships as a binary with no additional runtime requirements.
 
 ## Installing the CLI
 
-[TODO: link to the installation guide on Nextercism]
+Instructions can be found at [exercism/cli/releases](https://github.com/exercism/cli/releases)
 
 ## Contributing
 
