@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"sort"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -58,13 +57,10 @@ func TestLocate(t *testing.T) {
 	_, cwd, _, _ := runtime.Caller(0)
 	root := filepath.Join(cwd, "..", "..", "fixtures", "locate-exercise")
 
-	// Normalize the volume name.
-	// Clean doesn't do this.
-	volume := filepath.VolumeName(root)
-	root = fmt.Sprintf("%s%s", strings.ToUpper(volume), root[len(volume):])
-
 	wsPrimary := New(filepath.Join(root, "workspace"))
 	wsSymbolic := New(filepath.Join(root, "symlinked-workspace"))
+
+	assert.Equal(t, "something", filepath.VolumeName(wsPrimary.Dir))
 
 	tests := []struct {
 		desc      string
