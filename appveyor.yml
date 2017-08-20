@@ -1,0 +1,22 @@
+---
+version: "{build}"
+
+clone_folder: c:\gopath\src\github.com\exercism\cli
+
+environment:
+  GOPATH: c:\gopath
+
+init:
+  - git config --global core.autocrlf input
+
+install:
+  - echo %PATH%
+  - echo %GOPATH%
+  - go version
+  - go env
+  - go get -u github.com/golang/dep/...
+  - c:\gopath\bin\dep.exe ensure
+
+build_script:
+  - for /f "" %%G in ('go list github.com/exercism/cli/... ^| find /i /v "/vendor/"') do ( go test %%G & IF ERRORLEVEL == 1 EXIT 1)
+
