@@ -60,6 +60,8 @@ func TestLocate(t *testing.T) {
 	wsPrimary := New(filepath.Join(root, "workspace"))
 	wsSymbolic := New(filepath.Join(root, "symlinked-workspace"))
 
+	assert.Equal(t, "something", filepath.VolumeName(wsPrimary.Dir))
+
 	tests := []struct {
 		desc      string
 		workspace Workspace
