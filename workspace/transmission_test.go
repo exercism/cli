@@ -91,6 +91,6 @@ func TestTransmissionWithRelativePath(t *testing.T) {
 	file := filepath.Base(cwd)
 	tx, err := NewTransmission(dir, []string{file})
 	if assert.NoError(t, err) {
-		assert.Equal(t, cwd, tx.Files[0])
+		assert.Equal(t, filepath.Clean(cwd), tx.Files[0])
 	}
 }
