@@ -43,7 +43,9 @@ figuring things out if necessary.
 		BailOnError(err)
 
 		if len(args) == 0 {
-			args = []string{"."}
+			cwd, err := os.Getwd()
+			BailOnError(err)
+			args = []string{cwd}
 		}
 
 		// TODO: make sure we get the workspace configured.
