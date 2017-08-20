@@ -22,7 +22,19 @@ var submitCmd = &cobra.Command{
 	Use:     "submit",
 	Aliases: []string{"s"},
 	Short:   "Submit your solution to an exercise.",
-	Long:    `Submit your solution to an Exercism exercise.`,
+	Long: `Submit your solution to an Exercism exercise.
+
+The CLI will do its best to figure out what to submit.
+
+If you call the command without any arguments, it will
+submit the exercise contained in the current directory.
+
+If called with the path to a directory, it will submit it.
+
+If called with the name of an exercise, it will work out which
+track it is on and submit it. The command will ask for help
+figuring things out if necessary.
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		usrCfg, err := config.NewUserConfig()
 		BailOnError(err)
