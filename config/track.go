@@ -17,6 +17,7 @@ type Track struct {
 	ignoreRegexes  []*regexp.Regexp
 }
 
+// NewTrack provides a track configured with default values.
 func NewTrack(id string) *Track {
 	t := &Track{
 		ID: id,
@@ -25,6 +26,7 @@ func NewTrack(id string) *Track {
 	return t
 }
 
+// SetDefaults configures a track with default values.
 func (t *Track) SetDefaults() {
 	m := map[string]bool{}
 	for _, pattern := range t.IgnorePatterns {
@@ -38,6 +40,7 @@ func (t *Track) SetDefaults() {
 	sort.Strings(t.IgnorePatterns)
 }
 
+// AcceptFilename judges a files admissability based on the name.
 func (t *Track) AcceptFilename(f string) (bool, error) {
 	if err := t.CompileRegexes(); err != nil {
 		return false, err
@@ -51,6 +54,7 @@ func (t *Track) AcceptFilename(f string) (bool, error) {
 	return true, nil
 }
 
+// CompileRegexes precompiles the ignore patterns.
 func (t *Track) CompileRegexes() error {
 	if len(t.ignoreRegexes) == len(t.IgnorePatterns) {
 		return nil
