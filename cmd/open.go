@@ -1,9 +1,11 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/exercism/cli/browser"
+	"github.com/exercism/cli/comms"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/workspace"
 	"github.com/spf13/cobra"
@@ -49,7 +51,10 @@ the solution you want to see on the website.
 			solutions = mine
 		}
 
-		sx := workspace.Solutions(solutions)
+		selection := comms.NewSelection()
+		for _, solution := range solutions {
+			selection.Items = append(selection.Items, solution)
+		}
 		for {
 			prompt := `
 We found more than one. Which one did you mean?
@@ -57,13 +62,17 @@ Type the number of the one you want to select.
 
 %s
 > `
-			s, err := sx.Pick(prompt)
+			option, err := selection.Pick(prompt)
 			if err != nil {
 				fmt.Println(err)
 				continue
 			}
-			browser.Open(s.URL)
-			break
+			solution, ok := option.(*workspace.Solution)
+			if ok {
+				browser.Open(solution.URL)
+				break
+			}
+			BailOnError(errors.New("should never happen"))
 		}
 
 	},
