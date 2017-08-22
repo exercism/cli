@@ -9,6 +9,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// BinaryName is the name of the app.
+// By default this is exercism, but people
+// are free to name this however they want.
+// The usage examples and help strings should reflect
+// the actual name of the binary.
 var BinaryName string
 
 // RootCmd represents the base command when called without any subcommands.
