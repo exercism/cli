@@ -28,16 +28,12 @@ func DetectPathType(path string) (PathType, error) {
 		}
 	}
 
-	// If it doesn't exist, then it's an exercise name.
-	// We'll have to walk the workspace to find it.
-	if _, err := os.Stat(path); err != nil {
-		return TypeExerciseID, nil
-	}
-
-	// We found it. It's an actual path of some sort.
+	// Check if it's an actual path of some sort.
 	info, err := os.Lstat(path)
 	if err != nil {
-		return -1, err
+		// If it doesn't exist, then it's an exercise name.
+		// We'll have to walk the workspace to find it.
+		return TypeExerciseID, nil
 	}
 
 	// If it's a symlink, resolve it.
