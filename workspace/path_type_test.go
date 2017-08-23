@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"fmt"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -29,7 +30,7 @@ func TestDetectPathType(t *testing.T) {
 		},
 		{
 			desc: "symlinked dir",
-			path: filepath.Join(root, "symlinked-dir"),
+			path: filepath.Join(root, "symlinked-dir-windows"),
 			pt:   TypeDir,
 		},
 		{
@@ -57,6 +58,7 @@ func TestDetectPathType(t *testing.T) {
 	for _, test := range tests {
 		pt, err := DetectPathType(test.path)
 		assert.NoError(t, err, test.desc)
+		fmt.Println(pt)
 		assert.Equal(t, test.pt, pt, test.desc)
 	}
 }
