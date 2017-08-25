@@ -49,6 +49,12 @@ var (
 	LatestReleaseURL = "https://api.github.com/repos/exercism/cli/releases/latest"
 )
 
+// Updater is a simple upgradable file interface.
+type Updater interface {
+	IsUpToDate() (bool, error)
+	Upgrade() error
+}
+
 // CLI is information about the CLI itself.
 type CLI struct {
 	Version       string
