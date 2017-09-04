@@ -72,3 +72,12 @@ func (s *Solution) Write(dir string) error {
 	s.Dir = dir
 	return visibility.HideFile(path)
 }
+
+// PathToParent is the relative path from the workspace to the parent dir.
+func (s *Solution) PathToParent() string {
+	var dir string
+	if !s.IsRequester {
+		dir = filepath.Join("users")
+	}
+	return filepath.Join(dir, s.Track)
+}

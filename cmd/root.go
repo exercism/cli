@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"runtime"
 
@@ -9,12 +10,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// BinaryName is the name of the app.
-// By default this is exercism, but people
-// are free to name this however they want.
-// The usage examples and help strings should reflect
-// the actual name of the binary.
-var BinaryName string
+var (
+	// BinaryName is the name of the app.
+	// By default this is exercism, but people
+	// are free to name this however they want.
+	// The usage examples and help strings should reflect
+	// the actual name of the binary.
+	BinaryName string
+	Out        io.Writer
+)
 
 // RootCmd represents the base command when called without any subcommands.
 var RootCmd = &cobra.Command{
@@ -35,5 +39,6 @@ func Execute() {
 
 func init() {
 	BinaryName = os.Args[0]
+	Out = os.Stdout
 	api.UserAgent = fmt.Sprintf("github.com/exercism/cli v%s (%s/%s)", Version, runtime.GOOS, runtime.GOARCH)
 }
