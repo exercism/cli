@@ -17,7 +17,7 @@ If you don't care how and why and just want something that works, follow these s
 
 1. [fork this repo][fork]
 1. `go get github.com/exercism/cli/exercism`
-1. `cd $GOPATH/src/github.com/exercism/cli`
+1. `cd $GOPATH/src/github.com/exercism/cli` (or `cd %GOPATH%/src/github.com/exercism/cli` on Windows)
 1. `git remote set-url origin https://github.com/<your-github-username>/cli`
 1. `go get -u github.com/golang/dep/cmd/dep`
 1. `dep ensure`
