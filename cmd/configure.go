@@ -27,17 +27,23 @@ places.
 
 You can also override certain default settings to suit your preferences.
 `,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		usrCfg := config.NewEmptyUserConfig()
 		err := usrCfg.Load(viperUserConfig)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		apiCfg := config.NewEmptyAPIConfig()
 		err = apiCfg.Load(viperAPIConfig)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		show, err := cmd.Flags().GetBool("show")
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		if show {
 			w := tabwriter.NewWriter(Out, 0, 0, 2, ' ', 0)
@@ -48,14 +54,20 @@ You can also override certain default settings to suit your preferences.
 			fmt.Fprintln(w, fmt.Sprintf("-t, --token\t%s", usrCfg.Token))
 			fmt.Fprintln(w, fmt.Sprintf("-w, --workspace\t%s", usrCfg.Workspace))
 			fmt.Fprintln(w, fmt.Sprintf("-a, --api\t%s", apiCfg.BaseURL))
-			return
+			return nil
 		}
 
 		err = usrCfg.Write()
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		err = apiCfg.Write()
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	},
 }
 

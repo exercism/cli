@@ -25,18 +25,20 @@ To check for the latest available version, call the command with the
 --latest flag.
 	`,
 
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Println(currentVersion())
 
 		if checkLatest {
 			c := cli.New(Version)
 			l, err := checkForUpdate(c)
-			BailOnError(err)
+			if err != nil {
+				return err
+			}
 
 			fmt.Println(l)
 		}
 
-		return
+		return nil
 	},
 }
 

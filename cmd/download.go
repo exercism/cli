@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -26,16 +27,20 @@ latest solution.
 
 Download other people's solutions by providing the UUID.
 `,
-	Run: func(cmd *cobra.Command, args []string) {
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
 		uuid, err := cmd.Flags().GetString("uuid")
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 		if uuid == "" && len(args) == 0 {
 			// TODO: usage
-			fmt.Fprintf(os.Stderr, "need an exercise name or a solution --uuid")
-			return
+			return errors.New("need an exercise name or a solution --uuid")
 		}
 		apiCfg, err := config.NewAPIConfig()
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		var slug string
 		if uuid == "" {
@@ -46,13 +51,19 @@ Download other people's solutions by providing the UUID.
 		url := apiCfg.URL("download", slug)
 
 		client, err := api.NewClient()
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		req, err := client.NewRequest("GET", url, nil)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		track, err := cmd.Flags().GetString("track")
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 		var exercise string
 		if len(args) > 0 {
 			exercise = args[0]
@@ -69,14 +80,15 @@ Download other people's solutions by providing the UUID.
 
 		payload := &downloadPayload{}
 		res, err := client.Do(req, payload)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		if res.StatusCode != http.StatusOK {
 			switch payload.Error.Type {
 			case "track_ambiguous":
 			default:
-				fmt.Println(payload.Error.Message)
-				os.Exit(1)
+				return errors.New(payload.Error.Message)
 			}
 		}
 
@@ -98,20 +110,28 @@ Download other people's solutions by providing the UUID.
 		os.MkdirAll(ws.Dir, os.FileMode(0755))
 
 		dir, err := ws.SolutionPath(solution.Exercise, solution.ID)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		os.MkdirAll(dir, os.FileMode(0755))
 
 		err = solution.Write(dir)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		for _, file := range payload.Solution.Files {
 			url := fmt.Sprintf("%s%s", payload.Solution.FileDownloadBaseURL, file)
 			req, err := client.NewRequest("GET", url, nil)
-			BailOnError(err)
+			if err != nil {
+				return err
+			}
 
 			res, err := client.Do(req, nil)
-			BailOnError(err)
+			if err != nil {
+				return err
+			}
 			defer res.Body.Close()
 
 			if res.StatusCode != http.StatusOK {
@@ -130,12 +150,17 @@ Download other people's solutions by providing the UUID.
 			os.MkdirAll(dir, os.FileMode(0755))
 
 			f, err := os.Create(filepath.Join(solution.Dir, relativePath))
-			BailOnError(err)
+			if err != nil {
+				return err
+			}
 			defer f.Close()
 			_, err = io.Copy(f, res.Body)
-			BailOnError(err)
+			if err != nil {
+				return err
+			}
 		}
 		fmt.Fprintf(Out, "\nDownloaded to\n%s\n", solution.Dir)
+		return nil
 	},
 }
 

@@ -28,16 +28,21 @@ exercise will be downloaded along with the exercise.
 
 To customize the CLI to suit your own preferences, use the configure command.
 	`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		track, err := cmd.Flags().GetString("track")
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		if track == "" {
 			fmt.Println("prepare called")
-			return
+			return nil
 		}
 		err = prepareTrack(track)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
+		return nil
 	},
 }
 

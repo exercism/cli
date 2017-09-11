@@ -25,10 +25,13 @@ On Windows, this will work only with Powershell, however you would
 need to be on the same drive as your workspace directory. Otherwise
 nothing will happen.
 	`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		usrCfg, err := config.NewUserConfig()
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 		fmt.Println(usrCfg.Workspace)
+		return nil
 	},
 }
 

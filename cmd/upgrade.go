@@ -22,14 +22,17 @@ On Windows the old CLI will be left on disk, marked as hidden.
 The next time you upgrade, the hidden file will be overwritten.
 You can always delete this file.
 	`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
 			debug.Verbose = verbose
 		}
 
 		c := cli.New(Version)
 		err := updateCLI(c)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
+		return nil
 	},
 }
 

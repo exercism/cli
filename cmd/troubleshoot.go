@@ -23,18 +23,24 @@ var troubleshootCmd = &cobra.Command{
 If you're running into trouble, copy and paste the output from the troubleshoot
 command into a GitHub issue so we can help figure out what's going on.
 `,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		cli.HTTPClient = &http.Client{Timeout: 20 * time.Second}
 		c := cli.New(Version)
 
 		cfg, err := config.NewUserConfig()
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		status := cli.NewStatus(c, *cfg)
 		status.Censor = !fullAPIKey
 		s, err := status.Check()
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
+
 		fmt.Printf("%s", s)
+		return nil
 	},
 }
 

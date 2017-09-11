@@ -36,35 +36,49 @@ If called with the name of an exercise, it will work out which
 track it is on and submit it. The command will ask for help
 figuring things out if necessary.
 `,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		usrCfg, err := config.NewUserConfig()
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		cliCfg, err := config.NewCLIConfig()
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		if len(args) == 0 {
 			cwd, err := os.Getwd()
-			BailOnError(err)
+			if err != nil {
+				return err
+			}
 			args = []string{cwd}
 		}
 
 		// TODO: make sure we get the workspace configured.
 		if usrCfg.Workspace == "" {
 			cwd, err := os.Getwd()
-			BailOnError(err)
+			if err != nil {
+				return err
+			}
 			usrCfg.Workspace = filepath.Dir(filepath.Dir(cwd))
 		}
 
 		ws := workspace.New(usrCfg.Workspace)
 		tx, err := workspace.NewTransmission(ws.Dir, args)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		dirs, err := ws.Locate(tx.Dir)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		sx, err := workspace.NewSolutions(dirs)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		var solution *workspace.Solution
 
@@ -95,12 +109,14 @@ figuring things out if necessary.
 		}
 
 		if !solution.IsRequester {
-			BailOnError(errors.New("not your solution"))
+			return errors.New("not your solution")
 		}
 		track := cliCfg.Tracks[solution.Track]
 		if track == nil {
 			err := prepareTrack(solution.Track)
-			BailOnError(err)
+			if err != nil {
+				return err
+			}
 			cliCfg.Load(viper.New())
 			track = cliCfg.Tracks[solution.Track]
 		}
@@ -112,7 +128,9 @@ figuring things out if necessary.
 					return nil
 				}
 				ok, err := track.AcceptFilename(path)
-				BailOnError(err)
+				if err != nil {
+					return err
+				}
 				if !ok {
 					return nil
 				}
@@ -126,13 +144,14 @@ figuring things out if necessary.
 		writer := multipart.NewWriter(body)
 
 		if len(paths) == 0 {
-			fmt.Fprintf(os.Stderr, "No files found to submit.")
-			os.Exit(1)
+			return errors.New("no files found to submit")
 		}
 
 		for _, path := range paths {
 			file, err := os.Open(path)
-			BailOnError(err)
+			if err != nil {
+				return err
+			}
 			defer file.Close()
 
 			filename := strings.Replace(path, filepath.Join(usrCfg.Workspace, solution.Track, solution.Exercise), "", -1)
@@ -142,37 +161,54 @@ figuring things out if necessary.
 			filename = fmt.Sprintf("%s%s", string(os.PathSeparator), pieces[len(pieces)-1])
 
 			part, err := writer.CreateFormFile("files[]", filename)
-			BailOnError(err)
+			if err != nil {
+				return err
+			}
 			_, err = io.Copy(part, file)
-			BailOnError(err)
+			if err != nil {
+				return err
+			}
 		}
 
 		err = writer.Close()
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		apiCfg, err := config.NewAPIConfig()
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		client, err := api.NewClient()
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 		req, err := client.NewRequest("PATCH", apiCfg.URL("submit", solution.ID), body)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 		req.Header.Set("Content-Type", writer.FormDataContentType())
 
 		resp, err := client.Do(req, nil)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
 
 		bb := &bytes.Buffer{}
 		_, err = bb.ReadFrom(resp.Body)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		fmt.Fprintf(Out, "Submitted. View at %s\n", solution.URL)
+		return nil
 	},
 }
 
 func initSubmitCmd() {
-	// todo
+	// TODO
 }
 
 func init() {
