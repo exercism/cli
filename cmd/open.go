@@ -21,24 +21,26 @@ var openCmd = &cobra.Command{
 Pass either the name of an exercise, or the path to the directory that contains
 the solution you want to see on the website.
 	`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg, err := config.NewUserConfig()
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 		ws := workspace.New(cfg.Workspace)
 
-		if len(args) != 1 {
-			// TODO: usage
-			return
+		paths, err := ws.Locate(args[0])
+		if err != nil {
+			return err
 		}
 
-		paths, err := ws.Locate(args[0])
-		BailOnError(err)
-
 		solutions, err := workspace.NewSolutions(paths)
-		BailOnError(err)
+		if err != nil {
+			return err
+		}
 
 		if len(solutions) == 0 {
-			return
+			return nil
 		}
 
 		if len(solutions) > 1 {
@@ -70,11 +72,12 @@ Type the number of the one you want to select.
 			solution, ok := option.(*workspace.Solution)
 			if ok {
 				browser.Open(solution.URL)
-				break
+				return nil
 			}
-			BailOnError(errors.New("should never happen"))
+			if err != nil {
+				return errors.New("should never happen")
+			}
 		}
-
 	},
 }
 
