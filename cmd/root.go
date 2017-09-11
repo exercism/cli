@@ -17,7 +17,8 @@ var (
 	// The usage examples and help strings should reflect
 	// the actual name of the binary.
 	BinaryName string
-	Out        io.Writer
+	// Out is used to write to the required writer.
+	Out io.Writer
 )
 
 // RootCmd represents the base command when called without any subcommands.
@@ -27,12 +28,12 @@ var RootCmd = &cobra.Command{
 	Long: `A command-line interface for https://v2.exercism.io.
 
 Download exercises and submit your solutions.`,
+	SilenceUsage: true,
 }
 
 // Execute adds all child commands to the root command.
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(-1)
 	}
 }
