@@ -14,9 +14,9 @@ import (
 )
 
 func TestSubmit(t *testing.T) {
-	oldOut := out
-	out = ioutil.Discard
-	defer func() { out = oldOut }()
+	oldOut := Out
+	Out = ioutil.Discard
+	defer func() { Out = oldOut }()
 
 	type file struct {
 		relativePath string
