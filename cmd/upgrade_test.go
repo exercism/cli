@@ -22,9 +22,9 @@ func (fc *fakeCLI) Upgrade() error {
 }
 
 func TestUpgrade(t *testing.T) {
-	oldOut := out
-	out = ioutil.Discard
-	defer func() { out = oldOut }()
+	oldOut := Out
+	Out = ioutil.Discard
+	defer func() { Out = oldOut }()
 
 	tests := []struct {
 		desc     string

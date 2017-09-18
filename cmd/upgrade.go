@@ -2,15 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"io"
-	"os"
 
 	"github.com/exercism/cli/cli"
 	"github.com/exercism/cli/debug"
 	"github.com/spf13/cobra"
 )
-
-var out io.Writer
 
 // upgradeCmd downloads and installs the most recent version of the CLI.
 var upgradeCmd = &cobra.Command{
@@ -45,7 +41,7 @@ func updateCLI(c cli.Updater) error {
 	}
 
 	if ok {
-		fmt.Fprintln(out, "Your CLI version is up to date.")
+		fmt.Fprintln(Out, "Your CLI version is up to date.")
 		return nil
 	}
 
@@ -55,5 +51,4 @@ func updateCLI(c cli.Updater) error {
 func init() {
 	RootCmd.AddCommand(upgradeCmd)
 	upgradeCmd.Flags().BoolP("verbose", "v", false, "verbose output")
-	out = os.Stdout
 }
