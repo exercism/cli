@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"text/tabwriter"
 
 	"github.com/exercism/cli/config"
@@ -41,7 +40,7 @@ You can also override certain default settings to suit your preferences.
 		BailOnError(err)
 
 		if show {
-			w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+			w := tabwriter.NewWriter(Out, 0, 0, 2, ' ', 0)
 			defer w.Flush()
 
 			fmt.Fprintln(w, "")

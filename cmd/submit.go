@@ -167,7 +167,7 @@ figuring things out if necessary.
 		_, err = bb.ReadFrom(resp.Body)
 		BailOnError(err)
 
-		fmt.Fprintf(out, "Submitted. View at %s\n", solution.URL)
+		fmt.Fprintf(Out, "Submitted. View at %s\n", solution.URL)
 	},
 }
 
