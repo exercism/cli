@@ -49,6 +49,12 @@ var (
 	LatestReleaseURL = "https://api.github.com/repos/exercism/cli/releases/latest"
 )
 
+// Updater is a simple upgradable file interface.
+type Updater interface {
+	IsUpToDate() (bool, error)
+	Upgrade() error
+}
+
 // CLI is information about the CLI itself.
 type CLI struct {
 	Version       string
@@ -79,7 +85,7 @@ func (c *CLI) IsUpToDate() (bool, error) {
 		return false, fmt.Errorf("unable to parse current version (%s): %s", c.Version, err)
 	}
 
-	return rv.EQ(cv), nil
+	return cv.GTE(rv), nil
 }
 
 // Upgrade allows the user to upgrade to the latest version of the CLI.

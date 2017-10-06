@@ -10,6 +10,9 @@ OSVAR=github.com/exercism/cli/cmd.BuildOS
 ARCHVAR=github.com/exercism/cli/cmd.BuildARCH
 ARMVAR=github.com/exercism/cli/cmd.BuildARM
 
+# handle alternate binary name for pre-releases
+BINNAME=${NAME:-exercism}
+
 createRelease() {
 	os=$1
 	arch=$2
@@ -39,13 +42,13 @@ createRelease() {
 		ldflags="$ldflags -X $ARMVAR=8"
 	fi
 
-	binname=exercism
+	binname=$BINNAME
 	if [ "$osname" = windows ]
 	then
 		binname="$binname.exe"
 	fi
 
-	relname="../release/exercism-$osname-$osarch"
+	relname="../release/$BINNAME-$osname-$osarch"
 	echo "Creating $os/$arch binary..."
 
 	if [ "$arm" ]

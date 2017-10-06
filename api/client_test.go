@@ -10,48 +10,64 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	mux    *http.ServeMux
-	server *httptest.Server
-	client *Client
-	conf   = &config.Config{APIKey: "apikey", API: "localhost", XAPI: "xlocalhost"}
-)
-
 func TestNewRequestSetsDefaultHeaders(t *testing.T) {
-	UserAgent = "Test"
-	client = NewClient(conf)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, `ok`)
+	}))
+	defer ts.Close()
 
-	req, err := client.NewRequest("GET", client.APIHost, nil)
-	assert.NoError(t, err)
+	UserAgent = "BogusAgent"
 
-	assert.Equal(t, UserAgent, req.Header.Get("User-Agent"))
-	assert.Equal(t, "application/json", req.Header.Get("Content-Type"))
+	tests := []struct {
+		client      *Client
+		auth        string
+		contentType string
+	}{
+		{
+			// Use defaults.
+			client:      &Client{},
+			auth:        "",
+			contentType: "application/json",
+		},
+		{
+			// Override defaults.
+			client: &Client{
+				UserConfig:  &config.UserConfig{Token: "abc123"},
+				ContentType: "bogus",
+			},
+			auth:        "Bearer abc123",
+			contentType: "bogus",
+		},
+	}
+
+	for _, test := range tests {
+		req, err := test.client.NewRequest("GET", ts.URL, nil)
+		assert.NoError(t, err)
+		assert.Equal(t, "BogusAgent", req.Header.Get("User-Agent"))
+		assert.Equal(t, test.contentType, req.Header.Get("Content-Type"))
+		assert.Equal(t, test.auth, req.Header.Get("Authorization"))
+	}
 }
 
 func TestDo(t *testing.T) {
-	UserAgent = "Exercism Test v1"
-	mux = http.NewServeMux()
-	server = httptest.NewServer(mux)
-	defer server.Close()
-	url := server.URL
-	conf = &config.Config{APIKey: "apikey", API: url, XAPI: url}
-	client = NewClient(conf)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "GET", r.Method)
 
-	type test struct {
-		T string
+		fmt.Fprint(w, `{"hello": "world"}`)
+	}))
+	defer ts.Close()
+
+	type payload struct {
+		Hello string `json:"hello"`
 	}
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method)
-		assert.Equal(t, UserAgent, r.Header.Get("User-Agent"))
+	client := &Client{}
 
-		fmt.Fprint(w, `{"T":"world"}`)
-	})
-
-	req, _ := client.NewRequest("GET", client.APIHost+"/", nil)
-
-	var body test
-	_, err := client.Do(req, &body)
+	req, err := client.NewRequest("GET", ts.URL, nil)
 	assert.NoError(t, err)
-	assert.Equal(t, test{T: "world"}, body)
+
+	var body payload
+	_, err = client.Do(req, &body)
+	assert.NoError(t, err)
+	assert.Equal(t, "world", body.Hello)
 }

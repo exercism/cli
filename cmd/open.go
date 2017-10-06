@@ -1,36 +1,86 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
-	"log"
-	"os"
 
-	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/browser"
+	"github.com/exercism/cli/comms"
 	"github.com/exercism/cli/config"
-	app "github.com/urfave/cli"
+	"github.com/exercism/cli/workspace"
+	"github.com/spf13/cobra"
 )
 
-// Open opens the user's latest iteration of the exercise on the given track.
-func Open(ctx *app.Context) error {
-	c, err := config.New(ctx.GlobalString("config"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	client := api.NewClient(c)
+// openCmd opens the designated exercise in the browser.
+var openCmd = &cobra.Command{
+	Use:     "open",
+	Aliases: []string{"o"},
+	Short:   "Open an exercise on the website.",
+	Long: `Open the specified exercise to the solution page on the Exercism website.
 
-	args := ctx.Args()
-	if len(args) != 2 {
-		fmt.Fprintf(os.Stderr, "Usage: exercism open TRACK_ID PROBLEM\n")
-		os.Exit(1)
-	}
+Pass either the name of an exercise, or the path to the directory that contains
+the solution you want to see on the website.
+	`,
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cfg, err := config.NewUserConfig()
+		if err != nil {
+			return err
+		}
+		ws := workspace.New(cfg.Workspace)
 
-	trackID := args[0]
-	slug := args[1]
-	submission, err := client.SubmissionURL(trackID, slug)
-	if err != nil {
-		return err
-	}
+		paths, err := ws.Locate(args[0])
+		if err != nil {
+			return err
+		}
 
-	return browser.Open(submission.URL)
+		solutions, err := workspace.NewSolutions(paths)
+		if err != nil {
+			return err
+		}
+
+		if len(solutions) == 0 {
+			return nil
+		}
+
+		if len(solutions) > 1 {
+			var mine []*workspace.Solution
+			for _, s := range solutions {
+				if s.IsRequester {
+					mine = append(mine, s)
+				}
+			}
+			solutions = mine
+		}
+
+		selection := comms.NewSelection()
+		for _, solution := range solutions {
+			selection.Items = append(selection.Items, solution)
+		}
+		for {
+			prompt := `
+We found more than one. Which one did you mean?
+Type the number of the one you want to select.
+
+%s
+> `
+			option, err := selection.Pick(prompt)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			solution, ok := option.(*workspace.Solution)
+			if ok {
+				browser.Open(solution.URL)
+				return nil
+			}
+			if err != nil {
+				return errors.New("should never happen")
+			}
+		}
+	},
+}
+
+func init() {
+	RootCmd.AddCommand(openCmd)
 }

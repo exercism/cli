@@ -1,197 +1,62 @@
 package config
 
 import (
-	"bufio"
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"log"
-	"net/url"
+	"io/ioutil"
 	"os"
-	"strings"
+	"path/filepath"
 
-	"github.com/exercism/cli/paths"
+	"github.com/spf13/viper"
 )
 
-const (
-	// hostAPI is the endpoint to submit solutions to, and to get personalized data
-	hostAPI = "http://exercism.io"
-	// hostXAPI is the endpoint to fetch problems from
-	hostXAPI = "http://x.exercism.io"
-)
-
-// Config represents the settings for particular user.
-// This defines both the auth for talking to the API, as well as
-// where to put problems that get downloaded.
+// Config is a wrapper around a viper configuration.
 type Config struct {
-	APIKey string `json:"apiKey"`
-	Dir    string `json:"dir"`
-	API    string `json:"api"`
-	XAPI   string `json:"xapi"`
-	File   string `json:"-"` // full path to config file
+	dir  string
+	name string
 }
 
-// New returns a configuration struct with content from the exercism.json file
-func New(path string) (*Config, error) {
-	configPath := paths.Config(path)
-	_, err := os.Stat(configPath)
-	if err != nil && os.IsNotExist(err) {
-		if path == "" {
-			configPath = paths.DefaultConfig
-		}
-	} else if err != nil {
-		return nil, err
+// New creates a default config value for the given directory.
+func New(dir, name string) *Config {
+	return &Config{
+		dir:  dir,
+		name: name,
 	}
-
-	c := &Config{
-		File: configPath,
-	}
-	err = c.load()
-	return c, err
 }
 
-// Update sets new values where given.
-func (c *Config) Update(key, host, dir, xapi string) error {
-	key = strings.TrimSpace(key)
-	if key != "" {
-		c.APIKey = key
-	}
-
-	host = strings.TrimSpace(host)
-	if host != "" {
-		c.API = host
-	}
-
-	if dir != "" {
-		c.Dir = paths.Exercises(dir)
-	}
-
-	xapi = strings.TrimSpace(xapi)
-	if xapi != "" {
-		c.XAPI = xapi
-	}
-
-	return nil
+// File is the full path to the config file.
+func (cfg *Config) File() string {
+	return filepath.Join(cfg.dir, fmt.Sprintf("%s.json", cfg.name))
 }
 
-// Write saves the config as JSON.
-func (c *Config) Write() error {
-	// truncates existing file if it exists
-	f, err := os.Create(c.File)
+func (cfg *Config) readIn(v *viper.Viper) {
+	v.AddConfigPath(cfg.dir)
+	v.SetConfigName(cfg.name)
+	v.SetConfigType("json")
+	v.ReadInConfig()
+}
+
+type filer interface {
+	File() string
+}
+
+// Write stores the config into a file.
+func Write(f filer) error {
+	b, err := json.Marshal(f)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
-
-	b, err := json.MarshalIndent(c, "", "\t")
-	if err != nil {
+	if err := ensureDir(f); err != nil {
 		return err
 	}
-
-	if _, err := f.Write(b); err != nil {
-		return err
-	}
-
-	return nil
+	return ioutil.WriteFile(f.File(), b, os.FileMode(0644))
 }
 
-func (c *Config) load() error {
-	if err := c.read(); err != nil {
-		return err
+func ensureDir(f filer) error {
+	dir := filepath.Dir(f.File())
+	_, err := os.Stat(dir)
+	if os.IsNotExist(err) {
+		return os.MkdirAll(dir, os.FileMode(0755))
 	}
-
-	// in case people manually update the config file
-	// with weird formatting
-	c.APIKey = strings.TrimSpace(c.APIKey)
-	c.Dir = strings.TrimSpace(c.Dir)
-	c.API = strings.TrimSpace(c.API)
-	c.XAPI = strings.TrimSpace(c.XAPI)
-
-	return c.setDefaults()
-}
-
-func (c *Config) read() error {
-	if _, err := os.Stat(c.File); err != nil {
-		if os.IsNotExist(err) {
-			return nil
-		}
-		return err
-	}
-	f, err := os.Open(c.File)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	if err := json.NewDecoder(f).Decode(&c); err != nil {
-		var extra string
-		if serr, ok := err.(*json.SyntaxError); ok {
-			if _, serr := f.Seek(0, os.SEEK_SET); serr != nil {
-				log.Fatalf("seek error: %v", serr)
-			}
-			line, str := findInvalidJSON(f, serr.Offset)
-			extra = fmt.Sprintf(":\ninvalid JSON syntax at line %d:\n%s",
-				line, str)
-		}
-		return fmt.Errorf("error parsing JSON in the config file %s%s\n%s", f.Name(), extra, err)
-	}
-
-	return nil
-}
-
-func findInvalidJSON(f io.Reader, pos int64) (int, string) {
-	var (
-		col     int
-		line    int
-		errLine []byte
-	)
-	buf := new(bytes.Buffer)
-	fb := bufio.NewReader(f)
-
-	for c := int64(0); c < pos; {
-		b, err := fb.ReadBytes('\n')
-		if err != nil {
-			log.Fatalf("read error: %v", err)
-		}
-		c += int64(len(b))
-		col = len(b) - int(c-pos)
-
-		line++
-		errLine = b
-	}
-
-	if len(errLine) != 0 {
-		buf.WriteString(fmt.Sprintf("%5d: %s <~", line, errLine[:col]))
-	}
-
-	return line, buf.String()
-}
-
-// IsAuthenticated returns true if the config contains an API key.
-// This does not check whether or not that key is valid.
-func (c *Config) IsAuthenticated() bool {
-	return c.APIKey != ""
-}
-
-func (c *Config) setDefaults() error {
-	if c.API == "" {
-		c.API = hostAPI
-	}
-
-	if c.XAPI == "" {
-		c.XAPI = hostXAPI
-	}
-
-	if _, err := url.Parse(c.API); err != nil {
-		return fmt.Errorf("invalid API URL %s", err)
-	}
-
-	if _, err := url.Parse(c.XAPI); err != nil {
-		return fmt.Errorf("invalid xAPI URL %s", err)
-	}
-
-	c.Dir = paths.Exercises(c.Dir)
-
-	return nil
+	return err
 }

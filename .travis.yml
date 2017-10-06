@@ -3,11 +3,13 @@ language: go
 sudo: false
 
 go:
-  - 1.7
   - 1.8
+  - 1.9
   - tip
 
-install: true
+install:
+  - go get -u github.com/golang/dep/...
+  - dep ensure
 
 script:
   - go test $(go list ./... | grep -v /vendor/)

@@ -56,6 +56,7 @@ type apiPing struct {
 	Latency time.Duration
 }
 
+// NewStatus prepares a value to perform a diagnostic self-check.
 func NewStatus(c *CLI, uc config.UserConfig) Status {
 	status := Status{
 		cli: c,
@@ -64,11 +65,16 @@ func NewStatus(c *CLI, uc config.UserConfig) Status {
 	return status
 }
 
+// Check runs the CLI's diagnostic self-check.
 func (status *Status) Check() (string, error) {
 	status.Version = newVersionStatus(status.cli)
 	status.System = newSystemStatus()
 	status.Configuration = newConfigurationStatus(status)
-	status.APIReachability = newAPIReachabilityStatus()
+	ar, err := newAPIReachabilityStatus()
+	if err != nil {
+		return "", err
+	}
+	status.APIReachability = ar
 
 	return status.compile()
 }
@@ -83,12 +89,15 @@ func (status *Status) compile() (string, error) {
 	return bb.String(), nil
 }
 
-func newAPIReachabilityStatus() apiReachabilityStatus {
+func newAPIReachabilityStatus() (apiReachabilityStatus, error) {
+	apiCfg, err := config.NewAPIConfig()
+	if err != nil {
+		return apiReachabilityStatus{}, nil
+	}
 	ar := apiReachabilityStatus{
 		Services: []*apiPing{
 			{Service: "GitHub", URL: "https://api.github.com"},
-			{Service: "Exercism", URL: "http://exercism.io/api/v1"},
-			{Service: "X-API", URL: "http://x.exercism.io"},
+			{Service: "Exercism", URL: apiCfg.URL("ping")},
 		},
 	}
 	var wg sync.WaitGroup
@@ -97,7 +106,7 @@ func newAPIReachabilityStatus() apiReachabilityStatus {
 		go service.Call(&wg)
 	}
 	wg.Wait()
-	return ar
+	return ar, nil
 }
 
 func newVersionStatus(cli *CLI) versionStatus {
@@ -132,7 +141,7 @@ func newConfigurationStatus(status *Status) configurationStatus {
 	cs := configurationStatus{
 		Home:      status.cfg.Home,
 		Workspace: status.cfg.Workspace,
-		File:      status.cfg.Path,
+		File:      status.cfg.File(),
 		Token:     status.cfg.Token,
 		TokenURL:  "http://exercism.io/account/key",
 	}
@@ -164,9 +173,8 @@ func redactToken(token string) string {
 }
 
 const tmplSelfTest = `
-
-Debug Information
-=================
+Troubleshooting Information
+===========================
 
 Version
 ----------------
@@ -210,5 +218,4 @@ https://github.com/exercism/exercism.io/issues and include
 this information.
 {{ if not .Censor }}
 Don't share your API key. Keep that private.
-{{ end }}
-`
+{{ end }}`

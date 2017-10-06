@@ -1,68 +1,206 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
-	"io/ioutil"
-	"log"
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
-	app "github.com/urfave/cli"
+	"github.com/exercism/cli/workspace"
+	"github.com/spf13/cobra"
 )
 
-// Download returns specified iteration with its related problem.
-func Download(ctx *app.Context) error {
-	c, err := config.New(ctx.GlobalString("config"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	client := api.NewClient(c)
+// downloadCmd represents the download command
+var downloadCmd = &cobra.Command{
+	Use:     "download",
+	Aliases: []string{"d"},
+	Short:   "Download an exercise.",
+	Long: `Download an exercise.
 
-	args := ctx.Args()
-	if len(args) != 1 {
-		fmt.Fprintf(os.Stderr, "Usage: exercism download SUBMISSION_ID\n")
-		os.Exit(1)
-	}
+You may download an exercise to work on. If you've already
+started working on it, the command will also download your
+latest solution.
 
-	submission, err := client.Download(args[0])
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	path := filepath.Join(c.Dir, "solutions", submission.Username, submission.TrackID, submission.Slug, args[0])
-
-	if err := os.MkdirAll(path, 0755); err != nil {
-		log.Fatal(err)
-	}
-
-	for name, contents := range submission.ProblemFiles {
-		if err := writeFile(fmt.Sprintf("%s/%s", path, name), contents); err != nil {
-			log.Fatalf("Unable to write file %s: %s", name, err)
+Download other people's solutions by providing the UUID.
+`,
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		uuid, err := cmd.Flags().GetString("uuid")
+		if err != nil {
+			return err
 		}
-	}
-
-	for name, contents := range submission.SolutionFiles {
-		filename := strings.TrimPrefix(name, strings.ToLower("/"+submission.TrackID+"/"+submission.Slug+"/"))
-		if err := writeFile(fmt.Sprintf("%s/%s", path, filename), contents); err != nil {
-			log.Fatalf("Unable to write file %s: %s", name, err)
+		if uuid == "" && len(args) == 0 {
+			// TODO: usage
+			return errors.New("need an exercise name or a solution --uuid")
 		}
-	}
+		apiCfg, err := config.NewAPIConfig()
+		if err != nil {
+			return err
+		}
 
-	fmt.Printf("Successfully downloaded submission.\n\nThe submission can be viewed at:\n %s\n\n", path)
+		var slug string
+		if uuid == "" {
+			slug = "latest"
+		} else {
+			slug = uuid
+		}
+		url := apiCfg.URL("download", slug)
 
-	return nil
+		client, err := api.NewClient()
+		if err != nil {
+			return err
+		}
 
+		req, err := client.NewRequest("GET", url, nil)
+		if err != nil {
+			return err
+		}
+
+		track, err := cmd.Flags().GetString("track")
+		if err != nil {
+			return err
+		}
+		var exercise string
+		if len(args) > 0 {
+			exercise = args[0]
+		}
+
+		if uuid == "" {
+			q := req.URL.Query()
+			q.Add("exercise_id", exercise)
+			if track != "" {
+				q.Add("track_id", track)
+			}
+			req.URL.RawQuery = q.Encode()
+		}
+
+		payload := &downloadPayload{}
+		res, err := client.Do(req, payload)
+		if err != nil {
+			return err
+		}
+
+		if res.StatusCode != http.StatusOK {
+			switch payload.Error.Type {
+			case "track_ambiguous":
+			default:
+				return errors.New(payload.Error.Message)
+			}
+		}
+
+		solution := workspace.Solution{
+			AutoApprove: payload.Solution.Exercise.AutoApprove,
+			Track:       payload.Solution.Exercise.Track.ID,
+			Exercise:    payload.Solution.Exercise.ID,
+			ID:          payload.Solution.ID,
+			URL:         payload.Solution.URL,
+			Handle:      payload.Solution.User.Handle,
+			IsRequester: payload.Solution.User.IsRequester,
+		}
+
+		var ws workspace.Workspace
+		if solution.IsRequester {
+			ws = workspace.New(filepath.Join(client.UserConfig.Workspace, solution.Track))
+		} else {
+			ws = workspace.New(filepath.Join(client.UserConfig.Workspace, "users", solution.Handle, solution.Track))
+		}
+		os.MkdirAll(ws.Dir, os.FileMode(0755))
+
+		dir, err := ws.SolutionPath(solution.Exercise, solution.ID)
+		if err != nil {
+			return err
+		}
+
+		os.MkdirAll(dir, os.FileMode(0755))
+
+		err = solution.Write(dir)
+		if err != nil {
+			return err
+		}
+
+		for _, file := range payload.Solution.Files {
+			url := fmt.Sprintf("%s%s", payload.Solution.FileDownloadBaseURL, file)
+			req, err := client.NewRequest("GET", url, nil)
+			if err != nil {
+				return err
+			}
+
+			res, err := client.Do(req, nil)
+			if err != nil {
+				return err
+			}
+			defer res.Body.Close()
+
+			if res.StatusCode != http.StatusOK {
+				// TODO: deal with it
+				continue
+			}
+			// Don't bother with empty files.
+			if res.Header.Get("Content-Length") == "0" {
+				continue
+			}
+
+			// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
+			// TODO: handle --force flag to overwrite without asking.
+			relativePath := filepath.FromSlash(file)
+			dir := filepath.Join(solution.Dir, filepath.Dir(relativePath))
+			os.MkdirAll(dir, os.FileMode(0755))
+
+			f, err := os.Create(filepath.Join(solution.Dir, relativePath))
+			if err != nil {
+				return err
+			}
+			defer f.Close()
+			_, err = io.Copy(f, res.Body)
+			if err != nil {
+				return err
+			}
+		}
+		fmt.Fprintf(Out, "\nDownloaded to\n%s\n", solution.Dir)
+		return nil
+	},
 }
 
-// writeFile writes the given contents to the given path, creating any necessary parent directories.
-// This is useful because both problem files and solution files may have directory structures.
-func writeFile(path, contents string) error {
-	dir := filepath.Dir(path)
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return err
-	}
-	return ioutil.WriteFile(path, []byte(contents), 0644)
+type downloadPayload struct {
+	Solution struct {
+		ID   string `json:"id"`
+		URL  string `json:"url"`
+		User struct {
+			Handle      string `json:"handle"`
+			IsRequester bool   `json:"is_requester"`
+		} `json:"user"`
+		Exercise struct {
+			ID              string `json:"id"`
+			InstructionsURL string `json:"instructions_url"`
+			AutoApprove     bool   `json:"auto_approve"`
+			Track           struct {
+				ID       string `json:"id"`
+				Language string `json:"language"`
+			} `json:"track"`
+		} `json:"exercise"`
+		FileDownloadBaseURL string   `json:"file_download_base_url"`
+		Files               []string `json:"files"`
+		Iteration           struct {
+			SubmittedAt *string `json:"submitted_at"`
+		}
+	} `json:"solution"`
+	Error struct {
+		Type             string   `json:"type"`
+		Message          string   `json:"message"`
+		PossibleTrackIDs []string `json:"possible_track_ids"`
+	} `json:"error,omitempty"`
+}
+
+func initDownloadCmd() {
+	downloadCmd.Flags().StringP("uuid", "u", "", "the solution UUID")
+	downloadCmd.Flags().StringP("track", "t", "", "the track ID")
+}
+
+func init() {
+	RootCmd.AddCommand(downloadCmd)
+	initDownloadCmd()
 }

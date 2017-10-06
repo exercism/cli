@@ -15,8 +15,30 @@ func TestIsUpToDate(t *testing.T) {
 		releaseTag string
 		ok         bool
 	}{
-		{"1.0.0", "v1.0.1", false},
-		{"2.0.1", "v2.0.1", true},
+		{
+			// It returns false for versions less than release.
+			cliVersion: "1.0.0",
+			releaseTag: "v1.0.1",
+			ok:         false,
+		},
+		{
+			// It returns false for pre-release versions of release.
+			cliVersion: "1.0.1-alpha.1",
+			releaseTag: "v1.0.1",
+			ok:         false,
+		},
+		{
+			// It returns true for versions equal to release.
+			cliVersion: "2.0.1",
+			releaseTag: "v2.0.1",
+			ok:         true,
+		},
+		{
+			// It returns true for versions greater than release.
+			cliVersion: "2.0.2",
+			releaseTag: "v2.0.1",
+			ok:         true,
+		},
 	}
 
 	for _, test := range tests {
