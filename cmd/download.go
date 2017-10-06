@@ -93,6 +93,7 @@ Download other people's solutions by providing the UUID.
 		}
 
 		solution := workspace.Solution{
+			AutoApprove: payload.Solution.Exercise.AutoApprove,
 			Track:       payload.Solution.Exercise.Track.ID,
 			Exercise:    payload.Solution.Exercise.ID,
 			ID:          payload.Solution.ID,

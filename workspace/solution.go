@@ -24,6 +24,7 @@ type Solution struct {
 	IsRequester bool       `json:"is_requester"`
 	SubmittedAt *time.Time `json:"submitted_at,omitempty"`
 	Dir         string     `json:"-"`
+	AutoApprove bool       `json:"auto_approve"`
 }
 
 // NewSolution reads solution metadata from a file in the given directory.
