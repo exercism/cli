@@ -29,6 +29,16 @@ Download other people's solutions by providing the UUID.
 `,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		token, err := cmd.Flags().GetString("token")
+		if err != nil {
+			return err
+		}
+		if token != "" {
+			RootCmd.SetArgs([]string{"configure", "--token", token})
+			if err := RootCmd.Execute(); err != nil {
+				return err
+			}
+		}
 		uuid, err := cmd.Flags().GetString("uuid")
 		if err != nil {
 			return err
@@ -197,6 +207,7 @@ type downloadPayload struct {
 func initDownloadCmd() {
 	downloadCmd.Flags().StringP("uuid", "u", "", "the solution UUID")
 	downloadCmd.Flags().StringP("track", "t", "", "the track ID")
+	downloadCmd.Flags().StringP("token", "k", "", "authentication token used to connect to exercism.io")
 }
 
 func init() {
