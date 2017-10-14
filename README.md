@@ -64,6 +64,16 @@ The resulting binary can be found in `out/exercism` (Linux, Mac OS X) or `out/ex
 In order to cross-compile for all platforms, run `bin/build-all`. The binaries
 will be built into the `release` directory.
 
+## Alternative Ways of Installation
+
+MacOS/OSX with [Homebrew](https://brew.sh/):
+```
+brew install exercism
+```
+NixOS (or using its pacakge manager [Nix](https://nixos.org/nix/) which can be installed on any Linux distribution:
+```
+nix-env -i exercism
+``` 
 ## Domain Concepts
 
 - **Language** is the name of a programming language. E.g. C++ or Objective-C or JavaScript.
