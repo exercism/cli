@@ -148,6 +148,15 @@ figuring things out if necessary.
 		}
 
 		for _, path := range paths {
+			// Don't submit empty files
+			info, err := os.Stat(path)
+			if err != nil {
+				return err
+			}
+			if info.Size() == 0 {
+				fmt.Println("File %s was empty, skipping...", path)
+				continue
+			}
 			file, err := os.Open(path)
 			if err != nil {
 				return err
