@@ -154,7 +154,7 @@ figuring things out if necessary.
 				return err
 			}
 			if info.Size() == 0 {
-				fmt.Println("File %s was empty, skipping...", path)
+				fmt.Printf("Warning: file %s was empty, skipping...", path)
 				continue
 			}
 			file, err := os.Open(path)
