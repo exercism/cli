@@ -3,8 +3,7 @@
 **TLDR: Please open any pull-requests with the nextercism branch as the base
 branch.**
 
-Exercism is currently being completely [rebuilt from the ground
-up](https://github.com/exercism/v2-feedback), under the codename **Nextercism**.
+Exercism is currently being completely [rebuilt from the ground up](https://github.com/exercism/v2-feedback), under the codename **Nextercism**.
 This effort includes significant changes to the tooling, the cli client
 especially.
 
@@ -15,8 +14,7 @@ at the moment. These different versions are reflected in this repo by the
 master branch is frozen for now, except for security or bug fixes,** and new
 changes are being merged onto the nextercism branch. This means that any changes
 should be made in a branch based off the nextercism branch and any pull-requests
-should be made with the nextercism branch as base. See the [Github
-docs](https://github.com/blog/2224-change-the-base-branch-of-a-pull-request) for
+should be made with the nextercism branch as base. See the [Github docs](https://github.com/blog/2224-change-the-base-branch-of-a-pull-request) for
 how to change the base branch of a pull-request.
 
 The "nextercism" branch is our default branch, your PR should be applied to it
