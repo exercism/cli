@@ -56,7 +56,7 @@ func prepareTrack(id string) error {
 	if err != nil {
 		return err
 	}
-	url := fmt.Sprintf(apiCfg.URL("prepare-track"), id)
+	url := apiCfg.URL("prepare-track", id)
 
 	req, err := client.NewRequest("GET", url, nil)
 	if err != nil {
