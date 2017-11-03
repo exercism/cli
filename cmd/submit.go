@@ -144,29 +144,33 @@ figuring things out if necessary.
 			return errors.New("no files found to submit")
 		}
 
-		// confirm list of files to submit with user
-		prompt := "These are the files you are submitting:\n"
-		for i, path := range paths {
-			prompt += fmt.Sprintf("  [%d] %s\n", i+1, path)
+		// if the user submits a directory, confirm the list of files
+		if len(tx.ArgDirs) > 0 {
+			prompt := "You specified a directory. Here are the files you are submitting:\n"
+			for i, path := range paths {
+				prompt += fmt.Sprintf(" [%d]  %s\n", i+1, path)
+			}
+			prompt += "\nPress ENTER to submit, or control + c to cancel: "
+			
+			conf_q := &comms.Question{
+				Prompt: prompt, 
+				DefaultValue: "y",
+				Reader: os.Stdin,
+				Writer: os.Stdout,
+			}
+			answer, err := conf_q.Ask()
+			if err != nil {
+				fmt.Println(err)
+				return err
+			}
+			if answer != "y" {
+				fmt.Println("OK, try submitting files individually instead.")
+				return nil
+			}
+			fmt.Println("OK, submitting files now...")
 		}
-		prompt += "\n\n Press ENTER to submit, or control + c to cancel."
-		
-		conf_q := &comms.Question{
-			Prompt: prompt, 
-			DefaultValue: "y",
-			Reader: os.Stdin,
-			Writer: os.Stdout,
-		}
-		answer, err := conf_q.Ask()
-		if err != nil {
-			fmt.Println(err)
-			return err
-		}
-		if answer != "y" {
-			fmt.Println("OK, try submitting files individually then.")
-			return nil
-		}
-		fmt.Println("OK, submitting files now...")
+
+
 
 		for _, path := range paths {
 			// Don't submit empty files

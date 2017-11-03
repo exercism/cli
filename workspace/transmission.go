@@ -9,7 +9,7 @@ import (
 type Transmission struct {
 	Files   []string
 	Dir     string
-	argDirs []string
+	ArgDirs []string
 }
 
 // NewTransmission processes the arguments to the submit command to prep a submission.
@@ -29,12 +29,12 @@ func NewTransmission(root string, args []string) (*Transmission, error) {
 			continue
 		}
 		// For our purposes, if it's not a file then it's a directory.
-		tx.argDirs = append(tx.argDirs, arg)
+		tx.ArgDirs = append(tx.ArgDirs, arg)
 	}
-	if len(tx.argDirs) > 1 {
+	if len(tx.ArgDirs) > 1 {
 		return nil, errors.New("more than one dir")
 	}
-	if len(tx.argDirs) > 0 && len(tx.Files) > 0 {
+	if len(tx.ArgDirs) > 0 && len(tx.Files) > 0 {
 		return nil, errors.New("mixing files and dirs")
 	}
 	if len(tx.Files) > 0 {
@@ -52,8 +52,8 @@ func NewTransmission(root string, args []string) (*Transmission, error) {
 			return nil, errors.New("files are from more than one solution")
 		}
 	}
-	if len(tx.argDirs) == 1 {
-		tx.Dir = tx.argDirs[0]
+	if len(tx.ArgDirs) == 1 {
+		tx.Dir = tx.ArgDirs[0]
 	}
 	return tx, nil
 }
