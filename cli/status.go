@@ -145,7 +145,7 @@ func newConfigurationStatus(status *Status) configurationStatus {
 		Token:     status.cfg.Token,
 		TokenURL:  "http://exercism.io/account/key",
 	}
-	if status.Censor {
+	if status.Censor && status.cfg.Token != "" {
 		cs.Token = redactToken(status.cfg.Token)
 	}
 	return cs
