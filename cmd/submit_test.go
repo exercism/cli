@@ -55,6 +55,7 @@ func TestSubmit(t *testing.T) {
 		IsRequester: true,
 	}
 	err := solution.Write(dir)
+	assert.NoError(t, err)
 
 	for _, file := range []file{file1, file2, file3} {
 		err := ioutil.WriteFile(filepath.Join(dir, file.relativePath), []byte(file.contents), os.FileMode(0755))

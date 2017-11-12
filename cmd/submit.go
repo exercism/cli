@@ -163,11 +163,9 @@ figuring things out if necessary.
 			}
 			defer file.Close()
 
-			filename := strings.Replace(path, filepath.Join(usrCfg.Workspace, solution.Track, solution.Exercise), "", -1)
-
 			dirname := fmt.Sprintf("%s%s%s", string(os.PathSeparator), solution.Exercise, string(os.PathSeparator))
 			pieces := strings.Split(path, dirname)
-			filename = fmt.Sprintf("%s%s", string(os.PathSeparator), pieces[len(pieces)-1])
+			filename := fmt.Sprintf("%s%s", string(os.PathSeparator), pieces[len(pieces)-1])
 
 			part, err := writer.CreateFormFile("files[]", filename)
 			if err != nil {
