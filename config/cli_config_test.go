@@ -65,7 +65,7 @@ func TestCLIConfigSetDefaults(t *testing.T) {
 	// With a track, gets defaults.
 	cfg = &CLIConfig{
 		Tracks: map[string]*Track{
-			"bogus": &Track{
+			"bogus": {
 				ID: "bogus",
 			},
 		},
@@ -76,7 +76,7 @@ func TestCLIConfigSetDefaults(t *testing.T) {
 	// With partial defaults and extras, gets everything.
 	cfg = &CLIConfig{
 		Tracks: map[string]*Track{
-			"bogus": &Track{
+			"bogus": {
 				ID:             "bogus",
 				IgnorePatterns: []string{"[.]solution[.]json", "_spec[.]ext$"},
 			},
