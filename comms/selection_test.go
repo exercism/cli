@@ -20,9 +20,9 @@ func (t thing) String() string {
 
 var (
 	things = []thing{
-		thing{name: "water", rating: 10},
-		thing{name: "food", rating: 3},
-		thing{name: "music", rating: 0},
+		{name: "water", rating: 10},
+		{name: "food", rating: 3},
+		{name: "music", rating: 0},
 	}
 )
 
@@ -93,7 +93,7 @@ func TestSelectionPick(t *testing.T) {
 				Reader: strings.NewReader("BOOM!"),
 			},
 			things: []thing{
-				thing{"hugs", 100},
+				{"hugs", 100},
 			},
 			expected: "hugs",
 		},
@@ -103,9 +103,9 @@ func TestSelectionPick(t *testing.T) {
 				Reader: strings.NewReader("2"),
 			},
 			things: []thing{
-				thing{"food", 10},
-				thing{"water", 3},
-				thing{"music", 0},
+				{"food", 10},
+				{"water", 3},
+				{"music", 0},
 			},
 			expected: "water",
 		},
