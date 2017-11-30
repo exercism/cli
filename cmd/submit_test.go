@@ -24,7 +24,6 @@ func TestSubmit(t *testing.T) {
 	Out = ioutil.Discard
 	In = rdr
 
-
 	defer func() { Out = oldOut }()
 	defer func() { In = oldIn }()
 	defer os.Remove(tmpfile.Name()) // clean up

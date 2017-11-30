@@ -170,8 +170,6 @@ figuring things out if necessary.
 			fmt.Println("OK, submitting files now...")
 		}
 
-
-
 		for _, path := range paths {
 			// Don't submit empty files
 			info, err := os.Stat(path)
