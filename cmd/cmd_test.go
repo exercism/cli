@@ -18,6 +18,8 @@ const cfgHomeKey = "EXERCISM_CONFIG_HOME"
 // The args are the faked out os.Args. The first two arguments
 // in the Args will be ignored. These represent the command (e.g. exercism)
 // and the subcommand (e.g. download).
+// Pass any interactive responses needed for the test in a single
+// String in MockInput, separated by newlines.
 //
 // Finally, when you have done whatever other setup you need in your
 // test, call the command by calling Execute on the App.
@@ -27,6 +29,7 @@ const cfgHomeKey = "EXERCISM_CONFIG_HOME"
 // 	Cmd:    myCmd,
 // 	InitFn: initMyCmd,
 // 	Args:   []string{"fakeapp", "mycommand", "arg1", "--flag", "value"},
+//  MockInput: "first-input\nsecond\n"
 // }
 // cmdTest.Setup(t)
 // defer cmdTest.Teardown(t)
@@ -38,6 +41,7 @@ type CommandTest struct {
 	InitFn         func()
 	TmpDir         string
 	Args           []string
+	MockInput	   string
 	OriginalValues struct {
 		ConfigHome string
 		Args       []string
