@@ -155,7 +155,7 @@ figuring things out if necessary.
 			conf_q := &comms.Question{
 				Prompt: prompt, 
 				DefaultValue: "y",
-				Reader: os.Stdin,
+				Reader: In,
 				Writer: os.Stdout,
 			}
 			answer, err := conf_q.Ask()

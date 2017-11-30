@@ -19,6 +19,8 @@ var (
 	BinaryName string
 	// Out is used to write to the required writer.
 	Out io.Writer
+	// In used for testing
+	In io.Reader
 )
 
 // RootCmd represents the base command when called without any subcommands.
