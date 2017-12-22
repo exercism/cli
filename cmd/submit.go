@@ -124,15 +124,12 @@ figuring things out if necessary.
 		paths := tx.Files
 		if len(paths) == 0 {
 			walkFn := func(path string, info os.FileInfo, err error) error {
-				if info.IsDir() {
-					return nil
-				}
-				ok, err := track.AcceptFilename(path)
-				if err != nil {
+				if err != nil || info.IsDir() {
 					return err
 				}
-				if !ok {
-					return nil
+				ok, err := track.AcceptFilename(path)
+				if err != nil || !ok {
+					return err
 				}
 				paths = append(paths, path)
 				return nil

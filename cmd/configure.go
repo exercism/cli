@@ -62,12 +62,7 @@ You can also override certain default settings to suit your preferences.
 			return err
 		}
 
-		err = apiCfg.Write()
-		if err != nil {
-			return err
-		}
-
-		return nil
+		return apiCfg.Write()
 	},
 }
 

@@ -76,11 +76,10 @@ func TestSubmit(t *testing.T) {
 		files := mf.File["files[]"]
 		for _, fileHeader := range files {
 			file, err := fileHeader.Open()
-			defer file.Close()
-
 			if err != nil {
 				t.Fatal(err)
 			}
+			defer file.Close()
 			body, err := ioutil.ReadAll(file)
 			if err != nil {
 				t.Fatal(err)
