@@ -38,11 +38,7 @@ To customize the CLI to suit your own preferences, use the configure command.
 			fmt.Println("prepare called")
 			return nil
 		}
-		err = prepareTrack(track)
-		if err != nil {
-			return err
-		}
-		return nil
+		return prepareTrack(track)
 	},
 }
 

@@ -28,11 +28,7 @@ You can always delete this file.
 		}
 
 		c := cli.New(Version)
-		err := updateCLI(c)
-		if err != nil {
-			return err
-		}
-		return nil
+		return updateCLI(c)
 	},
 }
 
