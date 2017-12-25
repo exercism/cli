@@ -105,7 +105,7 @@ func TestDownload(t *testing.T) {
 		},
 		{
 			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", ".solution.json"),
-			contents: `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":true}`,
+			contents: `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":true,"auto_approve":false}`,
 		},
 	}
 

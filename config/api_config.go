@@ -57,6 +57,9 @@ func (cfg *APIConfig) SetDefaults() {
 // URL provides the API URL for a given endpoint key.
 func (cfg *APIConfig) URL(key string, args ...interface{}) string {
 	pattern := fmt.Sprintf("%s%s", cfg.BaseURL, cfg.Endpoints[key])
+	if args == nil {
+		return pattern
+	}
 	return fmt.Sprintf(pattern, args...)
 }
 
