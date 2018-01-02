@@ -77,6 +77,14 @@ createRelease darwin amd64
 createRelease linux 386
 createRelease linux amd64
 
+# FreeBSD Releases
+createRelease freebsd 386
+createRelease freebsd amd64
+
+# OpenBSD Releases
+createRelease openbsd 386
+createRelease openbsd amd64
+
 # ARM Releases
 createRelease linux arm 5
 createRelease linux arm 6
