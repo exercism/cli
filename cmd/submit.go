@@ -96,12 +96,11 @@ figuring things out if necessary.
 			> `
 			option, err := selection.Pick(prompt)
 			if err != nil {
-				fmt.Println(err)
-				continue
+				return err
 			}
 			s, ok := option.(*workspace.Solution)
 			if !ok {
-				fmt.Println("something went wrong trying to pick that solution, not sure what happened")
+				fmt.Fprintf(Out, "something went wrong trying to pick that solution, not sure what happened")
 				continue
 			}
 			solution = s
@@ -156,18 +155,17 @@ figuring things out if necessary.
 				Prompt:       prompt,
 				DefaultValue: "y",
 				Reader:       In,
-				Writer:       os.Stdout,
+				Writer:       Out,
 			}
 			answer, err := confirmQuestion.Ask()
 			if err != nil {
-				fmt.Println(err)
 				return err
 			}
 			if answer != "y" {
-				fmt.Println("OK, try submitting files individually instead.")
+				fmt.Fprintf(Out, "OK, try submitting files individually instead.")
 				return nil
 			}
-			fmt.Println("OK, submitting files now...")
+			fmt.Fprintf(Out, "OK, submitting files now...")
 		}
 
 		for _, path := range paths {
