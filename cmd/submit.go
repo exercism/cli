@@ -161,7 +161,7 @@ figuring things out if necessary.
 			if err != nil {
 				return err
 			}
-			if answer != "y" {
+			if strings.ToLower(answer) != "y" {
 				fmt.Fprintf(Out, "OK, try submitting files individually instead.")
 				return nil
 			}
