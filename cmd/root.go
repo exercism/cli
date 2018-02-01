@@ -19,7 +19,7 @@ var (
 	BinaryName string
 	// Out is used to write to the required writer.
 	Out io.Writer
-	// In used for testing
+	// In is used to provide mocked test input (i.e. for prompts).
 	In io.Reader
 )
 

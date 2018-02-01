@@ -29,7 +29,7 @@ const cfgHomeKey = "EXERCISM_CONFIG_HOME"
 // 	Cmd:    myCmd,
 // 	InitFn: initMyCmd,
 // 	Args:   []string{"fakeapp", "mycommand", "arg1", "--flag", "value"},
-//  MockInput: "first-input\nsecond\n"
+// 	MockInput: "first-input\nsecond\n",
 // }
 // cmdTest.Setup(t)
 // defer cmdTest.Teardown(t)
@@ -41,7 +41,7 @@ type CommandTest struct {
 	InitFn         func()
 	TmpDir         string
 	Args           []string
-	MockInput	   string
+	MockInput      string
 	OriginalValues struct {
 		ConfigHome string
 		Args       []string

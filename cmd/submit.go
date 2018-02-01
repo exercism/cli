@@ -144,21 +144,21 @@ figuring things out if necessary.
 			return errors.New("no files found to submit")
 		}
 
-		// if the user submits a directory, confirm the list of files
+		// If the user submits a directory, confirm the list of files.
 		if len(tx.ArgDirs) > 0 {
 			prompt := "You specified a directory. Here are the files you are submitting:\n"
 			for i, path := range paths {
 				prompt += fmt.Sprintf(" [%d]  %s\n", i+1, path)
 			}
 			prompt += "\nPress ENTER to submit, or control + c to cancel: "
-			
-			conf_q := &comms.Question{
-				Prompt: prompt, 
+
+			confirmQuestion := &comms.Question{
+				Prompt:       prompt,
 				DefaultValue: "y",
-				Reader: In,
-				Writer: os.Stdout,
+				Reader:       In,
+				Writer:       os.Stdout,
 			}
-			answer, err := conf_q.Ask()
+			answer, err := confirmQuestion.Ask()
 			if err != nil {
 				fmt.Println(err)
 				return err

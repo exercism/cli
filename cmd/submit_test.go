@@ -47,10 +47,10 @@ func TestSubmit(t *testing.T) {
 	}
 
 	cmdTest := &CommandTest{
-		Cmd:    submitCmd,
-		InitFn: initSubmitCmd,
+		Cmd:       submitCmd,
+		InitFn:    initSubmitCmd,
 		MockInput: "\n",
-		Args:   []string{"fakeapp", "submit", "bogus-exercise"},
+		Args:      []string{"fakeapp", "submit", "bogus-exercise"},
 	}
 	cmdTest.Setup(t)
 	defer cmdTest.Teardown(t)
