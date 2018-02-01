@@ -19,7 +19,7 @@ const cfgHomeKey = "EXERCISM_CONFIG_HOME"
 // in the Args will be ignored. These represent the command (e.g. exercism)
 // and the subcommand (e.g. download).
 // Pass any interactive responses needed for the test in a single
-// String in MockInput, separated by newlines.
+// String in MockInput, delimited by newlines.
 //
 // Finally, when you have done whatever other setup you need in your
 // test, call the command by calling Execute on the App.

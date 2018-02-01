@@ -122,7 +122,7 @@ func TestSubmit(t *testing.T) {
 	err = apiCfg.Write()
 	assert.NoError(t, err)
 
-	// write some mock input for interactive commands
+	// Write mock interactive input for the CLI command.
 	tmpfile.WriteString(cmdTest.MockInput)
 
 	// Execute the command!

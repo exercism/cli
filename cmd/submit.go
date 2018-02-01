@@ -145,7 +145,7 @@ figuring things out if necessary.
 
 		// If the user submits a directory, confirm the list of files.
 		if len(tx.ArgDirs) > 0 {
-			prompt := "You specified a directory. Here are the files you are submitting:\n"
+			prompt := "You specified a directory, which contains these files:\n"
 			for i, path := range paths {
 				prompt += fmt.Sprintf(" [%d]  %s\n", i+1, path)
 			}
@@ -162,10 +162,10 @@ figuring things out if necessary.
 				return err
 			}
 			if strings.ToLower(answer) != "y" {
-				fmt.Fprintf(Out, "OK, try submitting files individually instead.")
+				fmt.Fprintf(Out, "Submit cancelled.\nTry submitting individually instead.")
 				return nil
 			}
-			fmt.Fprintf(Out, "OK, submitting files now...")
+			fmt.Fprintf(Out, "Submitting files now...")
 		}
 
 		for _, path := range paths {
