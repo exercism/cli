@@ -45,8 +45,8 @@ var (
 var (
 	// HTTPClient is the client used to make HTTP calls in the cli package.
 	HTTPClient = &http.Client{Timeout: 10 * time.Second}
-	// LatestReleaseURL is the endpoint that provides information about the latest release.
-	LatestReleaseURL = "https://api.github.com/repos/exercism/cli/releases/latest"
+	// ReleaseURL is the endpoint that provides information about cli releases.
+	ReleaseURL = "https://api.github.com/repos/exercism/cli/releases"
 )
 
 // Updater is a simple upgradable file interface.
@@ -133,7 +133,8 @@ func (c *CLI) Upgrade() error {
 }
 
 func (c *CLI) fetchLatestRelease() error {
-	resp, err := HTTPClient.Get(LatestReleaseURL)
+	latestReleaseURL := fmt.Sprintf("%s/%s", ReleaseURL, "latest")
+	resp, err := HTTPClient.Get(latestReleaseURL)
 	if err != nil {
 		return err
 	}
