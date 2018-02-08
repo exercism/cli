@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/exercism/cli/config"
@@ -14,19 +15,12 @@ import (
 )
 
 func TestSubmit(t *testing.T) {
-	tmpfile, err := ioutil.TempFile("", "")
-	if err != nil {
-		t.Fatal(err)
-	}
 	oldOut := Out
 	oldIn := In
-	rdr, _ := os.Open(tmpfile.Name())
 	Out = ioutil.Discard
-	In = rdr
 
 	defer func() { Out = oldOut }()
 	defer func() { In = oldIn }()
-	defer os.Remove(tmpfile.Name()) // clean up
 
 	type file struct {
 		relativePath string
@@ -65,7 +59,7 @@ func TestSubmit(t *testing.T) {
 		Exercise:    "bogus-exercise",
 		IsRequester: true,
 	}
-	err = solution.Write(dir)
+	err := solution.Write(dir)
 	assert.NoError(t, err)
 
 	for _, file := range []file{file1, file2, file3} {
@@ -122,8 +116,8 @@ func TestSubmit(t *testing.T) {
 	err = apiCfg.Write()
 	assert.NoError(t, err)
 
-	// Write mock interactive input for the CLI command.
-	tmpfile.WriteString(cmdTest.MockInteractiveResponse)
+	// Write mock interactive input to In for the CLI command.
+	In = strings.NewReader(cmdTest.MockInteractiveResponse)
 
 	// Execute the command!
 	cmdTest.App.Execute()
