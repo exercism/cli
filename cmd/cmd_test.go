@@ -36,13 +36,13 @@ const cfgHomeKey = "EXERCISM_CONFIG_HOME"
 // ...
 // cmdTest.App.Execute()
 type CommandTest struct {
-	App            *cobra.Command
-	Cmd            *cobra.Command
-	InitFn         func()
-	TmpDir         string
-	Args           []string
-	MockInput      string
-	OriginalValues struct {
+	App                     *cobra.Command
+	Cmd                     *cobra.Command
+	InitFn                  func()
+	TmpDir                  string
+	Args                    []string
+	MockInteractiveResponse string
+	OriginalValues          struct {
 		ConfigHome string
 		Args       []string
 	}

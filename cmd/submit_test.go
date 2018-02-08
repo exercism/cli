@@ -47,10 +47,10 @@ func TestSubmit(t *testing.T) {
 	}
 
 	cmdTest := &CommandTest{
-		Cmd:       submitCmd,
-		InitFn:    initSubmitCmd,
-		MockInput: "\n",
-		Args:      []string{"fakeapp", "submit", "bogus-exercise"},
+		Cmd:                     submitCmd,
+		InitFn:                  initSubmitCmd,
+		MockInteractiveResponse: "\n",
+		Args: []string{"fakeapp", "submit", "bogus-exercise"},
 	}
 	cmdTest.Setup(t)
 	defer cmdTest.Teardown(t)
@@ -123,7 +123,7 @@ func TestSubmit(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Write mock interactive input for the CLI command.
-	tmpfile.WriteString(cmdTest.MockInput)
+	tmpfile.WriteString(cmdTest.MockInteractiveResponse)
 
 	// Execute the command!
 	cmdTest.App.Execute()

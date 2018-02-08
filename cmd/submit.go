@@ -231,8 +231,8 @@ figuring things out if necessary.
 		}
 
 		if solution.AutoApprove == true {
-			fmt.Fprintf(Out, "Your solution has been submitted " +
-				"successfully and has been auto-approved. You can complete " +
+			fmt.Fprintf(Out, "Your solution has been submitted "+
+				"successfully and has been auto-approved. You can complete "+
 				"the exercise and unlock the next core exercise at %s\n",
 				solution.URL)
 		} else {
