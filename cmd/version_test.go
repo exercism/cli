@@ -23,7 +23,7 @@ func TestVersionUpdateCheck(t *testing.T) {
 	})
 	ts := httptest.NewServer(fakeEndpoint)
 	defer ts.Close()
-	cli.LatestReleaseURL = ts.URL
+	cli.ReleaseURL = ts.URL
 
 	tests := []struct {
 		version  string
