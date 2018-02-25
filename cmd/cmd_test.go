@@ -29,7 +29,7 @@ const cfgHomeKey = "EXERCISM_CONFIG_HOME"
 // 	Cmd:    myCmd,
 // 	InitFn: initMyCmd,
 // 	Args:   []string{"fakeapp", "mycommand", "arg1", "--flag", "value"},
-// 	MockInput: "first-input\nsecond\n",
+// 	MockInteractiveResponse: "first-input\nsecond\n",
 // }
 // cmdTest.Setup(t)
 // defer cmdTest.Teardown(t)
