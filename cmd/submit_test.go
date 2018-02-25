@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/exercism/cli/config"
@@ -15,8 +16,11 @@ import (
 
 func TestSubmit(t *testing.T) {
 	oldOut := Out
+	oldIn := In
 	Out = ioutil.Discard
+
 	defer func() { Out = oldOut }()
+	defer func() { In = oldIn }()
 
 	type file struct {
 		relativePath string
@@ -37,9 +41,10 @@ func TestSubmit(t *testing.T) {
 	}
 
 	cmdTest := &CommandTest{
-		Cmd:    submitCmd,
-		InitFn: initSubmitCmd,
-		Args:   []string{"fakeapp", "submit", "bogus-exercise"},
+		Cmd:                     submitCmd,
+		InitFn:                  initSubmitCmd,
+		MockInteractiveResponse: "\n",
+		Args: []string{"fakeapp", "submit", "bogus-exercise"},
 	}
 	cmdTest.Setup(t)
 	defer cmdTest.Teardown(t)
@@ -110,6 +115,9 @@ func TestSubmit(t *testing.T) {
 	apiCfg.Endpoints["submit"] = "?%s"
 	err = apiCfg.Write()
 	assert.NoError(t, err)
+
+	// Write mock interactive input to In for the CLI command.
+	In = strings.NewReader(cmdTest.MockInteractiveResponse)
 
 	// Execute the command!
 	cmdTest.App.Execute()

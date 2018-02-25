@@ -19,6 +19,8 @@ var (
 	BinaryName string
 	// Out is used to write to the required writer.
 	Out io.Writer
+	// In is used to provide mocked test input (i.e. for prompts).
+	In io.Reader
 )
 
 // RootCmd represents the base command when called without any subcommands.
@@ -41,5 +43,6 @@ func Execute() {
 func init() {
 	BinaryName = os.Args[0]
 	Out = os.Stdout
+	In = os.Stdin
 	api.UserAgent = fmt.Sprintf("github.com/exercism/cli v%s (%s/%s)", Version, runtime.GOOS, runtime.GOARCH)
 }

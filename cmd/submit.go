@@ -96,12 +96,11 @@ figuring things out if necessary.
 			> `
 			option, err := selection.Pick(prompt)
 			if err != nil {
-				fmt.Println(err)
-				continue
+				return err
 			}
 			s, ok := option.(*workspace.Solution)
 			if !ok {
-				fmt.Println("something went wrong trying to pick that solution, not sure what happened")
+				fmt.Fprintf(Out, "something went wrong trying to pick that solution, not sure what happened")
 				continue
 			}
 			solution = s
@@ -142,6 +141,31 @@ figuring things out if necessary.
 
 		if len(paths) == 0 {
 			return errors.New("no files found to submit")
+		}
+
+		// If the user submits a directory, confirm the list of files.
+		if len(tx.ArgDirs) > 0 {
+			prompt := "You specified a directory, which contains these files:\n"
+			for i, path := range paths {
+				prompt += fmt.Sprintf(" [%d]  %s\n", i+1, path)
+			}
+			prompt += "\nPress ENTER to submit, or control + c to cancel: "
+
+			confirmQuestion := &comms.Question{
+				Prompt:       prompt,
+				DefaultValue: "y",
+				Reader:       In,
+				Writer:       Out,
+			}
+			answer, err := confirmQuestion.Ask()
+			if err != nil {
+				return err
+			}
+			if strings.ToLower(answer) != "y" {
+				fmt.Fprintf(Out, "Submit cancelled.\nTry submitting individually instead.")
+				return nil
+			}
+			fmt.Fprintf(Out, "Submitting files now...")
 		}
 
 		for _, path := range paths {
