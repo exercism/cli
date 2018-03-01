@@ -21,6 +21,7 @@ If you don't care how and why and just want something that works, follow these s
 1. `git remote set-url origin https://github.com/<your-github-username>/cli`
 1. `go get -u github.com/golang/dep/cmd/dep`
 1. `dep ensure`
+    * you may need to [install `dep`](https://github.com/golang/dep) if it's not already on your system
 
 Then make the change as usual, and submit a pull request. Please provide tests for the changes where possible.
 
