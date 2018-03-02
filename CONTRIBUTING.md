@@ -7,6 +7,8 @@ Exercism would be impossible without people like you being willing to spend time
 
 You'll need Go version 1.7 or higher. Follow the directions on http://golang.org/doc/install
 
+You will also need `dep`, the Go dependency management tool. Follow the directions on https://github.com/golang/dep
+
 ## Development
 
 If you've never contributed to a Go project before this is going to feel a little bit foreign.
@@ -20,8 +22,8 @@ If you don't care how and why and just want something that works, follow these s
 1. `cd $GOPATH/src/github.com/exercism/cli` (or `cd %GOPATH%/src/github.com/exercism/cli` on Windows)
 1. `git remote set-url origin https://github.com/<your-github-username>/cli`
 1. `go get -u github.com/golang/dep/cmd/dep`
+   * depending on your setup, you may need to install `dep` by following the instructions in the [`dep` repo](https://github.com/golang/dep)
 1. `dep ensure`
-    * you may need to [install `dep`](https://github.com/golang/dep) if it's not already on your system
 
 Then make the change as usual, and submit a pull request. Please provide tests for the changes where possible.
 
