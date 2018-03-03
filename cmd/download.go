@@ -31,7 +31,7 @@ Download other people's solutions by providing the UUID.
 		BailOnError(err)
 		if uuid == "" && len(args) == 0 {
 			// TODO: usage
-			fmt.Fprintf(os.Stderr, "need an exercise name or a solution --uuid")
+			fmt.Fprintf(os.Stderr, "need an exercise name or a solution --uuid\n")
 			return
 		}
 		apiCfg, err := config.NewAPIConfig()
