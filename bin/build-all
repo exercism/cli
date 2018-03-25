@@ -27,8 +27,12 @@ createRelease() {
 	if [ "$arch" = amd64 ]
 	then
 		osarch=64bit
-	else
+	elif [ "$os" = linux ] && [ "$arch" = ppc64 ]
+        then
+                osarch=ppc64
+        else
 		osarch=32bit
+
 	fi
 
 	ldflags="-X $OSVAR=$os -X $ARCHVAR=$arch"
