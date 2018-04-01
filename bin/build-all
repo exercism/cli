@@ -77,6 +77,9 @@ createRelease() {
 createRelease darwin 386
 createRelease darwin amd64
 
+# PowerPC Releases
+createRelease linux ppc64
+
 # Linux Releases
 createRelease linux 386
 createRelease linux amd64
