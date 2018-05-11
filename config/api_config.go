@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	defaultBaseURL   = "https://api.exercism.io/v1"
+	defaultBaseURL   = "https://v2.exercism.io/api/v1"
 	defaultEndpoints = map[string]string{
 		"download":      "/solutions/%s",
 		"submit":        "/solutions/%s",

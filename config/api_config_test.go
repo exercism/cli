@@ -42,7 +42,7 @@ func TestAPIConfigSetDefaults(t *testing.T) {
 	// All defaults.
 	cfg := &APIConfig{}
 	cfg.SetDefaults()
-	assert.Equal(t, "https://api.exercism.io/v1", cfg.BaseURL)
+	assert.Equal(t, "https://v2.exercism.io/api/v1", cfg.BaseURL)
 	assert.Equal(t, "/solutions/%s", cfg.Endpoints["download"])
 	assert.Equal(t, "/solutions/%s", cfg.Endpoints["submit"])
 
@@ -62,7 +62,7 @@ func TestAPIConfigSetDefaults(t *testing.T) {
 		},
 	}
 	cfg.SetDefaults()
-	assert.Equal(t, "https://api.exercism.io/v1", cfg.BaseURL)
+	assert.Equal(t, "https://v2.exercism.io/api/v1", cfg.BaseURL)
 	assert.Equal(t, "/download/%d", cfg.Endpoints["download"])
 	assert.Equal(t, "/solutions/%s", cfg.Endpoints["submit"])
 }
