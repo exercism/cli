@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/exercism/cli/cli"
-	"github.com/exercism/cli/debug"
 	"github.com/spf13/cobra"
 )
 
@@ -23,10 +22,6 @@ The next time you upgrade, the hidden file will be overwritten.
 You can always delete this file.
 	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
-			debug.Verbose = verbose
-		}
-
 		c := cli.New(Version)
 		return updateCLI(c)
 	},
