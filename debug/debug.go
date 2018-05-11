@@ -51,3 +51,24 @@ func DumpRequest(req *http.Request) {
 
 	req.Body = ioutil.NopCloser(&bodyCopy)
 }
+
+func DumpResponse(res *http.Response) {
+	if !Verbose {
+		return
+	}
+
+	var bodyCopy bytes.Buffer
+	body := io.TeeReader(res.Body, &bodyCopy)
+	res.Body = ioutil.NopCloser(body)
+
+	dump, err := httputil.DumpResponse(res, res.ContentLength > 0)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	Println("\n========================= BEGIN DumpResponse =========================")
+	Println(string(dump))
+	Println("========================= END DumpResponse =========================\n")
+
+	res.Body = ioutil.NopCloser(&bodyCopy)
+}
