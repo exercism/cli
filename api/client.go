@@ -1,7 +1,6 @@
 package api
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -73,13 +72,13 @@ func (c *Client) NewRequest(method, url string, body io.Reader) (*http.Request, 
 
 // Do performs an http.Request and optionally parses the response body into the given interface.
 func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
-	debug.Println("Request", req.Method, req.URL)
+	debug.DumpRequest(req)
 
 	res, err := c.Client.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	debug.Printf("Response StatusCode=%d\n", res.StatusCode)
+	debug.DumpResponse(res)
 
 	switch res.StatusCode {
 	case http.StatusNoContent:
@@ -91,11 +90,7 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 		if v != nil {
 			defer res.Body.Close()
 
-			var bodyCopy bytes.Buffer
-			body := io.TeeReader(res.Body, &bodyCopy)
-			debug.Printf("Response Body\n%s\n\n", bodyCopy.String())
-
-			if err := json.NewDecoder(body).Decode(v); err != nil {
+			if err := json.NewDecoder(res.Body).Decode(v); err != nil {
 				return nil, fmt.Errorf("unable to parse API response - %s", err)
 			}
 		}
