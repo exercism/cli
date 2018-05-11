@@ -7,6 +7,7 @@ import (
 	"runtime"
 
 	"github.com/exercism/cli/api"
+	"github.com/exercism/cli/debug"
 	"github.com/spf13/cobra"
 )
 
@@ -31,6 +32,11 @@ var RootCmd = &cobra.Command{
 
 Download exercises and submit your solutions.`,
 	SilenceUsage: true,
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
+			debug.Verbose = verbose
+		}
+	},
 }
 
 // Execute adds all child commands to the root command.
