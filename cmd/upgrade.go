@@ -49,5 +49,4 @@ func updateCLI(c cli.Updater) error {
 
 func init() {
 	RootCmd.AddCommand(upgradeCmd)
-	upgradeCmd.Flags().BoolP("verbose", "v", false, "verbose output")
 }

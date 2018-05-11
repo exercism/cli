@@ -45,4 +45,5 @@ func init() {
 	Out = os.Stdout
 	In = os.Stdin
 	api.UserAgent = fmt.Sprintf("github.com/exercism/cli v%s (%s/%s)", Version, runtime.GOOS, runtime.GOARCH)
+	RootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 }
