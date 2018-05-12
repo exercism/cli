@@ -35,7 +35,7 @@ createRelease() {
 
 	fi
 
-	ldflags="-X $OSVAR=$os -X $ARCHVAR=$arch"
+	ldflags="-s -w -X $OSVAR=$os -X $ARCHVAR=$arch"
 	if [ "$arm" ]
 	then
 		osarch=arm-v$arm
