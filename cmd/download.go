@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"io"
 	"net/http"
 	"os"
@@ -97,6 +98,7 @@ Download other people's solutions by providing the UUID.
 		if res.StatusCode != http.StatusOK {
 			switch payload.Error.Type {
 			case "track_ambiguous":
+				return fmt.Errorf("%s: %s", payload.Error.Message, strings.Join(payload.Error.PossibleTrackIDs, ", "))
 			default:
 				return errors.New(payload.Error.Message)
 			}
