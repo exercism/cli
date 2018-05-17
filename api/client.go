@@ -86,6 +86,8 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	case http.StatusInternalServerError:
 		// TODO: if it's json, and it has an error key, print the message.
 		return nil, fmt.Errorf("%s", res.Status)
+	case http.StatusUnauthorized:
+		return nil, fmt.Errorf("unauthorized request. Please run the configure command to set the api token found at https://v2.exercism.io/my/settings")
 	default:
 		if v != nil {
 			defer res.Body.Close()
