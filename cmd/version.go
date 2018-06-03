@@ -60,7 +60,16 @@ func checkForUpdate(c *cli.CLI) (string, error) {
 		return "Your CLI version is up to date.", nil
 	}
 
-	// Anything but ok is out of date.
+	ok, err = c.IsCuttingEdge()
+	if err != nil {
+		return "", err
+	}
+
+	if ok {
+		return "Your CLI version is newer than the most recent stable release.", nil
+	}
+
+	// The client is outdated.
 	msg := fmt.Sprintf("A new CLI version is available. Run `exercism upgrade` to update to %s", c.LatestRelease.Version())
 	return msg, nil
 
