@@ -88,6 +88,26 @@ func (c *CLI) IsUpToDate() (bool, error) {
 	return cv.GTE(rv), nil
 }
 
+// IsCuttingEdge compares the current version to that of the latest release.
+func (c *CLI) IsCuttingEdge() (bool, error) {
+	if c.LatestRelease == nil {
+		if err := c.fetchLatestRelease(); err != nil {
+			return false, err
+		}
+	}
+
+	rv, err := semver.Make(c.LatestRelease.Version())
+	if err != nil {
+		return false, fmt.Errorf("unable to parse latest version (%s): %s", c.LatestRelease.Version(), err)
+	}
+	cv, err := semver.Make(c.Version)
+	if err != nil {
+		return false, fmt.Errorf("unable to parse current version (%s): %s", c.Version, err)
+	}
+
+	return cv.GT(rv), nil
+}
+
 // Upgrade allows the user to upgrade to the latest version of the CLI.
 func (c *CLI) Upgrade() error {
 	var (
