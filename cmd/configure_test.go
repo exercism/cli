@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"runtime"
 	"testing"
 
 	"github.com/exercism/cli/config"
@@ -76,7 +77,12 @@ func makeTest(tc testCase) func(*testing.T) {
 		cmdTest.App.Execute()
 
 		if tc.expectedUsrCfg != nil {
+			if runtime.GOOS == "windows" {
+				tc.expectedUsrCfg.Normalize()
+			}
+
 			usrCfg, err := config.NewUserConfig()
+
 			assert.NoError(t, err, tc.desc)
 			assert.Equal(t, tc.expectedUsrCfg.Token, usrCfg.Token, tc.desc)
 			assert.Equal(t, tc.expectedUsrCfg.Workspace, usrCfg.Workspace, tc.desc)
