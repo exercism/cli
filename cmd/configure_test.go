@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os"
 	"runtime"
 	"testing"
 
@@ -92,6 +93,7 @@ func makeTest(tc testCase) func(*testing.T) {
 			apiCfg, err := config.NewAPIConfig()
 			assert.NoError(t, err, tc.desc)
 			assert.Equal(t, tc.expectedAPICfg.BaseURL, apiCfg.BaseURL, tc.desc)
+			os.Remove(apiCfg.File())
 		}
 	}
 }
