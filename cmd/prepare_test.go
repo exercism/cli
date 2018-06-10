@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/exercism/cli/config"
@@ -43,6 +44,7 @@ func TestPrepareTrack(t *testing.T) {
 	cmdTest.App.Execute()
 
 	cliCfg, err := config.NewCLIConfig()
+	os.Remove(cliCfg.File())
 	assert.NoError(t, err)
 
 	expected := []string{
