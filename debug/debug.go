@@ -47,7 +47,8 @@ func DumpRequest(req *http.Request) {
 
 	Println("\n========================= BEGIN DumpRequest =========================")
 	Println(string(dump))
-	Println("========================= END DumpRequest =========================\n")
+	Println("========================= END DumpRequest =========================")
+	Println("")
 
 	req.Body = ioutil.NopCloser(&bodyCopy)
 }
@@ -68,7 +69,8 @@ func DumpResponse(res *http.Response) {
 
 	Println("\n========================= BEGIN DumpResponse =========================")
 	Println(string(dump))
-	Println("========================= END DumpResponse =========================\n")
+	Println("========================= END DumpResponse =========================")
+	Println("")
 
 	res.Body = ioutil.NopCloser(&bodyCopy)
 }
