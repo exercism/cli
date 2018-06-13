@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type testDefinition struct {
+type testCase struct {
 	desc           string
 	args           []string
 	existingUsrCfg *config.UserConfig
@@ -17,8 +17,8 @@ type testDefinition struct {
 }
 
 func TestConfigure(t *testing.T) {
-	tests := []testDefinition{
-		testDefinition{
+	testCases := []testCase{
+		testCase{
 			desc:           "It writes the flags when there is no config file.",
 			args:           []string{"fakeapp", "configure", "--token", "a", "--workspace", "/a", "--api", "http://example.com"},
 			existingUsrCfg: nil,
@@ -26,7 +26,7 @@ func TestConfigure(t *testing.T) {
 			existingAPICfg: nil,
 			expectedAPICfg: &config.APIConfig{BaseURL: "http://example.com"},
 		},
-		testDefinition{
+		testCase{
 			desc:           "It overwrites the flags in the config file.",
 			args:           []string{"fakeapp", "configure", "--token", "b", "--workspace", "/b", "--api", "http://example.com/v2"},
 			existingUsrCfg: &config.UserConfig{Token: "token-b", Workspace: "/workspace-b"},
@@ -34,13 +34,13 @@ func TestConfigure(t *testing.T) {
 			existingAPICfg: &config.APIConfig{BaseURL: "http://example.com/v1"},
 			expectedAPICfg: &config.APIConfig{BaseURL: "http://example.com/v2"},
 		},
-		testDefinition{
+		testCase{
 			desc:           "It overwrites the flags that are passed, without losing the ones that are not.",
 			args:           []string{"fakeapp", "configure", "--token", "c"},
 			existingUsrCfg: &config.UserConfig{Token: "token-c", Workspace: "/workspace-c"},
 			expectedUsrCfg: &config.UserConfig{Token: "c", Workspace: "/workspace-c"},
 		},
-		testDefinition{
+		testCase{
 			desc:           "It gets the default API base URL.",
 			args:           []string{"fakeapp", "configure"},
 			existingAPICfg: &config.APIConfig{},
@@ -48,45 +48,44 @@ func TestConfigure(t *testing.T) {
 		},
 	}
 
-	for _, definition := range tests {
-		t.Run(definition.desc, makeTest(definition))
+	for _, tc := range testCases {
+		t.Run(tc.desc, makeTest(tc))
 	}
 }
 
-func makeTest(definition testDefinition) func(*testing.T) {
+func makeTest(tc testCase) func(*testing.T) {
 
 	return func(t *testing.T) {
-		var cmdTest *CommandTest
-		cmdTest = &CommandTest{
+		cmdTest := &CommandTest{
 			Cmd:    configureCmd,
 			InitFn: initConfigureCmd,
-			Args:   definition.args,
+			Args:   tc.args,
 		}
 		cmdTest.Setup(t)
 		defer cmdTest.Teardown(t)
 
-		if definition.existingUsrCfg != nil {
+		if tc.existingUsrCfg != nil {
 			// Write a fake config.
 			cfg := config.NewEmptyUserConfig()
-			cfg.Token = definition.existingUsrCfg.Token
-			cfg.Workspace = definition.existingUsrCfg.Workspace
+			cfg.Token = tc.existingUsrCfg.Token
+			cfg.Workspace = tc.existingUsrCfg.Workspace
 			err := cfg.Write()
-			assert.NoError(t, err, definition.desc)
+			assert.NoError(t, err, tc.desc)
 		}
 
 		cmdTest.App.Execute()
 
-		if definition.expectedUsrCfg != nil {
+		if tc.expectedUsrCfg != nil {
 			usrCfg, err := config.NewUserConfig()
-			assert.NoError(t, err, definition.desc)
-			assert.Equal(t, definition.expectedUsrCfg.Token, usrCfg.Token, definition.desc)
-			assert.Equal(t, definition.expectedUsrCfg.Workspace, usrCfg.Workspace, definition.desc)
+			assert.NoError(t, err, tc.desc)
+			assert.Equal(t, tc.expectedUsrCfg.Token, usrCfg.Token, tc.desc)
+			assert.Equal(t, tc.expectedUsrCfg.Workspace, usrCfg.Workspace, tc.desc)
 		}
 
-		if definition.expectedAPICfg != nil {
+		if tc.expectedAPICfg != nil {
 			apiCfg, err := config.NewAPIConfig()
-			assert.NoError(t, err, definition.desc)
-			assert.Equal(t, definition.expectedAPICfg.BaseURL, apiCfg.BaseURL, definition.desc)
+			assert.NoError(t, err, tc.desc)
+			assert.Equal(t, tc.expectedAPICfg.BaseURL, apiCfg.BaseURL, tc.desc)
 		}
 	}
 }
