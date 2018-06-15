@@ -7,6 +7,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -55,6 +56,15 @@ You can also override certain default settings to suit your preferences.
 		}
 		apiCfg.SetDefaults()
 
+		tokenFlag := cmd.Flags().Lookup("token")
+		if tokenFlag.Changed {
+			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
+			err = api.ValidateToken(usrCfg.Token, skipAuth)
+			if err != nil {
+				return err
+			}
+		}
+
 		show, err := cmd.Flags().GetBool("show")
 		if err != nil {
 			return err
@@ -86,6 +96,7 @@ func initConfigureCmd() {
 	configureCmd.Flags().StringP("workspace", "w", "", "directory for exercism exercises")
 	configureCmd.Flags().StringP("api", "a", "", "API base url")
 	configureCmd.Flags().BoolP("show", "s", false, "show the current configuration")
+	configureCmd.Flags().BoolP("skip-auth", "", false, "skip online token validation")
 
 	viperUserConfig = viper.New()
 	viperUserConfig.BindPFlag("token", configureCmd.Flags().Lookup("token"))
