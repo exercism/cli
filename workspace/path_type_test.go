@@ -8,16 +8,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type testCase struct {
+	desc string
+	path string
+	pt   PathType
+}
+
 func TestDetectPathType(t *testing.T) {
 	_, cwd, _, _ := runtime.Caller(0)
 	root := filepath.Join(cwd, "..", "..", "fixtures", "detect-path-type")
 
-	tests := []struct {
-		desc string
-		path string
-		pt   PathType
-	}{
-		{
+	testCases := []testCase{
+		testCase{
 			desc: "absolute dir",
 			path: filepath.Join(root, "a-dir"),
 			pt:   TypeDir,
@@ -54,9 +56,16 @@ func TestDetectPathType(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		pt, err := DetectPathType(test.path)
-		assert.NoError(t, err, test.desc)
-		assert.Equal(t, test.pt, pt, test.desc)
+	for _, tc := range testCases {
+		t.Run(tc.desc, makeTest(tc))
+
+	}
+}
+
+func makeTest(tc testCase) func(*testing.T) {
+	return func(t *testing.T) {
+		pt, err := DetectPathType(tc.path)
+		assert.NoError(t, err, tc.desc)
+		assert.Equal(t, tc.pt, pt, tc.desc)
 	}
 }
