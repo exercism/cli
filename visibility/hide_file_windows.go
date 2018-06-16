@@ -6,6 +6,15 @@ import "syscall"
 // This is the equivalent of giving a filename on
 // Linux or MacOS a leading dot (e.g. .bash_rc).
 func HideFile(path string) error {
+	return setVisibility(path, false)
+}
+
+// ShowFile unsets a Windows file's 'hidden' attribute.
+func ShowFile(path string) error {
+	return setVisibility(path, true)
+}
+
+func setVisibility(path string, visible bool) error {
 	// This is based on the discussion in
 	// https://www.reddit.com/r/golang/comments/5t3ezd/hidden_files_directories/
 	// but instead of duplicating all the effort to write the file, this takes
@@ -22,6 +31,11 @@ func HideFile(path string) error {
 		return err
 	}
 
-	attributes |= syscall.FILE_ATTRIBUTE_HIDDEN
+	if visible {
+		attributes &^= syscall.FILE_ATTRIBUTE_HIDDEN
+	} else {
+		attributes |= syscall.FILE_ATTRIBUTE_HIDDEN
+	}
+
 	return syscall.SetFileAttributes(ptr, attributes)
 }

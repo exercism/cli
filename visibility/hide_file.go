@@ -6,3 +6,8 @@ package visibility
 func HideFile(string) error {
 	return nil
 }
+
+// ShowFile is a no-op for non-Windows systems.
+func ShowFile(path string) error {
+	return nil
+}
