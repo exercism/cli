@@ -10,46 +10,49 @@ import (
 )
 
 func TestIsUpToDate(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
+		desc       string
 		cliVersion string
 		releaseTag string
 		ok         bool
 	}{
 		{
-			// It returns false for versions less than release.
+			desc:       "It returns false for versions less than release.",
 			cliVersion: "1.0.0",
 			releaseTag: "v1.0.1",
 			ok:         false,
 		},
 		{
-			// It returns false for pre-release versions of release.
+			desc:       "It returns false for pre-release versions of release.",
 			cliVersion: "1.0.1-alpha.1",
 			releaseTag: "v1.0.1",
 			ok:         false,
 		},
 		{
-			// It returns true for versions equal to release.
+			desc:       "It returns true for versions equal to release.",
 			cliVersion: "2.0.1",
 			releaseTag: "v2.0.1",
 			ok:         true,
 		},
 		{
-			// It returns true for versions greater than release.
+			desc:       "It returns true for versions greater than release.",
 			cliVersion: "2.0.2",
 			releaseTag: "v2.0.1",
 			ok:         true,
 		},
 	}
 
-	for _, test := range tests {
-		c := &CLI{
-			Version:       test.cliVersion,
-			LatestRelease: &Release{TagName: test.releaseTag},
-		}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			c := &CLI{
+				Version:       tc.cliVersion,
+				LatestRelease: &Release{TagName: tc.releaseTag},
+			}
 
-		ok, err := c.IsUpToDate()
-		assert.NoError(t, err)
-		assert.Equal(t, test.ok, ok, test.cliVersion)
+			ok, err := c.IsUpToDate()
+			assert.NoError(t, err)
+			assert.Equal(t, tc.ok, ok, tc.cliVersion)
+		})
 	}
 }
 
