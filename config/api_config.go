@@ -14,6 +14,7 @@ var (
 		"submit":        "/solutions/%s",
 		"prepare-track": "/tracks/%s",
 		"ping":          "/ping",
+		"validate":      "/validate_token",
 	}
 )
 

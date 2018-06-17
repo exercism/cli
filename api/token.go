@@ -33,7 +33,8 @@ func ValidateToken(token string, skipAuthCheck bool) error {
 // checkAuthorization calls the API to check if
 // the client is authorized.
 func (client *Client) checkAuthorization() error {
-	req, err := client.NewRequest("GET", "https://v2.exercism.io/api/v1/solutions/latest?exercise_id=hello-world&track_id=go", nil)
+	url := client.APIConfig.URL("validate")
+	req, err := client.NewRequest("GET", url, nil)
 	if err != nil {
 		return err
 	}
