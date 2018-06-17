@@ -43,7 +43,7 @@ func TestSolution(t *testing.T) {
 }
 
 func TestSuffix(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		solution Solution
 		suffix   string
 	}{
@@ -77,13 +77,16 @@ func TestSuffix(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		assert.Equal(t, test.suffix, test.solution.Suffix())
+	for _, tc := range testCases {
+		testName := "Suffix of '" + tc.solution.Dir + "' should be " + tc.suffix
+		t.Run(testName, func(t *testing.T) {
+			assert.Equal(t, tc.suffix, tc.solution.Suffix(), testName)
+		})
 	}
 }
 
 func TestSolutionString(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		solution Solution
 		desc     string
 	}{
@@ -136,7 +139,10 @@ func TestSolutionString(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		assert.Equal(t, test.desc, test.solution.String())
+	for _, tc := range testCases {
+		testName := "should stringify to '" + tc.desc + "'"
+		t.Run(testName, func(t *testing.T) {
+			assert.Equal(t, tc.desc, tc.solution.String())
+		})
 	}
 }
