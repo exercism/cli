@@ -16,7 +16,7 @@ func TestLocateErrors(t *testing.T) {
 
 	ws := New(filepath.Join(root, "workspace"))
 
-	tests := []struct {
+	testCases := []struct {
 		desc, arg string
 		errFn     func(error) bool
 	}{
@@ -47,9 +47,11 @@ func TestLocateErrors(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		_, err := ws.Locate(test.arg)
-		assert.True(t, test.errFn(err), fmt.Sprintf("test: %s (arg: %s), %#v", test.desc, test.arg, err))
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			_, err := ws.Locate(tc.arg)
+			assert.True(t, tc.errFn(err), fmt.Sprintf("test: %s (arg: %s), %#v", tc.desc, tc.arg, err))
+		})
 	}
 }
 
