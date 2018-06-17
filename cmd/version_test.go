@@ -25,36 +25,39 @@ func TestVersionUpdateCheck(t *testing.T) {
 	defer ts.Close()
 	cli.ReleaseURL = ts.URL
 
-	tests := []struct {
+	testCases := []struct {
+		desc     string
 		version  string
 		expected string
 	}{
 		{
-			// It returns new version available for versions older than latest.
+			desc:     "It returns new version available for versions older than latest.",
 			version:  "1.0.0",
 			expected: "A new CLI version is available. Run `exercism upgrade` to update to 2.0.0",
 		},
 		{
-			// It returns up to date for versions matching latest.
+			desc:     "It returns up to date for versions matching latest.",
 			version:  "2.0.0",
 			expected: "Your CLI version is up to date.",
 		},
 		{
-			// It returns up to date for versions newer than latest.
+			desc:     "It returns up to date for versions newer than latest.",
 			version:  "2.0.1",
 			expected: "Your CLI version is up to date.",
 		},
 	}
 
-	for _, test := range tests {
-		c := &cli.CLI{
-			Version: test.version,
-		}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			c := &cli.CLI{
+				Version: tc.version,
+			}
 
-		actual, err := checkForUpdate(c)
+			actual, err := checkForUpdate(c)
 
-		assert.NoError(t, err)
-		assert.NotEmpty(t, actual)
-		assert.Equal(t, test.expected, actual)
+			assert.NoError(t, err)
+			assert.NotEmpty(t, actual)
+			assert.Equal(t, tc.expected, actual)
+		})
 	}
 }
