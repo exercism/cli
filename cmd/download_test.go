@@ -91,19 +91,23 @@ func TestDownload(t *testing.T) {
 	err = apiCfg.Write()
 	assert.NoError(t, err)
 
-	tests := []struct {
+	testCases := []struct {
+		desc     string
 		path     string
 		contents string
 	}{
 		{
+			desc:     "path with no subdir",
 			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", "file-1.txt"),
 			contents: "this is file 1",
 		},
 		{
+			desc:     "path with subdir",
 			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", "subdir", "file-2.txt"),
 			contents: "this is file 2",
 		},
 		{
+			desc:     "solution file",
 			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", ".solution.json"),
 			contents: `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":true,"auto_approve":false}`,
 		},
@@ -111,14 +115,15 @@ func TestDownload(t *testing.T) {
 
 	cmdTest.App.Execute()
 
-	for _, test := range tests {
-		b, err := ioutil.ReadFile(test.path)
-		assert.NoError(t, err)
-		assert.Equal(t, test.contents, string(b))
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			b, err := ioutil.ReadFile(tc.path)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.contents, string(b), "content of "+tc.path)
+		})
 	}
 
-	// It doesn't write the empty file.
 	path := filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", path3)
 	_, err = os.Lstat(path)
-	assert.True(t, os.IsNotExist(err))
+	assert.True(t, os.IsNotExist(err), "It doesn't write the empty file.")
 }
