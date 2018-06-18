@@ -64,12 +64,25 @@ You can also override certain default settings to suit your preferences.
 			defer printCurrentConfig()
 		}
 
-		tokenFlag := cmd.Flags().Lookup("token")
-		if tokenFlag.Changed {
+		switch {
+		case cmd.Flags().Lookup("token").Changed:
+			// User set new token
 			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
 			err = api.ValidateToken(usrCfg.Token, skipAuth)
 			if err != nil {
 				return err
+			}
+		case usrCfg.Token == "":
+			fmt.Fprintln(Out, "There is no token configured, please set it using --token.")
+		default:
+			// Validate existing token
+			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
+			err = api.ValidateToken(usrCfg.Token, skipAuth)
+			if err != nil {
+				if !show {
+					defer printCurrentConfig()
+				}
+				fmt.Fprintln(Out, err)
 			}
 		}
 
@@ -94,6 +107,7 @@ func printCurrentConfig() {
 	w := tabwriter.NewWriter(Out, 0, 0, 2, ' ', 0)
 	defer w.Flush()
 
+	fmt.Fprintln(w, "")
 	fmt.Fprintln(w, fmt.Sprintf("Config dir:\t%s", config.Dir()))
 	fmt.Fprintln(w, fmt.Sprintf("-t, --token\t%s", usrCfg.Token))
 	fmt.Fprintln(w, fmt.Sprintf("-w, --workspace\t%s", usrCfg.Workspace))
