@@ -23,6 +23,7 @@ func (q Question) Read(r io.Reader) (string, error) {
 		return "", err
 	}
 	s = strings.Trim(s, "\n")
+	s = strings.Trim(s, "\r")
 	if s == "" {
 		return q.DefaultValue, nil
 	}
