@@ -56,6 +56,14 @@ You can also override certain default settings to suit your preferences.
 		}
 		apiCfg.SetDefaults()
 
+		show, err := cmd.Flags().GetBool("show")
+		if err != nil {
+			return err
+		}
+		if show {
+			defer printCurrentConfig()
+		}
+
 		tokenFlag := cmd.Flags().Lookup("token")
 		if tokenFlag.Changed {
 			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
@@ -65,23 +73,6 @@ You can also override certain default settings to suit your preferences.
 			}
 		}
 
-		show, err := cmd.Flags().GetBool("show")
-		if err != nil {
-			return err
-		}
-
-		if show {
-			w := tabwriter.NewWriter(Out, 0, 0, 2, ' ', 0)
-			defer w.Flush()
-
-			fmt.Fprintln(w, "")
-			fmt.Fprintln(w, fmt.Sprintf("Config dir:\t%s", config.Dir()))
-			fmt.Fprintln(w, fmt.Sprintf("-t, --token\t%s", usrCfg.Token))
-			fmt.Fprintln(w, fmt.Sprintf("-w, --workspace\t%s", usrCfg.Workspace))
-			fmt.Fprintln(w, fmt.Sprintf("-a, --api\t%s", apiCfg.BaseURL))
-			return nil
-		}
-
 		err = usrCfg.Write()
 		if err != nil {
 			return err
@@ -89,6 +80,25 @@ You can also override certain default settings to suit your preferences.
 
 		return apiCfg.Write()
 	},
+}
+
+func printCurrentConfig() {
+	usrCfg, err := config.NewUserConfig()
+	if err != nil {
+		return
+	}
+	apiCfg, err := config.NewAPIConfig()
+	if err != nil {
+		return
+	}
+	w := tabwriter.NewWriter(Out, 0, 0, 2, ' ', 0)
+	defer w.Flush()
+
+	fmt.Fprintln(w, fmt.Sprintf("Config dir:\t%s", config.Dir()))
+	fmt.Fprintln(w, fmt.Sprintf("-t, --token\t%s", usrCfg.Token))
+	fmt.Fprintln(w, fmt.Sprintf("-w, --workspace\t%s", usrCfg.Workspace))
+	fmt.Fprintln(w, fmt.Sprintf("-a, --api\t%s", apiCfg.BaseURL))
+	fmt.Fprintln(w, "")
 }
 
 func initConfigureCmd() {
