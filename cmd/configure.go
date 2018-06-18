@@ -96,7 +96,7 @@ func initConfigureCmd() {
 	configureCmd.Flags().StringP("workspace", "w", "", "directory for exercism exercises")
 	configureCmd.Flags().StringP("api", "a", "", "API base url")
 	configureCmd.Flags().BoolP("show", "s", false, "show the current configuration")
-	configureCmd.Flags().BoolP("skip-auth", "", false, "skip online token validation")
+	configureCmd.Flags().BoolP("skip-auth", "", false, "skip online token authorization check")
 
 	viperUserConfig = viper.New()
 	viperUserConfig.BindPFlag("token", configureCmd.Flags().Lookup("token"))
