@@ -65,6 +65,8 @@ You can also override certain default settings to suit your preferences.
 		}
 
 		switch {
+		case usrCfg.Token == "":
+			fmt.Fprintln(Out, "There is no token configured, please set it using --token.")
 		case cmd.Flags().Lookup("token").Changed:
 			// User set new token
 			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
@@ -72,17 +74,18 @@ You can also override certain default settings to suit your preferences.
 			if err != nil {
 				return err
 			}
-		case usrCfg.Token == "":
-			fmt.Fprintln(Out, "There is no token configured, please set it using --token.")
+			fmt.Fprintln(Out, "Token accepted")
 		default:
 			// Validate existing token
+			if !show {
+				defer printCurrentConfig()
+			}
 			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
 			err = api.ValidateToken(usrCfg.Token, skipAuth)
 			if err != nil {
-				if !show {
-					defer printCurrentConfig()
-				}
 				fmt.Fprintln(Out, err)
+			} else {
+				fmt.Fprintln(Out, "Token accepted")
 			}
 		}
 
