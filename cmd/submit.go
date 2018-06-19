@@ -36,7 +36,27 @@ If called with the name of an exercise, it will work out which
 track it is on and submit it. The command will ask for help
 figuring things out if necessary.
 `,
+	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		// check input before doing any other work
+		exercise, err := cmd.Flags().GetString("exercise")
+		if err != nil {
+			return err
+		}
+
+		trackId, err := cmd.Flags().GetString("track")
+		if err != nil {
+			return err
+		}
+
+		if len(args) == 0 && !(exercise != "" && trackId != "") {
+			return errors.New("must use --exercise and --track together with no args")
+		}
+
+		if len(args) > 0 && (exercise != "" || trackId != "") {
+			return errors.New("can't use flags and arguments together")
+		}
+
 		usrCfg, err := config.NewUserConfig()
 		if err != nil {
 			return err
@@ -45,14 +65,6 @@ figuring things out if necessary.
 		cliCfg, err := config.NewCLIConfig()
 		if err != nil {
 			return err
-		}
-
-		if len(args) == 0 {
-			cwd, err := os.Getwd()
-			if err != nil {
-				return err
-			}
-			args = []string{cwd}
 		}
 
 		// TODO: make sure we get the workspace configured.
@@ -65,16 +77,20 @@ figuring things out if necessary.
 		}
 
 		ws := workspace.New(usrCfg.Workspace)
+
+		// create directory from track and exercise slugs if needed
+		if (trackId != "" && exercise != "") {
+			args = []string{filepath.Join(ws.Dir, trackId, exercise)}
+		}
+
 		tx, err := workspace.NewTransmission(ws.Dir, args)
 		if err != nil {
 			return err
 		}
-
 		dirs, err := ws.Locate(tx.Dir)
 		if err != nil {
 			return err
 		}
-
 		sx, err := workspace.NewSolutions(dirs)
 		if err != nil {
 			return err
@@ -110,6 +126,7 @@ figuring things out if necessary.
 		if !solution.IsRequester {
 			return errors.New("not your solution")
 		}
+
 		track := cliCfg.Tracks[solution.Track]
 		if track == nil {
 			err := prepareTrack(solution.Track)
@@ -242,7 +259,8 @@ You can complete the exercise and unlock the next core exercise at:
 }
 
 func initSubmitCmd() {
-	// TODO
+	submitCmd.Flags().StringP("track", "t", "", "the track ID")
+	submitCmd.Flags().StringP("exercise", "e", "", "the exercise ID")
 }
 
 func init() {
