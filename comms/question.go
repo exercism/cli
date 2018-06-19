@@ -22,7 +22,7 @@ func (q Question) Read(r io.Reader) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	s = strings.Trim(s, "\n")
+	s = strings.TrimSpace(s)
 	if s == "" {
 		return q.DefaultValue, nil
 	}
