@@ -43,86 +43,103 @@ func TestSubmit(t *testing.T) {
 		relativePath: "README.md",
 		contents:     "The readme.",
 	}
-
-	cmdTest := &CommandTest{
+	// make a list of tests
+	cmdTestFlags := &CommandTest{
 		Cmd:                     submitCmd,
 		InitFn:                  initSubmitCmd,
 		MockInteractiveResponse: "\n",
 		Args: []string{"fakeapp", "submit", "-e", "bogus-exercise", "-t", "bogus-track"},
 	}
-	cmdTest.Setup(t)
-	defer cmdTest.Teardown(t)
-
-	// Create a temp dir for the config and the exercise files.
-	dir := filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise")
-	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
-
-	solution := &workspace.Solution{
-		ID:          "bogus-solution-uuid",
-		Track:       "bogus-track",
-		Exercise:    "bogus-exercise",
-		IsRequester: true,
+	cmdTestRelativeDir := &CommandTest{
+		Cmd:                     submitCmd,
+		InitFn:                  initSubmitCmd,
+		MockInteractiveResponse: "\n",
+		Args: []string{"fakeapp", "submit", filepath.Join("bogus-track", "bogus-exercise")},
 	}
-	err := solution.Write(dir)
-	assert.NoError(t, err)
+	tests := []*CommandTest{
+		cmdTestFlags,
+		cmdTestRelativeDir,
+	}
+	for _, cmdTest := range tests {
+		cmdTest.Setup(t)
+		defer cmdTest.Teardown(t)
 
-	for _, file := range []file{file1, file2, file3} {
-		err := ioutil.WriteFile(filepath.Join(dir, file.relativePath), []byte(file.contents), os.FileMode(0755))
+		// handle case when directory to submit needs the tmp dir prefix
+		if len(cmdTest.Args) == 3 {
+			cmdTest.Args[2] = filepath.Join(cmdTest.TmpDir, cmdTest.Args[2])
+		}
+
+		// Create a temp dir for the config and the exercise files.
+		dir := filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise")
+		os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
+
+		solution := &workspace.Solution{
+			ID:          "bogus-solution-uuid",
+			Track:       "bogus-track",
+			Exercise:    "bogus-exercise",
+			IsRequester: true,
+		}
+		err := solution.Write(dir)
 		assert.NoError(t, err)
-	}
 
-	// The fake endpoint will populate this when it receives the call from the command.
-	submittedFiles := map[string]string{}
-
-	// Set up the test server.
-	fakeEndpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseMultipartForm(2 << 10)
-		if err != nil {
-			t.Fatal(err)
+		for _, file := range []file{file1, file2, file3} {
+			err := ioutil.WriteFile(filepath.Join(dir, file.relativePath), []byte(file.contents), os.FileMode(0755))
+			assert.NoError(t, err)
 		}
-		mf := r.MultipartForm
 
-		files := mf.File["files[]"]
-		for _, fileHeader := range files {
-			file, err := fileHeader.Open()
+		// The fake endpoint will populate this when it receives the call from the command.
+		submittedFiles := map[string]string{}
+
+		// Set up the test server.
+		fakeEndpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			err := r.ParseMultipartForm(2 << 10)
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer file.Close()
-			body, err := ioutil.ReadAll(file)
-			if err != nil {
-				t.Fatal(err)
+			mf := r.MultipartForm
+
+			files := mf.File["files[]"]
+			for _, fileHeader := range files {
+				file, err := fileHeader.Open()
+				if err != nil {
+					t.Fatal(err)
+				}
+				defer file.Close()
+				body, err := ioutil.ReadAll(file)
+				if err != nil {
+					t.Fatal(err)
+				}
+				submittedFiles[fileHeader.Filename] = string(body)
 			}
-			submittedFiles[fileHeader.Filename] = string(body)
+		})
+		ts := httptest.NewServer(fakeEndpoint)
+		defer ts.Close()
+
+		// Create a fake user config.
+		usrCfg := config.NewEmptyUserConfig()
+		usrCfg.Workspace = cmdTest.TmpDir
+		usrCfg.APIBaseURL = ts.URL
+		err = usrCfg.Write()
+		assert.NoError(t, err)
+
+		// Create a fake CLI config.
+		cliCfg, err := config.NewCLIConfig()
+		assert.NoError(t, err)
+		cliCfg.Tracks["bogus-track"] = config.NewTrack("bogus-track")
+		err = cliCfg.Write()
+		assert.NoError(t, err)
+
+		// Write mock interactive input to In for the CLI command.
+		In = strings.NewReader(cmdTest.MockInteractiveResponse)
+
+		// Execute the command!
+		cmdTest.App.Execute()
+
+		// We got only the file we expected.
+		assert.Equal(t, 2, len(submittedFiles))
+		for _, file := range []file{file1, file2} {
+			path := string(os.PathSeparator) + file.relativePath
+			assert.Equal(t, file.contents, submittedFiles[path])
 		}
-	})
-	ts := httptest.NewServer(fakeEndpoint)
-	defer ts.Close()
-
-	// Create a fake user config.
-	usrCfg := config.NewEmptyUserConfig()
-	usrCfg.Workspace = cmdTest.TmpDir
-	usrCfg.APIBaseURL = ts.URL
-	err = usrCfg.Write()
-	assert.NoError(t, err)
-
-	// Create a fake CLI config.
-	cliCfg, err := config.NewCLIConfig()
-	assert.NoError(t, err)
-	cliCfg.Tracks["bogus-track"] = config.NewTrack("bogus-track")
-	err = cliCfg.Write()
-	assert.NoError(t, err)
-
-	// Write mock interactive input to In for the CLI command.
-	In = strings.NewReader(cmdTest.MockInteractiveResponse)
-
-	// Execute the command!
-	cmdTest.App.Execute()
-
-	// We got only the file we expected.
-	assert.Equal(t, 2, len(submittedFiles))
-	for _, file := range []file{file1, file2} {
-		path := string(os.PathSeparator) + file.relativePath
-		assert.Equal(t, file.contents, submittedFiles[path])
 	}
 }
