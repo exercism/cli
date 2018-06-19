@@ -18,6 +18,8 @@ func TestQuestion(t *testing.T) {
 		{"records interactive response", "hello\n", "", "hello"},
 		{"responds with default if response is empty", "\n", "Fine.", "Fine."},
 		{"removes trailing \\r in addition to trailing \\", "hello\r\n", "Fine.", "hello"},
+		{"removes trailing white spaces", "hello  \n", "Fine.", "hello"},
+		{"falls back to default value", "  \n", "Default", "Default"},
 	}
 	for _, test := range tests {
 		q := &Question{
