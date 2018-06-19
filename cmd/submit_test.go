@@ -48,7 +48,7 @@ func TestSubmit(t *testing.T) {
 		Cmd:                     submitCmd,
 		InitFn:                  initSubmitCmd,
 		MockInteractiveResponse: "\n",
-		Args: []string{"fakeapp", "submit", "bogus-exercise"},
+		Args: []string{"fakeapp", "submit", "-e", "bogus-exercise", "-t", "bogus-track"},
 	}
 	cmdTest.Setup(t)
 	defer cmdTest.Teardown(t)
