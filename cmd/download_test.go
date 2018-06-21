@@ -13,9 +13,37 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const payloadTemplate = `
+{
+	"solution": {
+		"id": "bogus-id",
+		"user": {
+			"handle": "alice",
+			"is_requester": true
+		},
+		"exercise": {
+			"id": "bogus-exercise",
+			"instructions_url": "http://example.com/bogus-exercise",
+			"auto_approve": false,
+			"track": {
+				"id": "bogus-track",
+				"language": "Bogus Language"
+			}
+		},
+		"file_download_base_url": "%s",
+		"files": [
+		"%s",
+		"%s",
+		"%s"
+		],
+		"iteration": {
+			"submitted_at": "2017-08-21t10:11:12.130z"
+		}
+	}
+}
+`
+
 func TestDownload(t *testing.T) {
-	// Let's not actually print to standard out while testing.
-	Out = ioutil.Discard
 
 	cmdTest := &CommandTest{
 		Cmd:    downloadCmd,
@@ -25,45 +53,66 @@ func TestDownload(t *testing.T) {
 	cmdTest.Setup(t)
 	defer cmdTest.Teardown(t)
 
-	// Write a fake user config setting the workspace to the temp dir.
-	userCfg := config.NewEmptyUserConfig()
-	userCfg.Workspace = cmdTest.TmpDir
-	err := userCfg.Write()
+	mockServer := makeMockServer()
+	defer mockServer.Close()
+
+	err := writeFakeUserConfigSetting(cmdTest.TmpDir)
+	assert.NoError(t, err)
+	err = writeFakeAPIConfigSetting(mockServer.URL)
 	assert.NoError(t, err)
 
-	payloadBody := `
-	{
-		"solution": {
-			"id": "bogus-id",
-			"user": {
-				"handle": "alice",
-				"is_requester": true
-			},
-			"exercise": {
-				"id": "bogus-exercise",
-				"instructions_url": "http://example.com/bogus-exercise",
-				"auto_approve": false,
-				"track": {
-					"id": "bogus-track",
-					"language": "Bogus Language"
-				}
-			},
-			"file_download_base_url": "%s",
-			"files": [
-			"%s",
-			"%s",
-			"%s"
-			],
-			"iteration": {
-				"submitted_at": "2017-08-21t10:11:12.130z"
-			}
-		}
+	testCases := []struct {
+		desc     string
+		path     string
+		contents string
+	}{
+		{
+			desc:     "It should download a file.",
+			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", "file-1.txt"),
+			contents: "this is file 1",
+		},
+		{
+			desc:     "It should download a file in a subdir.",
+			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", "subdir", "file-2.txt"),
+			contents: "this is file 2",
+		},
+		{
+			desc:     "It creates the .solution.json file.",
+			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", ".solution.json"),
+			contents: `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":true,"auto_approve":false}`,
+		},
 	}
-	`
 
+	cmdTest.App.Execute()
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			b, err := ioutil.ReadFile(tc.path)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.contents, string(b))
+		})
+	}
+
+	path := filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", "file-3.txt")
+	_, err = os.Lstat(path)
+	assert.True(t, os.IsNotExist(err), "It should not write the file if empty.")
+}
+
+func writeFakeUserConfigSetting(tmpDirPath string) error {
+	userCfg := config.NewEmptyUserConfig()
+	userCfg.Workspace = tmpDirPath
+	return userCfg.Write()
+}
+
+func writeFakeAPIConfigSetting(serverURL string) error {
+	apiCfg := config.NewEmptyAPIConfig()
+	apiCfg.BaseURL = serverURL
+	return apiCfg.Write()
+}
+
+func makeMockServer() *httptest.Server {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
-	defer server.Close()
 
 	path1 := "file-1.txt"
 	mux.HandleFunc("/"+path1, func(w http.ResponseWriter, r *http.Request) {
@@ -80,50 +129,11 @@ func TestDownload(t *testing.T) {
 		fmt.Fprint(w, "")
 	})
 
-	payloadBody = fmt.Sprintf(payloadBody, server.URL+"/", path1, path2, path3)
+	payloadBody := fmt.Sprintf(payloadTemplate, server.URL+"/", path1, path2, path3)
 	mux.HandleFunc("/solutions/latest", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, payloadBody)
 	})
 
-	// Write a fake api config setting the base url to the test server.
-	apiCfg := config.NewEmptyAPIConfig()
-	apiCfg.BaseURL = server.URL
-	err = apiCfg.Write()
-	assert.NoError(t, err)
+	return server
 
-	testCases := []struct {
-		desc     string
-		path     string
-		contents string
-	}{
-		{
-			desc:     "path with no subdir",
-			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", "file-1.txt"),
-			contents: "this is file 1",
-		},
-		{
-			desc:     "path with subdir",
-			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", "subdir", "file-2.txt"),
-			contents: "this is file 2",
-		},
-		{
-			desc:     "solution file",
-			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", ".solution.json"),
-			contents: `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":true,"auto_approve":false}`,
-		},
-	}
-
-	cmdTest.App.Execute()
-
-	for _, tc := range testCases {
-		t.Run(tc.desc, func(t *testing.T) {
-			b, err := ioutil.ReadFile(tc.path)
-			assert.NoError(t, err)
-			assert.Equal(t, tc.contents, string(b), "content of "+tc.path)
-		})
-	}
-
-	path := filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", path3)
-	_, err = os.Lstat(path)
-	assert.True(t, os.IsNotExist(err), "It doesn't write the empty file.")
 }
