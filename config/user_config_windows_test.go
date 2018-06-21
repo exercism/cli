@@ -40,7 +40,7 @@ func TestNormalizeWorkspace(t *testing.T) {
 	assert.NoError(t, err)
 
 	cfg := &UserConfig{Home: "C:\\Users\\alice"}
-	tests := []struct {
+	testCases := []struct {
 		in, out string
 	}{
 		{"", ""}, // don't make wild guesses
@@ -54,9 +54,13 @@ func TestNormalizeWorkspace(t *testing.T) {
 		{"relative///path", filepath.Join(cwd, "relative", "path")},
 	}
 
-	for _, test := range tests {
-		cfg.Workspace = test.in
-		cfg.Normalize()
-		assert.Equal(t, test.out, cfg.Workspace)
+	for _, tc := range testCases {
+		testName := "'" + tc.in + "' should be normalized as '" + tc.out + "'"
+
+		t.Run(testName, func(t *testing.T) {
+			cfg.Workspace = tc.in
+			cfg.Normalize()
+			assert.Equal(t, tc.out, cfg.Workspace, testName)
+		})
 	}
 }

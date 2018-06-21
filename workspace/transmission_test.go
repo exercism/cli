@@ -18,7 +18,7 @@ func TestNewTransmission(t *testing.T) {
 	fileBird := filepath.Join(dirBird, "hummingbird.txt")
 	fileSugar := filepath.Join(dirFeeder, "sugar.txt")
 
-	tests := []struct {
+	testCases := []struct {
 		desc string
 		args []string
 		ok   bool
@@ -65,18 +65,20 @@ func TestNewTransmission(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		tx, err := NewTransmission(root, test.args)
-		if test.ok {
-			assert.NoError(t, err, test.desc)
-		} else {
-			assert.Error(t, err, test.desc)
-		}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			tx, err := NewTransmission(root, tc.args)
+			if tc.ok {
+				assert.NoError(t, err, tc.desc)
+			} else {
+				assert.Error(t, err, tc.desc)
+			}
 
-		if test.tx != nil {
-			assert.Equal(t, test.tx.Files, tx.Files, test.desc)
-			assert.Equal(t, test.tx.Dir, tx.Dir, test.desc)
-		}
+			if tc.tx != nil {
+				assert.Equal(t, tc.tx.Files, tx.Files)
+				assert.Equal(t, tc.tx.Dir, tx.Dir)
+			}
+		})
 	}
 }
 

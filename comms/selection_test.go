@@ -78,7 +78,7 @@ func TestSelectionRead(t *testing.T) {
 }
 
 func TestSelectionPick(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		desc      string
 		selection Selection
 		things    []thing
@@ -111,16 +111,18 @@ func TestSelectionPick(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		test.selection.Writer = ioutil.Discard
-		for _, th := range test.things {
-			test.selection.Items = append(test.selection.Items, th)
-		}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			tc.selection.Writer = ioutil.Discard
+			for _, th := range tc.things {
+				tc.selection.Items = append(tc.selection.Items, th)
+			}
 
-		item, err := test.selection.Pick("which one? %s")
-		assert.NoError(t, err)
-		th, ok := item.(thing)
-		assert.True(t, ok)
-		assert.Equal(t, test.expected, th.name)
+			item, err := tc.selection.Pick("which one? %s")
+			assert.NoError(t, err)
+			th, ok := item.(thing)
+			assert.True(t, ok)
+			assert.Equal(t, tc.expected, th.name)
+		})
 	}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func TestQuestion(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		desc     string
 		given    string
 		fallback string
@@ -21,16 +21,18 @@ func TestQuestion(t *testing.T) {
 		{"removes trailing white spaces", "hello  \n", "Fine.", "hello"},
 		{"falls back to default value", "  \n", "Default", "Default"},
 	}
-	for _, test := range tests {
-		q := &Question{
-			Reader:       strings.NewReader(test.given),
-			Writer:       ioutil.Discard,
-			Prompt:       "Say something: ",
-			DefaultValue: test.fallback,
-		}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			q := &Question{
+				Reader:       strings.NewReader(tc.given),
+				Writer:       ioutil.Discard,
+				Prompt:       "Say something: ",
+				DefaultValue: tc.fallback,
+			}
 
-		answer, err := q.Ask()
-		assert.NoError(t, err)
-		assert.Equal(t, answer, test.expected, test.desc)
+			answer, err := q.Ask()
+			assert.NoError(t, err)
+			assert.Equal(t, answer, tc.expected)
+		})
 	}
 }

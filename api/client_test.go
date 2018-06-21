@@ -18,19 +18,20 @@ func TestNewRequestSetsDefaultHeaders(t *testing.T) {
 
 	UserAgent = "BogusAgent"
 
-	tests := []struct {
+	testCases := []struct {
+		desc        string
 		client      *Client
 		auth        string
 		contentType string
 	}{
 		{
-			// Use defaults.
+			desc:        "User defaults",
 			client:      &Client{},
 			auth:        "",
 			contentType: "application/json",
 		},
 		{
-			// Override defaults.
+			desc: "Override defaults",
 			client: &Client{
 				UserConfig:  &config.UserConfig{Token: "abc123"},
 				ContentType: "bogus",
@@ -40,12 +41,14 @@ func TestNewRequestSetsDefaultHeaders(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		req, err := test.client.NewRequest("GET", ts.URL, nil)
-		assert.NoError(t, err)
-		assert.Equal(t, "BogusAgent", req.Header.Get("User-Agent"))
-		assert.Equal(t, test.contentType, req.Header.Get("Content-Type"))
-		assert.Equal(t, test.auth, req.Header.Get("Authorization"))
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			req, err := tc.client.NewRequest("GET", ts.URL, nil)
+			assert.NoError(t, err)
+			assert.Equal(t, "BogusAgent", req.Header.Get("User-Agent"))
+			assert.Equal(t, tc.contentType, req.Header.Get("Content-Type"))
+			assert.Equal(t, tc.auth, req.Header.Get("Authorization"))
+		})
 	}
 }
 

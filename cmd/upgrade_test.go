@@ -26,7 +26,7 @@ func TestUpgrade(t *testing.T) {
 	Out = ioutil.Discard
 	defer func() { Out = oldOut }()
 
-	tests := []struct {
+	testCases := []struct {
 		desc     string
 		upToDate bool
 		expected bool
@@ -43,11 +43,13 @@ func TestUpgrade(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		fc := &fakeCLI{UpToDate: test.upToDate}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			fc := &fakeCLI{UpToDate: tc.upToDate}
 
-		err := updateCLI(fc)
-		assert.NoError(t, err)
-		assert.Equal(t, test.expected, fc.UpgradeCalled, test.desc)
+			err := updateCLI(fc)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expected, fc.UpgradeCalled)
+		})
 	}
 }
