@@ -44,7 +44,7 @@ func TestConfigure(t *testing.T) {
 			desc:           "It gets the default API base URL.",
 			args:           []string{"fakeapp", "configure"},
 			existingAPICfg: &config.APIConfig{},
-			expectedAPICfg: &config.APIConfig{BaseURL: "https://v2.exercism.io/api/v1"},
+			expectedAPICfg: &config.APIConfig{BaseURL: "https://mentors-beta.exercism.io/api/v1"},
 		},
 	}
 
