@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"path"
 	"text/tabwriter"
 
 	"github.com/exercism/cli/config"
@@ -34,7 +35,7 @@ You can also override certain default settings to suit your preferences.
 			return err
 		}
 		if usrCfg.Workspace == "" {
-			fmt.Println(usrCfg.Home + BinaryName)
+			usrCfg.Workspace = path.Join(usrCfg.Home, path.Base(BinaryName))
 		}
 
 		apiCfg := config.NewEmptyAPIConfig()
