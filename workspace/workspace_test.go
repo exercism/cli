@@ -55,29 +55,24 @@ func TestLocateErrors(t *testing.T) {
 	}
 }
 
+type locateTestCase struct {
+	desc      string
+	workspace Workspace
+	in        string
+	out       []string
+}
+
 func TestLocate(t *testing.T) {
 	_, cwd, _, _ := runtime.Caller(0)
 	root := filepath.Join(cwd, "..", "..", "fixtures", "locate-exercise")
 
 	wsPrimary := New(filepath.Join(root, "workspace"))
-	wsSymbolic := New(filepath.Join(root, "symlinked-workspace"))
 
-	tests := []struct {
-		desc      string
-		workspace Workspace
-		in        string
-		out       []string
-	}{
+	testCases := []locateTestCase{
 		{
 			desc:      "find absolute path within workspace",
 			workspace: wsPrimary,
 			in:        filepath.Join(wsPrimary.Dir, "creatures", "horse"),
-			out:       []string{filepath.Join(wsPrimary.Dir, "creatures", "horse")},
-		},
-		{
-			desc:      "find absolute path within symlinked workspace",
-			workspace: wsSymbolic,
-			in:        filepath.Join(wsSymbolic.Dir, "creatures", "horse"),
 			out:       []string{filepath.Join(wsPrimary.Dir, "creatures", "horse")},
 		},
 		{
@@ -93,12 +88,6 @@ func TestLocate(t *testing.T) {
 			out:       []string{filepath.Join(wsPrimary.Dir, "creatures", "horse")},
 		},
 		{
-			desc:      "find by name in a symlinked workspace",
-			workspace: wsSymbolic,
-			in:        "horse",
-			out:       []string{filepath.Join(wsPrimary.Dir, "creatures", "horse")},
-		},
-		{
 			desc:      "find by name in a subtree",
 			workspace: wsPrimary,
 			in:        "fly",
@@ -109,12 +98,6 @@ func TestLocate(t *testing.T) {
 			workspace: wsPrimary,
 			in:        "duck",
 			out:       []string{filepath.Join(wsPrimary.Dir, "creatures", "duck")},
-		},
-		{
-			desc:      "don't be confused by a symlinked file named the same as an exercise",
-			workspace: wsPrimary,
-			in:        "date",
-			out:       []string{filepath.Join(wsPrimary.Dir, "actions", "date")},
 		},
 		{
 			desc:      "find all the exercises with the same name",
@@ -134,25 +117,20 @@ func TestLocate(t *testing.T) {
 				filepath.Join(wsPrimary.Dir, "creatures", "crane-2"),
 			},
 		},
-		{
-			desc:      "find exercises that are symlinks",
-			workspace: wsPrimary,
-			in:        "squash",
-			out: []string{
-				filepath.Join(wsPrimary.Dir, "..", "food", "squash"),
-				filepath.Join(wsPrimary.Dir, "actions", "squash"),
-			},
-		},
 	}
 
-	for _, test := range tests {
-		dirs, err := test.workspace.Locate(test.in)
+	testLocate(testCases, t)
+}
+
+func testLocate(testCases []locateTestCase, t *testing.T) {
+	for _, tc := range testCases {
+		dirs, err := tc.workspace.Locate(tc.in)
 
 		sort.Strings(dirs)
-		sort.Strings(test.out)
+		sort.Strings(tc.out)
 
-		assert.NoError(t, err, test.desc)
-		assert.Equal(t, test.out, dirs, test.desc)
+		assert.NoError(t, err, tc.desc)
+		assert.Equal(t, tc.out, dirs, tc.desc)
 	}
 }
 

@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+	"runtime"
 	"testing"
 
 	"github.com/exercism/cli/config"
@@ -76,7 +78,12 @@ func makeTest(tc testCase) func(*testing.T) {
 		cmdTest.App.Execute()
 
 		if tc.expectedUsrCfg != nil {
+			if runtime.GOOS == "windows" {
+				tc.expectedUsrCfg.Normalize()
+			}
+
 			usrCfg, err := config.NewUserConfig()
+
 			assert.NoError(t, err, tc.desc)
 			assert.Equal(t, tc.expectedUsrCfg.Token, usrCfg.Token, tc.desc)
 			assert.Equal(t, tc.expectedUsrCfg.Workspace, usrCfg.Workspace, tc.desc)
@@ -86,6 +93,7 @@ func makeTest(tc testCase) func(*testing.T) {
 			apiCfg, err := config.NewAPIConfig()
 			assert.NoError(t, err, tc.desc)
 			assert.Equal(t, tc.expectedAPICfg.BaseURL, apiCfg.BaseURL, tc.desc)
+			os.Remove(apiCfg.File())
 		}
 	}
 }

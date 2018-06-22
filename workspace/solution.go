@@ -66,8 +66,13 @@ func (s *Solution) Write(dir string) error {
 	if err != nil {
 		return err
 	}
+
 	path := filepath.Join(dir, solutionFilename)
-	if err := ioutil.WriteFile(path, b, os.FileMode(0644)); err != nil {
+
+	// Hack because ioutil.WriteFile fails on hidden files
+	visibility.ShowFile(path)
+
+	if err := ioutil.WriteFile(path, b, os.FileMode(0600)); err != nil {
 		return err
 	}
 	s.Dir = dir
