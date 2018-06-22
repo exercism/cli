@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"path"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/exercism/cli/config"
@@ -34,8 +36,16 @@ You can also override certain default settings to suit your preferences.
 		if err != nil {
 			return err
 		}
+		usrCfg.Normalize()
 		if usrCfg.Workspace == "" {
-			usrCfg.Workspace = path.Join(usrCfg.Home, path.Base(BinaryName))
+			dirName := strings.Replace(path.Base(BinaryName), ".exe", "", 1)
+			defaultWorkspace := path.Join(usrCfg.Home, dirName)
+			_, err := os.Stat(defaultWorkspace)
+			// Sorry about the double negative.
+			if !os.IsNotExist(err) {
+				defaultWorkspace = fmt.Sprintf("%s-1", defaultWorkspace)
+			}
+			usrCfg.Workspace = defaultWorkspace
 		}
 
 		apiCfg := config.NewEmptyAPIConfig()
