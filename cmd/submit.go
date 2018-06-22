@@ -49,12 +49,22 @@ figuring things out if necessary.
 			return err
 		}
 
-		if len(args) == 0 && !(exercise != "" && trackId != "") {
-			return errors.New("must use --exercise and --track together with no args")
+		files, err := cmd.Flags().GetStringSlice("files")
+		if err != nil {
+			return err
 		}
 
-		if len(args) > 0 && (exercise != "" || trackId != "") {
-			return errors.New("can't use flags and arguments together")
+		// Verify correct usage of flags/args
+		if len(args) == 0 && len(files) == 0 && !(exercise != "" && trackId != "") {
+			return errors.New("must use --exercise and --track together")
+		}
+
+		if len(args) > 0 && (exercise != "" || trackId != "" || len(files) > 0) {
+			return errors.New("can't use flags and directory arguments together")
+		}
+
+		if len(files) > 0 && len(args) > 0 {
+			return errors.New("can't submit files and a directory together")
 		}
 
 		usrCfg, err := config.NewUserConfig()
@@ -79,8 +89,10 @@ figuring things out if necessary.
 		ws := workspace.New(usrCfg.Workspace)
 
 		// create directory from track and exercise slugs if needed
-		if (trackId != "" && exercise != "") {
+		if trackId != "" && exercise != "" {
 			args = []string{filepath.Join(ws.Dir, trackId, exercise)}
+		} else if len(files) > 0 {
+			args = files
 		}
 
 		tx, err := workspace.NewTransmission(ws.Dir, args)
@@ -261,6 +273,7 @@ You can complete the exercise and unlock the next core exercise at:
 func initSubmitCmd() {
 	submitCmd.Flags().StringP("track", "t", "", "the track ID")
 	submitCmd.Flags().StringP("exercise", "e", "", "the exercise ID")
+	submitCmd.Flags().StringSliceP("files", "f", make([]string, 0), "files to submit")
 }
 
 func init() {

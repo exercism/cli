@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -56,19 +57,33 @@ func TestSubmit(t *testing.T) {
 		MockInteractiveResponse: "\n",
 		Args: []string{"fakeapp", "submit", filepath.Join("bogus-track", "bogus-exercise")},
 	}
+	cmdTestFilesFlag := &CommandTest{
+		Cmd:                     submitCmd,
+		InitFn:                  initSubmitCmd,
+		MockInteractiveResponse: "\n",
+		Args: []string{"fakeapp", "submit", "--files"},
+	}
 	tests := []*CommandTest{
 		cmdTestFlags,
 		cmdTestRelativeDir,
+		cmdTestFilesFlag,
 	}
 	for _, cmdTest := range tests {
 		cmdTest.Setup(t)
 		defer cmdTest.Teardown(t)
 
 		// handle case when directory to submit needs the tmp dir prefix
-		if len(cmdTest.Args) == 3 {
+		if cmdTest.Args[2] == "--files" {
+			// prefix each file
+			filenames := make([]string, 2)
+			for i, file := range []file{file1, file2} {
+				filenames[i] = filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", file.relativePath)
+			}
+			filenameString := strings.Join(filenames, ",")
+			cmdTest.Args[2] = fmt.Sprintf("-f=%s", filenameString)
+		} else if len(cmdTest.Args) == 3 {
 			cmdTest.Args[2] = filepath.Join(cmdTest.TmpDir, cmdTest.Args[2])
 		}
-
 		// Create a temp dir for the config and the exercise files.
 		dir := filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise")
 		os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
