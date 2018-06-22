@@ -35,6 +35,7 @@ You can also override certain default settings to suit your preferences.
 		if err != nil {
 			return err
 		}
+		usrCfg.Normalize()
 		if usrCfg.Workspace == "" {
 			dirName := path.Base(BinaryName)
 			defaultWorkspace := path.Join(usrCfg.Home, dirName)
