@@ -6,6 +6,10 @@ import (
 	"runtime"
 )
 
+var (
+	SubdirectoryName = "exercism"
+)
+
 // Dir is the configured config home directory.
 // All the cli-related config files live in this directory.
 func Dir() string {
@@ -13,7 +17,7 @@ func Dir() string {
 	if runtime.GOOS == "windows" {
 		dir = os.Getenv("APPDATA")
 		if dir != "" {
-			return filepath.Join(dir, "exercism")
+			return filepath.Join(dir, SubdirectoryName)
 		}
 	} else {
 		dir := os.Getenv("EXERCISM_CONFIG_HOME")
@@ -25,7 +29,7 @@ func Dir() string {
 			dir = filepath.Join(os.Getenv("HOME"), ".config")
 		}
 		if dir != "" {
-			return filepath.Join(dir, "exercism")
+			return filepath.Join(dir, SubdirectoryName)
 		}
 	}
 	// If all else fails, use the current directory.

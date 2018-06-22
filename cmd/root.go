@@ -7,6 +7,7 @@ import (
 	"runtime"
 
 	"github.com/exercism/cli/api"
+	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/debug"
 	"github.com/spf13/cobra"
 )
@@ -48,6 +49,7 @@ func Execute() {
 
 func init() {
 	BinaryName = os.Args[0]
+	config.SubdirectoryName = BinaryName
 	Out = os.Stdout
 	In = os.Stdin
 	api.UserAgent = fmt.Sprintf("github.com/exercism/cli v%s (%s/%s)", Version, runtime.GOOS, runtime.GOARCH)
