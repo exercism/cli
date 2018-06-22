@@ -29,7 +29,7 @@ var (
 var RootCmd = &cobra.Command{
 	Use:   BinaryName,
 	Short: "A friendly command-line interface to Exercism.",
-	Long: `A command-line interface for https://v2.exercism.io.
+	Long: `A command-line interface for the v2 redesign of Exercism.
 
 Download exercises and submit your solutions.`,
 	SilenceUsage: true,

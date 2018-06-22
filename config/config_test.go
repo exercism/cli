@@ -95,3 +95,19 @@ func TestFakeConfig(t *testing.T) {
 	assert.Equal(t, "b", cfg.Letter)
 	assert.Equal(t, 1, cfg.Number)
 }
+
+func TestInferSiteURL(t *testing.T) {
+	testCases := []struct {
+		api, url string
+	}{
+		{"https://api.exercism.io/v1", "https://exercism.io"},
+		{"https://v2.exercism.io/api/v1", "https://v2.exercism.io"},
+		{"https://mentors-beta.exercism.io/api/v1", "https://mentors-beta.exercism.io"},
+		{"http://localhost:3000/api/v1", "http://localhost:3000"},
+		{"http://whatever", "http://whatever"}, // you're on your own, pal
+	}
+
+	for _, tc := range testCases {
+		assert.Equal(t, InferSiteURL(tc.api), tc.url)
+	}
+}

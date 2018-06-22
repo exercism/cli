@@ -69,7 +69,13 @@ func NewStatus(c *CLI, uc config.UserConfig) Status {
 func (status *Status) Check() (string, error) {
 	status.Version = newVersionStatus(status.cli)
 	status.System = newSystemStatus()
-	status.Configuration = newConfigurationStatus(status)
+
+	cs, err := newConfigurationStatus(status)
+	if err != nil {
+		return "", err
+	}
+	status.Configuration = cs
+
 	ar, err := newAPIReachabilityStatus()
 	if err != nil {
 		return "", err
@@ -94,6 +100,7 @@ func newAPIReachabilityStatus() (apiReachabilityStatus, error) {
 	if err != nil {
 		return apiReachabilityStatus{}, nil
 	}
+	apiCfg.SetDefaults()
 	ar := apiReachabilityStatus{
 		Services: []*apiPing{
 			{Service: "GitHub", URL: "https://api.github.com"},
@@ -137,18 +144,23 @@ func newSystemStatus() systemStatus {
 	return ss
 }
 
-func newConfigurationStatus(status *Status) configurationStatus {
+func newConfigurationStatus(status *Status) (configurationStatus, error) {
+	apiCfg, err := config.NewAPIConfig()
+	if err != nil {
+		return configurationStatus{}, err
+	}
+	apiCfg.SetDefaults()
 	cs := configurationStatus{
 		Home:      status.cfg.Home,
 		Workspace: status.cfg.Workspace,
 		File:      status.cfg.File(),
 		Token:     status.cfg.Token,
-		TokenURL:  "http://exercism.io/account/key",
+		TokenURL:  config.InferSiteURL(apiCfg.BaseURL) + "/my/settings",
 	}
 	if status.Censor && status.cfg.Token != "" {
 		cs.Token = redactToken(status.cfg.Token)
 	}
-	return cs
+	return cs, nil
 }
 
 func (ping *apiPing) Call(wg *sync.WaitGroup) {

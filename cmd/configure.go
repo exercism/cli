@@ -39,6 +39,7 @@ You can also override certain default settings to suit your preferences.
 		if err != nil {
 			return err
 		}
+		apiCfg.SetDefaults()
 
 		show, err := cmd.Flags().GetBool("show")
 		if err != nil {
@@ -67,7 +68,7 @@ You can also override certain default settings to suit your preferences.
 }
 
 func initConfigureCmd() {
-	configureCmd.Flags().StringP("token", "t", "", "authentication token used to connect to exercism.io")
+	configureCmd.Flags().StringP("token", "t", "", "authentication token used to connect to the site")
 	configureCmd.Flags().StringP("workspace", "w", "", "directory for exercism exercises")
 	configureCmd.Flags().StringP("api", "a", "", "API base url")
 	configureCmd.Flags().BoolP("show", "s", false, "show the current configuration")
