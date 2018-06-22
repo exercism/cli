@@ -61,6 +61,10 @@ func (ws Workspace) Locate(exercise string) ([]string, error) {
 	var paths []string
 	// Look through the entire workspace tree to find any matches.
 	walkFn := func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
 		// If it's a symlink, follow it, then get the file info of the target.
 		if info.Mode()&os.ModeSymlink == os.ModeSymlink {
 			src, err := filepath.EvalSymlinks(path)
