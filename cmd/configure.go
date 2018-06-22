@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"text/tabwriter"
 
@@ -35,7 +36,14 @@ You can also override certain default settings to suit your preferences.
 			return err
 		}
 		if usrCfg.Workspace == "" {
-			usrCfg.Workspace = path.Join(usrCfg.Home, path.Base(BinaryName))
+			dirName := path.Base(BinaryName)
+			defaultWorkspace := path.Join(usrCfg.Home, dirName)
+			_, err := os.Stat(defaultWorkspace)
+			// Sorry about the double negative.
+			if !os.IsNotExist(err) {
+				defaultWorkspace = fmt.Sprintf("%s-1", defaultWorkspace)
+			}
+			usrCfg.Workspace = defaultWorkspace
 		}
 
 		apiCfg := config.NewEmptyAPIConfig()
