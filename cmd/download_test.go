@@ -56,7 +56,7 @@ func TestDownload(t *testing.T) {
 	cmdTest := &CommandTest{
 		Cmd:    downloadCmd,
 		InitFn: initDownloadCmd,
-		Args:   []string{"fakeapp", "download", "bogus-exercise"},
+		Args:   []string{"fakeapp", "download", "--exercise=bogus-exercise"},
 	}
 	cmdTest.Setup(t)
 	defer cmdTest.Teardown(t)
