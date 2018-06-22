@@ -9,7 +9,7 @@ import (
 
 // Version is the version of the current build.
 // It follows semantic versioning.
-const Version = "3.0.0-alpha.4"
+const Version = "3.0.0-alpha.8.v2"
 
 // checkLatest flag for version command.
 var checkLatest bool
