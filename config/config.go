@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/spf13/viper"
 )
@@ -59,4 +60,14 @@ func ensureDir(f filer) error {
 		return os.MkdirAll(dir, os.FileMode(0755))
 	}
 	return err
+}
+
+// InferSiteURL guesses what the website URL is.
+// The basis for the guess is which API we're submitting to.
+func InferSiteURL(apiURL string) string {
+	if apiURL == "https://api.exercism.io/v1" {
+		return "https://exercism.io"
+	}
+	re := regexp.MustCompile("^(https?://[^/]*).*")
+	return re.ReplaceAllString(apiURL, "$1")
 }
