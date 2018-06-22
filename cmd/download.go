@@ -29,7 +29,7 @@ latest solution.
 
 Download other people's solutions by providing the UUID.
 `,
-	Args: cobra.ExactArgs(1),
+	Args: cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		token, err := cmd.Flags().GetString("token")
 		if err != nil {
@@ -45,9 +45,12 @@ Download other people's solutions by providing the UUID.
 		if err != nil {
 			return err
 		}
-		if uuid == "" && len(args) == 0 {
-			// TODO: usage
-			return errors.New("need an exercise name or a solution --uuid")
+		exercise, err := cmd.Flags().GetString("exercise")
+		if err != nil {
+			return err
+		}
+		if uuid == "" && exercise == "" {
+			return errors.New("need an --exercise name or a solution --uuid")
 		}
 		usrCfg, err := config.NewUserConfig()
 		if err != nil {
@@ -75,10 +78,6 @@ Download other people's solutions by providing the UUID.
 		track, err := cmd.Flags().GetString("track")
 		if err != nil {
 			return err
-		}
-		var exercise string
-		if len(args) > 0 {
-			exercise = args[0]
 		}
 
 		if uuid == "" {
@@ -222,6 +221,7 @@ type downloadPayload struct {
 func initDownloadCmd() {
 	downloadCmd.Flags().StringP("uuid", "u", "", "the solution UUID")
 	downloadCmd.Flags().StringP("track", "t", "", "the track ID")
+	downloadCmd.Flags().StringP("exercise", "e", "", "the exercise ID")
 	downloadCmd.Flags().StringP("token", "k", "", "authentication token used to connect to the site")
 }
 
