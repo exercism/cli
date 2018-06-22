@@ -33,6 +33,9 @@ You can also override certain default settings to suit your preferences.
 		if err != nil {
 			return err
 		}
+		if usrCfg.Workspace == "" {
+			fmt.Println(usrCfg.Home + BinaryName)
+		}
 
 		apiCfg := config.NewEmptyAPIConfig()
 		err = apiCfg.Load(viperAPIConfig)
