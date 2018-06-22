@@ -3,11 +3,11 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
@@ -210,7 +210,7 @@ type downloadPayload struct {
 func initDownloadCmd() {
 	downloadCmd.Flags().StringP("uuid", "u", "", "the solution UUID")
 	downloadCmd.Flags().StringP("track", "t", "", "the track ID")
-	downloadCmd.Flags().StringP("token", "k", "", "authentication token used to connect to exercism.io")
+	downloadCmd.Flags().StringP("token", "k", "", "authentication token used to connect to the site")
 }
 
 func init() {

@@ -87,7 +87,8 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 		// TODO: if it's json, and it has an error key, print the message.
 		return nil, fmt.Errorf("%s", res.Status)
 	case http.StatusUnauthorized:
-		return nil, fmt.Errorf("unauthorized request. Please run the configure command to set the api token found at https://v2.exercism.io/my/settings")
+		siteURL := config.InferSiteURL(c.APIConfig.BaseURL)
+		return nil, fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
 	default:
 		if v != nil {
 			defer res.Body.Close()
