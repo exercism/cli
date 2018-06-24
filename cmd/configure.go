@@ -70,22 +70,26 @@ You can also override certain default settings to suit your preferences.
 		case cmd.Flags().Lookup("token").Changed:
 			// User set new token
 			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
-			err = api.ValidateToken(usrCfg.Token, skipAuth)
-			if err != nil {
-				return err
+			if !skipAuth {
+				err = api.ValidateToken()
+				if err != nil {
+					return err
+				}
+				fmt.Fprintln(Out, "Token accepted")
 			}
-			fmt.Fprintln(Out, "Token accepted")
 		default:
 			// Validate existing token
 			if !show {
 				defer printCurrentConfig()
 			}
 			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
-			err = api.ValidateToken(usrCfg.Token, skipAuth)
-			if err != nil {
-				fmt.Fprintln(Out, err)
-			} else {
-				fmt.Fprintln(Out, "Token accepted")
+			if !skipAuth {
+				err = api.ValidateToken()
+				if err != nil {
+					fmt.Fprintln(Out, err)
+				} else {
+					fmt.Fprintln(Out, "Token accepted")
+				}
 			}
 		}
 
