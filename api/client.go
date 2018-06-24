@@ -102,9 +102,8 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	return res, nil
 }
 
-// checkAuthorization calls the API to check if
-// the client is authorized.
-func (c *Client) checkAuthorization() error {
+// ValidateToken calls the API to determine whether the token is valid.
+func (c *Client) ValidateToken() error {
 	url := c.APIConfig.URL("validate")
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
