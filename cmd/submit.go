@@ -212,7 +212,8 @@ figuring things out if necessary.
 		if err != nil {
 			return err
 		}
-		req, err := client.NewRequest("PATCH", apiCfg.URL("submit", solution.ID), body)
+		url := fmt.Sprintf("%s/solutions/%s", apiCfg.BaseURL, solution.ID)
+		req, err := client.NewRequest("PATCH", url, body)
 		if err != nil {
 			return err
 		}

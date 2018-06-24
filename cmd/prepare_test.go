@@ -37,7 +37,6 @@ func TestPrepareTrack(t *testing.T) {
 
 	apiCfg := config.NewEmptyAPIConfig()
 	apiCfg.BaseURL = ts.URL
-	apiCfg.Endpoints = map[string]string{"prepare-track": "?%s"}
 	err := apiCfg.Write()
 	assert.NoError(t, err)
 

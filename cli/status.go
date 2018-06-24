@@ -104,7 +104,7 @@ func newAPIReachabilityStatus() (apiReachabilityStatus, error) {
 	ar := apiReachabilityStatus{
 		Services: []*apiPing{
 			{Service: "GitHub", URL: "https://api.github.com"},
-			{Service: "Exercism", URL: apiCfg.URL("ping")},
+			{Service: "Exercism", URL: fmt.Sprintf("%s/ping", apiCfg.BaseURL)},
 		},
 	}
 	var wg sync.WaitGroup

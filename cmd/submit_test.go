@@ -112,7 +112,6 @@ func TestSubmit(t *testing.T) {
 	apiCfg, err := config.NewAPIConfig()
 	assert.NoError(t, err)
 	apiCfg.BaseURL = ts.URL
-	apiCfg.Endpoints["submit"] = "?%s"
 	err = apiCfg.Write()
 	assert.NoError(t, err)
 
