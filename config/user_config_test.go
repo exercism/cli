@@ -21,6 +21,7 @@ func TestUserConfig(t *testing.T) {
 	}
 	cfg.Token = "a"
 	cfg.Workspace = "/a"
+	cfg.APIBaseURL = "http://example.com"
 
 	// write it
 	err = cfg.Write()
@@ -34,4 +35,5 @@ func TestUserConfig(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "a", cfg.Token)
 	assert.Equal(t, "/a", cfg.Workspace)
+	assert.Equal(t, "http://example.com", cfg.APIBaseURL)
 }

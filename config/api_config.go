@@ -6,10 +6,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	defaultBaseURL = "https://v2.exercism.io/api/v1"
-)
-
 // APIConfig provides API-specific configuration values.
 type APIConfig struct {
 	*Config

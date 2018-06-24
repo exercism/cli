@@ -71,6 +71,7 @@ func makeTest(tc testCase) func(*testing.T) {
 			cfg := config.NewEmptyUserConfig()
 			cfg.Token = tc.existingUsrCfg.Token
 			cfg.Workspace = tc.existingUsrCfg.Workspace
+			cfg.APIBaseURL = tc.existingUsrCfg.APIBaseURL
 			err := cfg.Write()
 			assert.NoError(t, err, tc.desc)
 		}
