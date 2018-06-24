@@ -22,20 +22,24 @@ The next time you upgrade, the hidden file will be overwritten.
 You can always delete this file.
 	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		quiet, _ := cmd.Flags().GetBool("quiet")
+
 		c := cli.New(Version)
-		return updateCLI(c)
+		return updateCLI(c, quiet)
 	},
 }
 
 // updateCLI updates CLI to the latest available version, if it is out of date.
-func updateCLI(c cli.Updater) error {
+func updateCLI(c cli.Updater, quiet bool) error {
 	ok, err := c.IsUpToDate()
 	if err != nil {
 		return err
 	}
 
 	if ok {
-		fmt.Fprintln(Out, "Your CLI version is up to date.")
+		if !quiet {
+			fmt.Fprintln(Out, "Your CLI version is up to date.")
+		}
 		return nil
 	}
 
