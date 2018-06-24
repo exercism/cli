@@ -35,8 +35,8 @@ func NewEmptyUserConfig() *UserConfig {
 	}
 }
 
-// Normalize ensures that we have proper values where possible.
-func (cfg *UserConfig) Normalize() {
+// SetDefaults ensures that we have proper values where possible.
+func (cfg *UserConfig) SetDefaults() {
 	if cfg.Home == "" {
 		cfg.Home = userHome()
 	}
@@ -45,7 +45,7 @@ func (cfg *UserConfig) Normalize() {
 
 // Write stores the config to disk.
 func (cfg *UserConfig) Write() error {
-	cfg.Normalize()
+	cfg.SetDefaults()
 	return Write(cfg)
 }
 

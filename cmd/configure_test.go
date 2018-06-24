@@ -79,7 +79,7 @@ func makeTest(tc testCase) func(*testing.T) {
 
 		if tc.expectedUsrCfg != nil {
 			if runtime.GOOS == "windows" {
-				tc.expectedUsrCfg.Normalize()
+				tc.expectedUsrCfg.SetDefaults()
 			}
 
 			usrCfg, err := config.NewUserConfig()
