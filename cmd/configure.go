@@ -75,7 +75,6 @@ You can also override certain default settings to suit your preferences.
 				if err != nil {
 					return err
 				}
-				fmt.Fprintln(Out, "Token accepted")
 			}
 		default:
 			// Validate existing token
@@ -87,8 +86,6 @@ You can also override certain default settings to suit your preferences.
 				err = api.ValidateToken()
 				if err != nil {
 					fmt.Fprintln(Out, err)
-				} else {
-					fmt.Fprintln(Out, "Token accepted")
 				}
 			}
 		}
