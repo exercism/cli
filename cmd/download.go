@@ -30,6 +30,8 @@ Download other people's solutions by providing the UUID.
 `,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		quiet, _ := cmd.Flags().GetBool("quiet")
+
 		token, err := cmd.Flags().GetString("token")
 		if err != nil {
 			return err
@@ -171,6 +173,11 @@ Download other people's solutions by providing the UUID.
 			if err != nil {
 				return err
 			}
+		}
+
+		if quiet {
+			fmt.Fprintln(Out, solution.Dir)
+			return nil
 		}
 
 		fmt.Fprintf(Out, "\nDownloaded to\n%s\n", solution.Dir)
