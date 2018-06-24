@@ -22,7 +22,7 @@ func TestConfigure(t *testing.T) {
 	testCases := []testCase{
 		testCase{
 			desc:           "It writes the flags when there is no config file.",
-			args:           []string{"fakeapp", "configure", "--token", "a", "--workspace", "/a", "--api", "http://example.com"},
+			args:           []string{"fakeapp", "configure", "--token", "a", "--workspace", "/a", "--api", "http://example.com", "--skip-auth"},
 			existingUsrCfg: nil,
 			expectedUsrCfg: &config.UserConfig{Token: "a", Workspace: "/a"},
 			existingAPICfg: nil,
@@ -30,7 +30,7 @@ func TestConfigure(t *testing.T) {
 		},
 		testCase{
 			desc:           "It overwrites the flags in the config file.",
-			args:           []string{"fakeapp", "configure", "--token", "b", "--workspace", "/b", "--api", "http://example.com/v2"},
+			args:           []string{"fakeapp", "configure", "--token", "b", "--workspace", "/b", "--api", "http://example.com/v2", "--skip-auth"},
 			existingUsrCfg: &config.UserConfig{Token: "token-b", Workspace: "/workspace-b"},
 			expectedUsrCfg: &config.UserConfig{Token: "b", Workspace: "/b"},
 			existingAPICfg: &config.APIConfig{BaseURL: "http://example.com/v1"},
@@ -38,13 +38,13 @@ func TestConfigure(t *testing.T) {
 		},
 		testCase{
 			desc:           "It overwrites the flags that are passed, without losing the ones that are not.",
-			args:           []string{"fakeapp", "configure", "--token", "c"},
+			args:           []string{"fakeapp", "configure", "--token", "c", "--skip-auth"},
 			existingUsrCfg: &config.UserConfig{Token: "token-c", Workspace: "/workspace-c"},
 			expectedUsrCfg: &config.UserConfig{Token: "c", Workspace: "/workspace-c"},
 		},
 		testCase{
 			desc:           "It gets the default API base URL.",
-			args:           []string{"fakeapp", "configure"},
+			args:           []string{"fakeapp", "configure", "--skip-auth"},
 			existingAPICfg: &config.APIConfig{},
 			expectedAPICfg: &config.APIConfig{BaseURL: "https://v2.exercism.io/api/v1"},
 		},
