@@ -172,6 +172,7 @@ Download other people's solutions by providing the UUID.
 				return err
 			}
 		}
+
 		fmt.Fprintf(Out, "\nDownloaded to\n%s\n", solution.Dir)
 		return nil
 	},
