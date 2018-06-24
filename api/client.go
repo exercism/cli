@@ -67,6 +67,7 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	debug.DumpResponse(res)
 	return res, nil
 }
