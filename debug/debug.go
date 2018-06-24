@@ -31,6 +31,7 @@ func Printf(format string, args ...interface{}) {
 	}
 }
 
+// DumpRequest dumps out the provided http.Request
 func DumpRequest(req *http.Request) {
 	if !Verbose {
 		return
@@ -53,6 +54,7 @@ func DumpRequest(req *http.Request) {
 	req.Body = ioutil.NopCloser(&bodyCopy)
 }
 
+// DumpResponse dumps out the provided http.Response
 func DumpResponse(res *http.Response) {
 	if !Verbose {
 		return
@@ -72,5 +74,5 @@ func DumpResponse(res *http.Response) {
 	Println("========================= END DumpResponse =========================")
 	Println("")
 
-	res.Body = ioutil.NopCloser(&bodyCopy)
+	res.Body = ioutil.NopCloser(body)
 }
