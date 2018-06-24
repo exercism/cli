@@ -90,7 +90,7 @@ Download other people's solutions by providing the UUID.
 			req.URL.RawQuery = q.Encode()
 		}
 
-		res, err := client.Do(req, nil)
+		res, err := client.Do(req)
 		if err != nil {
 			return err
 		}
@@ -152,7 +152,7 @@ Download other people's solutions by providing the UUID.
 				return err
 			}
 
-			res, err := client.Do(req, nil)
+			res, err := client.Do(req)
 			if err != nil {
 				return err
 			}
