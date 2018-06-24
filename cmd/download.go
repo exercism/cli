@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -89,10 +90,20 @@ Download other people's solutions by providing the UUID.
 			req.URL.RawQuery = q.Encode()
 		}
 
-		payload := &downloadPayload{}
-		res, err := client.Do(req, payload)
+		res, err := client.Do(req, nil)
 		if err != nil {
 			return err
+		}
+
+		payload := &downloadPayload{}
+		defer res.Body.Close()
+		if err := json.NewDecoder(res.Body).Decode(payload); err != nil {
+			return fmt.Errorf("unable to parse API response - %s", err)
+		}
+
+		if res.StatusCode == http.StatusUnauthorized {
+			siteURL := config.InferSiteURL(usrCfg.APIBaseURL)
+			return fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
 		}
 
 		if res.StatusCode != http.StatusOK {
