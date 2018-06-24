@@ -35,9 +35,9 @@ func TestPrepareTrack(t *testing.T) {
 	ts := httptest.NewServer(fakeEndpoint)
 	defer ts.Close()
 
-	cfg := config.NewEmptyUserConfig()
-	cfg.APIBaseURL = ts.URL
-	err := cfg.Write()
+	usrCfg := config.NewEmptyUserConfig()
+	usrCfg.APIBaseURL = ts.URL
+	err := usrCfg.Write()
 	assert.NoError(t, err)
 
 	cmdTest.App.Execute()

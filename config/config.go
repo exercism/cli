@@ -12,6 +12,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	defaultBaseURL = "https://v2.exercism.io/api/v1"
+)
+
 // Config is a wrapper around a viper configuration.
 type Config struct {
 	dir  string
