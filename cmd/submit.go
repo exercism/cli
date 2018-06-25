@@ -37,6 +37,8 @@ track it is on and submit it. The command will ask for help
 figuring things out if necessary.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		quiet, _ := cmd.Flags().GetBool("quiet")
+
 		usrCfg, err := config.NewUserConfig()
 		if err != nil {
 			return err
@@ -100,7 +102,9 @@ figuring things out if necessary.
 			}
 			s, ok := option.(*workspace.Solution)
 			if !ok {
-				fmt.Fprintf(Out, "something went wrong trying to pick that solution, not sure what happened")
+				if !quiet {
+					fmt.Fprintf(Out, "something went wrong trying to pick that solution, not sure what happened")
+				}
 				continue
 			}
 			solution = s
@@ -162,10 +166,14 @@ figuring things out if necessary.
 				return err
 			}
 			if strings.ToLower(answer) != "y" {
-				fmt.Fprintf(Out, "Submit cancelled.\nTry submitting individually instead.")
+				if !quiet {
+					fmt.Fprintf(Out, "Submit cancelled.\nTry submitting individually instead.")
+				}
 				return nil
 			}
-			fmt.Fprintf(Out, "Submitting files now...")
+			if !quiet {
+				fmt.Fprintf(Out, "Submitting files now...")
+			}
 		}
 
 		for _, path := range paths {
@@ -231,10 +239,12 @@ figuring things out if necessary.
 		}
 
 		if solution.AutoApprove == true {
-			fmt.Fprintf(Out, "Your solution has been submitted " +
-				"successfully and has been auto-approved. You can complete " +
-				"the exercise and unlock the next core exercise at %s\n",
-				solution.URL)
+			if !quiet {
+				fmt.Fprintf(Out, "Your solution has been submitted "+
+					"successfully and has been auto-approved. You can complete "+
+					"the exercise and unlock the next core exercise at %s\n",
+					solution.URL)
+			}
 		} else {
 			//TODO
 		}

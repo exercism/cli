@@ -26,6 +26,12 @@ To check for the latest available version, call the command with the
 	`,
 
 	RunE: func(cmd *cobra.Command, args []string) error {
+		quiet, _ := cmd.Flags().GetBool("quiet")
+		if quiet {
+			fmt.Fprintln(Out, Version)
+			return nil
+		}
+
 		fmt.Println(currentVersion())
 
 		if checkLatest {
