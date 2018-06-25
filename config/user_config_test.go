@@ -37,7 +37,7 @@ func TestUserConfig(t *testing.T) {
 	assert.Equal(t, "/a", cfg.Workspace)
 }
 
-func TestNormalizeWorkspace(t *testing.T) {
+func TestSetDefaultWorkspace(t *testing.T) {
 	cwd, err := os.Getwd()
 	assert.NoError(t, err)
 
@@ -58,7 +58,7 @@ func TestNormalizeWorkspace(t *testing.T) {
 		testName := "'" + tc.in + "' should be normalized as '" + tc.out + "'"
 		t.Run(testName, func(t *testing.T) {
 			cfg.Workspace = tc.in
-			cfg.Normalize()
+			cfg.SetDefaults()
 			assert.Equal(t, tc.out, cfg.Workspace, testName)
 		})
 	}
