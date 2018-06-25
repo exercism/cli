@@ -42,7 +42,7 @@ You can also override certain default settings to suit your preferences.
 		if err != nil {
 			return err
 		}
-		apiCfg.SetDefaults()
+		apiCfg.BaseURL = usrCfg.APIBaseURL
 
 		show, err := cmd.Flags().GetBool("show")
 		if err != nil {
@@ -51,7 +51,7 @@ You can also override certain default settings to suit your preferences.
 		if show {
 			defer printCurrentConfig()
 		}
-		client, err := api.NewClient(usrCfg.Token, apiCfg.BaseURL)
+		client, err := api.NewClient(usrCfg.Token, usrCfg.APIBaseURL)
 		if err != nil {
 			return err
 		}
@@ -121,9 +121,9 @@ func initConfigureCmd() {
 	viperUserConfig = viper.New()
 	viperUserConfig.BindPFlag("token", configureCmd.Flags().Lookup("token"))
 	viperUserConfig.BindPFlag("workspace", configureCmd.Flags().Lookup("workspace"))
+	viperUserConfig.BindPFlag("apibaseurl", configureCmd.Flags().Lookup("api"))
 
 	viperAPIConfig = viper.New()
-	viperAPIConfig.BindPFlag("baseurl", configureCmd.Flags().Lookup("api"))
 }
 
 func init() {
