@@ -175,7 +175,7 @@ func newConfigurationStatus(status *Status) configurationStatus {
 		TokenURL:  config.InferSiteURL(status.cfg.APIBaseURL) + "/my/settings",
 	}
 	if status.Censor && status.cfg.Token != "" {
-		cs.Token = redactToken(status.cfg.Token)
+		cs.Token = redact(status.cfg.Token)
 	}
 	return cs
 }
@@ -195,7 +195,7 @@ func (ping *apiPing) Call(wg *sync.WaitGroup) {
 	ping.Status = "connected"
 }
 
-func redactToken(token string) string {
+func redact(token string) string {
 	str := token[4 : len(token)-3]
 	redaction := strings.Repeat("*", len(str))
 	return string(token[:4]) + redaction + string(token[len(token)-3:])
