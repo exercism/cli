@@ -59,7 +59,7 @@ Download other people's solutions by providing the UUID.
 		} else {
 			slug = uuid
 		}
-		url := apiCfg.URL("download", slug)
+		url := fmt.Sprintf("%s/solutions/%s", apiCfg.BaseURL, slug)
 
 		client, err := api.NewClient()
 		if err != nil {

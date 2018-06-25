@@ -104,7 +104,7 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 
 // ValidateToken calls the API to determine whether the token is valid.
 func (c *Client) ValidateToken() error {
-	url := c.APIConfig.URL("validate")
+	url := fmt.Sprintf("%s/validate_token", c.APIConfig.BaseURL)
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
 		return err

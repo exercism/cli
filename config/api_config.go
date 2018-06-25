@@ -1,28 +1,19 @@
 package config
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/spf13/viper"
 )
 
 var (
-	defaultBaseURL   = "https://v2.exercism.io/api/v1"
-	defaultEndpoints = map[string]string{
-		"download":      "/solutions/%s",
-		"submit":        "/solutions/%s",
-		"prepare-track": "/tracks/%s",
-		"ping":          "/ping",
-		"validate":      "/validate_token",
-	}
+	defaultBaseURL = "https://v2.exercism.io/api/v1"
 )
 
 // APIConfig provides API-specific configuration values.
 type APIConfig struct {
 	*Config
-	BaseURL   string
-	Endpoints map[string]string
+	BaseURL string
 }
 
 // NewAPIConfig loads the config file in the config directory.
@@ -43,25 +34,6 @@ func (cfg *APIConfig) SetDefaults() {
 	if cfg.BaseURL == "" {
 		cfg.BaseURL = defaultBaseURL
 	}
-	if cfg.Endpoints == nil {
-		cfg.Endpoints = defaultEndpoints
-		return
-	}
-
-	for key, endpoint := range defaultEndpoints {
-		if cfg.Endpoints[key] == "" {
-			cfg.Endpoints[key] = endpoint
-		}
-	}
-}
-
-// URL provides the API URL for a given endpoint key.
-func (cfg *APIConfig) URL(key string, args ...interface{}) string {
-	pattern := fmt.Sprintf("%s%s", cfg.BaseURL, cfg.Endpoints[key])
-	if args == nil {
-		return pattern
-	}
-	return fmt.Sprintf(pattern, args...)
 }
 
 // NewEmptyAPIConfig doesn't load the config from file or set default values.
