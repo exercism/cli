@@ -37,9 +37,9 @@ command into a GitHub issue so we can help figure out what's going on.
 			return err
 		}
 
-		status := NewStatus(c, *cfg)
+		status := newStatus(c, *cfg)
 		status.Censor = !fullAPIKey
-		s, err := status.Check()
+		s, err := status.check()
 		if err != nil {
 			return err
 		}
@@ -93,8 +93,8 @@ type apiPing struct {
 	Latency time.Duration
 }
 
-// NewStatus prepares a value to perform a diagnostic self-check.
-func NewStatus(c *cli.CLI, uc config.UserConfig) Status {
+// newStatus prepares a value to perform a diagnostic self-check.
+func newStatus(c *cli.CLI, uc config.UserConfig) Status {
 	status := Status{
 		cli: c,
 		cfg: uc,
@@ -102,8 +102,8 @@ func NewStatus(c *cli.CLI, uc config.UserConfig) Status {
 	return status
 }
 
-// Check runs the CLI's diagnostic self-check.
-func (status *Status) Check() (string, error) {
+// check runs the CLI's diagnostic self-check.
+func (status *Status) check() (string, error) {
 	status.Version = newVersionStatus(status.cli)
 	status.System = newSystemStatus()
 	status.Configuration = newConfigurationStatus(status)
