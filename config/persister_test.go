@@ -24,18 +24,18 @@ func TestFilePersisterSave(t *testing.T) {
 	v := viper.New()
 	v.Set("hello", "world")
 
-	if err = fp.Save(v, TypeAPI); err != nil {
+	if err = fp.Save(v, TypeCLI); err != nil {
 		t.Fatal(err)
 	}
 
-	path := filepath.Join(fp.Dir, "api.json")
+	path := filepath.Join(fp.Dir, "cli.json")
 	b, err := ioutil.ReadFile(path)
 	assert.NoError(t, err)
 
-	type apiConfig struct {
+	type helloConfig struct {
 		Hello string `json:"hello"`
 	}
-	var cfg apiConfig
+	var cfg helloConfig
 	err = json.Unmarshal(b, &cfg)
 	assert.NoError(t, err)
 	assert.Equal(t, "world", cfg.Hello)
@@ -48,7 +48,7 @@ func TestFilePersisterLoad(t *testing.T) {
 
 	// Write a JSON config.
 	body := `{"hello": "world"}`
-	if err := ioutil.WriteFile(filepath.Join(tmpDir, "api.json"), []byte(body), os.FileMode(0600)); err != nil {
+	if err := ioutil.WriteFile(filepath.Join(tmpDir, "cli.json"), []byte(body), os.FileMode(0600)); err != nil {
 		t.Fatal(err)
 	}
 
@@ -56,26 +56,9 @@ func TestFilePersisterLoad(t *testing.T) {
 	fp := FilePersister{
 		Dir: tmpDir,
 	}
-	v, err := fp.Load(TypeAPI)
+	v, err := fp.Load(TypeCLI)
 	if err != nil {
 		t.Fatal(err)
 	}
 	assert.Equal(t, v.GetString("hello"), "world")
-}
-
-func TestInMemoryPersister(t *testing.T) {
-	v1 := viper.New()
-	v1.Set("hello", "world")
-
-	imp := NewInMemoryPersister()
-
-	if err := imp.Save(v1, TypeAPI); err != nil {
-		t.Fatal(err)
-	}
-
-	v2, err := imp.Load(TypeAPI)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, "world", v2.GetString("hello"))
 }

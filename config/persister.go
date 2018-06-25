@@ -14,19 +14,18 @@ type ConfigType int
 const (
 	// TypeUser is configuration relevant to the individual's local setup.
 	TypeUser ConfigType = iota
-	// TypeAPI is configuration relevant to the API.
-	TypeAPI
+	// TypeCLI is configuration relevant to the API.
+	TypeCLI
 )
-
-// Persister saves viper configurations.
-type Persister interface {
-	Load(ConfigType) (*viper.Viper, error)
-	Save(*viper.Viper, ConfigType) error
-}
 
 // FilePersister handles viper configs on the file system.
 type FilePersister struct {
 	Dir string
+}
+
+func ReadViperConfig(ct ConfigType) (*viper.Viper, error) {
+	p := NewFilePersister()
+	return p.Load(ct)
 }
 
 // NewFilePersister returns a persister configured with the default config directory.
@@ -65,35 +64,12 @@ func (fp FilePersister) Load(ct ConfigType) (*viper.Viper, error) {
 	return v, err
 }
 
-// InMemoryPersister stores viper configs in memory (for testing).
-type InMemoryPersister struct {
-	store map[string]*viper.Viper
-}
-
-// NewInMemoryPersister creates a new in memory store.
-func NewInMemoryPersister() *InMemoryPersister {
-	return &InMemoryPersister{
-		store: map[string]*viper.Viper{},
-	}
-}
-
-// Save stores the viper config to memory.
-func (imp *InMemoryPersister) Save(v *viper.Viper, ct ConfigType) error {
-	imp.store[basename(ct)] = v
-	return nil
-}
-
-// Load returns a viper config stored in memory.
-func (imp *InMemoryPersister) Load(ct ConfigType) (*viper.Viper, error) {
-	return imp.store[basename(ct)], nil
-}
-
 func basename(ct ConfigType) string {
 	switch ct {
 	case TypeUser:
 		return "user"
-	case TypeAPI:
-		return "api"
+	case TypeCLI:
+		return "cli"
 	}
 	return "unknown"
 }
