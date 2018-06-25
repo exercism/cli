@@ -6,7 +6,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/exercism/cli/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,8 +32,8 @@ func TestNewRequestSetsDefaultHeaders(t *testing.T) {
 		{
 			desc: "Override defaults",
 			client: &Client{
-				UserConfig:  &config.UserConfig{Token: "abc123"},
 				ContentType: "bogus",
+				Token:       "abc123",
 			},
 			auth:        "Bearer abc123",
 			contentType: "bogus",

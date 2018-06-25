@@ -64,7 +64,7 @@ You can also override certain default settings to suit your preferences.
 		if show {
 			defer printCurrentConfig()
 		}
-		client, err := api.NewClient()
+		client, err := api.NewClient(usrCfg.Token, apiCfg.BaseURL)
 		if err != nil {
 			return err
 		}

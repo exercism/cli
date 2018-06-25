@@ -23,26 +23,17 @@ var (
 // Client is an http client that is configured for Exercism.
 type Client struct {
 	*http.Client
-	APIConfig   *config.APIConfig
-	UserConfig  *config.UserConfig
 	ContentType string
+	Token       string
+	BaseURL     string
 }
 
 // NewClient returns an Exercism API client.
-func NewClient() (*Client, error) {
-	apiCfg, err := config.NewAPIConfig()
-	if err != nil {
-		return nil, err
-	}
-	userCfg, err := config.NewUserConfig()
-	if err != nil {
-		return nil, err
-	}
-
+func NewClient(token, baseURL string) (*Client, error) {
 	return &Client{
-		Client:     DefaultHTTPClient,
-		APIConfig:  apiCfg,
-		UserConfig: userCfg,
+		Client:  DefaultHTTPClient,
+		Token:   token,
+		BaseURL: baseURL,
 	}, nil
 }
 
@@ -63,8 +54,8 @@ func (c *Client) NewRequest(method, url string, body io.Reader) (*http.Request, 
 	} else {
 		req.Header.Set("Content-Type", c.ContentType)
 	}
-	if c.UserConfig != nil && c.UserConfig.Token != "" {
-		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.UserConfig.Token))
+	if c.Token != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token))
 	}
 
 	return req, nil
@@ -87,7 +78,7 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 		// TODO: if it's json, and it has an error key, print the message.
 		return nil, fmt.Errorf("%s", res.Status)
 	case http.StatusUnauthorized:
-		siteURL := config.InferSiteURL(c.APIConfig.BaseURL)
+		siteURL := config.InferSiteURL(c.BaseURL)
 		return nil, fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
 	default:
 		if v != nil {
@@ -104,7 +95,7 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 
 // ValidateToken calls the API to determine whether the token is valid.
 func (c *Client) ValidateToken() error {
-	url := fmt.Sprintf("%s/validate_token", c.APIConfig.BaseURL)
+	url := fmt.Sprintf("%s/validate_token", c.BaseURL)
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
 		return err
