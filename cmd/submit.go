@@ -203,16 +203,11 @@ figuring things out if necessary.
 			return err
 		}
 
-		apiCfg, err := config.NewAPIConfig()
+		client, err := api.NewClient(usrCfg.Token, usrCfg.APIBaseURL)
 		if err != nil {
 			return err
 		}
-
-		client, err := api.NewClient(usrCfg.Token, apiCfg.BaseURL)
-		if err != nil {
-			return err
-		}
-		url := fmt.Sprintf("%s/solutions/%s", apiCfg.BaseURL, solution.ID)
+		url := fmt.Sprintf("%s/solutions/%s", usrCfg.APIBaseURL, solution.ID)
 		req, err := client.NewRequest("PATCH", url, body)
 		if err != nil {
 			return err

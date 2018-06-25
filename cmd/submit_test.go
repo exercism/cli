@@ -108,11 +108,11 @@ func TestSubmit(t *testing.T) {
 	err = cliCfg.Write()
 	assert.NoError(t, err)
 
-	// Create a fake API config.
-	apiCfg, err := config.NewAPIConfig()
+	// Create a fake config.
+	cfg, err := config.NewUserConfig()
 	assert.NoError(t, err)
-	apiCfg.BaseURL = ts.URL
-	err = apiCfg.Write()
+	cfg.APIBaseURL = ts.URL
+	err = cfg.Write()
 	assert.NoError(t, err)
 
 	// Write mock interactive input to In for the CLI command.
