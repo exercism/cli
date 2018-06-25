@@ -12,7 +12,6 @@ import (
 
 var (
 	viperUserConfig *viper.Viper
-	viperAPIConfig  *viper.Viper
 )
 
 // configureCmd configures the command-line client with user-specific settings.
@@ -36,13 +35,6 @@ You can also override certain default settings to suit your preferences.
 		}
 		usrCfg.Workspace = config.Resolve(usrCfg.Workspace, usrCfg.Home)
 		usrCfg.SetDefaults()
-
-		apiCfg := config.NewEmptyAPIConfig()
-		err = apiCfg.Load(viperAPIConfig)
-		if err != nil {
-			return err
-		}
-		apiCfg.BaseURL = usrCfg.APIBaseURL
 
 		show, err := cmd.Flags().GetBool("show")
 		if err != nil {
@@ -82,21 +74,12 @@ You can also override certain default settings to suit your preferences.
 			}
 		}
 
-		err = usrCfg.Write()
-		if err != nil {
-			return err
-		}
-
-		return apiCfg.Write()
+		return usrCfg.Write()
 	},
 }
 
 func printCurrentConfig() {
 	usrCfg, err := config.NewUserConfig()
-	if err != nil {
-		return
-	}
-	apiCfg, err := config.NewAPIConfig()
 	if err != nil {
 		return
 	}
@@ -107,7 +90,7 @@ func printCurrentConfig() {
 	fmt.Fprintln(w, fmt.Sprintf("Config dir:\t%s", config.Dir()))
 	fmt.Fprintln(w, fmt.Sprintf("-t, --token\t%s", usrCfg.Token))
 	fmt.Fprintln(w, fmt.Sprintf("-w, --workspace\t%s", usrCfg.Workspace))
-	fmt.Fprintln(w, fmt.Sprintf("-a, --api\t%s", apiCfg.BaseURL))
+	fmt.Fprintln(w, fmt.Sprintf("-a, --api\t%s", usrCfg.APIBaseURL))
 	fmt.Fprintln(w, "")
 }
 
@@ -122,8 +105,6 @@ func initConfigureCmd() {
 	viperUserConfig.BindPFlag("token", configureCmd.Flags().Lookup("token"))
 	viperUserConfig.BindPFlag("workspace", configureCmd.Flags().Lookup("workspace"))
 	viperUserConfig.BindPFlag("apibaseurl", configureCmd.Flags().Lookup("api"))
-
-	viperAPIConfig = viper.New()
 }
 
 func init() {
