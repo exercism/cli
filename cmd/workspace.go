@@ -5,6 +5,7 @@ import (
 
 	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // workspaceCmd outputs the path to the person's workspace directory.
@@ -26,13 +27,18 @@ need to be on the same drive as your workspace directory. Otherwise
 nothing will happen.
 	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		usrCfg, err := config.NewUserConfig()
+		p := config.NewFilePersister()
+		v, err := p.Load(config.TypeUser)
 		if err != nil {
 			return err
 		}
-		fmt.Println(usrCfg.Workspace)
+		workspaceRun(v)
 		return nil
 	},
+}
+
+func workspaceRun(v *viper.Viper) {
+	fmt.Fprintf(Out, "%s\n", v.GetString("workspace"))
 }
 
 func init() {
