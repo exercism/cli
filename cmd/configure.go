@@ -63,6 +63,10 @@ You can also override certain default settings to suit your preferences.
 		if show {
 			defer printCurrentConfig()
 		}
+		client, err := api.NewClient()
+		if err != nil {
+			return err
+		}
 
 		switch {
 		case usrCfg.Token == "":
@@ -71,7 +75,7 @@ You can also override certain default settings to suit your preferences.
 			// User set new token
 			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
 			if !skipAuth {
-				err = api.ValidateToken()
+				err = client.ValidateToken()
 				if err != nil {
 					return err
 				}
@@ -83,7 +87,7 @@ You can also override certain default settings to suit your preferences.
 			}
 			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
 			if !skipAuth {
-				err = api.ValidateToken()
+				err = client.ValidateToken()
 				if err != nil {
 					fmt.Fprintln(Out, err)
 				}
