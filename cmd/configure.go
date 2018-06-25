@@ -2,9 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-	"path"
-	"strings"
 	"text/tabwriter"
 
 	"github.com/exercism/cli/api"
@@ -39,16 +36,6 @@ You can also override certain default settings to suit your preferences.
 		}
 		usrCfg.Workspace = config.Resolve(usrCfg.Workspace, usrCfg.Home)
 		usrCfg.SetDefaults()
-		if usrCfg.Workspace == "" {
-			dirName := strings.Replace(path.Base(BinaryName), ".exe", "", 1)
-			defaultWorkspace := path.Join(usrCfg.Home, dirName)
-			_, err := os.Stat(defaultWorkspace)
-			// Sorry about the double negative.
-			if !os.IsNotExist(err) {
-				defaultWorkspace = fmt.Sprintf("%s-1", defaultWorkspace)
-			}
-			usrCfg.Workspace = defaultWorkspace
-		}
 
 		apiCfg := config.NewEmptyAPIConfig()
 		err = apiCfg.Load(viperAPIConfig)

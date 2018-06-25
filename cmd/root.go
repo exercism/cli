@@ -49,7 +49,7 @@ func Execute() {
 
 func init() {
 	BinaryName = os.Args[0]
-	config.SubdirectoryName = BinaryName
+	config.SetDefaultDirName(BinaryName)
 	Out = os.Stdout
 	In = os.Stdin
 	api.UserAgent = fmt.Sprintf("github.com/exercism/cli v%s (%s/%s)", Version, runtime.GOOS, runtime.GOARCH)
