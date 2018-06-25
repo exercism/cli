@@ -2,9 +2,7 @@ package config
 
 import (
 	"os"
-	"path/filepath"
 	"runtime"
-	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -40,7 +38,6 @@ func (cfg *UserConfig) SetDefaults() {
 	if cfg.Home == "" {
 		cfg.Home = userHome()
 	}
-	cfg.Workspace = cfg.resolve(cfg.Workspace)
 }
 
 // Write stores the config to disk.
@@ -75,26 +72,4 @@ func userHome() string {
 	// If all else fails, use the current directory.
 	dir, _ = os.Getwd()
 	return dir
-}
-
-func (cfg *UserConfig) resolve(path string) string {
-	if path == "" {
-		return ""
-	}
-	if strings.HasPrefix(path, "~/") {
-		path = strings.Replace(path, "~/", "", 1)
-		return filepath.Join(cfg.Home, path)
-	}
-	if filepath.IsAbs(path) {
-		return filepath.Clean(path)
-	}
-	// if using "/dir" on Windows
-	if strings.HasPrefix(path, "/") {
-		return filepath.Join(cfg.Home, filepath.Clean(path))
-	}
-	cwd, err := os.Getwd()
-	if err != nil {
-		return path
-	}
-	return filepath.Join(cwd, path)
 }
