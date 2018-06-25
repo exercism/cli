@@ -1,7 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"os"
+	"path"
 	"runtime"
 
 	"github.com/spf13/viper"
@@ -38,6 +40,9 @@ func (cfg *UserConfig) SetDefaults() {
 	if cfg.Home == "" {
 		cfg.Home = userHome()
 	}
+	if cfg.Workspace == "" {
+		cfg.Workspace = defaultWorkspace(cfg.Home)
+	}
 }
 
 // Write stores the config to disk.
@@ -71,5 +76,15 @@ func userHome() string {
 	}
 	// If all else fails, use the current directory.
 	dir, _ = os.Getwd()
+	return dir
+}
+
+func defaultWorkspace(home string) string {
+	dir := path.Join(home, DefaultDirName)
+	_, err := os.Stat(dir)
+	// Sorry about the double negative.
+	if !os.IsNotExist(err) {
+		dir = fmt.Sprintf("%s-1", dir)
+	}
 	return dir
 }
