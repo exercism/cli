@@ -76,11 +76,11 @@ func makeTest(tc testCase) func(*testing.T) {
 				tc.expectedUsrCfg.SetDefaults()
 			}
 
-			usrCfg, err := config.NewUserConfig()
+			cfg, err := config.NewUserConfig()
 
 			assert.NoError(t, err, tc.desc)
-			assert.Equal(t, tc.expectedUsrCfg.Token, usrCfg.Token, tc.desc)
-			assert.Equal(t, tc.expectedUsrCfg.Workspace, usrCfg.Workspace, tc.desc)
+			assert.Equal(t, tc.expectedUsrCfg.Token, cfg.Token, tc.desc)
+			assert.Equal(t, tc.expectedUsrCfg.Workspace, cfg.Workspace, tc.desc)
 		}
 	}
 }
