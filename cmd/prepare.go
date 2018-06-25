@@ -47,16 +47,12 @@ func prepareTrack(id string) error {
 	if err != nil {
 		return err
 	}
-	apiCfg, err := config.NewAPIConfig()
-	if err != nil {
-		return err
-	}
 
-	client, err := api.NewClient(usrCfg.Token, apiCfg.BaseURL)
+	client, err := api.NewClient(usrCfg.Token, usrCfg.APIBaseURL)
 	if err != nil {
 		return err
 	}
-	url := fmt.Sprintf("%s/tracks/%s", apiCfg.BaseURL, id)
+	url := fmt.Sprintf("%s/tracks/%s", usrCfg.APIBaseURL, id)
 
 	req, err := client.NewRequest("GET", url, nil)
 	if err != nil {
