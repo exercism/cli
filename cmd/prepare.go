@@ -43,12 +43,16 @@ To customize the CLI to suit your own preferences, use the configure command.
 }
 
 func prepareTrack(id string) error {
+	usrCfg, err := config.NewUserConfig()
+	if err != nil {
+		return err
+	}
 	apiCfg, err := config.NewAPIConfig()
 	if err != nil {
 		return err
 	}
 
-	client, err := api.NewClient()
+	client, err := api.NewClient(usrCfg.Token, apiCfg.BaseURL)
 	if err != nil {
 		return err
 	}

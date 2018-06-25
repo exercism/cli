@@ -48,6 +48,11 @@ Download other people's solutions by providing the UUID.
 			// TODO: usage
 			return errors.New("need an exercise name or a solution --uuid")
 		}
+		usrCfg, err := config.NewUserConfig()
+		if err != nil {
+			return err
+		}
+
 		apiCfg, err := config.NewAPIConfig()
 		if err != nil {
 			return err
@@ -61,7 +66,7 @@ Download other people's solutions by providing the UUID.
 		}
 		url := fmt.Sprintf("%s/solutions/%s", apiCfg.BaseURL, slug)
 
-		client, err := api.NewClient()
+		client, err := api.NewClient(usrCfg.Token, apiCfg.BaseURL)
 		if err != nil {
 			return err
 		}
@@ -116,9 +121,9 @@ Download other people's solutions by providing the UUID.
 
 		var ws workspace.Workspace
 		if solution.IsRequester {
-			ws = workspace.New(filepath.Join(client.UserConfig.Workspace, solution.Track))
+			ws = workspace.New(filepath.Join(usrCfg.Workspace, solution.Track))
 		} else {
-			ws = workspace.New(filepath.Join(client.UserConfig.Workspace, "users", solution.Handle, solution.Track))
+			ws = workspace.New(filepath.Join(usrCfg.Workspace, "users", solution.Handle, solution.Track))
 		}
 		os.MkdirAll(ws.Dir, os.FileMode(0755))
 
