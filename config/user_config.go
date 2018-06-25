@@ -38,7 +38,6 @@ func (cfg *UserConfig) SetDefaults() {
 	if cfg.Home == "" {
 		cfg.Home = userHome()
 	}
-	cfg.Workspace = Resolve(cfg.Workspace, cfg.Home)
 }
 
 // Write stores the config to disk.
