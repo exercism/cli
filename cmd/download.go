@@ -95,9 +95,9 @@ Download other people's solutions by providing the UUID.
 			return err
 		}
 
-		payload := &downloadPayload{}
+		var payload downloadPayload
 		defer res.Body.Close()
-		if err := json.NewDecoder(res.Body).Decode(payload); err != nil {
+		if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
 			return fmt.Errorf("unable to parse API response - %s", err)
 		}
 

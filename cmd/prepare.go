@@ -66,9 +66,9 @@ func prepareTrack(id string) error {
 	}
 	defer res.Body.Close()
 
-	payload := &prepareTrackPayload{}
+	var payload prepareTrackPayload
 
-	if err := json.NewDecoder(res.Body).Decode(payload); err != nil {
+	if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
 		return fmt.Errorf("unable to parse API response - %s", err)
 	}
 
