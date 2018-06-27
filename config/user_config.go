@@ -9,12 +9,17 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	defaultBaseURL = "https://v2.exercism.io/api/v1"
+)
+
 // UserConfig contains user-specific settings.
 type UserConfig struct {
 	*Config
-	Workspace string
-	Token     string
-	Home      string
+	Workspace  string
+	Token      string
+	Home       string
+	APIBaseURL string
 }
 
 // NewUserConfig loads a user configuration if it exists.
@@ -39,6 +44,9 @@ func NewEmptyUserConfig() *UserConfig {
 func (cfg *UserConfig) SetDefaults() {
 	if cfg.Home == "" {
 		cfg.Home = userHome()
+	}
+	if cfg.APIBaseURL == "" {
+		cfg.APIBaseURL = defaultBaseURL
 	}
 	if cfg.Workspace == "" {
 		cfg.Workspace = defaultWorkspace(cfg.Home)

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"os"
 	"runtime"
 	"testing"
 
@@ -14,8 +13,6 @@ type testCase struct {
 	args           []string
 	existingUsrCfg *config.UserConfig
 	expectedUsrCfg *config.UserConfig
-	existingAPICfg *config.APIConfig
-	expectedAPICfg *config.APIConfig
 }
 
 func TestConfigure(t *testing.T) {
@@ -24,17 +21,13 @@ func TestConfigure(t *testing.T) {
 			desc:           "It writes the flags when there is no config file.",
 			args:           []string{"fakeapp", "configure", "--token", "a", "--workspace", "/a", "--api", "http://example.com", "--skip-auth"},
 			existingUsrCfg: nil,
-			expectedUsrCfg: &config.UserConfig{Token: "a", Workspace: "/a"},
-			existingAPICfg: nil,
-			expectedAPICfg: &config.APIConfig{BaseURL: "http://example.com"},
+			expectedUsrCfg: &config.UserConfig{Token: "a", Workspace: "/a", APIBaseURL: "http://example.com"},
 		},
 		testCase{
 			desc:           "It overwrites the flags in the config file.",
 			args:           []string{"fakeapp", "configure", "--token", "b", "--workspace", "/b", "--api", "http://example.com/v2", "--skip-auth"},
-			existingUsrCfg: &config.UserConfig{Token: "token-b", Workspace: "/workspace-b"},
-			expectedUsrCfg: &config.UserConfig{Token: "b", Workspace: "/b"},
-			existingAPICfg: &config.APIConfig{BaseURL: "http://example.com/v1"},
-			expectedAPICfg: &config.APIConfig{BaseURL: "http://example.com/v2"},
+			existingUsrCfg: &config.UserConfig{Token: "token-b", Workspace: "/workspace-b", APIBaseURL: "http://example.com/v1"},
+			expectedUsrCfg: &config.UserConfig{Token: "b", Workspace: "/b", APIBaseURL: "http://example.com/v2"},
 		},
 		testCase{
 			desc:           "It overwrites the flags that are passed, without losing the ones that are not.",
@@ -45,8 +38,8 @@ func TestConfigure(t *testing.T) {
 		testCase{
 			desc:           "It gets the default API base URL.",
 			args:           []string{"fakeapp", "configure", "--skip-auth"},
-			existingAPICfg: &config.APIConfig{},
-			expectedAPICfg: &config.APIConfig{BaseURL: "https://v2.exercism.io/api/v1"},
+			existingUsrCfg: &config.UserConfig{Workspace: "/workspace-c"},
+			expectedUsrCfg: &config.UserConfig{Workspace: "/workspace-c", APIBaseURL: "https://v2.exercism.io/api/v1"},
 		},
 	}
 
@@ -71,6 +64,7 @@ func makeTest(tc testCase) func(*testing.T) {
 			cfg := config.NewEmptyUserConfig()
 			cfg.Token = tc.existingUsrCfg.Token
 			cfg.Workspace = tc.existingUsrCfg.Workspace
+			cfg.APIBaseURL = tc.existingUsrCfg.APIBaseURL
 			err := cfg.Write()
 			assert.NoError(t, err, tc.desc)
 		}
@@ -82,18 +76,11 @@ func makeTest(tc testCase) func(*testing.T) {
 				tc.expectedUsrCfg.SetDefaults()
 			}
 
-			usrCfg, err := config.NewUserConfig()
+			cfg, err := config.NewUserConfig()
 
 			assert.NoError(t, err, tc.desc)
-			assert.Equal(t, tc.expectedUsrCfg.Token, usrCfg.Token, tc.desc)
-			assert.Equal(t, tc.expectedUsrCfg.Workspace, usrCfg.Workspace, tc.desc)
-		}
-
-		if tc.expectedAPICfg != nil {
-			apiCfg, err := config.NewAPIConfig()
-			assert.NoError(t, err, tc.desc)
-			assert.Equal(t, tc.expectedAPICfg.BaseURL, apiCfg.BaseURL, tc.desc)
-			os.Remove(apiCfg.File())
+			assert.Equal(t, tc.expectedUsrCfg.Token, cfg.Token, tc.desc)
+			assert.Equal(t, tc.expectedUsrCfg.Workspace, cfg.Workspace, tc.desc)
 		}
 	}
 }

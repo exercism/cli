@@ -53,20 +53,15 @@ Download other people's solutions by providing the UUID.
 			return err
 		}
 
-		apiCfg, err := config.NewAPIConfig()
-		if err != nil {
-			return err
-		}
-
 		var slug string
 		if uuid == "" {
 			slug = "latest"
 		} else {
 			slug = uuid
 		}
-		url := fmt.Sprintf("%s/solutions/%s", apiCfg.BaseURL, slug)
+		url := fmt.Sprintf("%s/solutions/%s", usrCfg.APIBaseURL, slug)
 
-		client, err := api.NewClient(usrCfg.Token, apiCfg.BaseURL)
+		client, err := api.NewClient(usrCfg.Token, usrCfg.APIBaseURL)
 		if err != nil {
 			return err
 		}

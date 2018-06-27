@@ -76,7 +76,7 @@ func (status *Status) Check() (string, error) {
 	}
 	status.Configuration = cs
 
-	ar, err := newAPIReachabilityStatus()
+	ar, err := newAPIReachabilityStatus(status.cfg.APIBaseURL)
 	if err != nil {
 		return "", err
 	}
@@ -95,16 +95,11 @@ func (status *Status) compile() (string, error) {
 	return bb.String(), nil
 }
 
-func newAPIReachabilityStatus() (apiReachabilityStatus, error) {
-	apiCfg, err := config.NewAPIConfig()
-	if err != nil {
-		return apiReachabilityStatus{}, nil
-	}
-	apiCfg.SetDefaults()
+func newAPIReachabilityStatus(baseURL string) (apiReachabilityStatus, error) {
 	ar := apiReachabilityStatus{
 		Services: []*apiPing{
 			{Service: "GitHub", URL: "https://api.github.com"},
-			{Service: "Exercism", URL: fmt.Sprintf("%s/ping", apiCfg.BaseURL)},
+			{Service: "Exercism", URL: fmt.Sprintf("%s/ping", baseURL)},
 		},
 	}
 	var wg sync.WaitGroup
@@ -145,17 +140,12 @@ func newSystemStatus() systemStatus {
 }
 
 func newConfigurationStatus(status *Status) (configurationStatus, error) {
-	apiCfg, err := config.NewAPIConfig()
-	if err != nil {
-		return configurationStatus{}, err
-	}
-	apiCfg.SetDefaults()
 	cs := configurationStatus{
 		Home:      status.cfg.Home,
 		Workspace: status.cfg.Workspace,
 		File:      status.cfg.File(),
 		Token:     status.cfg.Token,
-		TokenURL:  config.InferSiteURL(apiCfg.BaseURL) + "/my/settings",
+		TokenURL:  config.InferSiteURL(status.cfg.APIBaseURL) + "/my/settings",
 	}
 	if status.Censor && status.cfg.Token != "" {
 		cs.Token = redactToken(status.cfg.Token)

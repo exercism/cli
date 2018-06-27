@@ -56,9 +56,7 @@ func TestDownload(t *testing.T) {
 	mockServer := makeMockServer()
 	defer mockServer.Close()
 
-	err := writeFakeUserConfigSetting(cmdTest.TmpDir)
-	assert.NoError(t, err)
-	err = writeFakeAPIConfigSetting(mockServer.URL)
+	err := writeFakeUserConfigSettings(cmdTest.TmpDir, mockServer.URL)
 	assert.NoError(t, err)
 
 	testCases := []struct {
@@ -98,16 +96,11 @@ func TestDownload(t *testing.T) {
 	assert.True(t, os.IsNotExist(err), "It should not write the file if empty.")
 }
 
-func writeFakeUserConfigSetting(tmpDirPath string) error {
+func writeFakeUserConfigSettings(tmpDirPath, serverURL string) error {
 	userCfg := config.NewEmptyUserConfig()
 	userCfg.Workspace = tmpDirPath
+	userCfg.APIBaseURL = serverURL
 	return userCfg.Write()
-}
-
-func writeFakeAPIConfigSetting(serverURL string) error {
-	apiCfg := config.NewEmptyAPIConfig()
-	apiCfg.BaseURL = serverURL
-	return apiCfg.Write()
 }
 
 func makeMockServer() *httptest.Server {

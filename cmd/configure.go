@@ -11,8 +11,7 @@ import (
 )
 
 var (
-	viperUserConfig *viper.Viper
-	viperAPIConfig  *viper.Viper
+	viperConfig *viper.Viper
 )
 
 // configureCmd configures the command-line client with user-specific settings.
@@ -29,20 +28,13 @@ places.
 You can also override certain default settings to suit your preferences.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		usrCfg := config.NewEmptyUserConfig()
-		err := usrCfg.Load(viperUserConfig)
+		cfg := config.NewEmptyUserConfig()
+		err := cfg.Load(viperConfig)
 		if err != nil {
 			return err
 		}
-		usrCfg.Workspace = config.Resolve(usrCfg.Workspace, usrCfg.Home)
-		usrCfg.SetDefaults()
-
-		apiCfg := config.NewEmptyAPIConfig()
-		err = apiCfg.Load(viperAPIConfig)
-		if err != nil {
-			return err
-		}
-		apiCfg.SetDefaults()
+		cfg.Workspace = config.Resolve(cfg.Workspace, cfg.Home)
+		cfg.SetDefaults()
 
 		show, err := cmd.Flags().GetBool("show")
 		if err != nil {
@@ -51,13 +43,13 @@ You can also override certain default settings to suit your preferences.
 		if show {
 			defer printCurrentConfig()
 		}
-		client, err := api.NewClient(usrCfg.Token, apiCfg.BaseURL)
+		client, err := api.NewClient(cfg.Token, cfg.APIBaseURL)
 		if err != nil {
 			return err
 		}
 
 		switch {
-		case usrCfg.Token == "":
+		case cfg.Token == "":
 			fmt.Fprintln(Out, "There is no token configured, please set it using --token.")
 		case cmd.Flags().Lookup("token").Changed:
 			// User set new token
@@ -82,21 +74,12 @@ You can also override certain default settings to suit your preferences.
 			}
 		}
 
-		err = usrCfg.Write()
-		if err != nil {
-			return err
-		}
-
-		return apiCfg.Write()
+		return cfg.Write()
 	},
 }
 
 func printCurrentConfig() {
-	usrCfg, err := config.NewUserConfig()
-	if err != nil {
-		return
-	}
-	apiCfg, err := config.NewAPIConfig()
+	cfg, err := config.NewUserConfig()
 	if err != nil {
 		return
 	}
@@ -105,9 +88,9 @@ func printCurrentConfig() {
 
 	fmt.Fprintln(w, "")
 	fmt.Fprintln(w, fmt.Sprintf("Config dir:\t%s", config.Dir()))
-	fmt.Fprintln(w, fmt.Sprintf("-t, --token\t%s", usrCfg.Token))
-	fmt.Fprintln(w, fmt.Sprintf("-w, --workspace\t%s", usrCfg.Workspace))
-	fmt.Fprintln(w, fmt.Sprintf("-a, --api\t%s", apiCfg.BaseURL))
+	fmt.Fprintln(w, fmt.Sprintf("-t, --token\t%s", cfg.Token))
+	fmt.Fprintln(w, fmt.Sprintf("-w, --workspace\t%s", cfg.Workspace))
+	fmt.Fprintln(w, fmt.Sprintf("-a, --api\t%s", cfg.APIBaseURL))
 	fmt.Fprintln(w, "")
 }
 
@@ -118,12 +101,10 @@ func initConfigureCmd() {
 	configureCmd.Flags().BoolP("show", "s", false, "show the current configuration")
 	configureCmd.Flags().BoolP("skip-auth", "", false, "skip online token authorization check")
 
-	viperUserConfig = viper.New()
-	viperUserConfig.BindPFlag("token", configureCmd.Flags().Lookup("token"))
-	viperUserConfig.BindPFlag("workspace", configureCmd.Flags().Lookup("workspace"))
-
-	viperAPIConfig = viper.New()
-	viperAPIConfig.BindPFlag("baseurl", configureCmd.Flags().Lookup("api"))
+	viperConfig = viper.New()
+	viperConfig.BindPFlag("token", configureCmd.Flags().Lookup("token"))
+	viperConfig.BindPFlag("workspace", configureCmd.Flags().Lookup("workspace"))
+	viperConfig.BindPFlag("apibaseurl", configureCmd.Flags().Lookup("api"))
 }
 
 func init() {
