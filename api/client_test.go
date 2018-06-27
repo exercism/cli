@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -68,8 +69,12 @@ func TestDo(t *testing.T) {
 	req, err := client.NewRequest("GET", ts.URL, nil)
 	assert.NoError(t, err)
 
-	var body payload
-	_, err = client.Do(req, &body)
+	res, err := client.Do(req)
 	assert.NoError(t, err)
+
+	var body payload
+	err = json.NewDecoder(res.Body).Decode(&body)
+	assert.NoError(t, err)
+
 	assert.Equal(t, "world", body.Hello)
 }

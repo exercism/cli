@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -59,14 +60,20 @@ func prepareTrack(id string) error {
 		return err
 	}
 
-	payload := &prepareTrackPayload{}
-	res, err := client.Do(req, payload)
+	res, err := client.Do(req)
 	if err != nil {
 		return err
 	}
+	defer res.Body.Close()
+
+	var payload prepareTrackPayload
+
+	if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
+		return fmt.Errorf("unable to parse API response - %s", err)
+	}
 
 	if res.StatusCode != http.StatusOK {
-		return errors.New("api call failed")
+		return errors.New(payload.Error.Message)
 	}
 
 	cliCfg, err := config.NewCLIConfig()
@@ -92,6 +99,10 @@ type prepareTrackPayload struct {
 		Language    string `json:"language"`
 		TestPattern string `json:"test_pattern"`
 	} `json:"track"`
+	Error struct {
+		Type    string `json:"type"`
+		Message string `json:"message"`
+	} `json:"error,omitempty"`
 }
 
 func initPrepareCmd() {

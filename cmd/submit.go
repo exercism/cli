@@ -214,7 +214,7 @@ figuring things out if necessary.
 		}
 		req.Header.Set("Content-Type", writer.FormDataContentType())
 
-		resp, err := client.Do(req, nil)
+		resp, err := client.Do(req)
 		if err != nil {
 			return err
 		}

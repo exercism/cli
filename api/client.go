@@ -1,13 +1,11 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"time"
 
-	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/debug"
 )
 
@@ -62,7 +60,7 @@ func (c *Client) NewRequest(method, url string, body io.Reader) (*http.Request, 
 }
 
 // Do performs an http.Request and optionally parses the response body into the given interface.
-func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
+func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	debug.DumpRequest(req)
 
 	res, err := c.Client.Do(req)
@@ -70,26 +68,6 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 		return nil, err
 	}
 	debug.DumpResponse(res)
-
-	switch res.StatusCode {
-	case http.StatusNoContent:
-		return res, nil
-	case http.StatusInternalServerError:
-		// TODO: if it's json, and it has an error key, print the message.
-		return nil, fmt.Errorf("%s", res.Status)
-	case http.StatusUnauthorized:
-		siteURL := config.InferSiteURL(c.BaseURL)
-		return nil, fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
-	default:
-		if v != nil {
-			defer res.Body.Close()
-
-			if err := json.NewDecoder(res.Body).Decode(v); err != nil {
-				return nil, fmt.Errorf("unable to parse API response - %s", err)
-			}
-		}
-	}
-
 	return res, nil
 }
 
@@ -100,7 +78,7 @@ func (c *Client) ValidateToken() error {
 	if err != nil {
 		return err
 	}
-	_, err = c.Do(req, nil)
+	_, err = c.Do(req)
 
 	return err
 }
