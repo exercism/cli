@@ -138,3 +138,32 @@ func makeMockServer() *httptest.Server {
 	return server
 
 }
+
+func TestDownloadArgs(t *testing.T) {
+	tests := []struct {
+		args          []string
+		expectedError string
+	}{
+		{
+			args:          []string{"bogus"}, // providing just an exercise slug without the flag
+			expectedError: "need an --exercise name or a solution --uuid",
+		},
+		{
+			args:          []string{""}, // providing no args
+			expectedError: "need an --exercise name or a solution --uuid",
+		},
+	}
+
+	for _, test := range tests {
+		cmdTest := &CommandTest{
+			Cmd:    downloadCmd,
+			InitFn: initDownloadCmd,
+			Args:   append([]string{"fakeapp", "download"}, test.args...),
+		}
+		cmdTest.Setup(t)
+		defer cmdTest.Teardown(t)
+		err := cmdTest.App.Execute()
+
+		assert.EqualError(t, err, test.expectedError)
+	}
+}
