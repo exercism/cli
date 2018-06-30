@@ -29,7 +29,6 @@ latest solution.
 
 Download other people's solutions by providing the UUID.
 `,
-	Args: cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		token, err := cmd.Flags().GetString("token")
 		if err != nil {
