@@ -221,7 +221,7 @@ type downloadPayload struct {
 func initDownloadCmd() {
 	downloadCmd.Flags().StringP("uuid", "u", "", "the solution UUID")
 	downloadCmd.Flags().StringP("track", "t", "", "the track ID")
-	downloadCmd.Flags().StringP("exercise", "e", "", "the exercise ID")
+	downloadCmd.Flags().StringP("exercise", "e", "", "the exercise slug")
 	downloadCmd.Flags().StringP("token", "k", "", "authentication token used to connect to the site")
 }
 
