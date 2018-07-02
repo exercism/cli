@@ -38,7 +38,7 @@ figuring things out if necessary.
 `,
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// check input before doing any other work
+		// Validate input before doing any other work
 		exercise, err := cmd.Flags().GetString("exercise")
 		if err != nil {
 			return err
@@ -88,7 +88,7 @@ figuring things out if necessary.
 
 		ws := workspace.New(usrCfg.Workspace)
 
-		// create directory from track and exercise slugs if needed
+		// Create directory from track and exercise slugs if needed
 		if trackId != "" && exercise != "" {
 			args = []string{filepath.Join(ws.Dir, trackId, exercise)}
 		} else if len(files) > 0 {
@@ -99,10 +99,12 @@ figuring things out if necessary.
 		if err != nil {
 			return err
 		}
+
 		dirs, err := ws.Locate(tx.Dir)
 		if err != nil {
 			return err
 		}
+
 		sx, err := workspace.NewSolutions(dirs)
 		if err != nil {
 			return err

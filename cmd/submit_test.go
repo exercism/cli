@@ -44,7 +44,7 @@ func TestSubmit(t *testing.T) {
 		relativePath: "README.md",
 		contents:     "The readme.",
 	}
-	// make a list of tests
+	// Make a list of test commands
 	cmdTestFlags := &CommandTest{
 		Cmd:                     submitCmd,
 		InitFn:                  initSubmitCmd,
@@ -72,9 +72,8 @@ func TestSubmit(t *testing.T) {
 		cmdTest.Setup(t)
 		defer cmdTest.Teardown(t)
 
-		// handle case when directory to submit needs the tmp dir prefix
+		// Prefix submitted filenames with correct temporary directory
 		if cmdTest.Args[2] == "--files" {
-			// prefix each file
 			filenames := make([]string, 2)
 			for i, file := range []file{file1, file2} {
 				filenames[i] = filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", file.relativePath)
