@@ -44,7 +44,7 @@ figuring things out if necessary.
 			return err
 		}
 
-		trackId, err := cmd.Flags().GetString("track")
+		trackID, err := cmd.Flags().GetString("track")
 		if err != nil {
 			return err
 		}
@@ -54,17 +54,28 @@ figuring things out if necessary.
 			return err
 		}
 
-		// Verify correct usage of flags/args
-		if len(args) == 0 && len(files) == 0 && !(exercise != "" && trackId != "") {
-			return errors.New("must use --exercise and --track together")
+		// Verify that both --track and --exercise are used together
+		if len(args) == 0 && len(files) == 0 && !(exercise != "" && trackID != "") {
+			// Are they both missing?
+			if exercise == "" && trackID == "" {
+				return errors.New("Please use the --exercise/--trackID flags to submit without an explicit directory or files.")
+			}
+			// Guess that --trackID is missing, unless it's not
+			present, missing := "--exercise", "--track"
+			if trackID != "" {
+				present, missing = missing, present
+			}
+			// Help user correct CLI command
+			missingFlagMessage := fmt.Sprintf("You specified %s, please also include %s.", present, missing)
+			return errors.New(missingFlagMessage)
 		}
 
-		if len(args) > 0 && (exercise != "" || trackId != "" || len(files) > 0) {
-			return errors.New("can't use flags and directory arguments together")
+		if len(args) > 0 && (exercise != "" || trackID != "") {
+			return errors.New("You are submitting a directory. We will infer the track and exercise from that. Please re-run the submit command without the flags.")
 		}
 
 		if len(files) > 0 && len(args) > 0 {
-			return errors.New("can't submit files and a directory together")
+			return errors.New("You can submit either a list of files, or a directory, but not both.")
 		}
 
 		usrCfg, err := config.NewUserConfig()
@@ -89,8 +100,8 @@ figuring things out if necessary.
 		ws := workspace.New(usrCfg.Workspace)
 
 		// Create directory from track and exercise slugs if needed
-		if trackId != "" && exercise != "" {
-			args = []string{filepath.Join(ws.Dir, trackId, exercise)}
+		if trackID != "" && exercise != "" {
+			args = []string{filepath.Join(ws.Dir, trackID, exercise)}
 		} else if len(files) > 0 {
 			args = files
 		}
