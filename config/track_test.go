@@ -23,11 +23,10 @@ func TestTrackIgnoreString(t *testing.T) {
 	}
 
 	for name, ok := range testCases {
-		testName := fmt.Sprintf("%s is %s", name, acceptability(ok))
-		t.Run(testName, func(t *testing.T) {
+		t.Run(name, func(t *testing.T) {
 			acceptable, err := track.AcceptFilename(name)
 			assert.NoError(t, err, name)
-			assert.Equal(t, ok, acceptable, testName)
+			assert.Equal(t, ok, acceptable, fmt.Sprintf("%s is %s", name, acceptability(ok)))
 		})
 	}
 }
