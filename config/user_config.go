@@ -9,6 +9,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	defaultBaseURL = "https://v2.exercism.io/api/v1"
+)
+
 // UserConfig contains user-specific settings.
 type UserConfig struct {
 	*Config
