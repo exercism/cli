@@ -39,16 +39,15 @@ To customize the CLI to suit your own preferences, use the configure command.
 			fmt.Println("prepare called")
 			return nil
 		}
-		return prepareTrack(track)
+		cfg, err := config.NewUserConfig()
+		if err != nil {
+			return err
+		}
+		return prepareTrack(track, cfg)
 	},
 }
 
-func prepareTrack(id string) error {
-	cfg, err := config.NewUserConfig()
-	if err != nil {
-		return err
-	}
-
+func prepareTrack(id string, cfg *config.UserConfig) error {
 	client, err := api.NewClient(cfg.Token, cfg.APIBaseURL)
 	if err != nil {
 		return err
