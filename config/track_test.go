@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -21,19 +22,19 @@ func TestTrackIgnoreString(t *testing.T) {
 		"proof":      false,
 	}
 
-	for name, acceptable := range testCases {
-		testName := name + " should " + notIfNeeded(acceptable) + "be an acceptable name."
+	for name, ok := range testCases {
+		testName := fmt.Sprintf("%s is %s", name, acceptability(ok))
 		t.Run(testName, func(t *testing.T) {
-			ok, err := track.AcceptFilename(name)
+			acceptable, err := track.AcceptFilename(name)
 			assert.NoError(t, err, name)
-			assert.Equal(t, acceptable, ok, testName)
+			assert.Equal(t, ok, acceptable, testName)
 		})
 	}
 }
 
-func notIfNeeded(b bool) string {
-	if !b {
-		return "not "
+func acceptability(ok bool) string {
+	if ok {
+		return "fine"
 	}
-	return ""
+	return "not acceptable"
 }
