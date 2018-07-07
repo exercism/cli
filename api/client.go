@@ -23,15 +23,15 @@ type Client struct {
 	*http.Client
 	ContentType string
 	Token       string
-	BaseURL     string
+	APIBaseURL  string
 }
 
 // NewClient returns an Exercism API client.
 func NewClient(token, baseURL string) (*Client, error) {
 	return &Client{
-		Client:  DefaultHTTPClient,
-		Token:   token,
-		BaseURL: baseURL,
+		Client:     DefaultHTTPClient,
+		Token:      token,
+		APIBaseURL: baseURL,
 	}, nil
 }
 
@@ -67,13 +67,14 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	debug.DumpResponse(res)
 	return res, nil
 }
 
 // ValidateToken calls the API to determine whether the token is valid.
 func (c *Client) ValidateToken() error {
-	url := fmt.Sprintf("%s/validate_token", c.BaseURL)
+	url := fmt.Sprintf("%s/validate_token", c.APIBaseURL)
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
 		return err

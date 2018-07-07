@@ -33,8 +33,9 @@ func TestNewRequestSetsDefaultHeaders(t *testing.T) {
 		{
 			desc: "Override defaults",
 			client: &Client{
-				ContentType: "bogus",
 				Token:       "abc123",
+				APIBaseURL:  "http://example.com",
+				ContentType: "bogus",
 			},
 			auth:        "Bearer abc123",
 			contentType: "bogus",

@@ -98,6 +98,7 @@ func TestSubmit(t *testing.T) {
 	// Create a fake user config.
 	usrCfg := config.NewEmptyUserConfig()
 	usrCfg.Workspace = cmdTest.TmpDir
+	usrCfg.APIBaseURL = ts.URL
 	err = usrCfg.Write()
 	assert.NoError(t, err)
 
@@ -106,13 +107,6 @@ func TestSubmit(t *testing.T) {
 	assert.NoError(t, err)
 	cliCfg.Tracks["bogus-track"] = config.NewTrack("bogus-track")
 	err = cliCfg.Write()
-	assert.NoError(t, err)
-
-	// Create a fake config.
-	cfg, err := config.NewUserConfig()
-	assert.NoError(t, err)
-	cfg.APIBaseURL = ts.URL
-	err = cfg.Write()
 	assert.NoError(t, err)
 
 	// Write mock interactive input to In for the CLI command.
