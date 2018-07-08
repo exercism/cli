@@ -26,31 +26,31 @@ func TestConfigureToken(t *testing.T) {
 		{
 			desc:       "It doesn't lose a configured value",
 			configured: "existing-token",
-			args:       []string{"--skip-auth"},
+			args:       []string{"--no-verify"},
 			expected:   "existing-token",
 		},
 		{
 			desc:       "It writes a token when passed as a flag",
 			configured: "",
-			args:       []string{"--skip-auth", "--token", "a-token"},
+			args:       []string{"--no-verify", "--token", "a-token"},
 			expected:   "a-token",
 		},
 		{
 			desc:       "It overwrites the token",
 			configured: "old-token",
-			args:       []string{"--skip-auth", "--token", "replacement-token"},
+			args:       []string{"--no-verify", "--token", "replacement-token"},
 			expected:   "replacement-token",
 		},
 		{
 			desc:       "It complains when token is neither configured nor passed",
 			configured: "",
-			args:       []string{"--skip-auth"},
+			args:       []string{"--no-verify"},
 			expected:   "",
 			err:        true,
 			message:    "no token configured",
 		},
 		{
-			desc:       "It validates the existing token if we're not skipping auth",
+			desc:       "It validates the existing token if we're not skipping validations",
 			configured: "configured-token",
 			args:       []string{},
 			expected:   "configured-token",
@@ -58,7 +58,7 @@ func TestConfigureToken(t *testing.T) {
 			message:    "token.*invalid",
 		},
 		{
-			desc:       "It validates the replacement token if we're not skipping auth",
+			desc:       "It validates the replacement token if we're not skipping validations",
 			configured: "",
 			args:       []string{"--token", "invalid-token"},
 			expected:   "",
@@ -130,7 +130,7 @@ func TestConfigure(t *testing.T) {
 		testCase{
 			desc: "It writes the flags when there is no config file.",
 			args: []string{
-				"fakeapp", "configure", "--skip-auth",
+				"fakeapp", "configure", "--no-verify",
 				"--token", "abc123",
 				"--workspace", "/workspace",
 				"--api", "http://api.example.com",
@@ -141,7 +141,7 @@ func TestConfigure(t *testing.T) {
 		testCase{
 			desc: "It overwrites the flags in the config file.",
 			args: []string{
-				"fakeapp", "configure", "--skip-auth",
+				"fakeapp", "configure", "--no-verify",
 				"--token", "new-token",
 				"--workspace", "/new-workspace",
 				"--api", "http://new.example.com",
@@ -152,7 +152,7 @@ func TestConfigure(t *testing.T) {
 		testCase{
 			desc: "It overwrites the flags that are passed, without losing the ones that are not.",
 			args: []string{
-				"fakeapp", "configure", "--skip-auth",
+				"fakeapp", "configure", "--no-verify",
 				"--token", "replacement-token",
 			},
 			existingUsrCfg: &config.UserConfig{Token: "original-token", Workspace: "/unmodified", APIBaseURL: "http://unmodified.example.com"},
@@ -160,7 +160,7 @@ func TestConfigure(t *testing.T) {
 		},
 		testCase{
 			desc:           "It gets the default API base url.",
-			args:           []string{"fakeapp", "configure", "--skip-auth"},
+			args:           []string{"fakeapp", "configure", "--no-verify"},
 			existingUsrCfg: &config.UserConfig{Workspace: "/configured-workspace"},
 			expectedUsrCfg: &config.UserConfig{Workspace: "/configured-workspace", APIBaseURL: "https://v2.exercism.io/api/v1"},
 		},
