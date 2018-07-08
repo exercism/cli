@@ -113,16 +113,20 @@ func printCurrentConfig(configuration config.Configuration) {
 }
 
 func initConfigureCmd() {
-	configureCmd.Flags().StringP("token", "t", "", "authentication token used to connect to the site")
-	configureCmd.Flags().StringP("workspace", "w", "", "directory for exercism exercises")
-	configureCmd.Flags().StringP("api", "a", "", "API base url")
-	configureCmd.Flags().BoolP("show", "s", false, "show the current configuration")
-	configureCmd.Flags().BoolP("skip-auth", "", false, "skip online token authorization check")
-
 	viperConfig = viper.New()
-	viperConfig.BindPFlag("token", configureCmd.Flags().Lookup("token"))
-	viperConfig.BindPFlag("workspace", configureCmd.Flags().Lookup("workspace"))
-	viperConfig.BindPFlag("apibaseurl", configureCmd.Flags().Lookup("api"))
+	setupConfigureFlags(configureCmd.Flags(), viperConfig)
+}
+
+func setupConfigureFlags(flags *pflag.FlagSet, v *viper.Viper) {
+	flags.StringP("token", "t", "", "authentication token used to connect to the site")
+	flags.StringP("workspace", "w", "", "directory for exercism exercises")
+	flags.StringP("api", "a", "", "API base url")
+	flags.BoolP("show", "s", false, "show the current configuration")
+	flags.BoolP("skip-auth", "", false, "skip online token authorization check")
+
+	v.BindPFlag("token", configureCmd.Flags().Lookup("token"))
+	v.BindPFlag("workspace", configureCmd.Flags().Lookup("workspace"))
+	v.BindPFlag("apibaseurl", configureCmd.Flags().Lookup("api"))
 }
 
 func init() {
