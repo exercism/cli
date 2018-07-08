@@ -45,6 +45,7 @@ Download exercises and submit your solutions.`,
 // Execute adds all child commands to the root command.
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
+		fmt.Fprintf(Err, err.Error())
 		os.Exit(-1)
 	}
 }
