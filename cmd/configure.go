@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"text/tabwriter"
 
@@ -46,9 +45,34 @@ You can also override certain default settings to suit your preferences.
 func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) error {
 	cfg := configuration.UserViperConfig
 
-	if cfg.GetString("apibaseurl") == "" {
-		cfg.Set("apibaseurl", configuration.DefaultBaseURL)
+	baseURL, err := flags.GetString("api")
+	if err != nil {
+		return err
 	}
+	if baseURL == "" {
+		baseURL = cfg.GetString("apibaseurl")
+	}
+	if baseURL == "" {
+		baseURL = configuration.DefaultBaseURL
+	}
+
+	skipVerification, err := flags.GetBool("no-verify")
+	if err != nil {
+		return err
+	}
+
+	if !skipVerification {
+		client, err := api.NewClient("", baseURL)
+		if err != nil {
+			return err
+		}
+
+		ok, err := client.IsPingable()
+		if !ok || err != nil {
+			return fmt.Errorf("The base API URL '%s' cannot be reached.\n\n%s", baseURL, err)
+		}
+	}
+	cfg.Set("apibaseurl", baseURL)
 
 	token, err := flags.GetString("token")
 	if err != nil {
@@ -63,13 +87,8 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 		return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
 	}
 
-	skipVerification, err := flags.GetBool("no-verify")
-	if err != nil {
-		return err
-	}
-
 	if !skipVerification {
-		client, err := api.NewClient(cfg.GetString("token"), cfg.GetString("apibaseurl"))
+		client, err := api.NewClient(token, baseURL)
 		if err != nil {
 			return err
 		}
@@ -78,8 +97,7 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 			return err
 		}
 		if !ok {
-			msg := fmt.Sprintf("The token '%s' is invalid. Find your token on %s.", token, tokenURL)
-			return errors.New(msg)
+			return fmt.Errorf("The token '%s' is invalid. Find your token on %s.", token, tokenURL)
 		}
 	}
 	cfg.Set("token", token)
@@ -127,7 +145,6 @@ func setupConfigureFlags(flags *pflag.FlagSet, v *viper.Viper) {
 	flags.BoolP("no-verify", "", false, "skip online token authorization check")
 
 	v.BindPFlag("workspace", flags.Lookup("workspace"))
-	v.BindPFlag("apibaseurl", flags.Lookup("api"))
 }
 
 func init() {
