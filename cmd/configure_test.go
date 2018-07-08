@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"io/ioutil"
 	"runtime"
 	"testing"
 
@@ -16,6 +17,15 @@ type testCase struct {
 }
 
 func TestConfigure(t *testing.T) {
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	Err = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+	}()
+
 	testCases := []testCase{
 		testCase{
 			desc: "It writes the flags when there is no config file.",

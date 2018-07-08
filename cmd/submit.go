@@ -100,7 +100,7 @@ figuring things out if necessary.
 			}
 			s, ok := option.(*workspace.Solution)
 			if !ok {
-				fmt.Fprintf(Out, "something went wrong trying to pick that solution, not sure what happened")
+				fmt.Fprintf(Err, "something went wrong trying to pick that solution, not sure what happened")
 				continue
 			}
 			solution = s
@@ -162,10 +162,10 @@ figuring things out if necessary.
 				return err
 			}
 			if strings.ToLower(answer) != "y" {
-				fmt.Fprintf(Out, "Submit cancelled.\nTry submitting individually instead.")
+				fmt.Fprintf(Err, "Submit cancelled.\nTry submitting individually instead.")
 				return nil
 			}
-			fmt.Fprintf(Out, "Submitting files now...")
+			fmt.Fprintf(Err, "Submitting files now...")
 		}
 
 		for _, path := range paths {
@@ -227,13 +227,15 @@ figuring things out if necessary.
 		}
 
 		if solution.AutoApprove == true {
-			fmt.Fprintf(Out, "Your solution has been submitted "+
-				"successfully and has been auto-approved. You can complete "+
-				"the exercise and unlock the next core exercise at %s\n",
-				solution.URL)
+			msg := `Your solution has been submitted successfully and has been auto-approved.
+You can complete the exercise and unlock the next core exercise at:
+`
+			fmt.Fprintf(Err, msg)
 		} else {
-			//TODO
+			msg := "Your solution has been submitted successfully. View it at:\n"
+			fmt.Fprintf(Err, msg)
 		}
+		fmt.Fprintf(Out, "%s\n", solution.URL)
 
 		return nil
 	},

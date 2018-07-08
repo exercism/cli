@@ -183,7 +183,8 @@ Download other people's solutions by providing the UUID.
 				return err
 			}
 		}
-		fmt.Fprintf(Out, "\nDownloaded to\n%s\n", solution.Dir)
+		fmt.Fprintf(Err, "\nDownloaded to\n")
+		fmt.Fprintf(Out, "%s\n", solution.Dir)
 		return nil
 	},
 }
