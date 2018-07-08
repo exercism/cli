@@ -72,14 +72,16 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	return res, nil
 }
 
-// ValidateToken calls the API to determine whether the token is valid.
-func (c *Client) ValidateToken() error {
+// TokenIsValid calls the API to determine whether the token is valid.
+func (c *Client) TokenIsValid() (bool, error) {
 	url := fmt.Sprintf("%s/validate_token", c.APIBaseURL)
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
-		return err
+		return false, err
 	}
-	_, err = c.Do(req)
-
-	return err
+	resp, err := c.Do(req)
+	if err != nil {
+		return false, err
+	}
+	return resp.StatusCode == http.StatusOK, nil
 }
