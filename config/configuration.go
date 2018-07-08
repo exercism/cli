@@ -15,16 +15,23 @@ type Configuration struct {
 	UserViperConfig     *viper.Viper
 	UserConfig          *UserConfig
 	CLI                 *CLIConfig
+	Persister           Persister
 }
 
 // NewConfiguration provides a configuration with default values.
 func NewConfiguration() Configuration {
 	home := userHome()
+	dir := Dir()
 
 	return Configuration{
-		Dir:                 Dir(),
+		Dir:                 dir,
 		Home:                home,
 		DefaultBaseURL:      defaultBaseURL,
 		DefaultWorkspaceDir: defaultWorkspace(home),
+		Persister:           FilePersister{Dir: dir},
 	}
+}
+
+func (c Configuration) Save(basename string) error {
+	return c.Persister.Save(c.UserViperConfig, basename)
 }

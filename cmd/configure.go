@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"text/tabwriter"
 
 	"github.com/exercism/cli/api"
@@ -97,23 +95,7 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 			defer printCurrentConfig(configuration)
 		}
 	}
-
-	viperConfig.SetConfigType("json")
-	viperConfig.AddConfigPath(configuration.Dir)
-	viperConfig.SetConfigName("user")
-
-	if _, err := os.Stat(configuration.Dir); os.IsNotExist(err) {
-		if err := os.MkdirAll(configuration.Dir, os.FileMode(0755)); err != nil {
-			return err
-		}
-	}
-	// WriteConfig is broken.
-	// Someone proposed a fix in https://github.com/spf13/viper/pull/503,
-	// but the fix doesn't work yet.
-	// When it's fixed and merged we can get rid of `path`
-	// and use viperConfig.WriteConfig() directly.
-	path := filepath.Join(configuration.Dir, "user.json")
-	return viperConfig.WriteConfigAs(path)
+	return configuration.Save("user")
 }
 
 func printCurrentConfig(configuration config.Configuration) {
