@@ -45,6 +45,16 @@ You can also override certain default settings to suit your preferences.
 func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) error {
 	cfg := configuration.UserViperConfig
 
+	show, err := flags.GetBool("show")
+	if err != nil {
+		return err
+	}
+
+	if show {
+		printCurrentConfig(configuration)
+		return nil
+	}
+
 	baseURL, err := flags.GetString("api")
 	if err != nil {
 		return err
@@ -108,18 +118,11 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 		cfg.Set("workspace", config.DefaultWorkspaceDir(configuration))
 	}
 
-	show, err := flags.GetBool("show")
-	if err != nil {
-		return err
-	}
-	if show {
-		defer printCurrentConfig(configuration)
-	}
 	return configuration.Save("user")
 }
 
 func printCurrentConfig(configuration config.Configuration) {
-	w := tabwriter.NewWriter(Out, 0, 0, 2, ' ', 0)
+	w := tabwriter.NewWriter(Err, 0, 0, 2, ' ', 0)
 	defer w.Flush()
 
 	v := configuration.UserViperConfig
