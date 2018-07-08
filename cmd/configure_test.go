@@ -111,6 +111,93 @@ func TestConfigureToken(t *testing.T) {
 	}
 }
 
+func TestConfigureAPIBaseURL(t *testing.T) {
+	endpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/ping" {
+			w.WriteHeader(http.StatusNotFound)
+		}
+	})
+	ts := httptest.NewServer(endpoint)
+	defer ts.Close()
+
+	testCases := []struct {
+		desc       string
+		configured string
+		args       []string
+		expected   string
+		message    string
+		err        bool
+	}{
+		{
+			desc:       "It doesn't lose a configured value",
+			configured: "http://example.com",
+			args:       []string{"--no-verify"},
+			expected:   "http://example.com",
+		},
+		{
+			desc:       "It writes a base url when passed as a flag",
+			configured: "",
+			args:       []string{"--no-verify", "--api", "http://api.example.com"},
+			expected:   "http://api.example.com",
+		},
+		{
+			desc:       "It overwrites the base url",
+			configured: "http://old.example.com",
+			args:       []string{"--no-verify", "--api", "http://replacement.example.com"},
+			expected:   "http://replacement.example.com",
+		},
+		{
+			desc:       "It validates the existing base url if we're not skipping validations",
+			configured: ts.URL,
+			args:       []string{},
+			expected:   ts.URL,
+			err:        true,
+			message:    "API.*cannot be reached",
+		},
+		{
+			desc:       "It validates the replacement base URL if we're not skipping validations",
+			configured: "",
+			args:       []string{"--api", ts.URL},
+			expected:   "",
+			err:        true,
+			message:    "API.*cannot be reached",
+		},
+	}
+
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+	}()
+
+	for _, tc := range testCases {
+		var buf bytes.Buffer
+		Err = &buf
+
+		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+		v := viper.New()
+		v.Set("apibaseurl", tc.configured)
+		setupConfigureFlags(flags, v)
+
+		err := flags.Parse(tc.args)
+		assert.NoError(t, err)
+
+		cfg := config.Configuration{
+			Persister:       config.InMemoryPersister{},
+			UserViperConfig: v,
+			DefaultBaseURL:  ts.URL,
+		}
+
+		err = runConfigure(cfg, flags)
+		if err != nil || tc.err {
+			assert.Regexp(t, tc.message, err.Error(), tc.desc)
+		}
+		assert.Equal(t, tc.expected, cfg.UserViperConfig.GetString("apibaseurl"), tc.desc)
+	}
+}
+
 func TestConfigure(t *testing.T) {
 	oldOut := Out
 	oldErr := Err
