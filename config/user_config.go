@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	defaultBaseURL = "https://v2.exercism.io/api/v1"
+	defaultBaseURL = "https://mentors-beta.exercism.io/api/v1"
 )
 
 // UserConfig contains user-specific settings.
