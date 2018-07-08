@@ -16,6 +16,31 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestBareConfigure(t *testing.T) {
+	oldErr := Err
+	defer func() {
+		Err = oldErr
+	}()
+
+	var buf bytes.Buffer
+	Err = &buf
+
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	v := viper.New()
+	setupConfigureFlags(flags, v)
+	err := flags.Parse([]string{})
+	assert.NoError(t, err)
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+		DefaultBaseURL:  "http://example.com",
+	}
+
+	err = runConfigure(cfg, flags)
+	assert.Regexp(t, "no token configured", err.Error())
+}
+
 func TestConfigureShow(t *testing.T) {
 	oldErr := Err
 	defer func() {
@@ -194,7 +219,7 @@ func TestConfigureAPIBaseURL(t *testing.T) {
 		{
 			desc:       "It validates the existing base url if we're not skipping validations",
 			configured: ts.URL,
-			args:       []string{},
+			args:       []string{"--token", "some-token"}, // need to bypass the error message on "bare configure"
 			expected:   ts.URL,
 			err:        true,
 			message:    "API.*cannot be reached",

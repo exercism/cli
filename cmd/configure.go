@@ -49,10 +49,18 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 	if err != nil {
 		return err
 	}
-
 	if show {
 		printCurrentConfig(configuration)
 		return nil
+	}
+
+	if flags.NFlag() == 0 && cfg.GetString("token") == "" {
+		baseURL := cfg.GetString("apibaseurl")
+		if baseURL != "" {
+			tokenURL := config.InferSiteURL(baseURL) + "/my/settings"
+			return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
+		}
+		return fmt.Errorf("There is no token configured. Find your token in your settings on the website, and call this command again with --token=<your-token>.")
 	}
 
 	baseURL, err := flags.GetString("api")
