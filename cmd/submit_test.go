@@ -16,11 +16,15 @@ import (
 
 func TestSubmit(t *testing.T) {
 	oldOut := Out
+	oldErr := Err
 	oldIn := In
 	Out = ioutil.Discard
-
-	defer func() { Out = oldOut }()
-	defer func() { In = oldIn }()
+	Err = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+		In = oldIn
+	}()
 
 	type file struct {
 		relativePath string
