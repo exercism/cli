@@ -7,6 +7,7 @@ import (
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -33,54 +34,59 @@ You can also override certain default settings to suit your preferences.
 		if err != nil {
 			return err
 		}
-		cfg.Workspace = config.Resolve(cfg.Workspace, cfg.Home)
-		cfg.SetDefaults()
-
-		show, err := cmd.Flags().GetBool("show")
-		if err != nil {
-			return err
-		}
-		if show {
-			defer printCurrentConfig()
-		}
-		client, err := api.NewClient(cfg.Token, cfg.APIBaseURL)
-		if err != nil {
-			return err
-		}
-
-		switch {
-		case cfg.Token == "":
-			fmt.Fprintln(Err, "There is no token configured, please set it using --token.")
-		case cmd.Flags().Lookup("token").Changed:
-			// User set new token
-			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
-			if !skipAuth {
-				ok, err := client.TokenIsValid()
-				if err != nil {
-					return err
-				}
-				if !ok {
-					fmt.Fprintln(Err, "The token is invalid.")
-				}
-			}
-		default:
-			// Validate existing token
-			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
-			if !skipAuth {
-				ok, err := client.TokenIsValid()
-				if err != nil {
-					return err
-				}
-				if !ok {
-					fmt.Fprintln(Err, "The token is invalid.")
-				}
-
-				defer printCurrentConfig()
-			}
-		}
-
-		return cfg.Write()
+		configuration := config.NewConfiguration()
+		configuration.UserConfig = cfg
+		return runConfigure(configuration, cmd.Flags())
 	},
+}
+
+func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) error {
+	cfg := configuration.UserConfig
+	cfg.Workspace = config.Resolve(cfg.Workspace, cfg.Home)
+	cfg.SetDefaults()
+
+	show, err := flags.GetBool("show")
+	if err != nil {
+		return err
+	}
+	if show {
+		defer printCurrentConfig()
+	}
+	client, err := api.NewClient(cfg.Token, cfg.APIBaseURL)
+	if err != nil {
+		return err
+	}
+
+	switch {
+	case cfg.Token == "":
+		fmt.Fprintln(Err, "There is no token configured, please set it using --token.")
+	case flags.Lookup("token").Changed:
+		// User set new token
+		skipAuth, _ := flags.GetBool("skip-auth")
+		if !skipAuth {
+			ok, err := client.TokenIsValid()
+			if err != nil {
+				return err
+			}
+			if !ok {
+				fmt.Fprintln(Err, "The token is invalid.")
+			}
+		}
+	default:
+		// Validate existing token
+		skipAuth, _ := flags.GetBool("skip-auth")
+		if !skipAuth {
+			ok, err := client.TokenIsValid()
+			if err != nil {
+				return err
+			}
+			if !ok {
+				fmt.Fprintln(Err, "The token is invalid.")
+			}
+		}
+	}
+
+	return cfg.Write()
 }
 
 func printCurrentConfig() {
