@@ -14,6 +14,51 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestConfigureShow(t *testing.T) {
+	oldErr := Err
+	defer func() {
+		Err = oldErr
+	}()
+
+	var buf bytes.Buffer
+	Err = &buf
+
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	v := viper.New()
+	v.Set("token", "configured-token")
+	v.Set("workspace", "configured-workspace")
+	v.Set("apibaseurl", "http://configured.example.com")
+
+	setupConfigureFlags(flags, v)
+
+	// it will ignore any flags
+	args := []string{
+		"--show",
+		"--api", "http://override.example.com",
+		"--token", "token-override",
+		"--workspace", "workspace-override",
+	}
+	err := flags.Parse(args)
+	assert.NoError(t, err)
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+	}
+
+	err = runConfigure(cfg, flags)
+	assert.NoError(t, err)
+
+	assert.Regexp(t, "configured.example", Err)
+	assert.NotRegexp(t, "override.example", Err)
+
+	assert.Regexp(t, "configured-token", Err)
+	assert.NotRegexp(t, "token-overrid", Err)
+
+	assert.Regexp(t, "configured-workspace", Err)
+	assert.NotRegexp(t, "workspace-override", Err)
+}
+
 func TestConfigureToken(t *testing.T) {
 	testCases := []struct {
 		desc       string
