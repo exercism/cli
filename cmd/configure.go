@@ -45,6 +45,7 @@ You can also override certain default settings to suit your preferences.
 func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) error {
 	cfg := configuration.UserViperConfig
 
+	// Show the existing configuration and exit.
 	show, err := flags.GetBool("show")
 	if err != nil {
 		return err
@@ -54,15 +55,20 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 		return nil
 	}
 
+	// If the command is run 'bare' and we have no token,
+	// explain how to set the token.
 	if flags.NFlag() == 0 && cfg.GetString("token") == "" {
 		baseURL := cfg.GetString("apibaseurl")
 		if baseURL != "" {
+			// If we have a base URL, then give the exact link.
 			tokenURL := config.InferSiteURL(baseURL) + "/my/settings"
 			return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
 		}
+		// If we don't, then do our best.
 		return fmt.Errorf("There is no token configured. Find your token in your settings on the website, and call this command again with --token=<your-token>.")
 	}
 
+	// Determine the base API URL.
 	baseURL, err := flags.GetString("api")
 	if err != nil {
 		return err
@@ -74,11 +80,15 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 		baseURL = configuration.DefaultBaseURL
 	}
 
+	// By default we verify that
+	// - the configured API URL is reachable.
+	// - the configured token is valid.
 	skipVerification, err := flags.GetBool("no-verify")
 	if err != nil {
 		return err
 	}
 
+	// Is the API URL reachable?
 	if !skipVerification {
 		client, err := api.NewClient("", baseURL)
 		if err != nil {
@@ -90,8 +100,10 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 			return fmt.Errorf("The base API URL '%s' cannot be reached.\n\n%s", baseURL, err)
 		}
 	}
+	// Finally, configure the URL.
 	cfg.Set("apibaseurl", baseURL)
 
+	// Determine the token.
 	token, err := flags.GetString("token")
 	if err != nil {
 		return err
@@ -100,11 +112,15 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 		token = cfg.GetString("token")
 	}
 
+	// Infer the URL where the token can be found.
 	tokenURL := config.InferSiteURL(cfg.GetString("apibaseurl")) + "/my/settings"
+
+	// If we don't have a token then explain how to set it and bail.
 	if token == "" {
 		return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
 	}
 
+	// Verify that the token is valid.
 	if !skipVerification {
 		client, err := api.NewClient(token, baseURL)
 		if err != nil {
@@ -118,8 +134,11 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 			return fmt.Errorf("The token '%s' is invalid. Find your token on %s.", token, tokenURL)
 		}
 	}
+
+	// Finally, configure the token.
 	cfg.Set("token", token)
 
+	// Determine the workspace.
 	workspace, err := flags.GetString("workspace")
 	if err != nil {
 		return err
@@ -131,8 +150,10 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 	if workspace == "" {
 		workspace = config.DefaultWorkspaceDir(configuration)
 	}
+	// Configure the workspace.
 	cfg.Set("workspace", workspace)
 
+	// Persist the new configuration.
 	return configuration.Save("user")
 }
 
