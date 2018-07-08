@@ -55,22 +55,27 @@ You can also override certain default settings to suit your preferences.
 			// User set new token
 			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
 			if !skipAuth {
-				err = client.ValidateToken()
+				ok, err := client.TokenIsValid()
 				if err != nil {
 					return err
+				}
+				if !ok {
+					fmt.Fprintln(Err, "The token is invalid.")
 				}
 			}
 		default:
 			// Validate existing token
-			if !show {
-				defer printCurrentConfig()
-			}
 			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
 			if !skipAuth {
-				err = client.ValidateToken()
+				ok, err := client.TokenIsValid()
 				if err != nil {
-					fmt.Fprintln(Err, err)
+					return err
 				}
+				if !ok {
+					fmt.Fprintln(Err, "The token is invalid.")
+				}
+
+				defer printCurrentConfig()
 			}
 		}
 
