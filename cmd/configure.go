@@ -120,11 +120,18 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 	}
 	cfg.Set("token", token)
 
-	cfg.Set("workspace", config.Resolve(viperConfig.GetString("workspace"), configuration.Home))
-
-	if cfg.GetString("workspace") == "" {
-		cfg.Set("workspace", configuration.DefaultWorkspaceDir)
+	workspace, err := flags.GetString("workspace")
+	if err != nil {
+		return err
 	}
+	if workspace == "" {
+		workspace = cfg.GetString("workspace")
+	}
+	workspace = config.Resolve(workspace, configuration.Home)
+	if workspace == "" {
+		workspace = configuration.DefaultWorkspaceDir
+	}
+	cfg.Set("workspace", workspace)
 
 	return configuration.Save("user")
 }
@@ -145,17 +152,15 @@ func printCurrentConfig(configuration config.Configuration) {
 
 func initConfigureCmd() {
 	viperConfig = viper.New()
-	setupConfigureFlags(configureCmd.Flags(), viperConfig)
+	setupConfigureFlags(configureCmd.Flags())
 }
 
-func setupConfigureFlags(flags *pflag.FlagSet, v *viper.Viper) {
+func setupConfigureFlags(flags *pflag.FlagSet) {
 	flags.StringP("token", "t", "", "authentication token used to connect to the site")
 	flags.StringP("workspace", "w", "", "directory for exercism exercises")
 	flags.StringP("api", "a", "", "API base url")
 	flags.BoolP("show", "s", false, "show the current configuration")
 	flags.BoolP("no-verify", "", false, "skip online token authorization check")
-
-	v.BindPFlag("workspace", flags.Lookup("workspace"))
 }
 
 func init() {
