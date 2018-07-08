@@ -66,12 +66,12 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 		return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
 	}
 
-	skipAuth, err := flags.GetBool("skip-auth")
+	skipVerification, err := flags.GetBool("no-verify")
 	if err != nil {
 		return err
 	}
 
-	if !skipAuth {
+	if !skipVerification {
 		client, err := api.NewClient(cfg.GetString("token"), cfg.GetString("apibaseurl"))
 		if err != nil {
 			return err
@@ -127,7 +127,7 @@ func setupConfigureFlags(flags *pflag.FlagSet, v *viper.Viper) {
 	flags.StringP("workspace", "w", "", "directory for exercism exercises")
 	flags.StringP("api", "a", "", "API base url")
 	flags.BoolP("show", "s", false, "show the current configuration")
-	flags.BoolP("skip-auth", "", false, "skip online token authorization check")
+	flags.BoolP("no-verify", "", false, "skip online token authorization check")
 
 	v.BindPFlag("workspace", flags.Lookup("workspace"))
 	v.BindPFlag("apibaseurl", flags.Lookup("api"))
