@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"text/tabwriter"
 
@@ -68,7 +69,7 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 
 	switch {
 	case cfg.GetString("token") == "":
-		fmt.Fprintln(Err, "There is no token configured, please set it using --token.")
+		return errors.New("There is no token configured, please set it using --token.")
 	case flags.Lookup("token").Changed:
 		// User set new token
 		skipAuth, _ := flags.GetBool("skip-auth")
@@ -78,7 +79,7 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 				return err
 			}
 			if !ok {
-				fmt.Fprintln(Err, "The token is invalid.")
+				return errors.New("The token is invalid.")
 			}
 		}
 	default:
@@ -90,7 +91,7 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 				return err
 			}
 			if !ok {
-				fmt.Fprintln(Err, "The token is invalid.")
+				return errors.New("The token is invalid.")
 			}
 			defer printCurrentConfig(configuration)
 		}
