@@ -50,7 +50,7 @@ You can also override certain default settings to suit your preferences.
 
 		switch {
 		case cfg.Token == "":
-			fmt.Fprintln(Out, "There is no token configured, please set it using --token.")
+			fmt.Fprintln(Err, "There is no token configured, please set it using --token.")
 		case cmd.Flags().Lookup("token").Changed:
 			// User set new token
 			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
@@ -69,7 +69,7 @@ You can also override certain default settings to suit your preferences.
 			if !skipAuth {
 				err = client.ValidateToken()
 				if err != nil {
-					fmt.Fprintln(Out, err)
+					fmt.Fprintln(Err, err)
 				}
 			}
 		}
