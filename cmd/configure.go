@@ -154,7 +154,11 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 	cfg.Set("workspace", workspace)
 
 	// Persist the new configuration.
-	return configuration.Save("user")
+	if err := configuration.Save("user"); err != nil {
+		return err
+	}
+	printCurrentConfig(configuration)
+	return nil
 }
 
 func printCurrentConfig(configuration config.Configuration) {

@@ -271,6 +271,12 @@ func TestConfigureAPIBaseURL(t *testing.T) {
 }
 
 func TestConfigureWorkspace(t *testing.T) {
+	oldErr := Err
+	Err = ioutil.Discard
+	defer func() {
+		Err = oldErr
+	}()
+
 	testCases := []struct {
 		desc       string
 		configured string
