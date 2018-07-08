@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 	"runtime"
 
 	"github.com/spf13/viper"
@@ -88,7 +88,7 @@ func userHome() string {
 }
 
 func defaultWorkspace(home string) string {
-	dir := path.Join(home, DefaultDirName)
+	dir := filepath.Join(home, DefaultDirName)
 	_, err := os.Stat(dir)
 	// Sorry about the double negative.
 	if !os.IsNotExist(err) {

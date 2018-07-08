@@ -2,7 +2,6 @@ package config
 
 import (
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -15,7 +14,7 @@ var (
 
 // SetDefaultDirName configures the default directory name based on the name of the binary.
 func SetDefaultDirName(binaryName string) {
-	DefaultDirName = strings.Replace(path.Base(binaryName), ".exe", "", 1)
+	DefaultDirName = strings.Replace(filepath.Base(binaryName), ".exe", "", 1)
 }
 
 // Dir is the configured config home directory.
