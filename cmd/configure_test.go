@@ -9,13 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type testCase struct {
-	desc           string
-	args           []string
-	existingUsrCfg *config.UserConfig
-	expectedUsrCfg *config.UserConfig
-}
-
 func TestConfigure(t *testing.T) {
 	oldOut := Out
 	oldErr := Err
@@ -25,6 +18,13 @@ func TestConfigure(t *testing.T) {
 		Out = oldOut
 		Err = oldErr
 	}()
+
+	type testCase struct {
+		desc           string
+		args           []string
+		existingUsrCfg *config.UserConfig
+		expectedUsrCfg *config.UserConfig
+	}
 
 	testCases := []testCase{
 		testCase{
@@ -67,13 +67,6 @@ func TestConfigure(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.desc, makeTest(tc))
-	}
-}
-
-func makeTest(tc testCase) func(*testing.T) {
-
-	return func(t *testing.T) {
 		cmdTest := &CommandTest{
 			Cmd:    configureCmd,
 			InitFn: initConfigureCmd,
