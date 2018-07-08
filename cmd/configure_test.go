@@ -26,8 +26,9 @@ func TestBareConfigure(t *testing.T) {
 	Err = &buf
 
 	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	setupConfigureFlags(flags)
+
 	v := viper.New()
-	setupConfigureFlags(flags, v)
 	err := flags.Parse([]string{})
 	assert.NoError(t, err)
 
@@ -51,12 +52,12 @@ func TestConfigureShow(t *testing.T) {
 	Err = &buf
 
 	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	setupConfigureFlags(flags)
+
 	v := viper.New()
 	v.Set("token", "configured-token")
 	v.Set("workspace", "configured-workspace")
 	v.Set("apibaseurl", "http://configured.example.com")
-
-	setupConfigureFlags(flags, v)
 
 	// it will ignore any flags
 	args := []string{
@@ -160,9 +161,10 @@ func TestConfigureToken(t *testing.T) {
 		Err = &buf
 
 		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+		setupConfigureFlags(flags)
+
 		v := viper.New()
 		v.Set("token", tc.configured)
-		setupConfigureFlags(flags, v)
 
 		err := flags.Parse(tc.args)
 		assert.NoError(t, err)
@@ -247,9 +249,10 @@ func TestConfigureAPIBaseURL(t *testing.T) {
 		Err = &buf
 
 		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+		setupConfigureFlags(flags)
+
 		v := viper.New()
 		v.Set("apibaseurl", tc.configured)
-		setupConfigureFlags(flags, v)
 
 		err := flags.Parse(tc.args)
 		assert.NoError(t, err)
@@ -265,6 +268,86 @@ func TestConfigureAPIBaseURL(t *testing.T) {
 			assert.Regexp(t, tc.message, err.Error(), tc.desc)
 		}
 		assert.Equal(t, tc.expected, cfg.UserViperConfig.GetString("apibaseurl"), tc.desc)
+	}
+}
+
+func TestConfigureWorkspace(t *testing.T) {
+	testCases := []struct {
+		desc       string
+		configured string
+		args       []string
+		expected   string
+		message    string
+		err        bool
+	}{
+		{
+			desc:       "It doesn't lose a configured value",
+			configured: "/the-workspace",
+			args:       []string{"--no-verify"},
+			expected:   "/the-workspace",
+		},
+		{
+			desc:       "It writes a workspace when passed as a flag",
+			configured: "",
+			args:       []string{"--no-verify", "--workspace", "/new-workspace"},
+			expected:   "/new-workspace",
+		},
+		{
+			desc:       "It overwrites the configured workspace",
+			configured: "/configured-workspace",
+			args:       []string{"--no-verify", "--workspace", "/replacement-workspace"},
+			expected:   "/replacement-workspace",
+		},
+		{
+			desc:       "It gets the default workspace when neither configured nor passed as a flag",
+			configured: "",
+			args:       []string{"--token", "some-token"}, // need to bypass the error message on "bare configure"
+			expected:   "/home/default-workspace",
+		},
+		{
+			desc:       "It resolves the passed workspace to expand ~",
+			configured: "",
+			args:       []string{"--workspace", "~/workspace-dir"},
+			expected:   "/home/workspace-dir",
+		},
+
+		{
+			desc:       "It resolves the configured workspace to expand ~",
+			configured: "~/configured-dir",
+			args:       []string{"--token", "some-token"}, // need to bypass the error message on "bare configure"
+			expected:   "/home/configured-dir",            // The configuration object hard-codes the home directory below
+		},
+	}
+
+	endpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// 200 OK by default. Ping and TokenAuth will both pass.
+	})
+	ts := httptest.NewServer(endpoint)
+	defer ts.Close()
+
+	for _, tc := range testCases {
+		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+		setupConfigureFlags(flags)
+
+		v := viper.New()
+		v.Set("token", "abc123") // set a token so we get past the no token configured logic
+		v.Set("workspace", tc.configured)
+
+		err := flags.Parse(tc.args)
+		assert.NoError(t, err)
+
+		cfg := config.Configuration{
+			Persister:       config.InMemoryPersister{},
+			UserViperConfig: v,
+			DefaultBaseURL:  ts.URL,
+			DefaultDirName:  "default-workspace",
+			Home:            "/home",
+			OS:              "linux",
+		}
+
+		err = runConfigure(cfg, flags)
+		assert.NoError(t, err, tc.desc)
+		assert.Equal(t, tc.expected, cfg.UserViperConfig.GetString("workspace"), tc.desc)
 	}
 }
 
