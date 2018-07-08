@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"text/tabwriter"
 
 	"github.com/exercism/cli/api"
@@ -29,36 +31,45 @@ places.
 You can also override certain default settings to suit your preferences.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg := config.NewEmptyUserConfig()
-		err := cfg.Load(viperConfig)
-		if err != nil {
-			return err
-		}
 		configuration := config.NewConfiguration()
-		configuration.UserConfig = cfg
+
+		viperConfig.AddConfigPath(configuration.Dir)
+		viperConfig.SetConfigName("user")
+		viperConfig.SetConfigType("json")
+		// Ignore error. If the file doesn't exist, that is fine.
+		_ = viperConfig.ReadInConfig()
+		configuration.UserViperConfig = viperConfig
+
 		return runConfigure(configuration, cmd.Flags())
 	},
 }
 
 func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) error {
-	cfg := configuration.UserConfig
-	cfg.Workspace = config.Resolve(cfg.Workspace, cfg.Home)
-	cfg.SetDefaults()
+	cfg := configuration.UserViperConfig
+
+	cfg.Set("workspace", config.Resolve(viperConfig.GetString("workspace"), configuration.Home))
+
+	if cfg.GetString("apibaseurl") == "" {
+		cfg.Set("apibaseurl", configuration.DefaultBaseURL)
+	}
+	if cfg.GetString("workspace") == "" {
+		cfg.Set("workspace", configuration.DefaultWorkspaceDir)
+	}
 
 	show, err := flags.GetBool("show")
 	if err != nil {
 		return err
 	}
 	if show {
-		defer printCurrentConfig()
+		defer printCurrentConfig(configuration)
 	}
-	client, err := api.NewClient(cfg.Token, cfg.APIBaseURL)
+	client, err := api.NewClient(cfg.GetString("token"), cfg.GetString("apibaseurl"))
 	if err != nil {
 		return err
 	}
 
 	switch {
-	case cfg.Token == "":
+	case cfg.GetString("token") == "":
 		fmt.Fprintln(Err, "There is no token configured, please set it using --token.")
 	case flags.Lookup("token").Changed:
 		// User set new token
@@ -83,25 +94,39 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 			if !ok {
 				fmt.Fprintln(Err, "The token is invalid.")
 			}
+			defer printCurrentConfig(configuration)
 		}
 	}
 
-	return cfg.Write()
+	viperConfig.SetConfigType("json")
+	viperConfig.AddConfigPath(configuration.Dir)
+	viperConfig.SetConfigName("user")
+
+	if _, err := os.Stat(configuration.Dir); os.IsNotExist(err) {
+		if err := os.MkdirAll(configuration.Dir, os.FileMode(0755)); err != nil {
+			return err
+		}
+	}
+	// WriteConfig is broken.
+	// Someone proposed a fix in https://github.com/spf13/viper/pull/503,
+	// but the fix doesn't work yet.
+	// When it's fixed and merged we can get rid of `path`
+	// and use viperConfig.WriteConfig() directly.
+	path := filepath.Join(configuration.Dir, "user.json")
+	return viperConfig.WriteConfigAs(path)
 }
 
-func printCurrentConfig() {
-	cfg, err := config.NewUserConfig()
-	if err != nil {
-		return
-	}
+func printCurrentConfig(configuration config.Configuration) {
 	w := tabwriter.NewWriter(Out, 0, 0, 2, ' ', 0)
 	defer w.Flush()
 
+	v := configuration.UserViperConfig
+
 	fmt.Fprintln(w, "")
-	fmt.Fprintln(w, fmt.Sprintf("Config dir:\t%s", config.Dir()))
-	fmt.Fprintln(w, fmt.Sprintf("-t, --token\t%s", cfg.Token))
-	fmt.Fprintln(w, fmt.Sprintf("-w, --workspace\t%s", cfg.Workspace))
-	fmt.Fprintln(w, fmt.Sprintf("-a, --api\t%s", cfg.APIBaseURL))
+	fmt.Fprintln(w, fmt.Sprintf("Config dir:\t%s", configuration.Dir))
+	fmt.Fprintln(w, fmt.Sprintf("-t, --token\t%s", v.GetString("token")))
+	fmt.Fprintln(w, fmt.Sprintf("-w, --workspace\t%s", v.GetString("workspace")))
+	fmt.Fprintln(w, fmt.Sprintf("-a, --api\t%s", v.GetString("apibaseurl")))
 	fmt.Fprintln(w, "")
 }
 
