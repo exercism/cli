@@ -3,13 +3,113 @@
 package cmd
 
 import (
+	"bytes"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"runtime"
 	"testing"
 
 	"github.com/exercism/cli/config"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestConfigureToken(t *testing.T) {
+	testCases := []struct {
+		desc       string
+		configured string
+		args       []string
+		expected   string
+		message    string
+		err        bool
+	}{
+		{
+			desc:       "It doesn't lose a configured value",
+			configured: "existing-token",
+			args:       []string{"--skip-auth"},
+			expected:   "existing-token",
+		},
+		{
+			desc:       "It writes a token when passed as a flag",
+			configured: "",
+			args:       []string{"--skip-auth", "--token", "a-token"},
+			expected:   "a-token",
+		},
+		{
+			desc:       "It overwrites the token",
+			configured: "old-token",
+			args:       []string{"--skip-auth", "--token", "replacement-token"},
+			expected:   "replacement-token",
+		},
+		{
+			desc:       "It complains when token is neither configured nor passed",
+			configured: "",
+			args:       []string{"--skip-auth"},
+			expected:   "",
+			err:        true,
+			message:    "no token configured",
+		},
+		{
+			desc:       "It validates the existing token if we're not skipping auth",
+			configured: "configured-token",
+			args:       []string{},
+			expected:   "configured-token",
+			err:        true,
+			message:    "token.*invalid",
+		},
+		{
+			desc:       "It validates the replacement token if we're not skipping auth",
+			configured: "",
+			args:       []string{"--token", "invalid-token"},
+			expected:   "",
+			err:        true,
+			message:    "token.*invalid",
+		},
+	}
+
+	endpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/validate_token" {
+			w.WriteHeader(http.StatusUnauthorized)
+		}
+	})
+	ts := httptest.NewServer(endpoint)
+	defer ts.Close()
+
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+	}()
+
+	for _, tc := range testCases {
+		var buf bytes.Buffer
+		Err = &buf
+
+		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+		v := viper.New()
+		v.Set("token", tc.configured)
+		setupConfigureFlags(flags, v)
+
+		err := flags.Parse(tc.args)
+		assert.NoError(t, err)
+
+		cfg := config.Configuration{
+			Persister:       config.InMemoryPersister{},
+			UserViperConfig: v,
+			DefaultBaseURL:  ts.URL,
+		}
+
+		err = runConfigure(cfg, flags)
+		if err != nil || tc.err {
+			assert.Regexp(t, tc.message, err.Error(), tc.desc)
+		}
+		assert.Equal(t, tc.expected, cfg.UserViperConfig.GetString("token"), tc.desc)
+	}
+}
 
 func TestConfigure(t *testing.T) {
 	oldOut := Out

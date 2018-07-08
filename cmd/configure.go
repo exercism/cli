@@ -46,11 +46,49 @@ You can also override certain default settings to suit your preferences.
 func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) error {
 	cfg := configuration.UserViperConfig
 
-	cfg.Set("workspace", config.Resolve(viperConfig.GetString("workspace"), configuration.Home))
-
 	if cfg.GetString("apibaseurl") == "" {
 		cfg.Set("apibaseurl", configuration.DefaultBaseURL)
 	}
+	if cfg.GetString("workspace") == "" {
+		cfg.Set("workspace", config.DefaultWorkspaceDir(configuration))
+	}
+
+	token, err := flags.GetString("token")
+	if err != nil {
+		return err
+	}
+	if token == "" {
+		token = cfg.GetString("token")
+	}
+
+	tokenURL := config.InferSiteURL(cfg.GetString("apibaseurl")) + "/my/settings"
+	if token == "" {
+		return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
+	}
+
+	skipAuth, err := flags.GetBool("skip-auth")
+	if err != nil {
+		return err
+	}
+
+	if !skipAuth {
+		client, err := api.NewClient(cfg.GetString("token"), cfg.GetString("apibaseurl"))
+		if err != nil {
+			return err
+		}
+		ok, err := client.TokenIsValid()
+		if err != nil {
+			return err
+		}
+		if !ok {
+			msg := fmt.Sprintf("The token '%s' is invalid. Find your token on %s.", token, tokenURL)
+			return errors.New(msg)
+		}
+	}
+	cfg.Set("token", token)
+
+	cfg.Set("workspace", config.Resolve(viperConfig.GetString("workspace"), configuration.Home))
+
 	if cfg.GetString("workspace") == "" {
 		cfg.Set("workspace", config.DefaultWorkspaceDir(configuration))
 	}
@@ -61,40 +99,6 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 	}
 	if show {
 		defer printCurrentConfig(configuration)
-	}
-	client, err := api.NewClient(cfg.GetString("token"), cfg.GetString("apibaseurl"))
-	if err != nil {
-		return err
-	}
-
-	switch {
-	case cfg.GetString("token") == "":
-		return errors.New("There is no token configured, please set it using --token.")
-	case flags.Lookup("token").Changed:
-		// User set new token
-		skipAuth, _ := flags.GetBool("skip-auth")
-		if !skipAuth {
-			ok, err := client.TokenIsValid()
-			if err != nil {
-				return err
-			}
-			if !ok {
-				return errors.New("The token is invalid.")
-			}
-		}
-	default:
-		// Validate existing token
-		skipAuth, _ := flags.GetBool("skip-auth")
-		if !skipAuth {
-			ok, err := client.TokenIsValid()
-			if err != nil {
-				return err
-			}
-			if !ok {
-				return errors.New("The token is invalid.")
-			}
-			defer printCurrentConfig(configuration)
-		}
 	}
 	return configuration.Save("user")
 }
@@ -125,9 +129,8 @@ func setupConfigureFlags(flags *pflag.FlagSet, v *viper.Viper) {
 	flags.BoolP("show", "s", false, "show the current configuration")
 	flags.BoolP("skip-auth", "", false, "skip online token authorization check")
 
-	v.BindPFlag("token", configureCmd.Flags().Lookup("token"))
-	v.BindPFlag("workspace", configureCmd.Flags().Lookup("workspace"))
-	v.BindPFlag("apibaseurl", configureCmd.Flags().Lookup("api"))
+	v.BindPFlag("workspace", flags.Lookup("workspace"))
+	v.BindPFlag("apibaseurl", flags.Lookup("api"))
 }
 
 func init() {
