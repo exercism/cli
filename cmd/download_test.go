@@ -44,6 +44,9 @@ const payloadTemplate = `
 `
 
 func TestDownload(t *testing.T) {
+	oldOut := Out
+	Out = ioutil.Discard
+	defer func() { Out = oldOut }()
 
 	cmdTest := &CommandTest{
 		Cmd:    downloadCmd,
