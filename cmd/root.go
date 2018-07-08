@@ -19,8 +19,10 @@ var (
 	// The usage examples and help strings should reflect
 	// the actual name of the binary.
 	BinaryName string
-	// Out is used to write to the required writer.
+	// Out is used to write to information.
 	Out io.Writer
+	// Err is used to write errors.
+	Err io.Writer
 	// In is used to provide mocked test input (i.e. for prompts).
 	In io.Reader
 )
@@ -51,6 +53,7 @@ func init() {
 	BinaryName = os.Args[0]
 	config.SetDefaultDirName(BinaryName)
 	Out = os.Stdout
+	Err = os.Stderr
 	In = os.Stdin
 	api.UserAgent = fmt.Sprintf("github.com/exercism/cli v%s (%s/%s)", Version, runtime.GOOS, runtime.GOARCH)
 	RootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
