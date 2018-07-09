@@ -21,6 +21,7 @@ var (
 // Once we do, we can rename this type to Config, and get rid of the
 // User and CLI fields.
 type Configuration struct {
+	OS                  string
 	Home                string
 	Dir                 string
 	DefaultBaseURL      string
@@ -35,6 +36,7 @@ func NewConfiguration() Configuration {
 	home := userHome()
 
 	return Configuration{
+		OS:                  runtime.GOOS,
 		Dir:                 Dir(),
 		Home:                home,
 		DefaultBaseURL:      defaultBaseURL,
