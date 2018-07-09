@@ -36,7 +36,48 @@ If called with the name of an exercise, it will work out which
 track it is on and submit it. The command will ask for help
 figuring things out if necessary.
 `,
+	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		// Validate input before doing any other work
+		exercise, err := cmd.Flags().GetString("exercise")
+		if err != nil {
+			return err
+		}
+
+		trackID, err := cmd.Flags().GetString("track")
+		if err != nil {
+			return err
+		}
+
+		files, err := cmd.Flags().GetStringSlice("files")
+		if err != nil {
+			return err
+		}
+
+		// Verify that both --track and --exercise are used together
+		if len(args) == 0 && len(files) == 0 && !(exercise != "" && trackID != "") {
+			// Are they both missing?
+			if exercise == "" && trackID == "" {
+				return errors.New("Please use the --exercise/--trackID flags to submit without an explicit directory or files.")
+			}
+			// Guess that --trackID is missing, unless it's not
+			present, missing := "--exercise", "--track"
+			if trackID != "" {
+				present, missing = missing, present
+			}
+			// Help user correct CLI command
+			missingFlagMessage := fmt.Sprintf("You specified %s, please also include %s.", present, missing)
+			return errors.New(missingFlagMessage)
+		}
+
+		if len(args) > 0 && (exercise != "" || trackID != "") {
+			return errors.New("You are submitting a directory. We will infer the track and exercise from that. Please re-run the submit command without the flags.")
+		}
+
+		if len(files) > 0 && len(args) > 0 {
+			return errors.New("You can submit either a list of files, or a directory, but not both.")
+		}
+
 		usrCfg, err := config.NewUserConfig()
 		if err != nil {
 			return err
@@ -45,14 +86,6 @@ figuring things out if necessary.
 		cliCfg, err := config.NewCLIConfig()
 		if err != nil {
 			return err
-		}
-
-		if len(args) == 0 {
-			cwd, err := os.Getwd()
-			if err != nil {
-				return err
-			}
-			args = []string{cwd}
 		}
 
 		// TODO: make sure we get the workspace configured.
@@ -65,6 +98,14 @@ figuring things out if necessary.
 		}
 
 		ws := workspace.New(usrCfg.Workspace)
+
+		// Create directory from track and exercise slugs if needed
+		if trackID != "" && exercise != "" {
+			args = []string{filepath.Join(ws.Dir, trackID, exercise)}
+		} else if len(files) > 0 {
+			args = files
+		}
+
 		tx, err := workspace.NewTransmission(ws.Dir, args)
 		if err != nil {
 			return err
@@ -110,6 +151,7 @@ figuring things out if necessary.
 		if !solution.IsRequester {
 			return errors.New("not your solution")
 		}
+
 		track := cliCfg.Tracks[solution.Track]
 		if track == nil {
 			err := prepareTrack(solution.Track)
@@ -242,7 +284,9 @@ You can complete the exercise and unlock the next core exercise at:
 }
 
 func initSubmitCmd() {
-	// TODO
+	submitCmd.Flags().StringP("track", "t", "", "the track ID")
+	submitCmd.Flags().StringP("exercise", "e", "", "the exercise ID")
+	submitCmd.Flags().StringSliceP("files", "f", make([]string, 0), "files to submit")
 }
 
 func init() {
