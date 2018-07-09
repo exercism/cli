@@ -26,6 +26,7 @@ type Configuration struct {
 	Dir                 string
 	DefaultBaseURL      string
 	DefaultWorkspaceDir string
+	DefaultDirName      string
 	UserViperConfig     *viper.Viper
 	UserConfig          *UserConfig
 	CLI                 *CLIConfig
@@ -41,6 +42,7 @@ func NewConfiguration() Configuration {
 		Home:                home,
 		DefaultBaseURL:      defaultBaseURL,
 		DefaultWorkspaceDir: defaultWorkspace(home),
+		DefaultDirName:      DefaultDirName,
 	}
 }
 
