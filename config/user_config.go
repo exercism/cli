@@ -3,8 +3,6 @@ package config
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-	"runtime"
 
 	"github.com/spf13/viper"
 )
@@ -20,6 +18,7 @@ type UserConfig struct {
 	Token      string
 	Home       string
 	APIBaseURL string
+	settings   Configuration
 }
 
 // NewUserConfig loads a user configuration if it exists.
@@ -36,7 +35,8 @@ func NewUserConfig() (*UserConfig, error) {
 // NewEmptyUserConfig creates a user configuration without loading it.
 func NewEmptyUserConfig() *UserConfig {
 	return &UserConfig{
-		Config: New(Dir(), "user"),
+		Config:   New(Dir(), "user"),
+		settings: NewConfiguration(),
 	}
 }
 
@@ -49,7 +49,14 @@ func (cfg *UserConfig) SetDefaults() {
 		cfg.APIBaseURL = defaultBaseURL
 	}
 	if cfg.Workspace == "" {
-		cfg.Workspace = defaultWorkspace(cfg.Home)
+		dir := DefaultWorkspaceDir(cfg.settings)
+
+		_, err := os.Stat(dir)
+		// Sorry about the double negative.
+		if !os.IsNotExist(err) {
+			dir = fmt.Sprintf("%s-1", dir)
+		}
+		cfg.Workspace = dir
 	}
 }
 
@@ -63,36 +70,4 @@ func (cfg *UserConfig) Write() error {
 func (cfg *UserConfig) Load(v *viper.Viper) error {
 	cfg.readIn(v)
 	return v.Unmarshal(&cfg)
-}
-
-func userHome() string {
-	var dir string
-	if runtime.GOOS == "windows" {
-		dir = os.Getenv("USERPROFILE")
-		if dir != "" {
-			return dir
-		}
-		dir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if dir != "" {
-			return dir
-		}
-	} else {
-		dir = os.Getenv("HOME")
-		if dir != "" {
-			return dir
-		}
-	}
-	// If all else fails, use the current directory.
-	dir, _ = os.Getwd()
-	return dir
-}
-
-func defaultWorkspace(home string) string {
-	dir := filepath.Join(home, DefaultDirName)
-	_, err := os.Stat(dir)
-	// Sorry about the double negative.
-	if !os.IsNotExist(err) {
-		dir = fmt.Sprintf("%s-1", dir)
-	}
-	return dir
 }
