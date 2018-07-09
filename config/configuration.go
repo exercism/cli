@@ -82,7 +82,7 @@ func userHome() string {
 		if dir != "" {
 			return dir
 		}
-		dir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		dir = filepath.Join(os.Getenv("HOMEDRIVE"), os.Getenv("HOMEPATH"))
 		if dir != "" {
 			return dir
 		}
