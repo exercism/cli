@@ -100,6 +100,14 @@ func userHome() string {
 	return dir
 }
 
+func DefaultWorkspaceDir(cfg Configuration) string {
+	dir := cfg.DefaultDirName
+	if cfg.OS != "linux" {
+		dir = strings.Title(dir)
+	}
+	return filepath.Join(cfg.Home, dir)
+}
+
 func defaultWorkspace(home string) string {
 	dir := filepath.Join(home, DefaultDirName)
 	_, err := os.Stat(dir)
