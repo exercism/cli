@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -21,15 +20,14 @@ var (
 // Once we do, we can rename this type to Config, and get rid of the
 // User and CLI fields.
 type Configuration struct {
-	OS                  string
-	Home                string
-	Dir                 string
-	DefaultBaseURL      string
-	DefaultWorkspaceDir string
-	DefaultDirName      string
-	UserViperConfig     *viper.Viper
-	UserConfig          *UserConfig
-	CLI                 *CLIConfig
+	OS              string
+	Home            string
+	Dir             string
+	DefaultBaseURL  string
+	DefaultDirName  string
+	UserViperConfig *viper.Viper
+	UserConfig      *UserConfig
+	CLI             *CLIConfig
 }
 
 // NewConfiguration provides a configuration with default values.
@@ -37,12 +35,11 @@ func NewConfiguration() Configuration {
 	home := userHome()
 
 	return Configuration{
-		OS:                  runtime.GOOS,
-		Dir:                 Dir(),
-		Home:                home,
-		DefaultBaseURL:      defaultBaseURL,
-		DefaultWorkspaceDir: defaultWorkspace(home),
-		DefaultDirName:      DefaultDirName,
+		OS:             runtime.GOOS,
+		Dir:            Dir(),
+		Home:           home,
+		DefaultBaseURL: defaultBaseURL,
+		DefaultDirName: DefaultDirName,
 	}
 }
 
@@ -106,14 +103,4 @@ func DefaultWorkspaceDir(cfg Configuration) string {
 		dir = strings.Title(dir)
 	}
 	return filepath.Join(cfg.Home, dir)
-}
-
-func defaultWorkspace(home string) string {
-	dir := filepath.Join(home, DefaultDirName)
-	_, err := os.Stat(dir)
-	// Sorry about the double negative.
-	if !os.IsNotExist(err) {
-		dir = fmt.Sprintf("%s-1", dir)
-	}
-	return dir
 }

@@ -1,6 +1,11 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"fmt"
+	"os"
+
+	"github.com/spf13/viper"
+)
 
 var (
 	defaultBaseURL = "https://v2.exercism.io/api/v1"
@@ -13,6 +18,7 @@ type UserConfig struct {
 	Token      string
 	Home       string
 	APIBaseURL string
+	settings   Configuration
 }
 
 // NewUserConfig loads a user configuration if it exists.
@@ -29,7 +35,8 @@ func NewUserConfig() (*UserConfig, error) {
 // NewEmptyUserConfig creates a user configuration without loading it.
 func NewEmptyUserConfig() *UserConfig {
 	return &UserConfig{
-		Config: New(Dir(), "user"),
+		Config:   New(Dir(), "user"),
+		settings: NewConfiguration(),
 	}
 }
 
@@ -42,7 +49,14 @@ func (cfg *UserConfig) SetDefaults() {
 		cfg.APIBaseURL = defaultBaseURL
 	}
 	if cfg.Workspace == "" {
-		cfg.Workspace = defaultWorkspace(cfg.Home)
+		dir := DefaultWorkspaceDir(cfg.settings)
+
+		_, err := os.Stat(dir)
+		// Sorry about the double negative.
+		if !os.IsNotExist(err) {
+			dir = fmt.Sprintf("%s-1", dir)
+		}
+		cfg.Workspace = dir
 	}
 }
 
