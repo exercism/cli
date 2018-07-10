@@ -1,7 +1,10 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/exercism/cli/api"
@@ -149,6 +152,22 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 	workspace = config.Resolve(workspace, configuration.Home)
 	if workspace == "" {
 		workspace = config.DefaultWorkspaceDir(configuration)
+
+		// If it already exists don't clobber it with the default.
+		if _, err := os.Lstat(workspace); !os.IsNotExist(err) {
+			msg := `
+			The default Exercism workspace is
+
+			  %s
+
+			There is already a directory there.
+			You can choose the workspace location by rerunning this command with the --workspace flag.
+
+			  %s configure %s --workspace=%s
+			`
+
+			return errors.New(fmt.Sprintf(msg, workspace, BinaryName, commandify(flags), workspace))
+		}
 	}
 	// Configure the workspace.
 	cfg.Set("workspace", workspace)
@@ -173,6 +192,17 @@ func printCurrentConfig(configuration config.Configuration) {
 	fmt.Fprintln(w, fmt.Sprintf("-w, --workspace\t%s", v.GetString("workspace")))
 	fmt.Fprintln(w, fmt.Sprintf("-a, --api\t%s", v.GetString("apibaseurl")))
 	fmt.Fprintln(w, "")
+}
+
+func commandify(flags *pflag.FlagSet) string {
+	var cmd string
+	fn := func(f *pflag.Flag) {
+		if f.Changed {
+			cmd = fmt.Sprintf("%s --%s=%s", cmd, f.Name, f.Value.String())
+		}
+	}
+	flags.VisitAll(fn)
+	return strings.TrimLeft(cmd, " ")
 }
 
 func initConfigureCmd() {

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/exercism/cli/config"
@@ -354,4 +355,58 @@ func TestConfigureWorkspace(t *testing.T) {
 		assert.NoError(t, err, tc.desc)
 		assert.Equal(t, tc.expected, cfg.UserViperConfig.GetString("workspace"), tc.desc)
 	}
+}
+
+func TestConfigureDefaultWorkspaceWithoutClobbering(t *testing.T) {
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	Err = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+	}()
+
+	// Stub server to always be 200 OK
+	endpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
+	ts := httptest.NewServer(endpoint)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "no-clobber")
+	assert.NoError(t, err)
+
+	cfg := config.Configuration{
+		OS:              "linux",
+		DefaultDirName:  "workspace",
+		Home:            tmpDir,
+		Dir:             tmpDir,
+		DefaultBaseURL:  ts.URL,
+		UserViperConfig: viper.New(),
+		Persister:       config.InMemoryPersister{},
+	}
+
+	// Create a directory at the workspace directory's location
+	// so that it's already present.
+	err = os.MkdirAll(config.DefaultWorkspaceDir(cfg), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	setupConfigureFlags(flags)
+	err = flags.Parse([]string{"--token", "abc123"})
+	assert.NoError(t, err)
+
+	err = runConfigure(cfg, flags)
+	assert.Error(t, err)
+	assert.Regexp(t, "already a directory", err.Error())
+}
+
+func TestCommandifyFlagSet(t *testing.T) {
+	flags := pflag.NewFlagSet("primitives", pflag.PanicOnError)
+	flags.StringP("word", "w", "", "a word")
+	flags.BoolP("yes", "y", false, "just do it")
+	flags.IntP("number", "n", 1, "count to one")
+
+	err := flags.Parse([]string{"--word", "banana", "--yes"})
+	assert.NoError(t, err)
+	assert.Equal(t, commandify(flags), "--word=banana --yes=true")
 }
