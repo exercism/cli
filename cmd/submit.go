@@ -39,18 +39,20 @@ figuring things out if necessary.
 `,
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		usrCfg, err := config.NewUserConfig()
-		if err != nil {
-			return err
-		}
+		cfg := config.NewConfiguration()
+
+		usrCfg := viper.New()
+		usrCfg.AddConfigPath(cfg.Dir)
+		usrCfg.SetConfigName("user")
+		usrCfg.SetConfigType("json")
+		// Ignore error. If the file doesn't exist, that is fine.
+		_ = usrCfg.ReadInConfig()
+		cfg.UserViperConfig = usrCfg
 
 		cliCfg, err := config.NewCLIConfig()
 		if err != nil {
 			return err
 		}
-
-		cfg := config.NewConfiguration()
-		cfg.UserConfig = usrCfg
 		cfg.CLIConfig = cliCfg
 
 		return runSubmit(cfg, cmd.Flags(), args)
@@ -98,19 +100,19 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 		return errors.New("You can submit either a list of files, or a directory, but not both.")
 	}
 
-	usrCfg := cfg.UserConfig
+	usrCfg := cfg.UserViperConfig
 	cliCfg := cfg.CLIConfig
 
 	// TODO: make sure we get the workspace configured.
-	if usrCfg.Workspace == "" {
+	if usrCfg.GetString("workspace") == "" {
 		cwd, err := os.Getwd()
 		if err != nil {
 			return err
 		}
-		usrCfg.Workspace = filepath.Dir(filepath.Dir(cwd))
+		usrCfg.Set("workspace", filepath.Dir(filepath.Dir(cwd)))
 	}
 
-	ws := workspace.New(usrCfg.Workspace)
+	ws := workspace.New(usrCfg.GetString("workspace"))
 
 	// Create directory from track and exercise slugs if needed
 	if trackID != "" && exercise != "" {
@@ -258,11 +260,11 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 		return err
 	}
 
-	client, err := api.NewClient(usrCfg.Token, usrCfg.APIBaseURL)
+	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return err
 	}
-	url := fmt.Sprintf("%s/solutions/%s", usrCfg.APIBaseURL, solution.ID)
+	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), solution.ID)
 	req, err := client.NewRequest("PATCH", url, body)
 	if err != nil {
 		return err
