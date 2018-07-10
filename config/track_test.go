@@ -7,33 +7,32 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTrackIgnoreString(t *testing.T) {
+func TestAcceptFilename(t *testing.T) {
+
+	testCases := []struct {
+		desc      string
+		filenames []string
+		expected  bool
+	}{
+
+		{"allowed filename", []string{"beacon.ext", "falcon.zip"}, true},
+		{"ignored filename", []string{"beacon|txt", "falcon.txt", "proof"}, false},
+	}
+
 	track := &Track{
 		IgnorePatterns: []string{
-			"con[.]txt",
+			"con[|.]txt",
 			"pro.f",
 		},
 	}
 
-	testCases := map[string]bool{
-		"falcon.txt": false,
-		"beacon|txt": true,
-		"beacon.ext": true,
-		"proof":      false,
+	for _, tc := range testCases {
+		for _, filename := range tc.filenames {
+			t.Run(fmt.Sprintf("%s %s", tc.desc, filename), func(t *testing.T) {
+				got, err := track.AcceptFilename(filename)
+				assert.NoError(t, err, fmt.Sprintf("%s %s", tc.desc, filename))
+				assert.Equal(t, tc.expected, got, fmt.Sprintf("should return %t for %s,  but got %t", tc.expected, tc.desc, got))
+			})
+		}
 	}
-
-	for name, ok := range testCases {
-		t.Run(name, func(t *testing.T) {
-			acceptable, err := track.AcceptFilename(name)
-			assert.NoError(t, err, name)
-			assert.Equal(t, ok, acceptable, fmt.Sprintf("%s is %s", name, acceptability(ok)))
-		})
-	}
-}
-
-func acceptability(ok bool) string {
-	if ok {
-		return "fine"
-	}
-	return "not acceptable"
 }
