@@ -39,11 +39,25 @@ figuring things out if necessary.
 `,
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return runSubmit(config.Configuration{}, cmd.Flags(), args)
+		usrCfg, err := config.NewUserConfig()
+		if err != nil {
+			return err
+		}
+
+		cliCfg, err := config.NewCLIConfig()
+		if err != nil {
+			return err
+		}
+
+		cfg := config.NewConfiguration()
+		cfg.UserConfig = usrCfg
+		cfg.CLIConfig = cliCfg
+
+		return runSubmit(cfg, cmd.Flags(), args)
 	},
 }
 
-func runSubmit(configuration config.Configuration, flags *pflag.FlagSet, args []string) error {
+func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) error {
 	// Validate input before doing any other work
 	exercise, err := flags.GetString("exercise")
 	if err != nil {
@@ -84,15 +98,8 @@ func runSubmit(configuration config.Configuration, flags *pflag.FlagSet, args []
 		return errors.New("You can submit either a list of files, or a directory, but not both.")
 	}
 
-	usrCfg, err := config.NewUserConfig()
-	if err != nil {
-		return err
-	}
-
-	cliCfg, err := config.NewCLIConfig()
-	if err != nil {
-		return err
-	}
+	usrCfg := cfg.UserConfig
+	cliCfg := cfg.CLIConfig
 
 	// TODO: make sure we get the workspace configured.
 	if usrCfg.Workspace == "" {

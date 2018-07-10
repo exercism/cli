@@ -27,7 +27,7 @@ type Configuration struct {
 	DefaultDirName  string
 	UserViperConfig *viper.Viper
 	UserConfig      *UserConfig
-	CLI             *CLIConfig
+	CLIConfig       *CLIConfig
 	Persister       Persister
 }
 
