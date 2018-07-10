@@ -161,6 +161,7 @@ func TestDownloadArgs(t *testing.T) {
 			Args:   append([]string{"fakeapp", "download"}, test.args...),
 		}
 		cmdTest.Setup(t)
+		cmdTest.App.SetOutput(ioutil.Discard)
 		defer cmdTest.Teardown(t)
 		err := cmdTest.App.Execute()
 
