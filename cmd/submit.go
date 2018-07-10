@@ -305,9 +305,13 @@ You can complete the exercise and unlock the next core exercise at:
 }
 
 func initSubmitCmd() {
-	submitCmd.Flags().StringP("track", "t", "", "the track ID")
-	submitCmd.Flags().StringP("exercise", "e", "", "the exercise ID")
-	submitCmd.Flags().StringSliceP("files", "f", make([]string, 0), "files to submit")
+	setupSubmitFlags(submitCmd.Flags())
+}
+
+func setupSubmitFlags(flags *pflag.FlagSet) {
+	flags.StringP("track", "t", "", "the track ID")
+	flags.StringP("exercise", "e", "", "the exercise ID")
+	flags.StringSliceP("files", "f", make([]string, 0), "files to submit")
 }
 
 func init() {
