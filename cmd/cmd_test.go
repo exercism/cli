@@ -76,6 +76,7 @@ func (test *CommandTest) Setup(t *testing.T) {
 
 	test.App = &cobra.Command{}
 	test.App.AddCommand(test.Cmd)
+	test.App.SetOutput(Err)
 }
 
 // Teardown puts the environment back the way it was before the test.

@@ -28,11 +28,13 @@ type Configuration struct {
 	UserViperConfig *viper.Viper
 	UserConfig      *UserConfig
 	CLI             *CLIConfig
+	Persister       Persister
 }
 
 // NewConfiguration provides a configuration with default values.
 func NewConfiguration() Configuration {
 	home := userHome()
+	dir := Dir()
 
 	return Configuration{
 		OS:             runtime.GOOS,
@@ -40,6 +42,7 @@ func NewConfiguration() Configuration {
 		Home:           home,
 		DefaultBaseURL: defaultBaseURL,
 		DefaultDirName: DefaultDirName,
+		Persister:      FilePersister{Dir: dir},
 	}
 }
 
@@ -103,4 +106,8 @@ func DefaultWorkspaceDir(cfg Configuration) string {
 		dir = strings.Title(dir)
 	}
 	return filepath.Join(cfg.Home, dir)
+}
+
+func (c Configuration) Save(basename string) error {
+	return c.Persister.Save(c.UserViperConfig, basename)
 }

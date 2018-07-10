@@ -1,12 +1,16 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -28,88 +32,190 @@ places.
 You can also override certain default settings to suit your preferences.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg := config.NewEmptyUserConfig()
-		err := cfg.Load(viperConfig)
-		if err != nil {
-			return err
-		}
-		cfg.Workspace = config.Resolve(cfg.Workspace, cfg.Home)
-		cfg.SetDefaults()
+		configuration := config.NewConfiguration()
 
-		show, err := cmd.Flags().GetBool("show")
-		if err != nil {
-			return err
-		}
-		if show {
-			defer printCurrentConfig()
-		}
-		client, err := api.NewClient(cfg.Token, cfg.APIBaseURL)
-		if err != nil {
-			return err
-		}
+		viperConfig.AddConfigPath(configuration.Dir)
+		viperConfig.SetConfigName("user")
+		viperConfig.SetConfigType("json")
+		// Ignore error. If the file doesn't exist, that is fine.
+		_ = viperConfig.ReadInConfig()
+		configuration.UserViperConfig = viperConfig
 
-		switch {
-		case cfg.Token == "":
-			fmt.Fprintln(Err, "There is no token configured, please set it using --token.")
-		case cmd.Flags().Lookup("token").Changed:
-			// User set new token
-			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
-			if !skipAuth {
-				ok, err := client.TokenIsValid()
-				if err != nil {
-					return err
-				}
-				if !ok {
-					fmt.Fprintln(Err, "The token is invalid.")
-				}
-			}
-		default:
-			// Validate existing token
-			skipAuth, _ := cmd.Flags().GetBool("skip-auth")
-			if !skipAuth {
-				ok, err := client.TokenIsValid()
-				if err != nil {
-					return err
-				}
-				if !ok {
-					fmt.Fprintln(Err, "The token is invalid.")
-				}
-
-				defer printCurrentConfig()
-			}
-		}
-
-		return cfg.Write()
+		return runConfigure(configuration, cmd.Flags())
 	},
 }
 
-func printCurrentConfig() {
-	cfg, err := config.NewUserConfig()
+func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) error {
+	cfg := configuration.UserViperConfig
+
+	// Show the existing configuration and exit.
+	show, err := flags.GetBool("show")
 	if err != nil {
-		return
+		return err
 	}
-	w := tabwriter.NewWriter(Out, 0, 0, 2, ' ', 0)
+	if show {
+		printCurrentConfig(configuration)
+		return nil
+	}
+
+	// If the command is run 'bare' and we have no token,
+	// explain how to set the token.
+	if flags.NFlag() == 0 && cfg.GetString("token") == "" {
+		baseURL := cfg.GetString("apibaseurl")
+		if baseURL != "" {
+			// If we have a base URL, then give the exact link.
+			tokenURL := config.InferSiteURL(baseURL) + "/my/settings"
+			return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
+		}
+		// If we don't, then do our best.
+		return fmt.Errorf("There is no token configured. Find your token in your settings on the website, and call this command again with --token=<your-token>.")
+	}
+
+	// Determine the base API URL.
+	baseURL, err := flags.GetString("api")
+	if err != nil {
+		return err
+	}
+	if baseURL == "" {
+		baseURL = cfg.GetString("apibaseurl")
+	}
+	if baseURL == "" {
+		baseURL = configuration.DefaultBaseURL
+	}
+
+	// By default we verify that
+	// - the configured API URL is reachable.
+	// - the configured token is valid.
+	skipVerification, err := flags.GetBool("no-verify")
+	if err != nil {
+		return err
+	}
+
+	// Is the API URL reachable?
+	if !skipVerification {
+		client, err := api.NewClient("", baseURL)
+		if err != nil {
+			return err
+		}
+
+		ok, err := client.IsPingable()
+		if !ok || err != nil {
+			return fmt.Errorf("The base API URL '%s' cannot be reached.\n\n%s", baseURL, err)
+		}
+	}
+	// Finally, configure the URL.
+	cfg.Set("apibaseurl", baseURL)
+
+	// Determine the token.
+	token, err := flags.GetString("token")
+	if err != nil {
+		return err
+	}
+	if token == "" {
+		token = cfg.GetString("token")
+	}
+
+	// Infer the URL where the token can be found.
+	tokenURL := config.InferSiteURL(cfg.GetString("apibaseurl")) + "/my/settings"
+
+	// If we don't have a token then explain how to set it and bail.
+	if token == "" {
+		return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
+	}
+
+	// Verify that the token is valid.
+	if !skipVerification {
+		client, err := api.NewClient(token, baseURL)
+		if err != nil {
+			return err
+		}
+		ok, err := client.TokenIsValid()
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return fmt.Errorf("The token '%s' is invalid. Find your token on %s.", token, tokenURL)
+		}
+	}
+
+	// Finally, configure the token.
+	cfg.Set("token", token)
+
+	// Determine the workspace.
+	workspace, err := flags.GetString("workspace")
+	if err != nil {
+		return err
+	}
+	if workspace == "" {
+		workspace = cfg.GetString("workspace")
+	}
+	workspace = config.Resolve(workspace, configuration.Home)
+	if workspace == "" {
+		workspace = config.DefaultWorkspaceDir(configuration)
+
+		// If it already exists don't clobber it with the default.
+		if _, err := os.Lstat(workspace); !os.IsNotExist(err) {
+			msg := `
+			The default Exercism workspace is
+
+			  %s
+
+			There is already a directory there.
+			You can choose the workspace location by rerunning this command with the --workspace flag.
+
+			  %s configure %s --workspace=%s
+			`
+
+			return errors.New(fmt.Sprintf(msg, workspace, BinaryName, commandify(flags), workspace))
+		}
+	}
+	// Configure the workspace.
+	cfg.Set("workspace", workspace)
+
+	// Persist the new configuration.
+	if err := configuration.Save("user"); err != nil {
+		return err
+	}
+	printCurrentConfig(configuration)
+	return nil
+}
+
+func printCurrentConfig(configuration config.Configuration) {
+	w := tabwriter.NewWriter(Err, 0, 0, 2, ' ', 0)
 	defer w.Flush()
 
+	v := configuration.UserViperConfig
+
 	fmt.Fprintln(w, "")
-	fmt.Fprintln(w, fmt.Sprintf("Config dir:\t%s", config.Dir()))
-	fmt.Fprintln(w, fmt.Sprintf("-t, --token\t%s", cfg.Token))
-	fmt.Fprintln(w, fmt.Sprintf("-w, --workspace\t%s", cfg.Workspace))
-	fmt.Fprintln(w, fmt.Sprintf("-a, --api\t%s", cfg.APIBaseURL))
+	fmt.Fprintln(w, fmt.Sprintf("Config dir:\t%s", configuration.Dir))
+	fmt.Fprintln(w, fmt.Sprintf("-t, --token\t%s", v.GetString("token")))
+	fmt.Fprintln(w, fmt.Sprintf("-w, --workspace\t%s", v.GetString("workspace")))
+	fmt.Fprintln(w, fmt.Sprintf("-a, --api\t%s", v.GetString("apibaseurl")))
 	fmt.Fprintln(w, "")
 }
 
-func initConfigureCmd() {
-	configureCmd.Flags().StringP("token", "t", "", "authentication token used to connect to the site")
-	configureCmd.Flags().StringP("workspace", "w", "", "directory for exercism exercises")
-	configureCmd.Flags().StringP("api", "a", "", "API base url")
-	configureCmd.Flags().BoolP("show", "s", false, "show the current configuration")
-	configureCmd.Flags().BoolP("skip-auth", "", false, "skip online token authorization check")
+func commandify(flags *pflag.FlagSet) string {
+	var cmd string
+	fn := func(f *pflag.Flag) {
+		if f.Changed {
+			cmd = fmt.Sprintf("%s --%s=%s", cmd, f.Name, f.Value.String())
+		}
+	}
+	flags.VisitAll(fn)
+	return strings.TrimLeft(cmd, " ")
+}
 
+func initConfigureCmd() {
 	viperConfig = viper.New()
-	viperConfig.BindPFlag("token", configureCmd.Flags().Lookup("token"))
-	viperConfig.BindPFlag("workspace", configureCmd.Flags().Lookup("workspace"))
-	viperConfig.BindPFlag("apibaseurl", configureCmd.Flags().Lookup("api"))
+	setupConfigureFlags(configureCmd.Flags())
+}
+
+func setupConfigureFlags(flags *pflag.FlagSet) {
+	flags.StringP("token", "t", "", "authentication token used to connect to the site")
+	flags.StringP("workspace", "w", "", "directory for exercism exercises")
+	flags.StringP("api", "a", "", "API base url")
+	flags.BoolP("show", "s", false, "show the current configuration")
+	flags.BoolP("no-verify", "", false, "skip online token authorization check")
 }
 
 func init() {
