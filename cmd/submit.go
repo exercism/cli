@@ -49,11 +49,18 @@ figuring things out if necessary.
 		_ = usrCfg.ReadInConfig()
 		cfg.UserViperConfig = usrCfg
 
-		cliCfg, err := config.NewCLIConfig()
-		if err != nil {
+		v := viper.New()
+		v.AddConfigPath(cfg.Dir)
+		v.SetConfigName("cli")
+		v.SetConfigType("json")
+		// Ignore error. If the file doesn't exist, that is fine.
+		_ = v.ReadInConfig()
+
+		cliCfg := config.CLIConfig{Tracks: config.Tracks{}}
+		if err := v.Unmarshal(&cliCfg); err != nil {
 			return err
 		}
-		cfg.CLIConfig = cliCfg
+		cfg.CLIConfig = &cliCfg
 
 		return runSubmit(cfg, cmd.Flags(), args)
 	},
