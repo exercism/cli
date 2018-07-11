@@ -123,15 +123,23 @@ Download other people's solutions by providing the UUID.
 			IsRequester: payload.Solution.User.IsRequester,
 		}
 
+		dir := filepath.Join(usrCfg.Workspace, solution.Track)
+		os.MkdirAll(dir, os.FileMode(0755))
+
 		var ws workspace.Workspace
 		if solution.IsRequester {
-			ws = workspace.New(filepath.Join(usrCfg.Workspace, solution.Track))
+			ws, err = workspace.New(dir)
+			if err != nil {
+				return err
+			}
 		} else {
-			ws = workspace.New(filepath.Join(usrCfg.Workspace, "users", solution.Handle, solution.Track))
+			ws, err = workspace.New(filepath.Join(usrCfg.Workspace, "users", solution.Handle, solution.Track))
+			if err != nil {
+				return err
+			}
 		}
-		os.MkdirAll(ws.Dir, os.FileMode(0755))
 
-		dir, err := ws.SolutionPath(solution.Exercise, solution.ID)
+		dir, err = ws.SolutionPath(solution.Exercise, solution.ID)
 		if err != nil {
 			return err
 		}

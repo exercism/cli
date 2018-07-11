@@ -77,7 +77,7 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 		return errors.New("TODO: run configure first")
 	}
 
-	for _, arg := range args {
+	for i, arg := range args {
 		info, err := os.Lstat(arg)
 		if err != nil {
 			if os.IsNotExist(err) {
@@ -88,9 +88,18 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 		if info.IsDir() {
 			return errors.New("TODO: it is a directory and we cannot handle that")
 		}
+
+		src, err := filepath.EvalSymlinks(arg)
+		if err != nil {
+			return err
+		}
+		args[i] = src
 	}
 
-	ws := workspace.New(usrCfg.GetString("workspace"))
+	ws, err := workspace.New(usrCfg.GetString("workspace"))
+	if err != nil {
+		return err
+	}
 
 	tx, err := workspace.NewTransmission(ws.Dir, args)
 	if err != nil {

@@ -210,6 +210,7 @@ func writeFakeSolution(t *testing.T, dir, trackID, exerciseSlug string) {
 		ID:          "bogus-solution-uuid",
 		Track:       trackID,
 		Exercise:    exerciseSlug,
+		URL:         "http://example.com/bogus-url",
 		IsRequester: true,
 	}
 	err := solution.Write(dir)

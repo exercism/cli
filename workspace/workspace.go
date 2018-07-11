@@ -19,8 +19,16 @@ type Workspace struct {
 }
 
 // New returns a configured workspace.
-func New(dir string) Workspace {
-	return Workspace{Dir: dir}
+func New(dir string) (Workspace, error) {
+	_, err := os.Lstat(dir)
+	if err != nil {
+		return Workspace{}, err
+	}
+	dir, err = filepath.EvalSymlinks(dir)
+	if err != nil {
+		return Workspace{}, err
+	}
+	return Workspace{Dir: dir}, nil
 }
 
 // Locate the matching directories within the workspace.

@@ -27,7 +27,10 @@ the solution you want to see on the website.
 		if err != nil {
 			return err
 		}
-		ws := workspace.New(cfg.Workspace)
+		ws, err := workspace.New(cfg.Workspace)
+		if err != nil {
+			return err
+		}
 
 		paths, err := ws.Locate(args[0])
 		if err != nil {

@@ -16,7 +16,8 @@ func TestLocateErrors(t *testing.T) {
 	_, cwd, _, _ := runtime.Caller(0)
 	root := filepath.Join(cwd, "..", "..", "fixtures", "locate-exercise")
 
-	ws := New(filepath.Join(root, "workspace"))
+	ws, err := New(filepath.Join(root, "workspace"))
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		desc, arg string
@@ -68,7 +69,8 @@ func TestLocate(t *testing.T) {
 	_, cwd, _, _ := runtime.Caller(0)
 	root := filepath.Join(cwd, "..", "..", "fixtures", "locate-exercise")
 
-	wsPrimary := New(filepath.Join(root, "workspace"))
+	wsPrimary, err := New(filepath.Join(root, "workspace"))
+	assert.NoError(t, err)
 
 	testCases := []locateTestCase{
 		{
