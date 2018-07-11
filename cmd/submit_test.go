@@ -6,7 +6,6 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/exercism/cli/config"
@@ -125,12 +124,6 @@ func TestSubmitFiles(t *testing.T) {
 
 	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
 	setupSubmitFlags(flags)
-	flagArgs := []string{
-		"--files",
-		strings.Join(filenames, ","),
-	}
-	err = flags.Parse(flagArgs)
-	assert.NoError(t, err)
 
 	v := viper.New()
 	v.Set("token", "abc123")
@@ -152,7 +145,7 @@ func TestSubmitFiles(t *testing.T) {
 		CLIConfig:       cliCfg,
 	}
 
-	err = runSubmit(cfg, flags, []string{})
+	err = runSubmit(cfg, flags, filenames)
 	assert.NoError(t, err)
 
 	// We currently have a bug, and we're not filtering anything.
