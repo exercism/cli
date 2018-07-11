@@ -207,31 +207,6 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 		return errors.New("no files found to submit")
 	}
 
-	// If the user submits a directory, confirm the list of files.
-	if len(tx.ArgDirs) > 0 {
-		prompt := "You specified a directory, which contains these files:\n"
-		for i, path := range paths {
-			prompt += fmt.Sprintf(" [%d]  %s\n", i+1, path)
-		}
-		prompt += "\nPress ENTER to submit, or control + c to cancel: "
-
-		confirmQuestion := &comms.Question{
-			Prompt:       prompt,
-			DefaultValue: "y",
-			Reader:       In,
-			Writer:       Out,
-		}
-		answer, err := confirmQuestion.Ask()
-		if err != nil {
-			return err
-		}
-		if strings.ToLower(answer) != "y" {
-			fmt.Fprintf(Err, "Submit cancelled.\nTry submitting individually instead.")
-			return nil
-		}
-		fmt.Fprintf(Err, "Submitting files now...")
-	}
-
 	for _, path := range paths {
 		// Don't submit empty files
 		info, err := os.Stat(path)

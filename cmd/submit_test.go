@@ -46,22 +46,19 @@ func TestSubmit(t *testing.T) {
 	}
 	// Make a list of test commands
 	cmdTestFlags := &CommandTest{
-		Cmd:                     submitCmd,
-		InitFn:                  initSubmitCmd,
-		MockInteractiveResponse: "\n",
-		Args: []string{"fakeapp", "submit", "-e", "bogus-exercise", "-t", "bogus-track"},
+		Cmd:    submitCmd,
+		InitFn: initSubmitCmd,
+		Args:   []string{"fakeapp", "submit", "-e", "bogus-exercise", "-t", "bogus-track"},
 	}
 	cmdTestRelativeDir := &CommandTest{
-		Cmd:                     submitCmd,
-		InitFn:                  initSubmitCmd,
-		MockInteractiveResponse: "\n",
-		Args: []string{"fakeapp", "submit", filepath.Join("bogus-track", "bogus-exercise")},
+		Cmd:    submitCmd,
+		InitFn: initSubmitCmd,
+		Args:   []string{"fakeapp", "submit", filepath.Join("bogus-track", "bogus-exercise")},
 	}
 	cmdTestFilesFlag := &CommandTest{
-		Cmd:                     submitCmd,
-		InitFn:                  initSubmitCmd,
-		MockInteractiveResponse: "\n",
-		Args: []string{"fakeapp", "submit", "--files"},
+		Cmd:    submitCmd,
+		InitFn: initSubmitCmd,
+		Args:   []string{"fakeapp", "submit", "--files"},
 	}
 	tests := []*CommandTest{
 		cmdTestFlags,
@@ -142,9 +139,6 @@ func TestSubmit(t *testing.T) {
 		cliCfg.Tracks["bogus-track"] = config.NewTrack("bogus-track")
 		err = cliCfg.Write()
 		assert.NoError(t, err)
-
-		// Write mock interactive input to In for the CLI command.
-		In = strings.NewReader(cmdTest.MockInteractiveResponse)
 
 		// Execute the command!
 		cmdTest.App.Execute()
