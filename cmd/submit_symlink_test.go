@@ -42,12 +42,6 @@ func TestSubmitFilesInSymlinkedPath(t *testing.T) {
 	dir := filepath.Join(dstDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
 
-	cliCfg := &config.CLIConfig{
-		Config: config.New(tmpDir, "cli"),
-		Tracks: config.Tracks{},
-	}
-	cliCfg.Tracks["bogus-track"] = config.NewTrack("bogus-track")
-
 	writeFakeSolution(t, dir, "bogus-track", "bogus-exercise")
 
 	v := viper.New()
@@ -58,7 +52,6 @@ func TestSubmitFilesInSymlinkedPath(t *testing.T) {
 	cfg := config.Configuration{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: v,
-		CLIConfig:       cliCfg,
 	}
 
 	file := filepath.Join(dir, "file.txt")

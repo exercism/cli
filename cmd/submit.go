@@ -55,19 +55,12 @@ figuring things out if necessary.
 		// Ignore error. If the file doesn't exist, that is fine.
 		_ = v.ReadInConfig()
 
-		cliCfg := config.CLIConfig{Tracks: config.Tracks{}}
-		if err := v.Unmarshal(&cliCfg); err != nil {
-			return err
-		}
-		cfg.CLIConfig = &cliCfg
-
 		return runSubmit(cfg, cmd.Flags(), args)
 	},
 }
 
 func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) error {
 	usrCfg := cfg.UserViperConfig
-	cliCfg := cfg.CLIConfig
 
 	if usrCfg.GetString("token") == "" {
 		return errors.New("TODO: Welcome to Exercism this is how you use this")
@@ -127,12 +120,6 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	if !solution.IsRequester {
 		// TODO: add test
 		return errors.New("not your solution. todo: fix error message")
-	}
-
-	track := cliCfg.Tracks[solution.Track]
-	if track == nil {
-		track = config.NewTrack(solution.Track)
-		track.SetDefaults()
 	}
 
 	paths := make([]string, 0, len(tx.Files))

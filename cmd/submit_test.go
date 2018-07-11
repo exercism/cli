@@ -135,19 +135,10 @@ func TestSubmitFiles(t *testing.T) {
 	v.Set("workspace", tmpDir)
 	v.Set("apibaseurl", ts.URL)
 
-	cliCfg := &config.CLIConfig{
-		Config: config.New(tmpDir, "cli"),
-		Tracks: config.Tracks{},
-	}
-	cliCfg.Tracks["bogus-track"] = config.NewTrack("bogus-track")
-	err = cliCfg.Write()
-	assert.NoError(t, err)
-
 	cfg := config.Configuration{
 		Persister:       config.InMemoryPersister{},
 		Dir:             tmpDir,
 		UserViperConfig: v,
-		CLIConfig:       cliCfg,
 	}
 
 	files := []string{
@@ -184,12 +175,6 @@ func TestSubmitWithEmptyFile(t *testing.T) {
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
 
-	cliCfg := &config.CLIConfig{
-		Config: config.New(tmpDir, "cli"),
-		Tracks: config.Tracks{},
-	}
-	cliCfg.Tracks["bogus-track"] = config.NewTrack("bogus-track")
-
 	writeFakeSolution(t, dir, "bogus-track", "bogus-exercise")
 
 	v := viper.New()
@@ -200,7 +185,6 @@ func TestSubmitWithEmptyFile(t *testing.T) {
 	cfg := config.Configuration{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: v,
-		CLIConfig:       cliCfg,
 	}
 
 	file1 := filepath.Join(dir, "file-1.txt")
@@ -231,12 +215,6 @@ func TestSubmitOnlyEmptyFile(t *testing.T) {
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
 
-	cliCfg := &config.CLIConfig{
-		Config: config.New(tmpDir, "cli"),
-		Tracks: config.Tracks{},
-	}
-	cliCfg.Tracks["bogus-track"] = config.NewTrack("bogus-track")
-
 	writeFakeSolution(t, dir, "bogus-track", "bogus-exercise")
 
 	v := viper.New()
@@ -246,7 +224,6 @@ func TestSubmitOnlyEmptyFile(t *testing.T) {
 	cfg := config.Configuration{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: v,
-		CLIConfig:       cliCfg,
 	}
 
 	file := filepath.Join(dir, "file.txt")
@@ -281,19 +258,10 @@ func TestSubmitFilesFromDifferentSolutions(t *testing.T) {
 	v.Set("token", "abc123")
 	v.Set("workspace", tmpDir)
 
-	cliCfg := &config.CLIConfig{
-		Config: config.New(tmpDir, "cli"),
-		Tracks: config.Tracks{},
-	}
-	cliCfg.Tracks["bogus-track"] = config.NewTrack("bogus-track")
-	err = cliCfg.Write()
-	assert.NoError(t, err)
-
 	cfg := config.Configuration{
 		Persister:       config.InMemoryPersister{},
 		Dir:             tmpDir,
 		UserViperConfig: v,
-		CLIConfig:       cliCfg,
 	}
 
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file1, file2})

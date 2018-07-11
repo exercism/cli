@@ -41,18 +41,9 @@ func TestSubmitRelativePath(t *testing.T) {
 	v.Set("workspace", tmpDir)
 	v.Set("apibaseurl", ts.URL)
 
-	cliCfg := &config.CLIConfig{
-		Config: config.New(tmpDir, "cli"),
-		Tracks: config.Tracks{},
-	}
-	cliCfg.Tracks["bogus-track"] = config.NewTrack("bogus-track")
-	err = cliCfg.Write()
-	assert.NoError(t, err)
-
 	cfg := config.Configuration{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: v,
-		CLIConfig:       cliCfg,
 	}
 
 	err = ioutil.WriteFile(filepath.Join(dir, "file.txt"), []byte("This is a file."), os.FileMode(0755))
