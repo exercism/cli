@@ -29,6 +29,22 @@ func TestSubmitWithoutToken(t *testing.T) {
 	assert.Regexp(t, "Welcome to Exercism", err.Error())
 }
 
+func TestSubmitWithoutWorkspace(t *testing.T) {
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+		DefaultBaseURL:  "http://example.com",
+	}
+
+	err := runSubmit(cfg, flags, []string{})
+	assert.Regexp(t, "run configure", err.Error())
+}
+
 func TestSubmitFiles(t *testing.T) {
 	oldOut := Out
 	oldErr := Err

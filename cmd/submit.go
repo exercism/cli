@@ -73,6 +73,10 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 		return errors.New("TODO: Welcome to Exercism this is how you use this")
 	}
 
+	if usrCfg.GetString("workspace") == "" {
+		return errors.New("TODO: run configure first")
+	}
+
 	files, err := flags.GetStringSlice("files")
 	if err != nil {
 		return err
