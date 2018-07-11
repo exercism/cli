@@ -78,11 +78,15 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	}
 
 	for _, arg := range args {
-		if _, err := os.Stat(arg); err != nil {
+		info, err := os.Lstat(arg)
+		if err != nil {
 			if os.IsNotExist(err) {
 				return errors.New("TODO: explain that there is no such file")
 			}
 			return err
+		}
+		if info.IsDir() {
+			return errors.New("TODO: it is a directory and we cannot handle that")
 		}
 	}
 
