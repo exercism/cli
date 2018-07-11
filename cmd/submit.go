@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/comms"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/workspace"
 	"github.com/spf13/cobra"
@@ -67,68 +66,17 @@ figuring things out if necessary.
 }
 
 func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) error {
-	// Validate input before doing any other work
-	exercise, err := flags.GetString("exercise")
-	if err != nil {
-		return err
-	}
-
-	trackID, err := flags.GetString("track")
-	if err != nil {
-		return err
-	}
-
 	files, err := flags.GetStringSlice("files")
 	if err != nil {
 		return err
 	}
 
-	// Verify that both --track and --exercise are used together
-	if len(args) == 0 && len(files) == 0 && !(exercise != "" && trackID != "") {
-		// Are they both missing?
-		if exercise == "" && trackID == "" {
-			return errors.New("Please use the --exercise/--trackID flags to submit without an explicit directory or files.")
-		}
-		// Guess that --trackID is missing, unless it's not
-		present, missing := "--exercise", "--track"
-		if trackID != "" {
-			present, missing = missing, present
-		}
-		// Help user correct CLI command
-		missingFlagMessage := fmt.Sprintf("You specified %s, please also include %s.", present, missing)
-		return errors.New(missingFlagMessage)
-	}
-
-	if len(args) > 0 && (exercise != "" || trackID != "") {
-		return errors.New("You are submitting a directory. We will infer the track and exercise from that. Please re-run the submit command without the flags.")
-	}
-
-	if len(files) > 0 && len(args) > 0 {
-		return errors.New("You can submit either a list of files, or a directory, but not both.")
-	}
-
 	usrCfg := cfg.UserViperConfig
 	cliCfg := cfg.CLIConfig
 
-	// TODO: make sure we get the workspace configured.
-	if usrCfg.GetString("workspace") == "" {
-		cwd, err := os.Getwd()
-		if err != nil {
-			return err
-		}
-		usrCfg.Set("workspace", filepath.Dir(filepath.Dir(cwd)))
-	}
-
 	ws := workspace.New(usrCfg.GetString("workspace"))
 
-	// Create directory from track and exercise slugs if needed
-	if trackID != "" && exercise != "" {
-		args = []string{filepath.Join(ws.Dir, trackID, exercise)}
-	} else if len(files) > 0 {
-		args = files
-	}
-
-	tx, err := workspace.NewTransmission(ws.Dir, args)
+	tx, err := workspace.NewTransmission(ws.Dir, files)
 	if err != nil {
 		return err
 	}
@@ -142,46 +90,25 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	if err != nil {
 		return err
 	}
-
-	var solution *workspace.Solution
-
-	selection := comms.NewSelection()
-	for _, s := range sx {
-		selection.Items = append(selection.Items, s)
+	if len(sx) == 0 {
+		// TODO: add test
+		return errors.New("can't find a solution metadata file. (todo: explain how to fix it)")
 	}
-
-	for {
-		prompt := `
-			We found more than one. Which one did you mean?
-			Type the number of the one you want to select.
-
-			%s
-			> `
-		option, err := selection.Pick(prompt)
-		if err != nil {
-			return err
-		}
-		s, ok := option.(*workspace.Solution)
-		if !ok {
-			fmt.Fprintf(Err, "something went wrong trying to pick that solution, not sure what happened")
-			continue
-		}
-		solution = s
-		break
+	if len(sx) > 1 {
+		// TODO: add test
+		return errors.New("files from multiple solutions. Can only submit one solution at a time. (todo: fix error message)")
 	}
+	solution := sx[0]
 
 	if !solution.IsRequester {
-		return errors.New("not your solution")
+		// TODO: add test
+		return errors.New("not your solution. todo: fix error message")
 	}
 
 	track := cliCfg.Tracks[solution.Track]
 	if track == nil {
-		err := prepareTrack(solution.Track)
-		if err != nil {
-			return err
-		}
-		cliCfg.Load(viper.New())
-		track = cliCfg.Tracks[solution.Track]
+		track = config.NewTrack(solution.Track)
+		track.SetDefaults()
 	}
 
 	paths := tx.Files
@@ -204,7 +131,7 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	writer := multipart.NewWriter(body)
 
 	if len(paths) == 0 {
-		return errors.New("no files found to submit")
+		return errors.New("no files found to submit. TODO: fix error messages")
 	}
 
 	for _, path := range paths {
