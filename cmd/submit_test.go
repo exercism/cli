@@ -129,6 +129,7 @@ func TestSubmitFiles(t *testing.T) {
 		relativePath: filepath.Join("subdir", "file-2.txt"),
 		contents:     "This is file 2.",
 	}
+	// We don't filter *.md files if you explicitly pass the file path.
 	file3 := file{
 		relativePath: "README.md",
 		contents:     "The readme.",
@@ -170,8 +171,6 @@ func TestSubmitFiles(t *testing.T) {
 	err = runSubmit(cfg, flags, filenames)
 	assert.NoError(t, err)
 
-	// We currently have a bug, and we're not filtering anything.
-	// Fix that in a separate commit.
 	assert.Equal(t, 3, len(submittedFiles))
 
 	for _, file := range []file{file1, file2, file3} {
