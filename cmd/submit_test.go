@@ -16,21 +16,17 @@ import (
 )
 
 func TestSubmitWithoutToken(t *testing.T) {
-	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
-
 	cfg := config.Configuration{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: viper.New(),
 		DefaultBaseURL:  "http://example.com",
 	}
 
-	err := runSubmit(cfg, flags, []string{})
+	err := runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
 	assert.Regexp(t, "Welcome to Exercism", err.Error())
 }
 
 func TestSubmitWithoutWorkspace(t *testing.T) {
-	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
-
 	v := viper.New()
 	v.Set("token", "abc123")
 
@@ -40,13 +36,11 @@ func TestSubmitWithoutWorkspace(t *testing.T) {
 		DefaultBaseURL:  "http://example.com",
 	}
 
-	err := runSubmit(cfg, flags, []string{})
+	err := runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
 	assert.Regexp(t, "run configure", err.Error())
 }
 
 func TestSubmitNonExistentFile(t *testing.T) {
-	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
-
 	tmpDir, err := ioutil.TempDir("", "submit-no-such-file")
 	assert.NoError(t, err)
 
@@ -65,14 +59,16 @@ func TestSubmitNonExistentFile(t *testing.T) {
 
 	err = ioutil.WriteFile(filepath.Join(tmpDir, "file-2.txt"), []byte("This is file 2"), os.FileMode(0755))
 	assert.NoError(t, err)
-
-	err = runSubmit(cfg, flags, []string{filepath.Join(tmpDir, "file-1.txt"), "no-such-file.txt", filepath.Join(tmpDir, "file-2.txt")})
+	files := []string{
+		filepath.Join(tmpDir, "file-1.txt"),
+		"no-such-file.txt",
+		filepath.Join(tmpDir, "file-2.txt"),
+	}
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
 	assert.Regexp(t, "no such file", err.Error())
 }
 
 func TestSubmitFilesAndDir(t *testing.T) {
-	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
-
 	tmpDir, err := ioutil.TempDir("", "submit-no-such-file")
 	assert.NoError(t, err)
 
@@ -91,8 +87,12 @@ func TestSubmitFilesAndDir(t *testing.T) {
 
 	err = ioutil.WriteFile(filepath.Join(tmpDir, "file-2.txt"), []byte("This is file 2"), os.FileMode(0755))
 	assert.NoError(t, err)
-
-	err = runSubmit(cfg, flags, []string{filepath.Join(tmpDir, "file-1.txt"), tmpDir, filepath.Join(tmpDir, "file-2.txt")})
+	files := []string{
+		filepath.Join(tmpDir, "file-1.txt"),
+		tmpDir,
+		filepath.Join(tmpDir, "file-2.txt"),
+	}
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
 	assert.Regexp(t, "is a directory", err.Error())
 }
 
@@ -115,38 +115,20 @@ func TestSubmitFiles(t *testing.T) {
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
-
-	type file struct {
-		relativePath string
-		contents     string
-	}
-
-	file1 := file{
-		relativePath: "file-1.txt",
-		contents:     "This is file 1.",
-	}
-	file2 := file{
-		relativePath: filepath.Join("subdir", "file-2.txt"),
-		contents:     "This is file 2.",
-	}
-	// We don't filter *.md files if you explicitly pass the file path.
-	file3 := file{
-		relativePath: "README.md",
-		contents:     "The readme.",
-	}
-
-	filenames := make([]string, 0, 3)
-	for _, file := range []file{file1, file2, file3} {
-		path := filepath.Join(dir, file.relativePath)
-		filenames = append(filenames, path)
-		err := ioutil.WriteFile(path, []byte(file.contents), os.FileMode(0755))
-		assert.NoError(t, err)
-	}
-
 	writeFakeSolution(t, dir, "bogus-track", "bogus-exercise")
 
-	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
-	setupSubmitFlags(flags)
+	file1 := filepath.Join(dir, "file-1.txt")
+	err = ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	file2 := filepath.Join(dir, "subdir", "file-2.txt")
+	err = ioutil.WriteFile(file2, []byte("This is file 2."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	// We don't filter *.md files if you explicitly pass the file path.
+	readme := filepath.Join(dir, "README.md")
+	err = ioutil.WriteFile(readme, []byte("This is the readme."), os.FileMode(0755))
+	assert.NoError(t, err)
 
 	v := viper.New()
 	v.Set("token", "abc123")
@@ -168,15 +150,17 @@ func TestSubmitFiles(t *testing.T) {
 		CLIConfig:       cliCfg,
 	}
 
-	err = runSubmit(cfg, flags, filenames)
+	files := []string{
+		file1, file2, readme,
+	}
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 3, len(submittedFiles))
 
-	for _, file := range []file{file1, file2, file3} {
-		path := string(os.PathSeparator) + file.relativePath
-		assert.Equal(t, file.contents, submittedFiles[path])
-	}
+	assert.Equal(t, "This is file 1.", submittedFiles[string(os.PathSeparator)+"file-1.txt"])
+	assert.Equal(t, "This is file 2.", submittedFiles[string(os.PathSeparator)+filepath.Join("subdir", "file-2.txt")])
+	assert.Equal(t, "This is the readme.", submittedFiles[string(os.PathSeparator)+"README.md"])
 }
 
 func TestSubmitFilesFromDifferentSolutions(t *testing.T) {
