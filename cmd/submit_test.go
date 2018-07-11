@@ -107,30 +107,7 @@ func TestSubmitFiles(t *testing.T) {
 	}()
 	// The fake endpoint will populate this when it receives the call from the command.
 	submittedFiles := map[string]string{}
-
-	// Set up the test server.
-	fakeEndpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseMultipartForm(2 << 10)
-		if err != nil {
-			t.Fatal(err)
-		}
-		mf := r.MultipartForm
-
-		files := mf.File["files[]"]
-		for _, fileHeader := range files {
-			file, err := fileHeader.Open()
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer file.Close()
-			body, err := ioutil.ReadAll(file)
-			if err != nil {
-				t.Fatal(err)
-			}
-			submittedFiles[fileHeader.Filename] = string(body)
-		}
-	})
-	ts := httptest.NewServer(fakeEndpoint)
+	ts := fakeSubmitServer(t, submittedFiles)
 	defer ts.Close()
 
 	tmpDir, err := ioutil.TempDir("", "submit-files")
@@ -208,4 +185,29 @@ func TestSubmitFiles(t *testing.T) {
 		path := string(os.PathSeparator) + file.relativePath
 		assert.Equal(t, file.contents, submittedFiles[path])
 	}
+}
+
+func fakeSubmitServer(t *testing.T, submittedFiles map[string]string) *httptest.Server {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseMultipartForm(2 << 10)
+		if err != nil {
+			t.Fatal(err)
+		}
+		mf := r.MultipartForm
+
+		files := mf.File["files[]"]
+		for _, fileHeader := range files {
+			file, err := fileHeader.Open()
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer file.Close()
+			body, err := ioutil.ReadAll(file)
+			if err != nil {
+				t.Fatal(err)
+			}
+			submittedFiles[fileHeader.Filename] = string(body)
+		}
+	})
+	return httptest.NewServer(handler)
 }
