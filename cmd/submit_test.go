@@ -179,6 +179,50 @@ func TestSubmitFiles(t *testing.T) {
 	}
 }
 
+func TestSubmitFilesFromDifferentSolutions(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "dir-1-submit")
+	assert.NoError(t, err)
+
+	dir1 := filepath.Join(tmpDir, "bogus-track", "bogus-exercise-1")
+	os.MkdirAll(dir1, os.FileMode(0755))
+	writeFakeSolution(t, dir1, "bogus-track", "bogus-exercise-1")
+
+	dir2 := filepath.Join(tmpDir, "bogus-track", "bogus-exercise-2")
+	os.MkdirAll(dir2, os.FileMode(0755))
+	writeFakeSolution(t, dir2, "bogus-track", "bogus-exercise-2")
+
+	file1 := filepath.Join(dir1, "file-1.txt")
+	err = ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	file2 := filepath.Join(dir2, "file-2.txt")
+	err = ioutil.WriteFile(file2, []byte("This is file 2."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+
+	cliCfg := &config.CLIConfig{
+		Config: config.New(tmpDir, "cli"),
+		Tracks: config.Tracks{},
+	}
+	cliCfg.Tracks["bogus-track"] = config.NewTrack("bogus-track")
+	err = cliCfg.Write()
+	assert.NoError(t, err)
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		Dir:             tmpDir,
+		UserViperConfig: v,
+		CLIConfig:       cliCfg,
+	}
+
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file1, file2})
+	assert.Error(t, err)
+	assert.Regexp(t, "more than one solution", err.Error())
+}
+
 func fakeSubmitServer(t *testing.T, submittedFiles map[string]string) *httptest.Server {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseMultipartForm(2 << 10)

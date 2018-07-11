@@ -120,7 +120,6 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 		return errors.New("can't find a solution metadata file. (todo: explain how to fix it)")
 	}
 	if len(sx) > 1 {
-		// TODO: add test
 		return errors.New("files from multiple solutions. Can only submit one solution at a time. (todo: fix error message)")
 	}
 	solution := sx[0]
