@@ -66,13 +66,17 @@ figuring things out if necessary.
 }
 
 func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) error {
+	usrCfg := cfg.UserViperConfig
+	cliCfg := cfg.CLIConfig
+
+	if usrCfg.GetString("token") == "" {
+		return errors.New("TODO: Welcome to Exercism this is how you use this")
+	}
+
 	files, err := flags.GetStringSlice("files")
 	if err != nil {
 		return err
 	}
-
-	usrCfg := cfg.UserViperConfig
-	cliCfg := cfg.CLIConfig
 
 	ws := workspace.New(usrCfg.GetString("workspace"))
 

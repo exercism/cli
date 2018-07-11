@@ -16,6 +16,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestSubmitWithoutToken(t *testing.T) {
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: viper.New(),
+		DefaultBaseURL:  "http://example.com",
+	}
+
+	err := runSubmit(cfg, flags, []string{})
+	assert.Regexp(t, "Welcome to Exercism", err.Error())
+}
+
 func TestSubmitFiles(t *testing.T) {
 	oldOut := Out
 	oldErr := Err
