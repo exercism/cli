@@ -142,14 +142,7 @@ func TestSubmitFiles(t *testing.T) {
 		assert.NoError(t, err)
 	}
 
-	solution := &workspace.Solution{
-		ID:          "bogus-solution-uuid",
-		Track:       "bogus-track",
-		Exercise:    "bogus-exercise",
-		IsRequester: true,
-	}
-	err = solution.Write(dir)
-	assert.NoError(t, err)
+	writeFakeSolution(t, dir, "bogus-track", "bogus-exercise")
 
 	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
 	setupSubmitFlags(flags)
@@ -210,4 +203,15 @@ func fakeSubmitServer(t *testing.T, submittedFiles map[string]string) *httptest.
 		}
 	})
 	return httptest.NewServer(handler)
+}
+
+func writeFakeSolution(t *testing.T, dir, trackID, exerciseSlug string) {
+	solution := &workspace.Solution{
+		ID:          "bogus-solution-uuid",
+		Track:       trackID,
+		Exercise:    exerciseSlug,
+		IsRequester: true,
+	}
+	err := solution.Write(dir)
+	assert.NoError(t, err)
 }
