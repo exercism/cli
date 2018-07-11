@@ -77,6 +77,15 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 		return errors.New("TODO: run configure first")
 	}
 
+	for _, arg := range args {
+		if _, err := os.Stat(arg); err != nil {
+			if os.IsNotExist(err) {
+				return errors.New("TODO: explain that there is no such file")
+			}
+			return err
+		}
+	}
+
 	ws := workspace.New(usrCfg.GetString("workspace"))
 
 	tx, err := workspace.NewTransmission(ws.Dir, args)

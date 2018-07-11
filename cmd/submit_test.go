@@ -44,6 +44,32 @@ func TestSubmitWithoutWorkspace(t *testing.T) {
 	assert.Regexp(t, "run configure", err.Error())
 }
 
+func TestSubmitNonExistentFile(t *testing.T) {
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+
+	tmpDir, err := ioutil.TempDir("", "submit-no-such-file")
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+		DefaultBaseURL:  "http://example.com",
+	}
+
+	err = ioutil.WriteFile(filepath.Join(tmpDir, "file-1.txt"), []byte("This is file 1"), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	err = ioutil.WriteFile(filepath.Join(tmpDir, "file-2.txt"), []byte("This is file 2"), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	err = runSubmit(cfg, flags, []string{filepath.Join(tmpDir, "file-1.txt"), "no-such-file.txt", filepath.Join(tmpDir, "file-2.txt")})
+	assert.Regexp(t, "no such file", err.Error())
+}
+
 func TestSubmitFiles(t *testing.T) {
 	oldOut := Out
 	oldErr := Err
