@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/exercism/cli/config"
@@ -397,7 +398,47 @@ func TestConfigureDefaultWorkspaceWithoutClobbering(t *testing.T) {
 
 	err = runConfigure(cfg, flags)
 	assert.Error(t, err)
-	assert.Regexp(t, "already a directory", err.Error())
+	assert.Regexp(t, "already something", err.Error())
+}
+
+func TestConfigureExplicitWorkspaceWithoutClobberingNonDirectory(t *testing.T) {
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	Err = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+	}()
+
+	tmpDir, err := ioutil.TempDir("", "no-clobber")
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+
+	cfg := config.Configuration{
+		OS:              "linux",
+		DefaultDirName:  "workspace",
+		Home:            tmpDir,
+		Dir:             tmpDir,
+		UserViperConfig: v,
+		Persister:       config.InMemoryPersister{},
+	}
+
+	// Create a file at the workspace directory's location
+	err = ioutil.WriteFile(filepath.Join(tmpDir, "workspace"), []byte("This is not a directory"), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	setupConfigureFlags(flags)
+	err = flags.Parse([]string{"--no-verify", "--workspace", config.DefaultWorkspaceDir(cfg)})
+	assert.NoError(t, err)
+
+	err = runConfigure(cfg, flags)
+	if assert.Error(t, err) {
+		assert.Regexp(t, "set a different workspace", err.Error())
+	}
 }
 
 func TestCommandifyFlagSet(t *testing.T) {

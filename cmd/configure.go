@@ -150,6 +150,25 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 		workspace = cfg.GetString("workspace")
 	}
 	workspace = config.Resolve(workspace, configuration.Home)
+
+	if workspace != "" {
+		// If there is a non-directory here, then we cannot proceed.
+		if info, err := os.Lstat(workspace); !os.IsNotExist(err) && !info.IsDir() {
+			msg := `
+
+			There is already something at the workspace location you are configuring:
+
+			  %s
+
+			Please rename it, or set a different workspace location:
+
+			  %s configure %s --workspace=PATH_TO_DIFFERENT_FOLDER
+			`
+
+			return errors.New(fmt.Sprintf(msg, workspace, BinaryName, commandify(flags)))
+		}
+	}
+
 	if workspace == "" {
 		workspace = config.DefaultWorkspaceDir(configuration)
 
@@ -160,7 +179,10 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 
 			  %s
 
-			There is already a directory there.
+			There is already something there.
+			If it's a directory, that might be fine. If it's a file, you will need to move it first,
+			or choose a different location for the workspace.
+
 			You can choose the workspace location by rerunning this command with the --workspace flag.
 
 			  %s configure %s --workspace=%s
