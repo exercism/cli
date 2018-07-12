@@ -135,39 +135,28 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 		track.SetDefaults()
 	}
 
-	paths := tx.Files
-	if len(paths) == 0 {
-		walkFn := func(path string, info os.FileInfo, err error) error {
-			if err != nil || info.IsDir() {
-				return err
-			}
-			ok, err := track.AcceptFilename(path)
-			if err != nil || !ok {
-				return err
-			}
-			paths = append(paths, path)
-			return nil
+	paths := make([]string, 0, len(tx.Files))
+	for _, file := range tx.Files {
+		// Don't submit empty files
+		info, err := os.Stat(file)
+		if err != nil {
+			return err
 		}
-		filepath.Walk(solution.Dir, walkFn)
+		if info.Size() == 0 {
+			fmt.Fprintf(Err, "(TODO) Warning: file %s was empty, skipping...", file)
+			continue
+		}
+		paths = append(paths, file)
 	}
-
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
 
 	if len(paths) == 0 {
 		return errors.New("no files found to submit. TODO: fix error messages")
 	}
 
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
 	for _, path := range paths {
-		// Don't submit empty files
-		info, err := os.Stat(path)
-		if err != nil {
-			return err
-		}
-		if info.Size() == 0 {
-			fmt.Printf("Warning: file %s was empty, skipping...", path)
-			continue
-		}
 		file, err := os.Open(path)
 		if err != nil {
 			return err
