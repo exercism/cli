@@ -1,159 +1,307 @@
 package cmd
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/workspace"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSubmit(t *testing.T) {
+func TestSubmitWithoutToken(t *testing.T) {
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: viper.New(),
+		DefaultBaseURL:  "http://example.com",
+	}
+
+	err := runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
+	assert.Regexp(t, "Welcome to Exercism", err.Error())
+}
+
+func TestSubmitWithoutWorkspace(t *testing.T) {
+	v := viper.New()
+	v.Set("token", "abc123")
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+		DefaultBaseURL:  "http://example.com",
+	}
+
+	err := runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
+	assert.Regexp(t, "re-run the configure", err.Error())
+}
+
+func TestSubmitNonExistentFile(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "submit-no-such-file")
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+		DefaultBaseURL:  "http://example.com",
+	}
+
+	err = ioutil.WriteFile(filepath.Join(tmpDir, "file-1.txt"), []byte("This is file 1"), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	err = ioutil.WriteFile(filepath.Join(tmpDir, "file-2.txt"), []byte("This is file 2"), os.FileMode(0755))
+	assert.NoError(t, err)
+	files := []string{
+		filepath.Join(tmpDir, "file-1.txt"),
+		"no-such-file.txt",
+		filepath.Join(tmpDir, "file-2.txt"),
+	}
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
+	assert.Regexp(t, "cannot be found", err.Error())
+}
+
+func TestSubmitFilesAndDir(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "submit-no-such-file")
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+		DefaultBaseURL:  "http://example.com",
+	}
+
+	err = ioutil.WriteFile(filepath.Join(tmpDir, "file-1.txt"), []byte("This is file 1"), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	err = ioutil.WriteFile(filepath.Join(tmpDir, "file-2.txt"), []byte("This is file 2"), os.FileMode(0755))
+	assert.NoError(t, err)
+	files := []string{
+		filepath.Join(tmpDir, "file-1.txt"),
+		tmpDir,
+		filepath.Join(tmpDir, "file-2.txt"),
+	}
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
+	assert.Regexp(t, "submitting a directory", err.Error())
+}
+
+func TestSubmitFiles(t *testing.T) {
 	oldOut := Out
 	oldErr := Err
-	oldIn := In
 	Out = ioutil.Discard
 	Err = ioutil.Discard
 	defer func() {
 		Out = oldOut
 		Err = oldErr
-		In = oldIn
+	}()
+	// The fake endpoint will populate this when it receives the call from the command.
+	submittedFiles := map[string]string{}
+	ts := fakeSubmitServer(t, submittedFiles)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "submit-files")
+	assert.NoError(t, err)
+
+	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
+	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
+	writeFakeSolution(t, dir, "bogus-track", "bogus-exercise")
+
+	file1 := filepath.Join(dir, "file-1.txt")
+	err = ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	file2 := filepath.Join(dir, "subdir", "file-2.txt")
+	err = ioutil.WriteFile(file2, []byte("This is file 2."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	// We don't filter *.md files if you explicitly pass the file path.
+	readme := filepath.Join(dir, "README.md")
+	err = ioutil.WriteFile(readme, []byte("This is the readme."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		Dir:             tmpDir,
+		UserViperConfig: v,
+	}
+
+	files := []string{
+		file1, file2, readme,
+	}
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
+	assert.NoError(t, err)
+
+	assert.Equal(t, 3, len(submittedFiles))
+
+	assert.Equal(t, "This is file 1.", submittedFiles[string(os.PathSeparator)+"file-1.txt"])
+	assert.Equal(t, "This is file 2.", submittedFiles[string(os.PathSeparator)+filepath.Join("subdir", "file-2.txt")])
+	assert.Equal(t, "This is the readme.", submittedFiles[string(os.PathSeparator)+"README.md"])
+}
+
+func TestSubmitWithEmptyFile(t *testing.T) {
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	Err = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
 	}()
 
-	type file struct {
-		relativePath string
-		contents     string
+	// The fake endpoint will populate this when it receives the call from the command.
+	submittedFiles := map[string]string{}
+	ts := fakeSubmitServer(t, submittedFiles)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "empty-file")
+	assert.NoError(t, err)
+
+	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
+	os.MkdirAll(dir, os.FileMode(0755))
+
+	writeFakeSolution(t, dir, "bogus-track", "bogus-exercise")
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
 	}
 
-	file1 := file{
-		relativePath: "file-1.txt",
-		contents:     "This is file 1.",
-	}
-	file2 := file{
-		relativePath: filepath.Join("subdir", "file-2.txt"),
-		contents:     "This is file 2.",
-	}
-	file3 := file{
-		relativePath: "README.md",
-		contents:     "The readme.",
-	}
-	// Make a list of test commands
-	cmdTestFlags := &CommandTest{
-		Cmd:                     submitCmd,
-		InitFn:                  initSubmitCmd,
-		MockInteractiveResponse: "\n",
-		Args: []string{"fakeapp", "submit", "-e", "bogus-exercise", "-t", "bogus-track"},
-	}
-	cmdTestRelativeDir := &CommandTest{
-		Cmd:                     submitCmd,
-		InitFn:                  initSubmitCmd,
-		MockInteractiveResponse: "\n",
-		Args: []string{"fakeapp", "submit", filepath.Join("bogus-track", "bogus-exercise")},
-	}
-	cmdTestFilesFlag := &CommandTest{
-		Cmd:                     submitCmd,
-		InitFn:                  initSubmitCmd,
-		MockInteractiveResponse: "\n",
-		Args: []string{"fakeapp", "submit", "--files"},
-	}
-	tests := []*CommandTest{
-		cmdTestFlags,
-		cmdTestRelativeDir,
-		cmdTestFilesFlag,
-	}
-	for _, cmdTest := range tests {
-		cmdTest.Setup(t)
-		defer cmdTest.Teardown(t)
+	file1 := filepath.Join(dir, "file-1.txt")
+	err = ioutil.WriteFile(file1, []byte(""), os.FileMode(0755))
+	file2 := filepath.Join(dir, "file-2.txt")
+	err = ioutil.WriteFile(file2, []byte("This is file 2."), os.FileMode(0755))
 
-		// Prefix submitted filenames with correct temporary directory
-		if cmdTest.Args[2] == "--files" {
-			filenames := make([]string, 2)
-			for i, file := range []file{file1, file2} {
-				filenames[i] = filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", file.relativePath)
-			}
-			filenameString := strings.Join(filenames, ",")
-			cmdTest.Args[2] = fmt.Sprintf("-f=%s", filenameString)
-		} else if len(cmdTest.Args) == 3 {
-			cmdTest.Args[2] = filepath.Join(cmdTest.TmpDir, cmdTest.Args[2])
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file1, file2})
+	assert.NoError(t, err)
+
+	assert.Equal(t, 1, len(submittedFiles))
+	assert.Equal(t, "This is file 2.", submittedFiles[string(os.PathSeparator)+"file-2.txt"])
+}
+
+func TestSubmitOnlyEmptyFile(t *testing.T) {
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	Err = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+	}()
+
+	tmpDir, err := ioutil.TempDir("", "just-an-empty-file")
+	assert.NoError(t, err)
+
+	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
+	os.MkdirAll(dir, os.FileMode(0755))
+
+	writeFakeSolution(t, dir, "bogus-track", "bogus-exercise")
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+	}
+
+	file := filepath.Join(dir, "file.txt")
+	err = ioutil.WriteFile(file, []byte(""), os.FileMode(0755))
+
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file})
+	assert.Error(t, err)
+	assert.Regexp(t, "No files found", err.Error())
+}
+
+func TestSubmitFilesFromDifferentSolutions(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "dir-1-submit")
+	assert.NoError(t, err)
+
+	dir1 := filepath.Join(tmpDir, "bogus-track", "bogus-exercise-1")
+	os.MkdirAll(dir1, os.FileMode(0755))
+	writeFakeSolution(t, dir1, "bogus-track", "bogus-exercise-1")
+
+	dir2 := filepath.Join(tmpDir, "bogus-track", "bogus-exercise-2")
+	os.MkdirAll(dir2, os.FileMode(0755))
+	writeFakeSolution(t, dir2, "bogus-track", "bogus-exercise-2")
+
+	file1 := filepath.Join(dir1, "file-1.txt")
+	err = ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	file2 := filepath.Join(dir2, "file-2.txt")
+	err = ioutil.WriteFile(file2, []byte("This is file 2."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		Dir:             tmpDir,
+		UserViperConfig: v,
+	}
+
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file1, file2})
+	assert.Error(t, err)
+	assert.Regexp(t, "more than one solution", err.Error())
+}
+
+func fakeSubmitServer(t *testing.T, submittedFiles map[string]string) *httptest.Server {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseMultipartForm(2 << 10)
+		if err != nil {
+			t.Fatal(err)
 		}
-		// Create a temp dir for the config and the exercise files.
-		dir := filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise")
-		os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
+		mf := r.MultipartForm
 
-		solution := &workspace.Solution{
-			ID:          "bogus-solution-uuid",
-			Track:       "bogus-track",
-			Exercise:    "bogus-exercise",
-			IsRequester: true,
-		}
-		err := solution.Write(dir)
-		assert.NoError(t, err)
-
-		for _, file := range []file{file1, file2, file3} {
-			err := ioutil.WriteFile(filepath.Join(dir, file.relativePath), []byte(file.contents), os.FileMode(0755))
-			assert.NoError(t, err)
-		}
-
-		// The fake endpoint will populate this when it receives the call from the command.
-		submittedFiles := map[string]string{}
-
-		// Set up the test server.
-		fakeEndpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			err := r.ParseMultipartForm(2 << 10)
+		files := mf.File["files[]"]
+		for _, fileHeader := range files {
+			file, err := fileHeader.Open()
 			if err != nil {
 				t.Fatal(err)
 			}
-			mf := r.MultipartForm
-
-			files := mf.File["files[]"]
-			for _, fileHeader := range files {
-				file, err := fileHeader.Open()
-				if err != nil {
-					t.Fatal(err)
-				}
-				defer file.Close()
-				body, err := ioutil.ReadAll(file)
-				if err != nil {
-					t.Fatal(err)
-				}
-				submittedFiles[fileHeader.Filename] = string(body)
+			defer file.Close()
+			body, err := ioutil.ReadAll(file)
+			if err != nil {
+				t.Fatal(err)
 			}
-		})
-		ts := httptest.NewServer(fakeEndpoint)
-		defer ts.Close()
-
-		// Create a fake user config.
-		usrCfg := config.NewEmptyUserConfig()
-		usrCfg.Workspace = cmdTest.TmpDir
-		usrCfg.APIBaseURL = ts.URL
-		err = usrCfg.Write()
-		assert.NoError(t, err)
-
-		// Create a fake CLI config.
-		cliCfg, err := config.NewCLIConfig()
-		assert.NoError(t, err)
-		cliCfg.Tracks["bogus-track"] = config.NewTrack("bogus-track")
-		err = cliCfg.Write()
-		assert.NoError(t, err)
-
-		// Write mock interactive input to In for the CLI command.
-		In = strings.NewReader(cmdTest.MockInteractiveResponse)
-
-		// Execute the command!
-		cmdTest.App.Execute()
-
-		// We got only the file we expected.
-		assert.Equal(t, 2, len(submittedFiles))
-		for _, file := range []file{file1, file2} {
-			path := string(os.PathSeparator) + file.relativePath
-			assert.Equal(t, file.contents, submittedFiles[path])
+			submittedFiles[fileHeader.Filename] = string(body)
 		}
+	})
+	return httptest.NewServer(handler)
+}
+
+func writeFakeSolution(t *testing.T, dir, trackID, exerciseSlug string) {
+	solution := &workspace.Solution{
+		ID:          "bogus-solution-uuid",
+		Track:       trackID,
+		Exercise:    exerciseSlug,
+		URL:         "http://example.com/bogus-url",
+		IsRequester: true,
 	}
+	err := solution.Write(dir)
+	assert.NoError(t, err)
 }

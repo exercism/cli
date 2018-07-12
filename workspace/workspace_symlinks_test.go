@@ -6,14 +6,18 @@ import (
 	"path/filepath"
 	"runtime"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLocateSymlinks(t *testing.T) {
 	_, cwd, _, _ := runtime.Caller(0)
 	root := filepath.Join(cwd, "..", "..", "fixtures", "locate-exercise")
 
-	wsSymbolic := New(filepath.Join(root, "symlinked-workspace"))
-	wsPrimary := New(filepath.Join(root, "workspace"))
+	wsSymbolic, err := New(filepath.Join(root, "symlinked-workspace"))
+	assert.NoError(t, err)
+	wsPrimary, err := New(filepath.Join(root, "workspace"))
+	assert.NoError(t, err)
 
 	testCases := []locateTestCase{
 		{

@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"io/ioutil"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -10,7 +11,8 @@ import (
 
 func TestSolutionPath(t *testing.T) {
 	root := filepath.Join("..", "fixtures", "solution-path", "creatures")
-	ws := New(root)
+	ws, err := New(root)
+	assert.NoError(t, err)
 
 	// An existing exercise.
 	path, err := ws.SolutionPath("gazelle", "ccc")
@@ -48,7 +50,9 @@ func TestIsSolutionPath(t *testing.T) {
 }
 
 func TestResolveSolutionPath(t *testing.T) {
-	ws := New("tmp")
+	tmpDir, err := ioutil.TempDir("", "resolve-solution-path")
+	ws, err := New(tmpDir)
+	assert.NoError(t, err)
 
 	existsFn := func(solutionID, path string) (bool, error) {
 		pathToSolutionID := map[string]string{
@@ -138,7 +142,8 @@ func TestSolutionDir(t *testing.T) {
 	_, cwd, _, _ := runtime.Caller(0)
 	root := filepath.Join(cwd, "..", "..", "fixtures", "solution-dir")
 
-	ws := New(filepath.Join(root, "workspace"))
+	ws, err := New(filepath.Join(root, "workspace"))
+	assert.NoError(t, err)
 
 	tests := []struct {
 		path string

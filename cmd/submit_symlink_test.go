@@ -1,0 +1,66 @@
+// +build !windows
+
+package cmd
+
+import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"testing"
+
+	"github.com/exercism/cli/config"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestSubmitFilesInSymlinkedPath(t *testing.T) {
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	Err = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+	}()
+
+	// The fake endpoint will populate this when it receives the call from the command.
+	submittedFiles := map[string]string{}
+	ts := fakeSubmitServer(t, submittedFiles)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "symlink-destination")
+	assert.NoError(t, err)
+	dstDir := filepath.Join(tmpDir, "workspace")
+
+	srcDir, err := ioutil.TempDir("", "symlink-source")
+	assert.NoError(t, err)
+
+	err = os.Symlink(srcDir, dstDir)
+	assert.NoError(t, err)
+
+	dir := filepath.Join(dstDir, "bogus-track", "bogus-exercise")
+	os.MkdirAll(dir, os.FileMode(0755))
+
+	writeFakeSolution(t, dir, "bogus-track", "bogus-exercise")
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", dstDir)
+	v.Set("apibaseurl", ts.URL)
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+	}
+
+	file := filepath.Join(dir, "file.txt")
+	err = ioutil.WriteFile(filepath.Join(dir, "file.txt"), []byte("This is a file."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	err = runSubmit(cfg, pflag.NewFlagSet("symlinks", pflag.PanicOnError), []string{file})
+	assert.NoError(t, err)
+
+	assert.Equal(t, 1, len(submittedFiles))
+	assert.Equal(t, "This is a file.", submittedFiles["/file.txt"])
+}

@@ -38,7 +38,10 @@ func NewTransmission(root string, args []string) (*Transmission, error) {
 		return nil, errors.New("mixing files and dirs")
 	}
 	if len(tx.Files) > 0 {
-		ws := New(root)
+		ws, err := New(root)
+		if err != nil {
+			return nil, err
+		}
 		parents := map[string]bool{}
 		for _, file := range tx.Files {
 			dir, err := ws.SolutionDir(file)
