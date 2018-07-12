@@ -37,7 +37,7 @@ func TestSubmitWithoutWorkspace(t *testing.T) {
 	}
 
 	err := runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
-	assert.Regexp(t, "run configure", err.Error())
+	assert.Regexp(t, "re-run the configure", err.Error())
 }
 
 func TestSubmitNonExistentFile(t *testing.T) {
@@ -65,7 +65,7 @@ func TestSubmitNonExistentFile(t *testing.T) {
 		filepath.Join(tmpDir, "file-2.txt"),
 	}
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
-	assert.Regexp(t, "no such file", err.Error())
+	assert.Regexp(t, "cannot be found", err.Error())
 }
 
 func TestSubmitFilesAndDir(t *testing.T) {
@@ -93,7 +93,7 @@ func TestSubmitFilesAndDir(t *testing.T) {
 		filepath.Join(tmpDir, "file-2.txt"),
 	}
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
-	assert.Regexp(t, "is a directory", err.Error())
+	assert.Regexp(t, "submitting a directory", err.Error())
 }
 
 func TestSubmitFiles(t *testing.T) {
@@ -231,7 +231,7 @@ func TestSubmitOnlyEmptyFile(t *testing.T) {
 
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file})
 	assert.Error(t, err)
-	assert.Regexp(t, "no files", err.Error())
+	assert.Regexp(t, "No files found", err.Error())
 }
 
 func TestSubmitFilesFromDifferentSolutions(t *testing.T) {

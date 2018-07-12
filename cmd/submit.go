@@ -63,23 +63,64 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	usrCfg := cfg.UserViperConfig
 
 	if usrCfg.GetString("token") == "" {
-		return errors.New("TODO: Welcome to Exercism this is how you use this")
+		tokenURL := config.InferSiteURL(usrCfg.GetString("apibaseurl")) + "/my/settings"
+		msg := `
+
+    Welcome to Exercism!
+
+    To get started, you need to configure the the tool with your API token.
+    Find your token at
+
+        %s
+
+    Then run the configure command:
+
+
+        %s configure --token=YOUR_TOKEN
+
+		`
+		return fmt.Errorf(msg, tokenURL, BinaryName)
 	}
 
 	if usrCfg.GetString("workspace") == "" {
-		return errors.New("TODO: run configure first")
+		// Running configure without any arguments will attempt to
+		// set the default workspace. If the default workspace directory
+		// risks clobbering an existing directory, it will print an
+		// error message that explains how to proceed.
+		msg := `
+
+    Please re-run the configure command to define where
+    to download the exercises.
+
+        %s configure
+		`
+		return fmt.Errorf(msg, BinaryName)
 	}
 
 	for i, arg := range args {
 		info, err := os.Lstat(arg)
 		if err != nil {
 			if os.IsNotExist(err) {
-				return errors.New("TODO: explain that there is no such file")
+				msg := `
+
+    The file you are trying to submit cannot be found.
+
+        %s
+
+		`
+				return fmt.Errorf(msg, arg)
 			}
 			return err
 		}
 		if info.IsDir() {
-			return errors.New("TODO: it is a directory and we cannot handle that")
+			msg := `
+
+    You are submitting a directory, which is not currently supported.
+
+        %s
+
+			`
+			return fmt.Errorf(msg, arg)
 		}
 
 		src, err := filepath.EvalSymlinks(arg)
@@ -110,16 +151,36 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	}
 	if len(sx) == 0 {
 		// TODO: add test
-		return errors.New("can't find a solution metadata file. (todo: explain how to fix it)")
+		msg := `
+
+    The exercise you are submitting doesn't have the necessary metadata.
+    Please see https://exercism.io/cli-v1-to-v2 for instructions on how to fix it.
+
+		`
+		return errors.New(msg)
 	}
 	if len(sx) > 1 {
-		return errors.New("files from multiple solutions. Can only submit one solution at a time. (todo: fix error message)")
+		msg := `
+
+    You are submitting files belonging to different solutions.
+    Please submit the files for one solution at a time.
+
+		`
+		return errors.New(msg)
 	}
 	solution := sx[0]
 
 	if !solution.IsRequester {
 		// TODO: add test
-		return errors.New("not your solution. todo: fix error message")
+		msg := `
+
+    The solution you are submitting is not connected to your account.
+    Please re-download the exercise to make sure it has the data it needs.
+
+        %s download --exercise=%s --track=%s
+
+		`
+		return fmt.Errorf(msg, BinaryName, solution.Exercise, solution.Track)
 	}
 
 	paths := make([]string, 0, len(tx.Files))
@@ -130,14 +191,26 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 			return err
 		}
 		if info.Size() == 0 {
-			fmt.Fprintf(Err, "(TODO) Warning: file %s was empty, skipping...", file)
+
+			msg := `
+
+		WARNING: Skipping empty file
+             %s
+
+		`
+			fmt.Fprintf(Err, msg, file)
 			continue
 		}
 		paths = append(paths, file)
 	}
 
 	if len(paths) == 0 {
-		return errors.New("no files found to submit. TODO: fix error messages")
+		msg := `
+
+		No files found to submit.
+
+		`
+		return errors.New(msg)
 	}
 
 	body := &bytes.Buffer{}
@@ -192,17 +265,17 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 		return err
 	}
 
-	if solution.AutoApprove == true {
-		msg := `Your solution has been submitted successfully and has been auto-approved.
-You can complete the exercise and unlock the next core exercise at:
-`
-		fmt.Fprintf(Err, msg)
-	} else {
-		msg := "Your solution has been submitted successfully. View it at:\n"
-		fmt.Fprintf(Err, msg)
-	}
-	fmt.Fprintf(Out, "%s\n", solution.URL)
+	msg := `
 
+    Your solution has been submitted successfully.
+		%s
+`
+	suffix := "View it at:"
+	if solution.AutoApprove {
+		suffix = "You can complete the exercise and unlock the next core exercise at:"
+	}
+	fmt.Fprintf(Err, msg, suffix)
+	fmt.Fprintf(Out, "%s\n", solution.URL)
 	return nil
 }
 
