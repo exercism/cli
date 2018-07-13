@@ -66,9 +66,9 @@ createRelease() {
 
 	if [ "$osname" = windows ]
 	then
-		zip "$relname.zip" "$binname" ../shell ../BUILD.md
+		zip "$relname.zip" "$binname" ../shell
 	else
-		tar cvzf "$relname.tgz" "$binname" ../shell ../BUILD.md
+		tar cvzf "$relname.tgz" "$binname" ../shell
 	fi
 	cd ..
 }
