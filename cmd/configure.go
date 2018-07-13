@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -165,7 +164,7 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 			  %s configure %s --workspace=PATH_TO_DIFFERENT_FOLDER
 			`
 
-			return errors.New(fmt.Sprintf(msg, workspace, BinaryName, commandify(flags)))
+			return fmt.Errorf(msg, workspace, BinaryName, commandify(flags))
 		}
 	}
 
@@ -188,7 +187,7 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 			  %s configure %s --workspace=%s
 			`
 
-			return errors.New(fmt.Sprintf(msg, workspace, BinaryName, commandify(flags), workspace))
+			return fmt.Errorf(msg, workspace, BinaryName, commandify(flags), workspace)
 		}
 	}
 	// Configure the workspace.

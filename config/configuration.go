@@ -100,6 +100,10 @@ func userHome() string {
 	return dir
 }
 
+// DefaultWorkspaceDir provides a sensible default for the Exercism workspace.
+// The default is different depending on the platform, in order to best match
+// the conventions for that platform.
+// It places the directory in the user's home path.
 func DefaultWorkspaceDir(cfg Configuration) string {
 	dir := cfg.DefaultDirName
 	if cfg.OS != "linux" {
@@ -108,6 +112,7 @@ func DefaultWorkspaceDir(cfg Configuration) string {
 	return filepath.Join(cfg.Home, dir)
 }
 
+// Save persists a viper config of the base name.
 func (c Configuration) Save(basename string) error {
 	return c.Persister.Save(c.UserViperConfig, basename)
 }
