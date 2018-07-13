@@ -13,7 +13,7 @@ import (
 )
 
 func TestSubmitRelativePath(t *testing.T) {
-	t.Skip("The Windows build is failing and needs to be debugged.\nSee https://ci.appveyor.com/project/kytrinyx/cli/build/110")
+	//t.Skip("The Windows build is failing and needs to be debugged.\nSee https://ci.appveyor.com/project/kytrinyx/cli/build/110")
 
 	oldOut := Out
 	oldErr := Err
@@ -30,6 +30,7 @@ func TestSubmitRelativePath(t *testing.T) {
 
 	tmpDir, err := ioutil.TempDir("", "relative-path")
 	assert.NoError(t, err)
+	defer os.RemoveAll(tmpDir)
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
@@ -55,5 +56,5 @@ func TestSubmitRelativePath(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, 1, len(submittedFiles))
-	assert.Equal(t, "This is a file.", submittedFiles["/file.txt"])
+	assert.Equal(t, "This is a file.", submittedFiles["\\file.txt"])
 }
