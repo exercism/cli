@@ -6,7 +6,7 @@ Unpack the archive relevant to your machine and place in $PATH
 ### Bash
 
     mkdir -p ~/.config/exercism
-    mv ./exercism_completion.bash ~/.config/exercism/exercism\exercism_completion.bash
+    mv ../shell/exercism_completion.bash ~/.config/exercism/exercism\exercism_completion.bash
 
 Load the completion in your `.bashrc`, `.bash_profile` or `.profile` by
 adding the following snippet:
@@ -18,7 +18,7 @@ adding the following snippet:
 ### Zsh
 
     mkdir -p ~/.config/exercism
-    mv ./exercism_completion.zsh ~/.config/exercism/exercism_completion.zsh
+    mv ../shell/exercism_completion.zsh ~/.config/exercism/exercism_completion.zsh
 
 Load up the completion in your `.zshrc`, `.zsh_profile` or `.profile` by adding
 the following snippet
