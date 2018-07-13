@@ -155,14 +155,14 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 		if info, err := os.Lstat(workspace); !os.IsNotExist(err) && !info.IsDir() {
 			msg := `
 
-			There is already something at the workspace location you are configuring:
+    There is already something at the workspace location you are configuring:
 
-			  %s
+      %s
 
-			Please rename it, or set a different workspace location:
+     Please rename it, or set a different workspace location:
 
-			  %s configure %s --workspace=PATH_TO_DIFFERENT_FOLDER
-			`
+       %s configure %s --workspace=PATH_TO_DIFFERENT_FOLDER
+     `
 
 			return fmt.Errorf(msg, workspace, BinaryName, commandify(flags))
 		}
@@ -174,18 +174,20 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 		// If it already exists don't clobber it with the default.
 		if _, err := os.Lstat(workspace); !os.IsNotExist(err) {
 			msg := `
-			The default Exercism workspace is
+    The default Exercism workspace is
 
-			  %s
+      %s
 
-			There is already something there.
-			If it's a directory, that might be fine. If it's a file, you will need to move it first,
-			or choose a different location for the workspace.
+    There is already something there.
+    If it's a directory, that might be fine.
+    If it's a file, you will need to move it first, or choose a
+    different location for the workspace.
 
-			You can choose the workspace location by rerunning this command with the --workspace flag.
+    You can choose the workspace location by rerunning this command
+    with the --workspace flag.
 
-			  %s configure %s --workspace=%s
-			`
+      %s configure %s --workspace=%s
+    `
 
 			return fmt.Errorf(msg, workspace, BinaryName, commandify(flags), workspace)
 		}

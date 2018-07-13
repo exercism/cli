@@ -77,7 +77,7 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 
         %s configure --token=YOUR_TOKEN
 
-		`
+    `
 		return fmt.Errorf(msg, tokenURL, BinaryName)
 	}
 
@@ -212,7 +212,7 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 
 			msg := `
 
-		WARNING: Skipping empty file
+    WARNING: Skipping empty file
              %s
 
 		`
@@ -225,7 +225,7 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	if len(paths) == 0 {
 		msg := `
 
-		No files found to submit.
+    No files found to submit.
 
 		`
 		return errors.New(msg)
