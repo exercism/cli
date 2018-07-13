@@ -98,6 +98,12 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	}
 
 	for i, arg := range args {
+		var err error
+		arg, err = filepath.Abs(arg)
+		if err != nil {
+			return err
+		}
+
 		info, err := os.Lstat(arg)
 		if err != nil {
 			if os.IsNotExist(err) {
@@ -135,12 +141,25 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 		return err
 	}
 
-	tx, err := workspace.NewTransmission(ws.Dir, args)
-	if err != nil {
-		return err
+	var exerciseDir string
+	for _, arg := range args {
+		dir, err := ws.SolutionDir(arg)
+		if err != nil {
+			return err
+		}
+		if exerciseDir != "" && dir != exerciseDir {
+			msg := `
+
+    You are submitting files belonging to different solutions.
+    Please submit the files for one solution at a time.
+
+		`
+			return errors.New(msg)
+		}
+		exerciseDir = dir
 	}
 
-	dirs, err := ws.Locate(tx.Dir)
+	dirs, err := ws.Locate(exerciseDir)
 	if err != nil {
 		return err
 	}
@@ -183,8 +202,8 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 		return fmt.Errorf(msg, BinaryName, solution.Exercise, solution.Track)
 	}
 
-	paths := make([]string, 0, len(tx.Files))
-	for _, file := range tx.Files {
+	paths := make([]string, 0, len(args))
+	for _, file := range args {
 		// Don't submit empty files
 		info, err := os.Stat(file)
 		if err != nil {
