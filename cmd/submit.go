@@ -36,7 +36,6 @@ If called with the name of an exercise, it will work out which
 track it is on and submit it. The command will ask for help
 figuring things out if necessary.
 `,
-	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.NewConfiguration()
 
