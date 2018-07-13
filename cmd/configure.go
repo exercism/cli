@@ -197,6 +197,7 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 	if err := configuration.Save("user"); err != nil {
 		return err
 	}
+	fmt.Fprintln(Err, "\nYou have configured the Exercism command-line client:")
 	printCurrentConfig(configuration)
 	return nil
 }
@@ -208,10 +209,10 @@ func printCurrentConfig(configuration config.Configuration) {
 	v := configuration.UserViperConfig
 
 	fmt.Fprintln(w, "")
-	fmt.Fprintln(w, fmt.Sprintf("Config dir:\t%s", configuration.Dir))
-	fmt.Fprintln(w, fmt.Sprintf("-t, --token\t%s", v.GetString("token")))
-	fmt.Fprintln(w, fmt.Sprintf("-w, --workspace\t%s", v.GetString("workspace")))
-	fmt.Fprintln(w, fmt.Sprintf("-a, --api\t%s", v.GetString("apibaseurl")))
+	fmt.Fprintln(w, fmt.Sprintf("Config dir:\t\t%s", configuration.Dir))
+	fmt.Fprintln(w, fmt.Sprintf("Token:\t(-t, --token)\t%s", v.GetString("token")))
+	fmt.Fprintln(w, fmt.Sprintf("Workspace:\t(-w, --workspace)\t%s", v.GetString("workspace")))
+	fmt.Fprintln(w, fmt.Sprintf("API Base URL:\t(-a, --api)\t%s", v.GetString("apibaseurl")))
 	fmt.Fprintln(w, "")
 }
 
