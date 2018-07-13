@@ -287,14 +287,14 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	msg := `
 
     Your solution has been submitted successfully.
-		%s
+    %s
 `
-	suffix := "View it at:"
+	suffix := "View it at:\n\n    "
 	if solution.AutoApprove {
-		suffix = "You can complete the exercise and unlock the next core exercise at:"
+		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
 	}
 	fmt.Fprintf(Err, msg, suffix)
-	fmt.Fprintf(Out, "%s\n", solution.URL)
+	fmt.Fprintf(Out, "    %s\n\n", solution.URL)
 	return nil
 }
 
