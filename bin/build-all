@@ -13,6 +13,15 @@ ARMVAR=github.com/exercism/cli/cmd.BuildARM
 # handle alternate binary name for pre-releases
 BINNAME=${NAME:-exercism}
 
+get_shell_completions() {
+        SHELLCOMP_BASEURL=http://cli.exercism.io/shell/exercism_completion
+        curl -O $SHELLCOMP_BASEURL.bash -O $SHELLCOMP_BASEURL.zsh
+}
+
+cleanup() {
+        rm -f exercism_completion.bash exercism_completion.zsh
+}
+
 createRelease() {
 	os=$1
 	arch=$2
@@ -66,12 +75,14 @@ createRelease() {
 
 	if [ "$osname" = windows ]
 	then
-		zip "$relname.zip" "$binname"
+		zip "$relname.zip" "$binname" ../exercism_completion* ../BUILD.md
 	else
-		tar cvzf "$relname.tgz" "$binname"
+		tar cvzf "$relname.tgz" "$binname" ../exercism_completion* ../BUILD.md
 	fi
 	cd ..
 }
+
+get_shell_completions
 
 # Mac Releases
 createRelease darwin 386
@@ -101,3 +112,5 @@ createRelease linux arm64
 # Windows Releases
 createRelease windows 386
 createRelease windows amd64
+
+cleanup
