@@ -266,7 +266,7 @@ func TestSubmitFilesFromDifferentSolutions(t *testing.T) {
 
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file1, file2})
 	assert.Error(t, err)
-	assert.Regexp(t, "more than one solution", err.Error())
+	assert.Regexp(t, "different solutions", err.Error())
 }
 
 func fakeSubmitServer(t *testing.T, submittedFiles map[string]string) *httptest.Server {
