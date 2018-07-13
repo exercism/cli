@@ -52,7 +52,6 @@ createRelease() {
 		binname="$binname.exe"
 	fi
 
-	relname="../release/$BINNAME-$osname-$osarch"
 	echo "Creating $os/$arch binary..."
 
 	if [ "$arm" ]
@@ -62,15 +61,12 @@ createRelease() {
 		GOOS=$os GOARCH=$arch go build -ldflags "$ldflags" -o "out/$binname" exercism/main.go
 	fi
 
-	cd out
-
-	if [ "$osname" = windows ]
-	then
-		zip "$relname.zip" "$binname" ../shell
+	release_name="release/$BINNAME-$osname-$osarch"
+	if [ "$osname" = windows ]; then
+		(cd out && zip "../$release_name.zip" ../shell/* "./$binname")
 	else
-		tar cvzf "$relname.tgz" "$binname" ../shell
+		tar cvzf "$release_name.tgz" shell -C out "./$binname"
 	fi
-	cd ..
 }
 
 # Mac Releases
