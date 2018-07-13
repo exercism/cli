@@ -13,36 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const payloadTemplate = `
-{
-	"solution": {
-		"id": "bogus-id",
-		"user": {
-			"handle": "alice",
-			"is_requester": true
-		},
-		"exercise": {
-			"id": "bogus-exercise",
-			"instructions_url": "http://example.com/bogus-exercise",
-			"auto_approve": false,
-			"track": {
-				"id": "bogus-track",
-				"language": "Bogus Language"
-			}
-		},
-		"file_download_base_url": "%s",
-		"files": [
-		"%s",
-		"%s",
-		"%s"
-		],
-		"iteration": {
-			"submitted_at": "2017-08-21t10:11:12.130z"
-		}
-	}
-}
-`
-
 func TestDownload(t *testing.T) {
 	oldOut := Out
 	oldErr := Err
@@ -104,6 +74,36 @@ func TestDownload(t *testing.T) {
 	assert.True(t, os.IsNotExist(err), "It should not write the file if empty.")
 }
 
+func TestDownloadArgs(t *testing.T) {
+	tests := []struct {
+		args          []string
+		expectedError string
+	}{
+		{
+			args:          []string{"bogus"}, // providing just an exercise slug without the flag
+			expectedError: "need an --exercise name or a solution --uuid",
+		},
+		{
+			args:          []string{""}, // providing no args
+			expectedError: "need an --exercise name or a solution --uuid",
+		},
+	}
+
+	for _, test := range tests {
+		cmdTest := &CommandTest{
+			Cmd:    downloadCmd,
+			InitFn: initDownloadCmd,
+			Args:   append([]string{"fakeapp", "download"}, test.args...),
+		}
+		cmdTest.Setup(t)
+		cmdTest.App.SetOutput(ioutil.Discard)
+		defer cmdTest.Teardown(t)
+		err := cmdTest.App.Execute()
+
+		assert.EqualError(t, err, test.expectedError)
+	}
+}
+
 func writeFakeUserConfigSettings(tmpDirPath, serverURL string) error {
 	userCfg := config.NewEmptyUserConfig()
 	userCfg.Workspace = tmpDirPath
@@ -136,35 +136,34 @@ func makeMockServer() *httptest.Server {
 	})
 
 	return server
-
 }
 
-func TestDownloadArgs(t *testing.T) {
-	tests := []struct {
-		args          []string
-		expectedError string
-	}{
-		{
-			args:          []string{"bogus"}, // providing just an exercise slug without the flag
-			expectedError: "need an --exercise name or a solution --uuid",
+const payloadTemplate = `
+{
+	"solution": {
+		"id": "bogus-id",
+		"user": {
+			"handle": "alice",
+			"is_requester": true
 		},
-		{
-			args:          []string{""}, // providing no args
-			expectedError: "need an --exercise name or a solution --uuid",
+		"exercise": {
+			"id": "bogus-exercise",
+			"instructions_url": "http://example.com/bogus-exercise",
+			"auto_approve": false,
+			"track": {
+				"id": "bogus-track",
+				"language": "Bogus Language"
+			}
 		},
-	}
-
-	for _, test := range tests {
-		cmdTest := &CommandTest{
-			Cmd:    downloadCmd,
-			InitFn: initDownloadCmd,
-			Args:   append([]string{"fakeapp", "download"}, test.args...),
+		"file_download_base_url": "%s",
+		"files": [
+		"%s",
+		"%s",
+		"%s"
+		],
+		"iteration": {
+			"submitted_at": "2017-08-21t10:11:12.130z"
 		}
-		cmdTest.Setup(t)
-		cmdTest.App.SetOutput(ioutil.Discard)
-		defer cmdTest.Teardown(t)
-		err := cmdTest.App.Execute()
-
-		assert.EqualError(t, err, test.expectedError)
 	}
 }
+`
