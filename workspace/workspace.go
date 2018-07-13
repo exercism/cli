@@ -196,5 +196,4 @@ func (ws Workspace) SolutionDir(s string) (string, error) {
 		}
 		path = filepath.Dir(path)
 	}
-	return "", nil
 }
