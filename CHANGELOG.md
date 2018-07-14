@@ -5,6 +5,9 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
+* **Your contribution here**
+
+## v3.0.3 (2018-07-14)
 [#642](https://github.com/exercism/cli/pull/642) Add better error messages when configuration is needed before download - [@kytrinyx]
 [#641](https://github.com/exercism/cli/pull/641) Fix broken download for uuid flag - [@kytrinyx]
 [#618](https://github.com/exercism/cli/pull/618) Fix broken test in Windows build for relative paths - [@nywilken]
@@ -12,7 +15,6 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 [#616](https://github.com/exercism/cli/pull/616) Add shell completion scripts to build artifacts - [@jdsutherland]
 [#624](https://github.com/exercism/cli/pull/624) Tweak command documentation to reflect reality - [@kytrinyx]
 [#625](https://github.com/exercism/cli/pull/625) Fix wildly excessive whitespace in error messages - [@kytrinyx]
-* **Your contribution here**
 
 ## v3.0.2 (2018-07-13)
 * [#622](https://github.com/exercism/cli/pull/622) Fix bug with multi-file submission - [@kytrinyx]
