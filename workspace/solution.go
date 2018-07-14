@@ -13,7 +13,7 @@ import (
 )
 
 const ignoreSubdir = ".exercism"
-const solutionFilename = ".solution.json"
+const solutionFilename = "solution.json"
 
 var solutionRelPath = filepath.Join(ignoreSubdir, solutionFilename)
 

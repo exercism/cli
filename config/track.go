@@ -7,7 +7,7 @@ import (
 
 var defaultIgnorePatterns = []string{
 	".*[.]md",
-	"[.]solution[.]json",
+	"solution[.]json",
 }
 
 // Track holds the CLI-related settings for a track.

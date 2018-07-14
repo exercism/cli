@@ -83,8 +83,8 @@ func TestDownload(t *testing.T) {
 			contents: "this is file 2",
 		},
 		{
-			desc:     "It creates the .solution.json file.",
-			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", "./.exercism/.solution.json"),
+			desc:     "It creates the solution.json file.",
+			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", ".exercism", "solution.json"),
 			contents: `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":true,"auto_approve":false}`,
 		},
 	}

@@ -78,7 +78,7 @@ func TestCLIConfigSetDefaults(t *testing.T) {
 		Tracks: map[string]*Track{
 			"bogus": {
 				ID:             "bogus",
-				IgnorePatterns: []string{"[.]solution[.]json", "_spec[.]ext$"},
+				IgnorePatterns: []string{"solution[.]json", "_spec[.]ext$"},
 			},
 		},
 	}
