@@ -17,7 +17,7 @@ The TL;DR is: **don't clone your fork**, and it matters where on your filesystem
 
 If you don't care how and why and just want something that works, follow these steps:
 
-1. [fork this repo on the Github webpage][fork]
+1. [fork this repo on the GitHub webpage][fork]
 1. `go get github.com/exercism/cli/exercism`
 1. `cd $GOPATH/src/github.com/exercism/cli` (or `cd %GOPATH%/src/github.com/exercism/cli` on Windows)
 1. `git remote rename origin upstream`
@@ -51,15 +51,21 @@ As of Go 1.9 this is simplified to `go test ./...`.
 
 ## Manual Testing against Exercism
 
-If you want to test your changes while doing your everyday exorcism work you could do:
+To test your changes while doing everyday Exercism work you
+can build using the following instructions. Any name may be used for the
+binary (e.g. `testercism`) - by using a name other than `exercism` you
+can have different profiles under `~/.config` and avoid possibly
+damaging your real Exercism submissions, or test different tokens, etc.
 
 On Unices:
 
-- `cd $GOPATH/src/github.com/exercism/cli/exercism && go build -o exercism main.go && mv exercism ~/bin`
+- `cd $GOPATH/src/github.com/exercism/cli/exercism && go build -o testercism main.go && mv testercism ~/bin`
 
 On Windows:
 
-- ?? TODO
+- `cd /d %GOPATH%\src\github.com\exercism\cli`
+- `go build -o testercism.exe exercism\main.go`
+- TODO where would a Windows developer put the binary?
 
 ### Building for All Platforms
 
