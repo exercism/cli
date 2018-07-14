@@ -233,13 +233,13 @@ type downloadPayload struct {
 	} `json:"error,omitempty"`
 }
 
-func initDownloadCmd() {
-	downloadCmd.Flags().StringP("uuid", "u", "", "the solution UUID")
-	downloadCmd.Flags().StringP("track", "t", "", "the track ID")
-	downloadCmd.Flags().StringP("exercise", "e", "", "the exercise slug")
+func setupDownloadFlags(flags *pflag.FlagSet) {
+	flags.StringP("uuid", "u", "", "the solution UUID")
+	flags.StringP("track", "t", "", "the track ID")
+	flags.StringP("exercise", "e", "", "the exercise slug")
 }
 
 func init() {
 	RootCmd.AddCommand(downloadCmd)
-	initDownloadCmd()
+	setupDownloadFlags(downloadCmd.Flags())
 }
