@@ -13,6 +13,39 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestDownloadWithoutToken(t *testing.T) {
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	Err = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+	}()
+
+	cmdTest := &CommandTest{
+		Cmd:    downloadCmd,
+		InitFn: initDownloadCmd,
+		Args:   []string{"fakeapp", "download", "--exercise=bogus-exercise"},
+	}
+	cmdTest.Setup(t)
+	defer cmdTest.Teardown(t)
+
+	ts := fakeDownloadServer()
+	defer ts.Close()
+
+	userCfg := config.NewEmptyUserConfig()
+	userCfg.Workspace = cmdTest.TmpDir
+	userCfg.APIBaseURL = ts.URL
+	err := userCfg.Write()
+	assert.NoError(t, err)
+
+	err = cmdTest.App.Execute()
+	if assert.Error(t, err) {
+		assert.Regexp(t, "Welcome to Exercism", err.Error())
+	}
+}
+
 func TestDownload(t *testing.T) {
 	oldOut := Out
 	oldErr := Err
@@ -96,9 +129,16 @@ func TestDownloadArgs(t *testing.T) {
 			Args:   append([]string{"fakeapp", "download"}, test.args...),
 		}
 		cmdTest.Setup(t)
+		userCfg := config.NewEmptyUserConfig()
+		userCfg.Workspace = cmdTest.TmpDir
+		userCfg.APIBaseURL = "http://example.com"
+		userCfg.Token = "abc123"
+		err := userCfg.Write()
+		assert.NoError(t, err)
+
 		cmdTest.App.SetOutput(ioutil.Discard)
 		defer cmdTest.Teardown(t)
-		err := cmdTest.App.Execute()
+		err = cmdTest.App.Execute()
 
 		assert.EqualError(t, err, test.expectedError)
 	}

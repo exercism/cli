@@ -30,6 +30,30 @@ latest solution.
 Download other people's solutions by providing the UUID.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		usrCfg, err := config.NewUserConfig()
+		if err != nil {
+			return err
+		}
+		if usrCfg.Token == "" {
+			tokenURL := config.InferSiteURL(usrCfg.APIBaseURL) + "/my/settings"
+			msg := `
+
+    Welcome to Exercism!
+
+    To get started, you need to configure the the tool with your API token.
+    Find your token at
+
+        %s
+
+    Then run the configure command:
+
+
+        %s configure --token=YOUR_TOKEN
+
+    `
+			return fmt.Errorf(msg, tokenURL, BinaryName)
+		}
+
 		uuid, err := cmd.Flags().GetString("uuid")
 		if err != nil {
 			return err
@@ -40,10 +64,6 @@ Download other people's solutions by providing the UUID.
 		}
 		if uuid == "" && exercise == "" {
 			return errors.New("need an --exercise name or a solution --uuid")
-		}
-		usrCfg, err := config.NewUserConfig()
-		if err != nil {
-			return err
 		}
 
 		var slug string
