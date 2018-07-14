@@ -31,10 +31,10 @@ func TestDownload(t *testing.T) {
 	cmdTest.Setup(t)
 	defer cmdTest.Teardown(t)
 
-	mockServer := makeMockServer()
-	defer mockServer.Close()
+	ts := fakeDownloadServer()
+	defer ts.Close()
 
-	err := writeFakeUserConfigSettings(cmdTest.TmpDir, mockServer.URL)
+	err := writeFakeUserConfigSettings(cmdTest.TmpDir, ts.URL)
 	assert.NoError(t, err)
 
 	testCases := []struct {
@@ -111,7 +111,7 @@ func writeFakeUserConfigSettings(tmpDirPath, serverURL string) error {
 	return userCfg.Write()
 }
 
-func makeMockServer() *httptest.Server {
+func fakeDownloadServer() *httptest.Server {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 
