@@ -43,7 +43,7 @@ func TestDownloadWithoutFlags(t *testing.T) {
 	}
 }
 
-func TestDownload(t *testing.T) {
+func TestDownloadTHISONE(t *testing.T) {
 	oldOut := Out
 	oldErr := Err
 	Out = ioutil.Discard
@@ -60,6 +60,7 @@ func TestDownload(t *testing.T) {
 	}{
 		{requestorSelf, "", "exercise", "bogus-exercise"},
 		{requestorSelf, "", "uuid", "bogus-id"},
+		{requestorOther, filepath.Join("users", "alice"), "uuid", "bogus-id"},
 	}
 
 	for _, tc := range testCases {
@@ -84,7 +85,7 @@ func TestDownload(t *testing.T) {
 		err = runDownload(cfg, flags, []string{})
 		assert.NoError(t, err)
 
-		assertDownloadedCorrectFiles(t, filepath.Join(tmpDir, tc.expectedDir))
+		assertDownloadedCorrectFiles(t, filepath.Join(tmpDir, tc.expectedDir), tc.requestor)
 	}
 }
 
@@ -118,7 +119,8 @@ func fakeDownloadServer(requestor string) *httptest.Server {
 	return server
 }
 
-func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
+func assertDownloadedCorrectFiles(t *testing.T, targetDir, requestor string) {
+	metadata := `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":%s,"auto_approve":false}`
 	expectedFiles := []struct {
 		desc     string
 		path     string
@@ -137,7 +139,7 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
 		{
 			desc:     "the solution metadata file",
 			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", ".solution.json"),
-			contents: `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":true,"auto_approve":false}`,
+			contents: fmt.Sprintf(metadata, requestor),
 		},
 	}
 
