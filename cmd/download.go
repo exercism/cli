@@ -132,20 +132,16 @@ func runDownload(cfg config.Configuration, flags *pflag.FlagSet, args []string) 
 		IsRequester: payload.Solution.User.IsRequester,
 	}
 
-	dir := filepath.Join(usrCfg.GetString("workspace"), solution.Track)
-	os.MkdirAll(dir, os.FileMode(0755))
+	dir := usrCfg.GetString("workspace")
+	if !solution.IsRequester {
+		dir = filepath.Join(dir, "users", solution.Handle)
+	}
+	dir = filepath.Join(dir, solution.Track)
 
-	var ws workspace.Workspace
-	if solution.IsRequester {
-		ws, err = workspace.New(dir)
-		if err != nil {
-			return err
-		}
-	} else {
-		ws, err = workspace.New(filepath.Join(usrCfg.GetString("workspace"), "users", solution.Handle, solution.Track))
-		if err != nil {
-			return err
-		}
+	os.MkdirAll(dir, os.FileMode(0755))
+	ws, err := workspace.New(dir)
+	if err != nil {
+		return err
 	}
 
 	dir, err = ws.SolutionPath(solution.Exercise, solution.ID)

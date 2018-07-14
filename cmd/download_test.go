@@ -43,7 +43,7 @@ func TestDownloadWithoutFlags(t *testing.T) {
 	}
 }
 
-func TestDownload(t *testing.T) {
+func TestDownloadTHISONE(t *testing.T) {
 	oldOut := Out
 	oldErr := Err
 	Out = ioutil.Discard
@@ -53,63 +53,43 @@ func TestDownload(t *testing.T) {
 		Err = oldErr
 	}()
 
-	tmpDir, err := ioutil.TempDir("", "download-cmd")
-	assert.NoError(t, err)
-
-	ts := fakeDownloadServer()
-	defer ts.Close()
-
-	v := viper.New()
-	v.Set("workspace", tmpDir)
-	v.Set("apibaseurl", ts.URL)
-	v.Set("token", "abc123")
-
-	cfg := config.Configuration{
-		UserViperConfig: v,
-	}
-	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
-	setupDownloadFlags(flags)
-	flags.Set("exercise", "bogus-exercise")
-
-	err = runDownload(cfg, flags, []string{})
-	assert.NoError(t, err)
-
-	expectedFiles := []struct {
-		desc     string
-		path     string
-		contents string
+	testCases := []struct {
+		requestor       string
+		expectedDir     string
+		flag, flagValue string
 	}{
-		{
-			desc:     "a file in the exercise root directory",
-			path:     filepath.Join(tmpDir, "bogus-track", "bogus-exercise", "file-1.txt"),
-			contents: "this is file 1",
-		},
-		{
-			desc:     "a file in a subdirectory",
-			path:     filepath.Join(tmpDir, "bogus-track", "bogus-exercise", "subdir", "file-2.txt"),
-			contents: "this is file 2",
-		},
-		{
-			desc:     "the solution metadata file",
-			path:     filepath.Join(tmpDir, "bogus-track", "bogus-exercise", ".solution.json"),
-			contents: `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":true,"auto_approve":false}`,
-		},
+		{requestorSelf, "", "exercise", "bogus-exercise"},
+		{requestorSelf, "", "uuid", "bogus-id"},
+		{requestorOther, filepath.Join("users", "alice"), "uuid", "bogus-id"},
 	}
 
-	for _, file := range expectedFiles {
-		t.Run(file.desc, func(t *testing.T) {
-			b, err := ioutil.ReadFile(file.path)
-			assert.NoError(t, err)
-			assert.Equal(t, file.contents, string(b))
-		})
-	}
+	for _, tc := range testCases {
+		tmpDir, err := ioutil.TempDir("", "download-cmd")
+		assert.NoError(t, err)
 
-	path := filepath.Join(tmpDir, "bogus-track", "bogus-exercise", "file-3.txt")
-	_, err = os.Lstat(path)
-	assert.True(t, os.IsNotExist(err), "It should not write the file if empty.")
+		ts := fakeDownloadServer(tc.requestor)
+		defer ts.Close()
+
+		v := viper.New()
+		v.Set("workspace", tmpDir)
+		v.Set("apibaseurl", ts.URL)
+		v.Set("token", "abc123")
+
+		cfg := config.Configuration{
+			UserViperConfig: v,
+		}
+		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+		setupDownloadFlags(flags)
+		flags.Set(tc.flag, tc.flagValue)
+
+		err = runDownload(cfg, flags, []string{})
+		assert.NoError(t, err)
+
+		assertDownloadedCorrectFiles(t, filepath.Join(tmpDir, tc.expectedDir), tc.requestor)
+	}
 }
 
-func fakeDownloadServer() *httptest.Server {
+func fakeDownloadServer(requestor string) *httptest.Server {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 
@@ -128,13 +108,56 @@ func fakeDownloadServer() *httptest.Server {
 		fmt.Fprint(w, "")
 	})
 
-	payloadBody := fmt.Sprintf(payloadTemplate, server.URL+"/", path1, path2, path3)
+	payloadBody := fmt.Sprintf(payloadTemplate, requestor, server.URL+"/", path1, path2, path3)
 	mux.HandleFunc("/solutions/latest", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, payloadBody)
+	})
+	mux.HandleFunc("/solutions/bogus-id", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, payloadBody)
 	})
 
 	return server
 }
+
+func assertDownloadedCorrectFiles(t *testing.T, targetDir, requestor string) {
+	metadata := `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":%s,"auto_approve":false}`
+	expectedFiles := []struct {
+		desc     string
+		path     string
+		contents string
+	}{
+		{
+			desc:     "a file in the exercise root directory",
+			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "file-1.txt"),
+			contents: "this is file 1",
+		},
+		{
+			desc:     "a file in a subdirectory",
+			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "subdir", "file-2.txt"),
+			contents: "this is file 2",
+		},
+		{
+			desc:     "the solution metadata file",
+			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", ".solution.json"),
+			contents: fmt.Sprintf(metadata, requestor),
+		},
+	}
+
+	for _, file := range expectedFiles {
+		t.Run(file.desc, func(t *testing.T) {
+			b, err := ioutil.ReadFile(file.path)
+			assert.NoError(t, err)
+			assert.Equal(t, file.contents, string(b))
+		})
+	}
+
+	path := filepath.Join(targetDir, "bogus-track", "bogus-exercise", "file-3.txt")
+	_, err := os.Lstat(path)
+	assert.True(t, os.IsNotExist(err), "It should not write the file if empty.")
+}
+
+const requestorSelf = "true"
+const requestorOther = "false"
 
 const payloadTemplate = `
 {
@@ -142,7 +165,7 @@ const payloadTemplate = `
 		"id": "bogus-id",
 		"user": {
 			"handle": "alice",
-			"is_requester": true
+			"is_requester": %s
 		},
 		"exercise": {
 			"id": "bogus-exercise",
