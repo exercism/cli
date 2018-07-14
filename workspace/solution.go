@@ -12,7 +12,10 @@ import (
 	"github.com/exercism/cli/visibility"
 )
 
+const ignoreSubdir = ".exercism"
 const solutionFilename = ".solution.json"
+
+var solutionRelPath = filepath.Join(ignoreSubdir, solutionFilename)
 
 // Solution contains metadata about a user's solution.
 type Solution struct {
@@ -29,7 +32,7 @@ type Solution struct {
 
 // NewSolution reads solution metadata from a file in the given directory.
 func NewSolution(dir string) (*Solution, error) {
-	path := filepath.Join(dir, solutionFilename)
+	path := filepath.Join(dir, solutionRelPath)
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return &Solution{}, err
@@ -67,11 +70,13 @@ func (s *Solution) Write(dir string) error {
 		return err
 	}
 
-	path := filepath.Join(dir, solutionFilename)
+	path := filepath.Join(dir, ignoreSubdir)
+	_ = os.Mkdir(path, os.FileMode(0755))
 
 	// Hack because ioutil.WriteFile fails on hidden files
 	visibility.ShowFile(path)
 
+	path = filepath.Join(dir, solutionRelPath)
 	if err := ioutil.WriteFile(path, b, os.FileMode(0600)); err != nil {
 		return err
 	}

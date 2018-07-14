@@ -191,7 +191,7 @@ func (ws Workspace) SolutionDir(s string) (string, error) {
 		if _, err := os.Lstat(path); os.IsNotExist(err) {
 			return "", err
 		}
-		if _, err := os.Lstat(filepath.Join(path, solutionFilename)); err == nil {
+		if _, err := os.Lstat(filepath.Join(path, solutionRelPath)); err == nil {
 			return path, nil
 		}
 		path = filepath.Dir(path)
