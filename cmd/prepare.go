@@ -10,6 +10,7 @@ import (
 	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 // prepareCmd does necessary setup for Exercism and its tracks.
@@ -28,17 +29,21 @@ To customize the CLI to suit your own preferences, use the configure command.
 	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.NewConfiguration()
-		usrCfg, err := config.NewUserConfig()
-		if err != nil {
-			return err
-		}
-		cfg.UserConfig = usrCfg
+
+		v := viper.New()
+		v.AddConfigPath(cfg.Dir)
+		v.SetConfigName("user")
+		v.SetConfigType("json")
+		// Ignore error. If the file doesn't exist, that is fine.
+		_ = v.ReadInConfig()
+		cfg.UserViperConfig = v
+
 		return runPrepare(cfg, cmd.Flags(), args)
 	},
 }
 
 func runPrepare(cfg config.Configuration, flags *pflag.FlagSet, args []string) error {
-	usrCfg := cfg.UserConfig
+	v := cfg.UserViperConfig
 
 	track, err := flags.GetString("track")
 	if err != nil {
@@ -48,11 +53,11 @@ func runPrepare(cfg config.Configuration, flags *pflag.FlagSet, args []string) e
 	if track == "" {
 		return nil
 	}
-	client, err := api.NewClient(usrCfg.Token, usrCfg.APIBaseURL)
+	client, err := api.NewClient(v.GetString("token"), v.GetString("apibaseurl"))
 	if err != nil {
 		return err
 	}
-	url := fmt.Sprintf("%s/tracks/%s", usrCfg.APIBaseURL, track)
+	url := fmt.Sprintf("%s/tracks/%s", v.GetString("apibaseurl"), track)
 
 	req, err := client.NewRequest("GET", url, nil)
 	if err != nil {
