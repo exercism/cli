@@ -53,28 +53,39 @@ func TestDownload(t *testing.T) {
 		Err = oldErr
 	}()
 
-	tmpDir, err := ioutil.TempDir("", "download-cmd")
-	assert.NoError(t, err)
-
-	ts := fakeDownloadServer(requestorSelf)
-	defer ts.Close()
-
-	v := viper.New()
-	v.Set("workspace", tmpDir)
-	v.Set("apibaseurl", ts.URL)
-	v.Set("token", "abc123")
-
-	cfg := config.Configuration{
-		UserViperConfig: v,
+	testCases := []struct {
+		requestor       string
+		expectedDir     string
+		flag, flagValue string
+	}{
+		{requestorSelf, "", "exercise", "bogus-exercise"},
+		{requestorSelf, "", "uuid", "bogus-id"},
 	}
-	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
-	setupDownloadFlags(flags)
-	flags.Set("exercise", "bogus-exercise")
 
-	err = runDownload(cfg, flags, []string{})
-	assert.NoError(t, err)
+	for _, tc := range testCases {
+		tmpDir, err := ioutil.TempDir("", "download-cmd")
+		assert.NoError(t, err)
 
-	assertDownloadedCorrectFiles(t, tmpDir)
+		ts := fakeDownloadServer(tc.requestor)
+		defer ts.Close()
+
+		v := viper.New()
+		v.Set("workspace", tmpDir)
+		v.Set("apibaseurl", ts.URL)
+		v.Set("token", "abc123")
+
+		cfg := config.Configuration{
+			UserViperConfig: v,
+		}
+		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+		setupDownloadFlags(flags)
+		flags.Set(tc.flag, tc.flagValue)
+
+		err = runDownload(cfg, flags, []string{})
+		assert.NoError(t, err)
+
+		assertDownloadedCorrectFiles(t, filepath.Join(tmpDir, tc.expectedDir))
+	}
 }
 
 func fakeDownloadServer(requestor string) *httptest.Server {
@@ -98,6 +109,9 @@ func fakeDownloadServer(requestor string) *httptest.Server {
 
 	payloadBody := fmt.Sprintf(payloadTemplate, requestor, server.URL+"/", path1, path2, path3)
 	mux.HandleFunc("/solutions/latest", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, payloadBody)
+	})
+	mux.HandleFunc("/solutions/bogus-id", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, payloadBody)
 	})
 
