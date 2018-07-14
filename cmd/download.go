@@ -52,7 +52,7 @@ func runDownload(cfg config.Configuration, flags *pflag.FlagSet, args []string) 
 		tokenURL := config.InferSiteURL(usrCfg.GetString("apibaseurl")) + "/my/settings"
 		return fmt.Errorf(msgWelcomePleaseConfigure, tokenURL, BinaryName)
 	}
-	if usrCfg.GetString("workspace") == "" {
+	if usrCfg.GetString("workspace") == "" || usrCfg.GetString("apibaseurl") == "" {
 		return fmt.Errorf(msgRerunConfigure, BinaryName)
 	}
 
