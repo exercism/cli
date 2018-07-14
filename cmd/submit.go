@@ -25,16 +25,7 @@ var submitCmd = &cobra.Command{
 	Short:   "Submit your solution to an exercise.",
 	Long: `Submit your solution to an Exercism exercise.
 
-The CLI will do its best to figure out what to submit.
-
-If you call the command without any arguments, it will
-submit the exercise contained in the current directory.
-
-If called with the path to a directory, it will submit it.
-
-If called with the name of an exercise, it will work out which
-track it is on and submit it. The command will ask for help
-figuring things out if necessary.
+	Call the command with the list of files you want to submit.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.NewConfiguration()
