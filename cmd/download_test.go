@@ -13,35 +13,38 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const payloadTemplate = `
-{
-	"solution": {
-		"id": "bogus-id",
-		"user": {
-			"handle": "alice",
-			"is_requester": true
-		},
-		"exercise": {
-			"id": "bogus-exercise",
-			"instructions_url": "http://example.com/bogus-exercise",
-			"auto_approve": false,
-			"track": {
-				"id": "bogus-track",
-				"language": "Bogus Language"
-			}
-		},
-		"file_download_base_url": "%s",
-		"files": [
-		"%s",
-		"%s",
-		"%s"
-		],
-		"iteration": {
-			"submitted_at": "2017-08-21t10:11:12.130z"
-		}
+func TestDownloadWithoutToken(t *testing.T) {
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	Err = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+	}()
+
+	cmdTest := &CommandTest{
+		Cmd:    downloadCmd,
+		InitFn: initDownloadCmd,
+		Args:   []string{"fakeapp", "download", "--exercise=bogus-exercise"},
+	}
+	cmdTest.Setup(t)
+	defer cmdTest.Teardown(t)
+
+	ts := fakeDownloadServer()
+	defer ts.Close()
+
+	userCfg := config.NewEmptyUserConfig()
+	userCfg.Workspace = cmdTest.TmpDir
+	userCfg.APIBaseURL = ts.URL
+	err := userCfg.Write()
+	assert.NoError(t, err)
+
+	err = cmdTest.App.Execute()
+	if assert.Error(t, err) {
+		assert.Regexp(t, "Welcome to Exercism", err.Error())
 	}
 }
-`
 
 func TestDownload(t *testing.T) {
 	oldOut := Out
@@ -61,10 +64,10 @@ func TestDownload(t *testing.T) {
 	cmdTest.Setup(t)
 	defer cmdTest.Teardown(t)
 
-	mockServer := makeMockServer()
-	defer mockServer.Close()
+	ts := fakeDownloadServer()
+	defer ts.Close()
 
-	err := writeFakeUserConfigSettings(cmdTest.TmpDir, mockServer.URL)
+	err := writeFakeUserConfigSettings(cmdTest.TmpDir, ts.URL)
 	assert.NoError(t, err)
 
 	testCases := []struct {
@@ -104,14 +107,52 @@ func TestDownload(t *testing.T) {
 	assert.True(t, os.IsNotExist(err), "It should not write the file if empty.")
 }
 
+func TestDownloadArgs(t *testing.T) {
+	tests := []struct {
+		args          []string
+		expectedError string
+	}{
+		{
+			args:          []string{"bogus"}, // providing just an exercise slug without the flag
+			expectedError: "need an --exercise name or a solution --uuid",
+		},
+		{
+			args:          []string{""}, // providing no args
+			expectedError: "need an --exercise name or a solution --uuid",
+		},
+	}
+
+	for _, test := range tests {
+		cmdTest := &CommandTest{
+			Cmd:    downloadCmd,
+			InitFn: initDownloadCmd,
+			Args:   append([]string{"fakeapp", "download"}, test.args...),
+		}
+		cmdTest.Setup(t)
+		userCfg := config.NewEmptyUserConfig()
+		userCfg.Workspace = cmdTest.TmpDir
+		userCfg.APIBaseURL = "http://example.com"
+		userCfg.Token = "abc123"
+		err := userCfg.Write()
+		assert.NoError(t, err)
+
+		cmdTest.App.SetOutput(ioutil.Discard)
+		defer cmdTest.Teardown(t)
+		err = cmdTest.App.Execute()
+
+		assert.EqualError(t, err, test.expectedError)
+	}
+}
+
 func writeFakeUserConfigSettings(tmpDirPath, serverURL string) error {
 	userCfg := config.NewEmptyUserConfig()
 	userCfg.Workspace = tmpDirPath
 	userCfg.APIBaseURL = serverURL
+	userCfg.Token = "abc123"
 	return userCfg.Write()
 }
 
-func makeMockServer() *httptest.Server {
+func fakeDownloadServer() *httptest.Server {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 
@@ -136,35 +177,34 @@ func makeMockServer() *httptest.Server {
 	})
 
 	return server
-
 }
 
-func TestDownloadArgs(t *testing.T) {
-	tests := []struct {
-		args          []string
-		expectedError string
-	}{
-		{
-			args:          []string{"bogus"}, // providing just an exercise slug without the flag
-			expectedError: "need an --exercise name or a solution --uuid",
+const payloadTemplate = `
+{
+	"solution": {
+		"id": "bogus-id",
+		"user": {
+			"handle": "alice",
+			"is_requester": true
 		},
-		{
-			args:          []string{""}, // providing no args
-			expectedError: "need an --exercise name or a solution --uuid",
+		"exercise": {
+			"id": "bogus-exercise",
+			"instructions_url": "http://example.com/bogus-exercise",
+			"auto_approve": false,
+			"track": {
+				"id": "bogus-track",
+				"language": "Bogus Language"
+			}
 		},
-	}
-
-	for _, test := range tests {
-		cmdTest := &CommandTest{
-			Cmd:    downloadCmd,
-			InitFn: initDownloadCmd,
-			Args:   append([]string{"fakeapp", "download"}, test.args...),
+		"file_download_base_url": "%s",
+		"files": [
+		"%s",
+		"%s",
+		"%s"
+		],
+		"iteration": {
+			"submitted_at": "2017-08-21t10:11:12.130z"
 		}
-		cmdTest.Setup(t)
-		cmdTest.App.SetOutput(ioutil.Discard)
-		defer cmdTest.Teardown(t)
-		err := cmdTest.App.Execute()
-
-		assert.EqualError(t, err, test.expectedError)
 	}
 }
+`
