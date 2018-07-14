@@ -17,13 +17,19 @@ The TL;DR is: **don't clone your fork**, and it matters where on your filesystem
 
 If you don't care how and why and just want something that works, follow these steps:
 
-1. [fork this repo][fork]
+1. [fork this repo on the Github webpage][fork]
 1. `go get github.com/exercism/cli/exercism`
 1. `cd $GOPATH/src/github.com/exercism/cli` (or `cd %GOPATH%/src/github.com/exercism/cli` on Windows)
-1. `git remote set-url origin https://github.com/<your-github-username>/cli`
+1. `git remote add upstream https://github.com/exercism/cli.git`
+1. `git remote add origin git@github.com:<your-github-username>/cli.git`
+1. `git checkout -b development`
+1. `git push -u origin development`
+1. `
 1. `go get -u github.com/golang/dep/cmd/dep`
    * depending on your setup, you may need to install `dep` by following the instructions in the [`dep` repo](https://github.com/golang/dep)
 1. `dep ensure`
+1. `git update-index --assume-unchanged Gopkg.lock`
+1. `cd $GOPATH/src/github.com/exercism/cli/exercism && go build -o exercism main.go && mv exercism ~/bin`
 
 Then make the change as usual, and submit a pull request. Please provide tests for the changes where possible.
 
