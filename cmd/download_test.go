@@ -108,6 +108,7 @@ func writeFakeUserConfigSettings(tmpDirPath, serverURL string) error {
 	userCfg := config.NewEmptyUserConfig()
 	userCfg.Workspace = tmpDirPath
 	userCfg.APIBaseURL = serverURL
+	userCfg.Token = "abc123"
 	return userCfg.Write()
 }
 

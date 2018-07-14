@@ -30,16 +30,6 @@ latest solution.
 Download other people's solutions by providing the UUID.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		token, err := cmd.Flags().GetString("token")
-		if err != nil {
-			return err
-		}
-		if token != "" {
-			RootCmd.SetArgs([]string{"configure", "--token", token})
-			if err := RootCmd.Execute(); err != nil {
-				return err
-			}
-		}
 		uuid, err := cmd.Flags().GetString("uuid")
 		if err != nil {
 			return err
@@ -229,7 +219,6 @@ func initDownloadCmd() {
 	downloadCmd.Flags().StringP("uuid", "u", "", "the solution UUID")
 	downloadCmd.Flags().StringP("track", "t", "", "the track ID")
 	downloadCmd.Flags().StringP("exercise", "e", "", "the exercise slug")
-	downloadCmd.Flags().StringP("token", "k", "", "authentication token used to connect to the site")
 }
 
 func init() {
