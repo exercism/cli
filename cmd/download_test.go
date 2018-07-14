@@ -26,9 +26,38 @@ func TestDownloadWithoutToken(t *testing.T) {
 	}
 }
 
+func TestDownloadWithoutWorkspace(t *testing.T) {
+	v := viper.New()
+	v.Set("token", "abc123")
+	cfg := config.Configuration{
+		UserViperConfig: v,
+	}
+
+	err := runDownload(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
+	if assert.Error(t, err) {
+		assert.Regexp(t, "re-run the configure", err.Error())
+	}
+}
+
+func TestDownloadWithoutBaseURL(t *testing.T) {
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", "/home/whatever")
+	cfg := config.Configuration{
+		UserViperConfig: v,
+	}
+
+	err := runDownload(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
+	if assert.Error(t, err) {
+		assert.Regexp(t, "re-run the configure", err.Error())
+	}
+}
+
 func TestDownloadWithoutFlags(t *testing.T) {
 	v := viper.New()
 	v.Set("token", "abc123")
+	v.Set("workspace", "/home/username")
+	v.Set("apibaseurl", "http://example.com")
 
 	cfg := config.Configuration{
 		UserViperConfig: v,

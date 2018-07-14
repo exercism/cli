@@ -58,18 +58,7 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	}
 
 	if usrCfg.GetString("workspace") == "" {
-		// Running configure without any arguments will attempt to
-		// set the default workspace. If the default workspace directory
-		// risks clobbering an existing directory, it will print an
-		// error message that explains how to proceed.
-		msg := `
-
-    Please re-run the configure command to define where
-    to download the exercises.
-
-        %s configure
-		`
-		return fmt.Errorf(msg, BinaryName)
+		return fmt.Errorf(msgRerunConfigure, BinaryName)
 	}
 
 	for i, arg := range args {
