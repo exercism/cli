@@ -10,39 +10,36 @@ import (
 	"testing"
 
 	"github.com/exercism/cli/config"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDownloadWithoutToken(t *testing.T) {
-	oldOut := Out
-	oldErr := Err
-	Out = ioutil.Discard
-	Err = ioutil.Discard
-	defer func() {
-		Out = oldOut
-		Err = oldErr
-	}()
-
-	cmdTest := &CommandTest{
-		Cmd:    downloadCmd,
-		InitFn: initDownloadCmd,
-		Args:   []string{"fakeapp", "download", "--exercise=bogus-exercise"},
+	cfg := config.Configuration{
+		UserViperConfig: viper.New(),
 	}
-	cmdTest.Setup(t)
-	defer cmdTest.Teardown(t)
 
-	ts := fakeDownloadServer()
-	defer ts.Close()
-
-	userCfg := config.NewEmptyUserConfig()
-	userCfg.Workspace = cmdTest.TmpDir
-	userCfg.APIBaseURL = ts.URL
-	err := userCfg.Write()
-	assert.NoError(t, err)
-
-	err = cmdTest.App.Execute()
+	err := runDownload(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
 	if assert.Error(t, err) {
 		assert.Regexp(t, "Welcome to Exercism", err.Error())
+	}
+}
+
+func TestDownloadWithoutFlags(t *testing.T) {
+	v := viper.New()
+	v.Set("token", "abc123")
+
+	cfg := config.Configuration{
+		UserViperConfig: v,
+	}
+
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	setupDownloadFlags(flags)
+
+	err := runDownload(cfg, flags, []string{})
+	if assert.Error(t, err) {
+		assert.Regexp(t, "need an --exercise name or a solution --uuid", err.Error())
 	}
 }
 
@@ -56,100 +53,60 @@ func TestDownload(t *testing.T) {
 		Err = oldErr
 	}()
 
-	cmdTest := &CommandTest{
-		Cmd:    downloadCmd,
-		InitFn: initDownloadCmd,
-		Args:   []string{"fakeapp", "download", "--exercise=bogus-exercise"},
-	}
-	cmdTest.Setup(t)
-	defer cmdTest.Teardown(t)
+	tmpDir, err := ioutil.TempDir("", "download-cmd")
+	assert.NoError(t, err)
 
 	ts := fakeDownloadServer()
 	defer ts.Close()
 
-	err := writeFakeUserConfigSettings(cmdTest.TmpDir, ts.URL)
+	v := viper.New()
+	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
+	v.Set("token", "abc123")
+
+	cfg := config.Configuration{
+		UserViperConfig: v,
+	}
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	setupDownloadFlags(flags)
+	flags.Set("exercise", "bogus-exercise")
+
+	err = runDownload(cfg, flags, []string{})
 	assert.NoError(t, err)
 
-	testCases := []struct {
+	expectedFiles := []struct {
 		desc     string
 		path     string
 		contents string
 	}{
 		{
-			desc:     "It should download a file.",
-			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", "file-1.txt"),
+			desc:     "a file in the exercise root directory",
+			path:     filepath.Join(tmpDir, "bogus-track", "bogus-exercise", "file-1.txt"),
 			contents: "this is file 1",
 		},
 		{
-			desc:     "It should download a file in a subdir.",
-			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", "subdir", "file-2.txt"),
+			desc:     "a file in a subdirectory",
+			path:     filepath.Join(tmpDir, "bogus-track", "bogus-exercise", "subdir", "file-2.txt"),
 			contents: "this is file 2",
 		},
 		{
-			desc:     "It creates the .solution.json file.",
-			path:     filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", ".solution.json"),
+			desc:     "the solution metadata file",
+			path:     filepath.Join(tmpDir, "bogus-track", "bogus-exercise", ".solution.json"),
 			contents: `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":true,"auto_approve":false}`,
 		},
 	}
 
-	cmdTest.App.Execute()
-
-	for _, tc := range testCases {
-		t.Run(tc.desc, func(t *testing.T) {
-			b, err := ioutil.ReadFile(tc.path)
+	for _, file := range expectedFiles {
+		t.Run(file.desc, func(t *testing.T) {
+			b, err := ioutil.ReadFile(file.path)
 			assert.NoError(t, err)
-			assert.Equal(t, tc.contents, string(b))
+			assert.Equal(t, file.contents, string(b))
 		})
 	}
 
-	path := filepath.Join(cmdTest.TmpDir, "bogus-track", "bogus-exercise", "file-3.txt")
+	path := filepath.Join(tmpDir, "bogus-track", "bogus-exercise", "file-3.txt")
 	_, err = os.Lstat(path)
 	assert.True(t, os.IsNotExist(err), "It should not write the file if empty.")
-}
-
-func TestDownloadArgs(t *testing.T) {
-	tests := []struct {
-		args          []string
-		expectedError string
-	}{
-		{
-			args:          []string{"bogus"}, // providing just an exercise slug without the flag
-			expectedError: "need an --exercise name or a solution --uuid",
-		},
-		{
-			args:          []string{""}, // providing no args
-			expectedError: "need an --exercise name or a solution --uuid",
-		},
-	}
-
-	for _, test := range tests {
-		cmdTest := &CommandTest{
-			Cmd:    downloadCmd,
-			InitFn: initDownloadCmd,
-			Args:   append([]string{"fakeapp", "download"}, test.args...),
-		}
-		cmdTest.Setup(t)
-		userCfg := config.NewEmptyUserConfig()
-		userCfg.Workspace = cmdTest.TmpDir
-		userCfg.APIBaseURL = "http://example.com"
-		userCfg.Token = "abc123"
-		err := userCfg.Write()
-		assert.NoError(t, err)
-
-		cmdTest.App.SetOutput(ioutil.Discard)
-		defer cmdTest.Teardown(t)
-		err = cmdTest.App.Execute()
-
-		assert.EqualError(t, err, test.expectedError)
-	}
-}
-
-func writeFakeUserConfigSettings(tmpDirPath, serverURL string) error {
-	userCfg := config.NewEmptyUserConfig()
-	userCfg.Workspace = tmpDirPath
-	userCfg.APIBaseURL = serverURL
-	userCfg.Token = "abc123"
-	return userCfg.Write()
 }
 
 func fakeDownloadServer() *httptest.Server {

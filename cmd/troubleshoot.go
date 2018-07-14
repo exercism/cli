@@ -13,6 +13,7 @@ import (
 	"github.com/exercism/cli/cli"
 	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // fullAPIKey flag for troubleshoot command.
@@ -32,12 +33,16 @@ command into a GitHub issue so we can help figure out what's going on.
 		cli.HTTPClient = &http.Client{Timeout: 20 * time.Second}
 		c := cli.New(Version)
 
-		cfg, err := config.NewUserConfig()
-		if err != nil {
-			return err
-		}
+		cfg := config.NewConfiguration()
 
-		status := newStatus(c, *cfg)
+		v := viper.New()
+		v.AddConfigPath(cfg.Dir)
+		v.SetConfigName("user")
+		v.SetConfigType("json")
+		// Ignore error. If the file doesn't exist, that is fine.
+		_ = v.ReadInConfig()
+
+		status := newStatus(c, v)
 		status.Censor = !fullAPIKey
 		s, err := status.check()
 		if err != nil {
@@ -57,7 +62,7 @@ type Status struct {
 	Configuration   configurationStatus
 	APIReachability apiReachabilityStatus
 	cli             *cli.CLI
-	cfg             config.UserConfig
+	cfg             *viper.Viper
 }
 
 type versionStatus struct {
@@ -94,10 +99,10 @@ type apiPing struct {
 }
 
 // newStatus prepares a value to perform a diagnostic self-check.
-func newStatus(c *cli.CLI, uc config.UserConfig) Status {
+func newStatus(c *cli.CLI, v *viper.Viper) Status {
 	status := Status{
 		cli: c,
-		cfg: uc,
+		cfg: v,
 	}
 	return status
 }
@@ -107,7 +112,7 @@ func (status *Status) check() (string, error) {
 	status.Version = newVersionStatus(status.cli)
 	status.System = newSystemStatus()
 	status.Configuration = newConfigurationStatus(status)
-	status.APIReachability = newAPIReachabilityStatus(status.cfg.APIBaseURL)
+	status.APIReachability = newAPIReachabilityStatus(status.cfg.GetString("apibaseurl"))
 
 	return status.compile()
 }
@@ -167,15 +172,16 @@ func newSystemStatus() systemStatus {
 }
 
 func newConfigurationStatus(status *Status) configurationStatus {
+	token := status.cfg.GetString("token")
 	cs := configurationStatus{
-		Home:      status.cfg.Home,
-		Workspace: status.cfg.Workspace,
-		File:      status.cfg.File(),
-		Token:     status.cfg.Token,
-		TokenURL:  config.InferSiteURL(status.cfg.APIBaseURL) + "/my/settings",
+		Home:      status.cfg.GetString("home"),
+		Workspace: status.cfg.GetString("workspace"),
+		File:      status.cfg.ConfigFileUsed(),
+		Token:     token,
+		TokenURL:  config.InferSiteURL(status.cfg.GetString("apibaseurl")) + "/my/settings",
 	}
-	if status.Censor && status.cfg.Token != "" {
-		cs.Token = redact(status.cfg.Token)
+	if status.Censor && token != "" {
+		cs.Token = redact(token)
 	}
 	return cs
 }

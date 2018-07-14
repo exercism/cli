@@ -5,6 +5,7 @@ import (
 
 	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // workspaceCmd outputs the path to the person's workspace directory.
@@ -26,11 +27,16 @@ need to be on the same drive as your workspace directory. Otherwise
 nothing will happen.
 	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		usrCfg, err := config.NewUserConfig()
-		if err != nil {
-			return err
-		}
-		fmt.Println(usrCfg.Workspace)
+		cfg := config.NewConfiguration()
+
+		v := viper.New()
+		v.AddConfigPath(cfg.Dir)
+		v.SetConfigName("user")
+		v.SetConfigType("json")
+		// Ignore error. If the file doesn't exist, that is fine.
+		_ = v.ReadInConfig()
+
+		fmt.Fprintf(Out, "%s\n", v.GetString("workspace"))
 		return nil
 	},
 }

@@ -15,10 +15,6 @@ var (
 )
 
 // Configuration lets us inject configuration options into commands.
-// Note that we are slowly working towards getting rid of the
-// config.Config, config.UserConfig, and config.CLIConfig types.
-// Once we do, we can rename this type to Config, and get rid of the
-// User and CLI fields.
 type Configuration struct {
 	OS              string
 	Home            string
@@ -26,7 +22,6 @@ type Configuration struct {
 	DefaultBaseURL  string
 	DefaultDirName  string
 	UserViperConfig *viper.Viper
-	UserConfig      *UserConfig
 	CLIConfig       *CLIConfig
 	Persister       Persister
 }

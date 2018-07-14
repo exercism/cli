@@ -2,24 +2,19 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 
 	"github.com/exercism/cli/config"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestPrepareTrack(t *testing.T) {
-	cmdTest := &CommandTest{
-		Cmd:    prepareCmd,
-		InitFn: initPrepareCmd,
-		Args:   []string{"fakeapp", "prepare", "--track", "bogus"},
-	}
-	cmdTest.Setup(t)
-	defer cmdTest.Teardown(t)
-
 	fakeEndpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		payload := `
 		{
@@ -35,12 +30,28 @@ func TestPrepareTrack(t *testing.T) {
 	ts := httptest.NewServer(fakeEndpoint)
 	defer ts.Close()
 
-	usrCfg := config.NewEmptyUserConfig()
-	usrCfg.APIBaseURL = ts.URL
-	err := usrCfg.Write()
+	tmpDir, err := ioutil.TempDir("", "prepare-track")
 	assert.NoError(t, err)
+	defer os.Remove(tmpDir)
 
-	cmdTest.App.Execute()
+	// Until we can decouple CLIConfig from filesystem, overwrite config dir.
+	originalConfigDir := os.Getenv(cfgHomeKey)
+	os.Setenv(cfgHomeKey, tmpDir)
+	defer os.Setenv(cfgHomeKey, originalConfigDir)
+
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	setupPrepareFlags(flags)
+	flags.Set("track", "bogus")
+
+	v := viper.New()
+	v.Set("apibaseurl", ts.URL)
+
+	cfg := config.Configuration{
+		UserViperConfig: v,
+	}
+
+	err = runPrepare(cfg, flags, []string{})
+	assert.NoError(t, err)
 
 	cliCfg, err := config.NewCLIConfig()
 	os.Remove(cliCfg.File())
