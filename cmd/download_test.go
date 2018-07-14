@@ -56,7 +56,7 @@ func TestDownload(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "download-cmd")
 	assert.NoError(t, err)
 
-	ts := fakeDownloadServer()
+	ts := fakeDownloadServer(requestorSelf)
 	defer ts.Close()
 
 	v := viper.New()
@@ -74,42 +74,10 @@ func TestDownload(t *testing.T) {
 	err = runDownload(cfg, flags, []string{})
 	assert.NoError(t, err)
 
-	expectedFiles := []struct {
-		desc     string
-		path     string
-		contents string
-	}{
-		{
-			desc:     "a file in the exercise root directory",
-			path:     filepath.Join(tmpDir, "bogus-track", "bogus-exercise", "file-1.txt"),
-			contents: "this is file 1",
-		},
-		{
-			desc:     "a file in a subdirectory",
-			path:     filepath.Join(tmpDir, "bogus-track", "bogus-exercise", "subdir", "file-2.txt"),
-			contents: "this is file 2",
-		},
-		{
-			desc:     "the solution metadata file",
-			path:     filepath.Join(tmpDir, "bogus-track", "bogus-exercise", ".solution.json"),
-			contents: `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":true,"auto_approve":false}`,
-		},
-	}
-
-	for _, file := range expectedFiles {
-		t.Run(file.desc, func(t *testing.T) {
-			b, err := ioutil.ReadFile(file.path)
-			assert.NoError(t, err)
-			assert.Equal(t, file.contents, string(b))
-		})
-	}
-
-	path := filepath.Join(tmpDir, "bogus-track", "bogus-exercise", "file-3.txt")
-	_, err = os.Lstat(path)
-	assert.True(t, os.IsNotExist(err), "It should not write the file if empty.")
+	assertDownloadedCorrectFiles(t, tmpDir)
 }
 
-func fakeDownloadServer() *httptest.Server {
+func fakeDownloadServer(requestor string) *httptest.Server {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 
@@ -128,7 +96,7 @@ func fakeDownloadServer() *httptest.Server {
 		fmt.Fprint(w, "")
 	})
 
-	payloadBody := fmt.Sprintf(payloadTemplate, server.URL+"/", path1, path2, path3)
+	payloadBody := fmt.Sprintf(payloadTemplate, requestor, server.URL+"/", path1, path2, path3)
 	mux.HandleFunc("/solutions/latest", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, payloadBody)
 	})
@@ -136,13 +104,52 @@ func fakeDownloadServer() *httptest.Server {
 	return server
 }
 
+func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
+	expectedFiles := []struct {
+		desc     string
+		path     string
+		contents string
+	}{
+		{
+			desc:     "a file in the exercise root directory",
+			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "file-1.txt"),
+			contents: "this is file 1",
+		},
+		{
+			desc:     "a file in a subdirectory",
+			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "subdir", "file-2.txt"),
+			contents: "this is file 2",
+		},
+		{
+			desc:     "the solution metadata file",
+			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", ".solution.json"),
+			contents: `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":true,"auto_approve":false}`,
+		},
+	}
+
+	for _, file := range expectedFiles {
+		t.Run(file.desc, func(t *testing.T) {
+			b, err := ioutil.ReadFile(file.path)
+			assert.NoError(t, err)
+			assert.Equal(t, file.contents, string(b))
+		})
+	}
+
+	path := filepath.Join(targetDir, "bogus-track", "bogus-exercise", "file-3.txt")
+	_, err := os.Lstat(path)
+	assert.True(t, os.IsNotExist(err), "It should not write the file if empty.")
+}
+
+const requestorSelf = "true"
+const requestorOther = "false"
+
 const payloadTemplate = `
 {
 	"solution": {
 		"id": "bogus-id",
 		"user": {
 			"handle": "alice",
-			"is_requester": true
+			"is_requester": %s
 		},
 		"exercise": {
 			"id": "bogus-exercise",
