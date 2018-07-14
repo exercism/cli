@@ -5,7 +5,7 @@ Exercism would be impossible without people like you being willing to spend time
 
 ## Dependencies
 
-You'll need Go version 1.8 or higher. Follow the directions on http://golang.org/doc/install
+You'll need Go version 1.9 or higher. Follow the directions on http://golang.org/doc/install
 
 You will also need `dep`, the Go dependency management tool. Follow the directions on https://golang.github.io/dep/docs/installation.html
 
@@ -19,7 +19,7 @@ If you don't care how and why and just want something that works, follow these s
 
 1. [fork this repo on the GitHub webpage][fork]
 1. `go get github.com/exercism/cli/exercism`
-1. `cd $GOPATH/src/github.com/exercism/cli` (or `cd %GOPATH%/src/github.com/exercism/cli` on Windows)
+1. `cd $GOPATH/src/github.com/exercism/cli` (or `cd %GOPATH%\src\github.com\exercism\cli` on Windows)
 1. `git remote rename origin upstream`
 1. `git remote add origin git@github.com:<your-github-username>/cli.git`
 1. `git checkout -b development`
@@ -35,19 +35,11 @@ If you care about the details, check out the blog post [Contributing to Open Sou
 
 ## Running the Tests
 
-To run the tests locally on Linux or MacOS, use
+To run the tests locally
 
 ```
-go test $(go list ./... | grep -v vendor)
+go test ./...
 ```
-
-On Windows, the command is more painful (sorry!):
-
-```
-for /f "" %G in ('go list ./... ^| find /i /v "/vendor/"') do @go test %G
-```
-
-As of Go 1.9 this is simplified to `go test ./...`.
 
 ## Manual Testing against Exercism
 
@@ -66,7 +58,7 @@ On Windows:
 
 - `cd /d %GOPATH%\src\github.com\exercism\cli`
 - `go build -o testercism.exe exercism\main.go`
-- `testercism.exe —help`
+- `testercism.exe —h`
 
 ### Building for All Platforms
 
