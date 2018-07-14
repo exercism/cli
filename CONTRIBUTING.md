@@ -59,13 +59,14 @@ damaging your real Exercism submissions, or test different tokens, etc.
 
 On Unices:
 
-- `cd $GOPATH/src/github.com/exercism/cli/exercism && go build -o testercism main.go && mv testercism ~/bin`
+- `cd $GOPATH/src/github.com/exercism/cli/exercism && go build -o testercism main.go`
+- `./testercism -h`
 
 On Windows:
 
 - `cd /d %GOPATH%\src\github.com\exercism\cli`
 - `go build -o testercism.exe exercism\main.go`
-- TODO where would a Windows developer put the binary?
+- `testercism.exe —help`
 
 ### Building for All Platforms
 
