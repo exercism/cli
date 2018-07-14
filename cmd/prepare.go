@@ -110,7 +110,11 @@ type prepareTrackPayload struct {
 }
 
 func initPrepareCmd() {
-	prepareCmd.Flags().StringP("track", "t", "", "the track you want to prepare")
+	setupPrepareFlags(prepareCmd.Flags())
+}
+
+func setupPrepareFlags(flags *pflag.FlagSet) {
+	flags.StringP("track", "t", "", "the track you want to prepare")
 }
 
 func init() {
