@@ -7,6 +7,9 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * **Your contribution here**
 
+## v3.0.4 (2018-07-15)
+[#644](https://github.com/exercism/cli/pull/644) Add better error messages when solution metadata is missing - [@kytrinyx]
+
 ## v3.0.3 (2018-07-14)
 [#642](https://github.com/exercism/cli/pull/642) Add better error messages when configuration is needed before download - [@kytrinyx]
 [#641](https://github.com/exercism/cli/pull/641) Fix broken download for uuid flag - [@kytrinyx]
