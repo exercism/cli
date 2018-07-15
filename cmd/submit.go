@@ -109,6 +109,9 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	for _, arg := range args {
 		dir, err := ws.SolutionDir(arg)
 		if err != nil {
+			if workspace.IsMissingMetadata(err) {
+				return errors.New(msgMissingMetadata)
+			}
 			return err
 		}
 		if exerciseDir != "" && dir != exerciseDir {
@@ -131,16 +134,6 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	sx, err := workspace.NewSolutions(dirs)
 	if err != nil {
 		return err
-	}
-	if len(sx) == 0 {
-		// TODO: add test
-		msg := `
-
-    The exercise you are submitting doesn't have the necessary metadata.
-    Please see https://exercism.io/cli-v1-to-v2 for instructions on how to fix it.
-
-		`
-		return errors.New(msg)
 	}
 	if len(sx) > 1 {
 		msg := `

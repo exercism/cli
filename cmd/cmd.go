@@ -26,3 +26,10 @@ const msgRerunConfigure = `
 
         %s configure
 `
+
+const msgMissingMetadata = `
+
+    The exercise you are submitting doesn't have the necessary metadata.
+    Please see https://exercism.io/cli-v1-to-v2 for instructions on how to fix it.
+
+`
