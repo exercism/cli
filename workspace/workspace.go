@@ -186,14 +186,29 @@ func (ws Workspace) SolutionDir(s string) (string, error) {
 	path := s
 	for {
 		if path == ws.Dir {
-			return "", errors.New("couldn't find it")
+			return "", fmt.Errorf("couldn't find %s", solutionFilename)
 		}
 		if _, err := os.Lstat(path); os.IsNotExist(err) {
 			return "", err
 		}
-		if _, err := os.Lstat(filepath.Join(path, solutionRelPath)); err == nil {
+		if err := checkSolutionFile(path); err == nil {
 			return path, nil
 		}
 		path = filepath.Dir(path)
+	}
+}
+
+func checkSolutionFile(path string) error {
+	legacySolutionPath := filepath.Join(path, ".solution.json")
+	solutionPath := filepath.Join(path, solutionRelPath)
+
+	if _, legacyErr := os.Lstat(legacySolutionPath); legacyErr == nil {
+		return migrateLegacySolutionFile(path, legacySolutionPath, solutionPath)
+	} else if _, err := os.Lstat(solutionPath); err != nil {
+		return err
+	} else if legacyErr != nil && err == nil {
+		return nil
+	} else {
+		return legacyErr
 	}
 }

@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -71,7 +72,9 @@ func (s *Solution) Write(dir string) error {
 	}
 
 	path := filepath.Join(dir, ignoreSubdir)
-	_ = os.Mkdir(path, os.FileMode(0755))
+	if err := createIgnoreSubdir(path); err != nil {
+		return err
+	}
 
 	// Hack because ioutil.WriteFile fails on hidden files
 	visibility.ShowFile(path)
@@ -91,4 +94,23 @@ func (s *Solution) PathToParent() string {
 		dir = filepath.Join("users")
 	}
 	return filepath.Join(dir, s.Track)
+}
+
+func createIgnoreSubdir(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		if err := os.Mkdir(path, os.FileMode(0755)); err != nil {
+			return fmt.Errorf("failed to create directory: %s", path)
+		}
+	}
+	return nil
+}
+
+func migrateLegacySolutionFile(path string, legacySolutionPath string, solutionPath string) error {
+	if err := createIgnoreSubdir(filepath.Join(path, ignoreSubdir)); err != nil {
+		return err
+	}
+	if err := os.Rename(legacySolutionPath, solutionPath); err != nil {
+		return errors.New("failed migrating legacy solution file")
+	}
+	return nil
 }
