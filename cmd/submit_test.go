@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -9,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/exercism/cli/config"
+	"github.com/exercism/cli/visibility"
 	"github.com/exercism/cli/workspace"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -234,6 +236,51 @@ func TestSubmitOnlyEmptyFile(t *testing.T) {
 	assert.Regexp(t, "No files found", err.Error())
 }
 
+func TestSubmitExerciseWithLegacySolutionMetadataFileAndGetsMigrated(t *testing.T) {
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	Err = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+	}()
+	// The fake endpoint will populate this when it receives the call from the command.
+	submittedFiles := map[string]string{}
+	ts := fakeSubmitServer(t, submittedFiles)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "legacy-metadata-file")
+	assert.NoError(t, err)
+
+	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
+	os.MkdirAll(dir, os.FileMode(0755))
+	writeFakeLegacySolution(t, dir, "bogus-track", "bogus-exercise")
+
+	file := filepath.Join(dir, "file.txt")
+	err = ioutil.WriteFile(file, []byte("This is a file."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		Dir:             tmpDir,
+		UserViperConfig: v,
+	}
+	solutionRelPath := filepath.Join(workspace.IgnoreSubdir, workspace.SolutionFilename)
+	expectedSolutionPathAfterMigration := filepath.Join(dir, solutionRelPath)
+
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file})
+	assert.NoError(t, err)
+	assert.Equal(t, "This is a file.", submittedFiles[string(os.PathSeparator)+"file.txt"])
+
+	_, err = os.Stat(expectedSolutionPathAfterMigration)
+	assert.NoError(t, err)
+}
+
 func TestSubmitFilesFromDifferentSolutions(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "dir-1-submit")
 	assert.NoError(t, err)
@@ -303,5 +350,28 @@ func writeFakeSolution(t *testing.T, dir, trackID, exerciseSlug string) {
 		IsRequester: true,
 	}
 	err := solution.Write(dir)
+	assert.NoError(t, err)
+}
+
+func writeFakeLegacySolution(t *testing.T, dir, trackID, exerciseSlug string) {
+	solution := &workspace.Solution{
+		ID:          "bogus-solution-uuid",
+		Track:       trackID,
+		Exercise:    exerciseSlug,
+		URL:         "http://example.com/bogus-url",
+		IsRequester: true,
+	}
+	legacySolutionFilePath := filepath.Join(dir, ".solution.json")
+
+	// Hack because ioutil.WriteFile fails on hidden files
+	visibility.ShowFile(legacySolutionFilePath)
+
+	b, err := json.Marshal(solution)
+	assert.NoError(t, err)
+
+	err = ioutil.WriteFile(legacySolutionFilePath, b, os.FileMode(0600))
+	assert.NoError(t, err)
+
+	err = visibility.HideFile(legacySolutionFilePath)
 	assert.NoError(t, err)
 }

@@ -13,10 +13,10 @@ import (
 	"github.com/exercism/cli/visibility"
 )
 
-const ignoreSubdir = ".exercism"
-const solutionFilename = "solution.json"
+const IgnoreSubdir = ".exercism"
+const SolutionFilename = "solution.json"
 
-var solutionRelPath = filepath.Join(ignoreSubdir, solutionFilename)
+var solutionRelPath = filepath.Join(IgnoreSubdir, SolutionFilename)
 
 // Solution contains metadata about a user's solution.
 type Solution struct {
@@ -71,7 +71,7 @@ func (s *Solution) Write(dir string) error {
 		return err
 	}
 
-	path := filepath.Join(dir, ignoreSubdir)
+	path := filepath.Join(dir, IgnoreSubdir)
 	if err := createIgnoreSubdir(path); err != nil {
 		return err
 	}
@@ -106,7 +106,7 @@ func createIgnoreSubdir(path string) error {
 }
 
 func migrateLegacySolutionFile(path string, legacySolutionPath string, solutionPath string) error {
-	if err := createIgnoreSubdir(filepath.Join(path, ignoreSubdir)); err != nil {
+	if err := createIgnoreSubdir(filepath.Join(path, IgnoreSubdir)); err != nil {
 		return err
 	}
 	if err := os.Rename(legacySolutionPath, solutionPath); err != nil {
