@@ -10,7 +10,10 @@ import (
 	"time"
 )
 
+// IgnoreSubdir is the name of the hidden directory to be ignored on submit.
 const IgnoreSubdir = ".exercism"
+
+// SolutionFilename is the name of the solution metadata file.
 const SolutionFilename = "solution.json"
 
 var solutionRealPath = filepath.Join(IgnoreSubdir, SolutionFilename)
@@ -67,10 +70,10 @@ func (s *Solution) Write(path string) error {
 	if err != nil {
 		return err
 	}
-	if err := createIgnoreSubdir(path); err != nil {
+	if err = createIgnoreSubdir(path); err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile(filepath.Join(path, solutionRealPath), b, os.FileMode(0600)); err != nil {
+	if err = ioutil.WriteFile(filepath.Join(path, solutionRealPath), b, os.FileMode(0600)); err != nil {
 		return err
 	}
 	s.Dir = path
@@ -103,7 +106,6 @@ func migrateLegacySolutionFile(legacySolutionPath string, solutionPath string) e
 	if err := createIgnoreSubdir(filepath.Dir(legacySolutionPath)); err != nil {
 		return err
 	}
-	// if the solution file exists in the new location, don't migrate
 	if _, err := os.Lstat(solutionPath); err != nil {
 		if err := os.Rename(legacySolutionPath, solutionPath); err != nil {
 			return err
