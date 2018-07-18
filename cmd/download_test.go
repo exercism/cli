@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/exercism/cli/config"
+	ws "github.com/exercism/cli/workspace"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
@@ -167,7 +168,7 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir, requestor string) {
 		},
 		{
 			desc:     "the solution metadata file",
-			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", ".solution.json"),
+			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", ws.IgnoreSubdir, ws.SolutionFilename),
 			contents: fmt.Sprintf(metadata, requestor),
 		},
 	}

@@ -100,7 +100,7 @@ func createIgnoreSubdir(path string) (string, error) {
 	path = filepath.Join(path, IgnoreSubdir)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		if err := os.Mkdir(path, os.FileMode(0755)); err != nil {
-			return "", fmt.Errorf("failed to create directory: %s", path)
+			return "", err
 		}
 	}
 	return path, nil
