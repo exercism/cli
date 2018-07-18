@@ -2,7 +2,6 @@ package workspace
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -14,7 +13,7 @@ import (
 const IgnoreSubdir = ".exercism"
 const SolutionFilename = "solution.json"
 
-var solutionRelPath = filepath.Join(IgnoreSubdir, SolutionFilename)
+var solutionRealPath = filepath.Join(IgnoreSubdir, SolutionFilename)
 
 // Solution contains metadata about a user's solution.
 type Solution struct {
@@ -31,7 +30,7 @@ type Solution struct {
 
 // NewSolution reads solution metadata from a file in the given directory.
 func NewSolution(dir string) (*Solution, error) {
-	path := filepath.Join(dir, solutionRelPath)
+	path := filepath.Join(dir, solutionRealPath)
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return &Solution{}, err
@@ -63,22 +62,18 @@ func (s *Solution) String() string {
 }
 
 // Write stores solution metadata to a file.
-func (s *Solution) Write(dir string) error {
+func (s *Solution) Write(path string) error {
 	b, err := json.Marshal(s)
 	if err != nil {
 		return err
 	}
-
-	path, err := createIgnoreSubdir(dir)
-	if err != nil {
+	if err := createIgnoreSubdir(path); err != nil {
 		return err
 	}
-
-	path = filepath.Join(dir, solutionRelPath)
-	if err := ioutil.WriteFile(path, b, os.FileMode(0600)); err != nil {
+	if err := ioutil.WriteFile(filepath.Join(path, solutionRealPath), b, os.FileMode(0600)); err != nil {
 		return err
 	}
-	s.Dir = dir
+	s.Dir = path
 	return err
 }
 
@@ -91,22 +86,32 @@ func (s *Solution) PathToParent() string {
 	return filepath.Join(dir, s.Track)
 }
 
-func createIgnoreSubdir(path string) (string, error) {
+func createIgnoreSubdir(path string) error {
 	path = filepath.Join(path, IgnoreSubdir)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		if err := os.Mkdir(path, os.FileMode(0755)); err != nil {
-			return "", err
+			return err
 		}
 	}
-	return path, nil
+	return nil
 }
 
 func migrateLegacySolutionFile(legacySolutionPath string, solutionPath string) error {
-	if _, err := createIgnoreSubdir(filepath.Dir(legacySolutionPath)); err != nil {
+	if _, err := os.Lstat(legacySolutionPath); err != nil {
 		return err
 	}
-	if err := os.Rename(legacySolutionPath, solutionPath); err != nil {
-		return errors.New("failed migrating legacy solution file")
+	if err := createIgnoreSubdir(filepath.Dir(legacySolutionPath)); err != nil {
+		return err
+	}
+	// if the solution file exists in the new location, don't migrate
+	if _, err := os.Lstat(solutionPath); err != nil {
+		if err := os.Rename(legacySolutionPath, solutionPath); err != nil {
+			return err
+		}
+		fmt.Fprintf(os.Stderr, "\nMigrated solution metadata to %s\n", solutionPath)
+	} else {
+		// TODO: decide how to handle case where both legacy and modern metadata files exist
+		fmt.Fprintf(os.Stderr, "\nAttempted to migrate solution metadata to %s but file already exists\n", solutionPath)
 	}
 	return nil
 }

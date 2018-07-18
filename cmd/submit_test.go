@@ -295,8 +295,8 @@ func TestSubmitExerciseWithLegacySolutionMetadataFileAndGetsMigrated(t *testing.
 		Dir:             tmpDir,
 		UserViperConfig: v,
 	}
-	solutionRelPath := filepath.Join(workspace.IgnoreSubdir, workspace.SolutionFilename)
-	expectedSolutionPathAfterMigration := filepath.Join(dir, solutionRelPath)
+	solutionRealPath := filepath.Join(workspace.IgnoreSubdir, workspace.SolutionFilename)
+	expectedSolutionPathAfterMigration := filepath.Join(dir, solutionRealPath)
 
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file})
 	assert.NoError(t, err)
