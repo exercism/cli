@@ -72,7 +72,7 @@ func TestDownloadWithoutFlags(t *testing.T) {
 	}
 }
 
-func TestDownloadTHISONE(t *testing.T) {
+func TestDownload(t *testing.T) {
 	oldOut := Out
 	oldErr := Err
 	Out = ioutil.Discard
