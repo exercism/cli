@@ -9,8 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/exercism/cli/visibility"
 )
 
 const IgnoreSubdir = ".exercism"
@@ -76,15 +74,12 @@ func (s *Solution) Write(dir string) error {
 		return err
 	}
 
-	// Hack because ioutil.WriteFile fails on hidden files
-	visibility.ShowFile(path)
-
 	path = filepath.Join(dir, solutionRelPath)
 	if err := ioutil.WriteFile(path, b, os.FileMode(0600)); err != nil {
 		return err
 	}
 	s.Dir = dir
-	return visibility.HideFile(path)
+	return err
 }
 
 // PathToParent is the relative path from the workspace to the parent dir.

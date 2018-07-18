@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/visibility"
 	"github.com/exercism/cli/workspace"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -389,15 +388,9 @@ func writeFakeLegacySolution(t *testing.T, dir, trackID, exerciseSlug string) {
 	}
 	legacySolutionFilePath := filepath.Join(dir, ".solution.json")
 
-	// Hack because ioutil.WriteFile fails on hidden files
-	visibility.ShowFile(legacySolutionFilePath)
-
 	b, err := json.Marshal(solution)
 	assert.NoError(t, err)
 
 	err = ioutil.WriteFile(legacySolutionFilePath, b, os.FileMode(0600))
-	assert.NoError(t, err)
-
-	err = visibility.HideFile(legacySolutionFilePath)
 	assert.NoError(t, err)
 }
