@@ -71,8 +71,8 @@ func (s *Solution) Write(dir string) error {
 		return err
 	}
 
-	path := filepath.Join(dir, IgnoreSubdir)
-	if err := createIgnoreSubdir(path); err != nil {
+	path, err := createIgnoreSubdir(dir)
+	if err != nil {
 		return err
 	}
 
@@ -96,17 +96,18 @@ func (s *Solution) PathToParent() string {
 	return filepath.Join(dir, s.Track)
 }
 
-func createIgnoreSubdir(path string) error {
+func createIgnoreSubdir(path string) (string, error) {
+	path = filepath.Join(path, IgnoreSubdir)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		if err := os.Mkdir(path, os.FileMode(0755)); err != nil {
-			return fmt.Errorf("failed to create directory: %s", path)
+			return "", fmt.Errorf("failed to create directory: %s", path)
 		}
 	}
-	return nil
+	return path, nil
 }
 
-func migrateLegacySolutionFile(path string, legacySolutionPath string, solutionPath string) error {
-	if err := createIgnoreSubdir(filepath.Join(path, IgnoreSubdir)); err != nil {
+func migrateLegacySolutionFile(legacySolutionPath string, solutionPath string) error {
+	if _, err := createIgnoreSubdir(filepath.Dir(legacySolutionPath)); err != nil {
 		return err
 	}
 	if err := os.Rename(legacySolutionPath, solutionPath); err != nil {

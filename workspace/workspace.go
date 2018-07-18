@@ -203,7 +203,7 @@ func checkSolutionFile(path string) error {
 	solutionPath := filepath.Join(path, solutionRelPath)
 
 	if _, err := os.Lstat(legacySolutionPath); err == nil {
-		return migrateLegacySolutionFile(path, legacySolutionPath, solutionPath)
+		return migrateLegacySolutionFile(legacySolutionPath, solutionPath)
 	} else if _, err := os.Lstat(solutionPath); err != nil {
 		return err
 	}
