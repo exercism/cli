@@ -7,6 +7,31 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * **Your contribution here**
 
+## v3.0.5 (2018-07-17)
+* [#646](https://github.com/exercism/cli/pull/646) Fix issue with upgrading on Windows - [@nywilken]
+
+## v3.0.4 (2018-07-15)
+* [#644](https://github.com/exercism/cli/pull/644) Add better error messages when solution metadata is missing - [@kytrinyx]
+
+## v3.0.3 (2018-07-14)
+* [#642](https://github.com/exercism/cli/pull/642) Add better error messages when configuration is needed before download - [@kytrinyx]
+* [#641](https://github.com/exercism/cli/pull/641) Fix broken download for uuid flag - [@kytrinyx]
+* [#618](https://github.com/exercism/cli/pull/618) Fix broken test in Windows build for relative paths - [@nywilken]
+* [#631](https://github.com/exercism/cli/pull/631) Stop accepting token flag on download command - [@kytrinyx]
+* [#616](https://github.com/exercism/cli/pull/616) Add shell completion scripts to build artifacts - [@jdsutherland]
+* [#624](https://github.com/exercism/cli/pull/624) Tweak command documentation to reflect reality - [@kytrinyx]
+* [#625](https://github.com/exercism/cli/pull/625) Fix wildly excessive whitespace in error messages - [@kytrinyx]
+
+## v3.0.2 (2018-07-13)
+* [#622](https://github.com/exercism/cli/pull/622) Fix bug with multi-file submission - [@kytrinyx]
+
+## v3.0.1 (2018-07-13)
+* [#619](https://github.com/exercism/cli/pull/619) Improve error message for successful configuration - [@kytrinyx]
+
+## v3.0.0 (2018-07-13)
+
+This is a complete rewrite from the ground up to work against the new https://exercism.io site.
+
 ## v2.4.1 (2017-07-01)
 * [#385](https://github.com/exercism/cli/pull/385) Fix broken upgrades for Windows - [@Tonkpils]
 
@@ -365,6 +390,7 @@ All changes by [@msgehard]
 [@harimp]: https://github.com/harimp
 [@hjljo]: https://github.com/hjljo
 [@isbadawi]: https://github.com/isbadawi
+[@jdsutherland]: https://github.com/jdsutherland
 [@jgsqware]: https://github.com/jgsqware
 [@jish]: https://github.com/jish
 [@jppunnett]: https://github.com/jppunnett

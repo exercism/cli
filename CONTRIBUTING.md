@@ -5,7 +5,7 @@ Exercism would be impossible without people like you being willing to spend time
 
 ## Dependencies
 
-You'll need Go version 1.8 or higher. Follow the directions on http://golang.org/doc/install
+You'll need Go version 1.9 or higher. Follow the directions on http://golang.org/doc/install
 
 You will also need `dep`, the Go dependency management tool. Follow the directions on https://golang.github.io/dep/docs/installation.html
 
@@ -17,54 +17,48 @@ The TL;DR is: **don't clone your fork**, and it matters where on your filesystem
 
 If you don't care how and why and just want something that works, follow these steps:
 
-1. [fork this repo][fork]
+1. [fork this repo on the GitHub webpage][fork]
 1. `go get github.com/exercism/cli/exercism`
-1. `cd $GOPATH/src/github.com/exercism/cli` (or `cd %GOPATH%/src/github.com/exercism/cli` on Windows)
-1. `git remote set-url origin https://github.com/<your-github-username>/cli`
+1. `cd $GOPATH/src/github.com/exercism/cli` (or `cd %GOPATH%\src\github.com\exercism\cli` on Windows)
+1. `git remote rename origin upstream`
+1. `git remote add origin git@github.com:<your-github-username>/cli.git`
+1. `git checkout -b development`
+1. `git push -u origin development` (setup where you push to, check it works)
 1. `go get -u github.com/golang/dep/cmd/dep`
    * depending on your setup, you may need to install `dep` by following the instructions in the [`dep` repo](https://github.com/golang/dep)
 1. `dep ensure`
+1. `git update-index --assume-unchanged Gopkg.lock` (prevent your dep changes being committed)
 
-Then make the change as usual, and submit a pull request. Please provide tests for the changes where possible.
+Then make changes as usual and submit a pull request. Please provide tests for the changes where possible.
 
 If you care about the details, check out the blog post [Contributing to Open Source Repositories in Go][contrib-blog] on the Splice blog.
 
 ## Running the Tests
 
-To run the tests locally on Linux or MacOS, use
+To run the tests locally
 
 ```
-go test $(go list ./... | grep -v vendor)
+go test ./...
 ```
-
-On Windows, the command is more painful (sorry!):
-
-```
-for /f "" %G in ('go list ./... ^| find /i /v "/vendor/"') do @go test %G
-```
-
-As of Go 1.9 this is simplified to `go test ./...`.
 
 ## Manual Testing against Exercism
 
-You can build whatever is in your local, working copy of the CLI without overwriting your existing Exercism
-CLI installation by using the `go build` command:
+To test your changes while doing everyday Exercism work you
+can build using the following instructions. Any name may be used for the
+binary (e.g. `testercism`) - by using a name other than `exercism` you
+can have different profiles under `~/.config` and avoid possibly
+damaging your real Exercism submissions, or test different tokens, etc.
 
-```
-go build -o testercism exercism/main.go
-```
+On Unices:
 
-This assumes that you are standing at the root of the exercism/cli repository checked out locally, and it will put a binary named `testercism` in your current working directory.
+- `cd $GOPATH/src/github.com/exercism/cli/exercism && go build -o testercism main.go`
+- `./testercism -h`
 
-You can call it whatever you like, but `exercism` would conflict with the directory that is already there.
+On Windows:
 
-Then you call it with `./testercism`.
-
-You can always put this in your path if you want to run it from elsewhere on your system.
-
-We highly recommend spinning up a local copy of Exercism to test against so that you can mess with the database (and so you don't accidentally break stuff for yourself in production).
-
-[TODO: link to the nextercism repo installation instructions, and explain how to reconfigure the CLI]
+- `cd /d %GOPATH%\src\github.com\exercism\cli`
+- `go build -o testercism.exe exercism\main.go`
+- `testercism.exe —h`
 
 ### Building for All Platforms
 

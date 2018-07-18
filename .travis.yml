@@ -3,8 +3,8 @@ language: go
 sudo: false
 
 go:
-  - 1.8
-  - 1.9
+  - "1.9"
+  - "1.10.x"
   - tip
 
 install:
@@ -12,4 +12,4 @@ install:
   - dep ensure
 
 script:
-  - go test $(go list ./... | grep -v /vendor/)
+  - go test -cover ./...

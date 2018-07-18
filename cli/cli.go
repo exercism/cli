@@ -164,6 +164,10 @@ func extractBinary(source *bytes.Reader, os string) (binary io.ReadCloser, err e
 		}
 
 		for _, f := range zr.File {
+			info := f.FileInfo()
+			if info.IsDir() || !strings.HasSuffix(f.Name, ".exe") {
+				continue
+			}
 			return f.Open()
 		}
 	} else {

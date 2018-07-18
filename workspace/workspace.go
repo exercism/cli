@@ -9,6 +9,13 @@ import (
 	"strings"
 )
 
+var errMissingMetadata = errors.New("no solution metadata file found")
+
+// IsMissingMetadata verifies the type of error.
+func IsMissingMetadata(err error) bool {
+	return err == errMissingMetadata
+}
+
 var rgxSerialSuffix = regexp.MustCompile(`-\d*$`)
 
 // Workspace represents a user's Exercism workspace.
@@ -186,7 +193,7 @@ func (ws Workspace) SolutionDir(s string) (string, error) {
 	path := s
 	for {
 		if path == ws.Dir {
-			return "", fmt.Errorf("couldn't find %s", SolutionFilename)
+			return "", errMissingMetadata
 		}
 		if _, err := os.Lstat(path); os.IsNotExist(err) {
 			return "", err

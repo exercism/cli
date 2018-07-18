@@ -9,6 +9,7 @@ import (
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/workspace"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // openCmd opens the designated exercise in the browser.
@@ -23,11 +24,16 @@ the solution you want to see on the website.
 	`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg, err := config.NewUserConfig()
-		if err != nil {
-			return err
-		}
-		ws, err := workspace.New(cfg.Workspace)
+		cfg := config.NewConfiguration()
+
+		v := viper.New()
+		v.AddConfigPath(cfg.Dir)
+		v.SetConfigName("user")
+		v.SetConfigType("json")
+		// Ignore error. If the file doesn't exist, that is fine.
+		_ = v.ReadInConfig()
+
+		ws, err := workspace.New(v.GetString("workspace"))
 		if err != nil {
 			return err
 		}

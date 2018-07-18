@@ -9,6 +9,8 @@ import (
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 // prepareCmd does necessary setup for Exercism and its tracks.
@@ -18,10 +20,6 @@ var prepareCmd = &cobra.Command{
 	Short:   "Prepare does setup for Exercism and its tracks.",
 	Long: `Prepare downloads settings and dependencies for Exercism and the language tracks.
 
-When called without any arguments, this downloads all the copy for the CLI so we
-know what to say in all the various situations. It also provides an up-to-date list
-of the API endpoints to use.
-
 When called with a track ID, it will do specific setup for that track. This
 might include downloading the files that the track maintainers have said are
 necessary for the track in general. Any files that are only necessary for a specific
@@ -30,30 +28,36 @@ exercise will be downloaded along with the exercise.
 To customize the CLI to suit your own preferences, use the configure command.
 	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		track, err := cmd.Flags().GetString("track")
-		if err != nil {
-			return err
-		}
+		cfg := config.NewConfiguration()
 
-		if track == "" {
-			fmt.Println("prepare called")
-			return nil
-		}
-		return prepareTrack(track)
+		v := viper.New()
+		v.AddConfigPath(cfg.Dir)
+		v.SetConfigName("user")
+		v.SetConfigType("json")
+		// Ignore error. If the file doesn't exist, that is fine.
+		_ = v.ReadInConfig()
+		cfg.UserViperConfig = v
+
+		return runPrepare(cfg, cmd.Flags(), args)
 	},
 }
 
-func prepareTrack(id string) error {
-	cfg, err := config.NewUserConfig()
+func runPrepare(cfg config.Configuration, flags *pflag.FlagSet, args []string) error {
+	v := cfg.UserViperConfig
+
+	track, err := flags.GetString("track")
 	if err != nil {
 		return err
 	}
 
-	client, err := api.NewClient(cfg.Token, cfg.APIBaseURL)
+	if track == "" {
+		return nil
+	}
+	client, err := api.NewClient(v.GetString("token"), v.GetString("apibaseurl"))
 	if err != nil {
 		return err
 	}
-	url := fmt.Sprintf("%s/tracks/%s", cfg.APIBaseURL, id)
+	url := fmt.Sprintf("%s/tracks/%s", v.GetString("apibaseurl"), track)
 
 	req, err := client.NewRequest("GET", url, nil)
 	if err != nil {
@@ -81,14 +85,14 @@ func prepareTrack(id string) error {
 		return err
 	}
 
-	t, ok := cliCfg.Tracks[id]
+	t, ok := cliCfg.Tracks[track]
 	if !ok {
-		t = config.NewTrack(id)
+		t = config.NewTrack(track)
 	}
 	if payload.Track.TestPattern != "" {
 		t.IgnorePatterns = append(t.IgnorePatterns, payload.Track.TestPattern)
 	}
-	cliCfg.Tracks[id] = t
+	cliCfg.Tracks[track] = t
 
 	return cliCfg.Write()
 }
@@ -106,7 +110,11 @@ type prepareTrackPayload struct {
 }
 
 func initPrepareCmd() {
-	prepareCmd.Flags().StringP("track", "t", "", "the track you want to prepare")
+	setupPrepareFlags(prepareCmd.Flags())
+}
+
+func setupPrepareFlags(flags *pflag.FlagSet) {
+	flags.StringP("track", "t", "", "the track you want to prepare")
 }
 
 func init() {

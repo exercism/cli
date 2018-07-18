@@ -25,16 +25,7 @@ var submitCmd = &cobra.Command{
 	Short:   "Submit your solution to an exercise.",
 	Long: `Submit your solution to an Exercism exercise.
 
-The CLI will do its best to figure out what to submit.
-
-If you call the command without any arguments, it will
-submit the exercise contained in the current directory.
-
-If called with the path to a directory, it will submit it.
-
-If called with the name of an exercise, it will work out which
-track it is on and submit it. The command will ask for help
-figuring things out if necessary.
+	Call the command with the list of files you want to submit.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.NewConfiguration()
@@ -63,37 +54,11 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 
 	if usrCfg.GetString("token") == "" {
 		tokenURL := config.InferSiteURL(usrCfg.GetString("apibaseurl")) + "/my/settings"
-		msg := `
-
-    Welcome to Exercism!
-
-    To get started, you need to configure the the tool with your API token.
-    Find your token at
-
-        %s
-
-    Then run the configure command:
-
-
-        %s configure --token=YOUR_TOKEN
-
-    `
-		return fmt.Errorf(msg, tokenURL, BinaryName)
+		return fmt.Errorf(msgWelcomePleaseConfigure, tokenURL, BinaryName)
 	}
 
 	if usrCfg.GetString("workspace") == "" {
-		// Running configure without any arguments will attempt to
-		// set the default workspace. If the default workspace directory
-		// risks clobbering an existing directory, it will print an
-		// error message that explains how to proceed.
-		msg := `
-
-    Please re-run the configure command to define where
-    to download the exercises.
-
-        %s configure
-		`
-		return fmt.Errorf(msg, BinaryName)
+		return fmt.Errorf(msgRerunConfigure, BinaryName)
 	}
 
 	for i, arg := range args {
@@ -144,6 +109,9 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	for _, arg := range args {
 		dir, err := ws.SolutionDir(arg)
 		if err != nil {
+			if workspace.IsMissingMetadata(err) {
+				return errors.New(msgMissingMetadata)
+			}
 			return err
 		}
 		if exerciseDir != "" && dir != exerciseDir {
@@ -166,16 +134,6 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	sx, err := workspace.NewSolutions(dirs)
 	if err != nil {
 		return err
-	}
-	if len(sx) == 0 {
-		// TODO: add test
-		msg := `
-
-    The exercise you are submitting doesn't have the necessary metadata.
-    Please see https://exercism.io/cli-v1-to-v2 for instructions on how to fix it.
-
-		`
-		return errors.New(msg)
 	}
 	if len(sx) > 1 {
 		msg := `

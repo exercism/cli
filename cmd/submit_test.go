@@ -70,6 +70,32 @@ func TestSubmitNonExistentFile(t *testing.T) {
 	assert.Regexp(t, "cannot be found", err.Error())
 }
 
+func TestSubmitExerciseWithoutSolutionMetadataFile(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "no-metadata-file")
+	assert.NoError(t, err)
+
+	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
+	os.MkdirAll(dir, os.FileMode(0755))
+
+	file := filepath.Join(dir, "file.txt")
+	err = ioutil.WriteFile(file, []byte("This is a file."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		Dir:             tmpDir,
+		UserViperConfig: v,
+	}
+
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file})
+	assert.Error(t, err)
+	assert.Regexp(t, "doesn't have the necessary metadata", err.Error())
+}
+
 func TestSubmitFilesAndDir(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "submit-no-such-file")
 	assert.NoError(t, err)
