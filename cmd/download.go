@@ -49,7 +49,11 @@ Download other people's solutions by providing the UUID.
 func runDownload(cfg config.Configuration, flags *pflag.FlagSet, args []string) error {
 	usrCfg := cfg.UserViperConfig
 	if usrCfg.GetString("token") == "" {
-		tokenURL := config.InferSiteURL(usrCfg.GetString("apibaseurl")) + "/my/settings"
+		apiURL := usrCfg.GetString("apibaseurl")
+		if apiURL == "" {
+			apiURL = cfg.DefaultBaseURL
+		}
+		tokenURL := fmt.Sprintf("%s/my/settings", config.InferSiteURL(apiURL))
 		return fmt.Errorf(msgWelcomePleaseConfigure, tokenURL, BinaryName)
 	}
 	if usrCfg.GetString("workspace") == "" || usrCfg.GetString("apibaseurl") == "" {

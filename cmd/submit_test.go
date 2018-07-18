@@ -19,11 +19,12 @@ func TestSubmitWithoutToken(t *testing.T) {
 	cfg := config.Configuration{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: viper.New(),
-		DefaultBaseURL:  "http://example.com",
+		DefaultBaseURL:  "http://unconfigured.exercism.io",
 	}
 
 	err := runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
 	assert.Regexp(t, "Welcome to Exercism", err.Error())
+	assert.Regexp(t, "http://unconfigured.exercism.io/my/settings", err.Error())
 }
 
 func TestSubmitWithoutWorkspace(t *testing.T) {
