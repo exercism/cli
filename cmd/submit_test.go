@@ -320,6 +320,50 @@ func fakeSubmitServer(t *testing.T, submittedFiles map[string]string) *httptest.
 	return httptest.NewServer(handler)
 }
 
+func TestSubmitRelativePath(t *testing.T) {
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	Err = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+	}()
+	// The fake endpoint will populate this when it receives the call from the command.
+	submittedFiles := map[string]string{}
+	ts := fakeSubmitServer(t, submittedFiles)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "relative-path")
+	assert.NoError(t, err)
+
+	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
+	os.MkdirAll(dir, os.FileMode(0755))
+
+	writeFakeSolution(t, dir, "bogus-track", "bogus-exercise")
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
+
+	cfg := config.Configuration{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+	}
+
+	err = ioutil.WriteFile(filepath.Join(dir, "file.txt"), []byte("This is a file."), os.FileMode(0755))
+
+	err = os.Chdir(dir)
+	assert.NoError(t, err)
+
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{"file.txt"})
+	assert.NoError(t, err)
+
+	assert.Equal(t, 1, len(submittedFiles))
+	assert.Equal(t, "This is a file.", submittedFiles[string(os.PathSeparator)+"file.txt"])
+}
+
 func writeFakeSolution(t *testing.T, dir, trackID, exerciseSlug string) {
 	solution := &workspace.Solution{
 		ID:          "bogus-solution-uuid",
