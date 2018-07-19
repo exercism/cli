@@ -255,16 +255,6 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	return nil
 }
 
-func initSubmitCmd() {
-	setupSubmitFlags(submitCmd.Flags())
-}
-
-func setupSubmitFlags(flags *pflag.FlagSet) {
-	flags.StringP("track", "t", "", "the track ID")
-	flags.StringP("exercise", "e", "", "the exercise ID")
-	flags.StringSliceP("files", "f", make([]string, 0), "files to submit")
-}
-
 func init() {
 	RootCmd.AddCommand(submitCmd)
 }
