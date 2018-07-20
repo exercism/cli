@@ -83,27 +83,24 @@ func TestDownload(t *testing.T) {
 	}()
 
 	testCases := []struct {
-		requestor       string
-		expectedDir     string
-		flag, flagValue string
+		requestor   string
+		expectedDir string
+		flags       map[string]string
 	}{
 		{
 			requestor:   requestorSelf,
 			expectedDir: "",
-			flag:        "exercise",
-			flagValue:   "bogus-exercise",
+			flags:       map[string]string{"exercise": "bogus-exercise"},
 		},
 		{
 			requestor:   requestorSelf,
 			expectedDir: "",
-			flag:        "uuid",
-			flagValue:   "bogus-id",
+			flags:       map[string]string{"uuid": "bogus-id"},
 		},
 		{
 			requestor:   requestorOther,
 			expectedDir: filepath.Join("users", "alice"),
-			flag:        "uuid",
-			flagValue:   "bogus-id",
+			flags:       map[string]string{"uuid": "bogus-id"},
 		},
 	}
 
@@ -124,7 +121,9 @@ func TestDownload(t *testing.T) {
 		}
 		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
 		setupDownloadFlags(flags)
-		flags.Set(tc.flag, tc.flagValue)
+		for name, value := range tc.flags {
+			flags.Set(name, value)
+		}
 
 		err = runDownload(cfg, flags, []string{})
 		assert.NoError(t, err)
