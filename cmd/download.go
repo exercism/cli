@@ -50,9 +50,6 @@ func runDownload(cfg config.Configuration, flags *pflag.FlagSet, args []string) 
 	usrCfg := cfg.UserViperConfig
 	if usrCfg.GetString("token") == "" {
 		apiURL := usrCfg.GetString("apibaseurl")
-		if apiURL == "" {
-			apiURL = cfg.DefaultBaseURL
-		}
 		tokenURL := fmt.Sprintf("%s/my/settings", config.InferSiteURL(apiURL))
 		return fmt.Errorf(msgWelcomePleaseConfigure, tokenURL, BinaryName)
 	}

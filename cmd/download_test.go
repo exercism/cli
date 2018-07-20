@@ -18,14 +18,13 @@ import (
 func TestDownloadWithoutToken(t *testing.T) {
 	cfg := config.Configuration{
 		UserViperConfig: viper.New(),
-		DefaultBaseURL:  "http://fake.exercism.io",
 	}
 
 	err := runDownload(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
 	if assert.Error(t, err) {
 		assert.Regexp(t, "Welcome to Exercism", err.Error())
 		// It uses the default base API url to infer the host
-		assert.Regexp(t, "fake.exercism.io/my/settings", err.Error())
+		assert.Regexp(t, "exercism.io/my/settings", err.Error())
 	}
 }
 
