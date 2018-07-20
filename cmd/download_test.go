@@ -87,9 +87,24 @@ func TestDownload(t *testing.T) {
 		expectedDir     string
 		flag, flagValue string
 	}{
-		{requestorSelf, "", "exercise", "bogus-exercise"},
-		{requestorSelf, "", "uuid", "bogus-id"},
-		{requestorOther, filepath.Join("users", "alice"), "uuid", "bogus-id"},
+		{
+			requestor:   requestorSelf,
+			expectedDir: "",
+			flag:        "exercise",
+			flagValue:   "bogus-exercise",
+		},
+		{
+			requestor:   requestorSelf,
+			expectedDir: "",
+			flag:        "uuid",
+			flagValue:   "bogus-id",
+		},
+		{
+			requestor:   requestorOther,
+			expectedDir: filepath.Join("users", "alice"),
+			flag:        "uuid",
+			flagValue:   "bogus-id",
+		},
 	}
 
 	for _, tc := range testCases {
