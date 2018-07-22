@@ -168,7 +168,7 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir, requestor string) {
 		},
 		{
 			desc:     "the solution metadata file",
-			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", ws.IgnoreSubdir, ws.SolutionFilename),
+			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", ws.SolutionMetadataFilepath()),
 			contents: fmt.Sprintf(metadata, requestor),
 		},
 	}

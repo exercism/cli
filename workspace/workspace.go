@@ -207,7 +207,7 @@ func (ws Workspace) SolutionDir(s string) (string, error) {
 
 func checkSolutionFile(path string) error {
 	legacySolutionPath := filepath.Join(path, ".solution.json")
-	solutionPath := filepath.Join(path, solutionRealPath)
+	solutionPath := filepath.Join(path, SolutionMetadataFilepath())
 
 	if _, err := os.Lstat(legacySolutionPath); err == nil {
 		return migrateLegacySolutionFile(legacySolutionPath, solutionPath)

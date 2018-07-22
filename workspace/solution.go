@@ -10,13 +10,8 @@ import (
 	"time"
 )
 
-// IgnoreSubdir is the name of the hidden directory to be ignored on submit.
-const IgnoreSubdir = ".exercism"
-
-// SolutionFilename is the name of the solution metadata file.
-const SolutionFilename = "solution.json"
-
-var solutionRealPath = filepath.Join(IgnoreSubdir, SolutionFilename)
+const ignoreSubdir = ".exercism"
+const solutionFilename = "solution.json"
 
 // Solution contains metadata about a user's solution.
 type Solution struct {
@@ -33,7 +28,7 @@ type Solution struct {
 
 // NewSolution reads solution metadata from a file in the given directory.
 func NewSolution(dir string) (*Solution, error) {
-	path := filepath.Join(dir, solutionRealPath)
+	path := filepath.Join(dir, SolutionMetadataFilepath())
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return &Solution{}, err
@@ -73,7 +68,7 @@ func (s *Solution) Write(path string) error {
 	if err = createIgnoreSubdir(path); err != nil {
 		return err
 	}
-	if err = ioutil.WriteFile(filepath.Join(path, solutionRealPath), b, os.FileMode(0600)); err != nil {
+	if err = ioutil.WriteFile(filepath.Join(path, SolutionMetadataFilepath()), b, os.FileMode(0600)); err != nil {
 		return err
 	}
 	s.Dir = path
@@ -89,8 +84,13 @@ func (s *Solution) PathToParent() string {
 	return filepath.Join(dir, s.Track)
 }
 
+// SolutionMetadataFilepath is the path of the solution metadata file relative to the workspace.
+func SolutionMetadataFilepath() string {
+	return filepath.Join(ignoreSubdir, solutionFilename)
+}
+
 func createIgnoreSubdir(path string) error {
-	path = filepath.Join(path, IgnoreSubdir)
+	path = filepath.Join(path, ignoreSubdir)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		if err := os.Mkdir(path, os.FileMode(0755)); err != nil {
 			return err
