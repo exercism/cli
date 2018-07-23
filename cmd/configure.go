@@ -60,14 +60,8 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 	// If the command is run 'bare' and we have no token,
 	// explain how to set the token.
 	if flags.NFlag() == 0 && cfg.GetString("token") == "" {
-		baseURL := cfg.GetString("apibaseurl")
-		if baseURL != "" {
-			// If we have a base URL, then give the exact link.
-			tokenURL := config.InferSiteURL(baseURL) + "/my/settings"
-			return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
-		}
-		// If we don't, then do our best.
-		return fmt.Errorf("There is no token configured. Find your token in your settings on the website, and call this command again with --token=<your-token>.")
+		tokenURL := config.SettingsURL(cfg.GetString("apibaseurl"))
+		return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
 	}
 
 	// Determine the base API URL.
@@ -114,8 +108,7 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 		token = cfg.GetString("token")
 	}
 
-	// Infer the URL where the token can be found.
-	tokenURL := config.InferSiteURL(cfg.GetString("apibaseurl")) + "/my/settings"
+	tokenURL := config.SettingsURL(cfg.GetString("apibaseurl"))
 
 	// If we don't have a token then explain how to set it and bail.
 	if token == "" {
