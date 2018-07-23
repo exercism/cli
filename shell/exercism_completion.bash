@@ -68,4 +68,5 @@ _exercism () {
   return 0
 }
 
-complete -F _exercism exercism
+complete -o bashdefault -o default -o nospace -F _exercism exercism 2>/dev/null \
+	|| complete -o default -o nospace -F _exercism exercism
