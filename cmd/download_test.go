@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -134,8 +136,18 @@ func TestDownload(t *testing.T) {
 		targetDir := filepath.Join(tmpDir, tc.expectedDir)
 		assertDownloadedCorrectFiles(t, targetDir, tc.requestor)
 
-		metadata := `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":%s,"auto_approve":false}`
+		metadata := `{
+			"track": "bogus-track",
+			"exercise":"bogus-exercise",
+			"id":"bogus-id",
+			"url":"",
+			"handle":"alice",
+			"is_requester":%s,
+			"auto_approve":false
+		}`
 		metadata = fmt.Sprintf(metadata, tc.requestor)
+		metadata = compact(t, metadata)
+
 		path := filepath.Join(targetDir, "bogus-track", "bogus-exercise", ".solution.json")
 		b, err := ioutil.ReadFile(path)
 		assert.NoError(t, err)
@@ -236,3 +248,10 @@ const payloadTemplate = `
 	}
 }
 `
+
+func compact(t *testing.T, s string) string {
+	buffer := new(bytes.Buffer)
+	err := json.Compact(buffer, []byte(s))
+	assert.NoError(t, err)
+	return buffer.String()
+}
