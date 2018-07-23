@@ -108,6 +108,7 @@ func TestDownload(t *testing.T) {
 
 	for _, tc := range testCases {
 		tmpDir, err := ioutil.TempDir("", "download-cmd")
+		defer os.RemoveAll(tmpDir)
 		assert.NoError(t, err)
 
 		ts := fakeDownloadServer(tc.requestor)
