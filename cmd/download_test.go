@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -108,6 +110,7 @@ func TestDownload(t *testing.T) {
 
 	for _, tc := range testCases {
 		tmpDir, err := ioutil.TempDir("", "download-cmd")
+		defer os.RemoveAll(tmpDir)
 		assert.NoError(t, err)
 
 		ts := fakeDownloadServer(tc.requestor)
@@ -130,7 +133,25 @@ func TestDownload(t *testing.T) {
 		err = runDownload(cfg, flags, []string{})
 		assert.NoError(t, err)
 
-		assertDownloadedCorrectFiles(t, filepath.Join(tmpDir, tc.expectedDir), tc.requestor)
+		targetDir := filepath.Join(tmpDir, tc.expectedDir)
+		assertDownloadedCorrectFiles(t, targetDir, tc.requestor)
+
+		metadata := `{
+			"track": "bogus-track",
+			"exercise":"bogus-exercise",
+			"id":"bogus-id",
+			"url":"",
+			"handle":"alice",
+			"is_requester":%s,
+			"auto_approve":false
+		}`
+		metadata = fmt.Sprintf(metadata, tc.requestor)
+		metadata = compact(t, metadata)
+
+		path := filepath.Join(targetDir, "bogus-track", "bogus-exercise", ".solution.json")
+		b, err := ioutil.ReadFile(path)
+		assert.NoError(t, err)
+		assert.Equal(t, metadata, string(b), "the solution metadata file")
 	}
 }
 
@@ -165,7 +186,6 @@ func fakeDownloadServer(requestor string) *httptest.Server {
 }
 
 func assertDownloadedCorrectFiles(t *testing.T, targetDir, requestor string) {
-	metadata := `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":%s,"auto_approve":false}`
 	expectedFiles := []struct {
 		desc     string
 		path     string
@@ -180,11 +200,6 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir, requestor string) {
 			desc:     "a file in a subdirectory",
 			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "subdir", "file-2.txt"),
 			contents: "this is file 2",
-		},
-		{
-			desc:     "the solution metadata file",
-			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", ".solution.json"),
-			contents: fmt.Sprintf(metadata, requestor),
 		},
 	}
 
@@ -233,3 +248,10 @@ const payloadTemplate = `
 	}
 }
 `
+
+func compact(t *testing.T, s string) string {
+	buffer := new(bytes.Buffer)
+	err := json.Compact(buffer, []byte(s))
+	assert.NoError(t, err)
+	return buffer.String()
+}
