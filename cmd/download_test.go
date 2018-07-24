@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,9 +8,11 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strconv"
 	"testing"
 
 	"github.com/exercism/cli/config"
+	"github.com/exercism/cli/workspace"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
@@ -87,22 +88,22 @@ func TestDownload(t *testing.T) {
 	}()
 
 	testCases := []struct {
-		requestor   string
+		requester   bool
 		expectedDir string
 		flags       map[string]string
 	}{
 		{
-			requestor:   requestorSelf,
+			requester:   true,
 			expectedDir: "",
 			flags:       map[string]string{"exercise": "bogus-exercise"},
 		},
 		{
-			requestor:   requestorSelf,
+			requester:   true,
 			expectedDir: "",
 			flags:       map[string]string{"uuid": "bogus-id"},
 		},
 		{
-			requestor:   requestorOther,
+			requester:   false,
 			expectedDir: filepath.Join("users", "alice"),
 			flags:       map[string]string{"uuid": "bogus-id"},
 		},
@@ -113,7 +114,7 @@ func TestDownload(t *testing.T) {
 		defer os.RemoveAll(tmpDir)
 		assert.NoError(t, err)
 
-		ts := fakeDownloadServer(tc.requestor)
+		ts := fakeDownloadServer(strconv.FormatBool(tc.requester))
 		defer ts.Close()
 
 		v := viper.New()
@@ -136,22 +137,15 @@ func TestDownload(t *testing.T) {
 		targetDir := filepath.Join(tmpDir, tc.expectedDir)
 		assertDownloadedCorrectFiles(t, targetDir)
 
-		metadata := `{
-			"track": "bogus-track",
-			"exercise":"bogus-exercise",
-			"id":"bogus-id",
-			"url":"",
-			"handle":"alice",
-			"is_requester":%s,
-			"auto_approve":false
-		}`
-		metadata = fmt.Sprintf(metadata, tc.requestor)
-		metadata = compact(t, metadata)
-
 		path := filepath.Join(targetDir, "bogus-track", "bogus-exercise", ".solution.json")
 		b, err := ioutil.ReadFile(path)
+		var s workspace.Solution
+		err = json.Unmarshal(b, &s)
 		assert.NoError(t, err)
-		assert.Equal(t, metadata, string(b), "the solution metadata file")
+
+		assert.Equal(t, "bogus-track", s.Track)
+		assert.Equal(t, "bogus-exercise", s.Exercise)
+		assert.Equal(t, tc.requester, s.IsRequester)
 	}
 }
 
@@ -213,9 +207,6 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
 	assert.True(t, os.IsNotExist(err), "It should not write the file if empty.")
 }
 
-const requestorSelf = "true"
-const requestorOther = "false"
-
 const payloadTemplate = `
 {
 	"solution": {
@@ -245,10 +236,3 @@ const payloadTemplate = `
 	}
 }
 `
-
-func compact(t *testing.T, s string) string {
-	buffer := new(bytes.Buffer)
-	err := json.Compact(buffer, []byte(s))
-	assert.NoError(t, err)
-	return buffer.String()
-}
