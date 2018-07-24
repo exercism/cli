@@ -159,22 +159,19 @@ func fakeDownloadServer(requestor string) *httptest.Server {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 
-	path1 := "file-1.txt"
-	mux.HandleFunc("/"+path1, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/file-1.txt", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "this is file 1")
 	})
 
-	path2 := "subdir/file-2.txt"
-	mux.HandleFunc("/"+path2, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/subdir/file-2.txt", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "this is file 2")
 	})
 
-	path3 := "file-3.txt"
-	mux.HandleFunc("/"+path3, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/file-3.txt", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "")
 	})
 
-	payloadBody := fmt.Sprintf(payloadTemplate, requestor, server.URL+"/", path1, path2, path3)
+	payloadBody := fmt.Sprintf(payloadTemplate, requestor, server.URL+"/")
 	mux.HandleFunc("/solutions/latest", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, payloadBody)
 	})
@@ -238,9 +235,9 @@ const payloadTemplate = `
 		},
 		"file_download_base_url": "%s",
 		"files": [
-		"%s",
-		"%s",
-		"%s"
+		"/file-1.txt",
+		"/subdir/file-2.txt",
+		"/file-3.txt"
 		],
 		"iteration": {
 			"submitted_at": "2017-08-21t10:11:12.130z"
