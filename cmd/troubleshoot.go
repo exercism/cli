@@ -22,7 +22,7 @@ var fullAPIKey bool
 // troubleshootCmd does a diagnostic self-check.
 var troubleshootCmd = &cobra.Command{
 	Use:     "troubleshoot",
-	Aliases: []string{"t"},
+	Aliases: []string{"t", "debug"},
 	Short:   "Troubleshoot does a diagnostic self-check.",
 	Long: `Provides output to help with troubleshooting.
 
