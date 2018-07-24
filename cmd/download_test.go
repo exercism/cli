@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -24,6 +26,8 @@ func TestDownloadWithoutToken(t *testing.T) {
 	err := runDownload(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
 	if assert.Error(t, err) {
 		assert.Regexp(t, "Welcome to Exercism", err.Error())
+		// It uses the default base API url to infer the host
+		assert.Regexp(t, "exercism.io/my/settings", err.Error())
 	}
 }
 
@@ -84,17 +88,30 @@ func TestDownload(t *testing.T) {
 	}()
 
 	testCases := []struct {
-		requestor       string
-		expectedDir     string
-		flag, flagValue string
+		requestor   string
+		expectedDir string
+		flags       map[string]string
 	}{
-		{requestorSelf, "", "exercise", "bogus-exercise"},
-		{requestorSelf, "", "uuid", "bogus-id"},
-		{requestorOther, filepath.Join("users", "alice"), "uuid", "bogus-id"},
+		{
+			requestor:   requestorSelf,
+			expectedDir: "",
+			flags:       map[string]string{"exercise": "bogus-exercise"},
+		},
+		{
+			requestor:   requestorSelf,
+			expectedDir: "",
+			flags:       map[string]string{"uuid": "bogus-id"},
+		},
+		{
+			requestor:   requestorOther,
+			expectedDir: filepath.Join("users", "alice"),
+			flags:       map[string]string{"uuid": "bogus-id"},
+		},
 	}
 
 	for _, tc := range testCases {
 		tmpDir, err := ioutil.TempDir("", "download-cmd")
+		defer os.RemoveAll(tmpDir)
 		assert.NoError(t, err)
 
 		ts := fakeDownloadServer(tc.requestor)
@@ -110,12 +127,32 @@ func TestDownload(t *testing.T) {
 		}
 		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
 		setupDownloadFlags(flags)
-		flags.Set(tc.flag, tc.flagValue)
+		for name, value := range tc.flags {
+			flags.Set(name, value)
+		}
 
 		err = runDownload(cfg, flags, []string{})
 		assert.NoError(t, err)
 
-		assertDownloadedCorrectFiles(t, filepath.Join(tmpDir, tc.expectedDir), tc.requestor)
+		targetDir := filepath.Join(tmpDir, tc.expectedDir)
+		assertDownloadedCorrectFiles(t, targetDir, tc.requestor)
+
+		metadata := `{
+			"track": "bogus-track",
+			"exercise":"bogus-exercise",
+			"id":"bogus-id",
+			"url":"",
+			"handle":"alice",
+			"is_requester":%s,
+			"auto_approve":false
+		}`
+		metadata = fmt.Sprintf(metadata, tc.requestor)
+		metadata = compact(t, metadata)
+
+		path := filepath.Join(targetDir, "bogus-track", "bogus-exercise", ws.SolutionMetadataFilepath())
+		b, err := ioutil.ReadFile(path)
+		assert.NoError(t, err)
+		assert.Equal(t, metadata, string(b), "the solution metadata file")
 	}
 }
 
@@ -150,7 +187,6 @@ func fakeDownloadServer(requestor string) *httptest.Server {
 }
 
 func assertDownloadedCorrectFiles(t *testing.T, targetDir, requestor string) {
-	metadata := `{"track":"bogus-track","exercise":"bogus-exercise","id":"bogus-id","url":"","handle":"alice","is_requester":%s,"auto_approve":false}`
 	expectedFiles := []struct {
 		desc     string
 		path     string
@@ -165,11 +201,6 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir, requestor string) {
 			desc:     "a file in a subdirectory",
 			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "subdir", "file-2.txt"),
 			contents: "this is file 2",
-		},
-		{
-			desc:     "the solution metadata file",
-			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", ws.SolutionMetadataFilepath()),
-			contents: fmt.Sprintf(metadata, requestor),
 		},
 	}
 
@@ -218,3 +249,10 @@ const payloadTemplate = `
 	}
 }
 `
+
+func compact(t *testing.T, s string) string {
+	buffer := new(bytes.Buffer)
+	err := json.Compact(buffer, []byte(s))
+	assert.NoError(t, err)
+	return buffer.String()
+}

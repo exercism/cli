@@ -53,8 +53,7 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	usrCfg := cfg.UserViperConfig
 
 	if usrCfg.GetString("token") == "" {
-		tokenURL := config.InferSiteURL(usrCfg.GetString("apibaseurl")) + "/my/settings"
-		return fmt.Errorf(msgWelcomePleaseConfigure, tokenURL, BinaryName)
+		return fmt.Errorf(msgWelcomePleaseConfigure, config.SettingsURL(usrCfg.GetString("apibaseurl")), BinaryName)
 	}
 
 	if usrCfg.GetString("workspace") == "" {
@@ -253,16 +252,6 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	fmt.Fprintf(Err, msg, suffix)
 	fmt.Fprintf(Out, "    %s\n\n", solution.URL)
 	return nil
-}
-
-func initSubmitCmd() {
-	setupSubmitFlags(submitCmd.Flags())
-}
-
-func setupSubmitFlags(flags *pflag.FlagSet) {
-	flags.StringP("track", "t", "", "the track ID")
-	flags.StringP("exercise", "e", "", "the exercise ID")
-	flags.StringSliceP("files", "f", make([]string, 0), "files to submit")
 }
 
 func init() {

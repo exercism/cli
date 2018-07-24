@@ -104,6 +104,7 @@ func TestInferSiteURL(t *testing.T) {
 		{"https://v2.exercism.io/api/v1", "https://v2.exercism.io"},
 		{"https://mentors-beta.exercism.io/api/v1", "https://mentors-beta.exercism.io"},
 		{"http://localhost:3000/api/v1", "http://localhost:3000"},
+		{"", "https://exercism.io"},            // use the default
 		{"http://whatever", "http://whatever"}, // you're on your own, pal
 	}
 
