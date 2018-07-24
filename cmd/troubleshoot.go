@@ -84,7 +84,7 @@ type systemStatus struct {
 type configurationStatus struct {
 	Home      string
 	Workspace string
-	File      string
+	Dir       string
 	Token     string
 	TokenURL  string
 }
@@ -185,7 +185,7 @@ func newConfigurationStatus(status *Status) configurationStatus {
 	cs := configurationStatus{
 		Home:      status.cfg.Home,
 		Workspace: workspace,
-		File:      v.ConfigFileUsed(),
+		Dir:       status.cfg.Dir,
 		Token:     token,
 		TokenURL:  config.InferSiteURL(v.GetString("apibaseurl")) + "/my/settings",
 	}
@@ -244,7 +244,7 @@ Configuration
 ----------------
 Home:      {{ .Configuration.Home }}
 Workspace: {{ .Configuration.Workspace }}
-Config:    {{ .Configuration.File }}
+Config:    {{ .Configuration.Dir }}
 API key:   {{ with .Configuration.Token }}{{ . }}{{ else }}<not configured>
 Find your API key at {{ .Configuration.TokenURL }}{{ end }}
 
