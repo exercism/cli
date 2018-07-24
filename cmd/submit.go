@@ -251,6 +251,14 @@ func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) er
 	}
 	fmt.Fprintf(Err, msg, suffix)
 	fmt.Fprintf(Out, "    %s\n\n", solution.URL)
+
+	siteURL := config.InferSiteURL(usrCfg.GetString("apibaseurl"))
+	msg = `
+    View other solutions to this exercise at:
+    %s/tracks/%s/exercises/%s/solutions
+
+`
+	fmt.Fprintf(Err, msg, siteURL, solution.Track, solution.Exercise)
 	return nil
 }
 
