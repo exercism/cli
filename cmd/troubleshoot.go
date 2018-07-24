@@ -177,7 +177,7 @@ func newConfigurationStatus(status *Status) configurationStatus {
 	v := status.cfg.UserViperConfig
 	token := v.GetString("token")
 	cs := configurationStatus{
-		Home:      v.GetString("home"),
+		Home:      status.cfg.Home,
 		Workspace: v.GetString("workspace"),
 		File:      v.ConfigFileUsed(),
 		Token:     token,
