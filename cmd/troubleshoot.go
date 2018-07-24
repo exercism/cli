@@ -175,10 +175,16 @@ func newSystemStatus() systemStatus {
 
 func newConfigurationStatus(status *Status) configurationStatus {
 	v := status.cfg.UserViperConfig
+
+	workspace := v.GetString("workspace")
+	if workspace == "" {
+		workspace = fmt.Sprintf("%s (default)", config.DefaultWorkspaceDir(status.cfg))
+	}
+
 	token := v.GetString("token")
 	cs := configurationStatus{
 		Home:      status.cfg.Home,
-		Workspace: v.GetString("workspace"),
+		Workspace: workspace,
 		File:      v.ConfigFileUsed(),
 		Token:     token,
 		TokenURL:  config.InferSiteURL(v.GetString("apibaseurl")) + "/my/settings",
