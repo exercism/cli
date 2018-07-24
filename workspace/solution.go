@@ -60,19 +60,19 @@ func (s *Solution) String() string {
 }
 
 // Write stores solution metadata to a file.
-func (s *Solution) Write(path string) error {
+func (s *Solution) Write(dir string) error {
 	b, err := json.Marshal(s)
 	if err != nil {
 		return err
 	}
-	if err = createIgnoreSubdir(path); err != nil {
+	if err = createIgnoreSubdir(dir); err != nil {
 		return err
 	}
-	if err = ioutil.WriteFile(filepath.Join(path, SolutionMetadataFilepath()), b, os.FileMode(0600)); err != nil {
+	if err = ioutil.WriteFile(filepath.Join(dir, SolutionMetadataFilepath()), b, os.FileMode(0600)); err != nil {
 		return err
 	}
-	s.Dir = path
-	return err
+	s.Dir = dir
+	return nil
 }
 
 // PathToParent is the relative path from the workspace to the parent dir.

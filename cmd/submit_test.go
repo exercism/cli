@@ -261,7 +261,7 @@ func TestSubmitOnlyEmptyFile(t *testing.T) {
 	assert.Regexp(t, "No files found", err.Error())
 }
 
-func TestSubmitExerciseWithLegacySolutionMetadataFileAndGetsMigrated(t *testing.T) {
+func TestLegacySolutionMetadataMigration(t *testing.T) {
 	oldOut := Out
 	oldErr := Err
 	Out = ioutil.Discard
@@ -276,6 +276,7 @@ func TestSubmitExerciseWithLegacySolutionMetadataFileAndGetsMigrated(t *testing.
 	defer ts.Close()
 
 	tmpDir, err := ioutil.TempDir("", "legacy-metadata-file")
+	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
@@ -296,6 +297,8 @@ func TestSubmitExerciseWithLegacySolutionMetadataFileAndGetsMigrated(t *testing.
 		UserViperConfig: v,
 	}
 	expectedSolutionPathAfterMigration := filepath.Join(dir, workspace.SolutionMetadataFilepath())
+	_, err = os.Stat(expectedSolutionPathAfterMigration)
+	assert.Error(t, err)
 
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file})
 	assert.NoError(t, err)

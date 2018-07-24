@@ -209,10 +209,11 @@ func checkSolutionFile(path string) error {
 	legacySolutionPath := filepath.Join(path, ".solution.json")
 	solutionPath := filepath.Join(path, SolutionMetadataFilepath())
 
-	if _, err := os.Lstat(legacySolutionPath); err == nil {
+	var err error
+	if _, err = os.Lstat(solutionPath); err == nil {
+		return nil
+	} else if _, err := os.Lstat(legacySolutionPath); err == nil {
 		return migrateLegacySolutionFile(legacySolutionPath, solutionPath)
-	} else if _, err := os.Lstat(solutionPath); err != nil {
-		return err
 	}
-	return nil
+	return err
 }
