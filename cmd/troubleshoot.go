@@ -42,6 +42,12 @@ command into a GitHub issue so we can help figure out what's going on.
 		// Ignore error. If the file doesn't exist, that is fine.
 		_ = v.ReadInConfig()
 
+		// Set it in-memory only.
+		// This doesn't write the config to file.
+		if v.GetString("apibaseurl") == "" {
+			v.Set("apibaseurl", cfg.DefaultBaseURL)
+		}
+
 		status := newStatus(c, v)
 		status.Censor = !fullAPIKey
 		s, err := status.check()
