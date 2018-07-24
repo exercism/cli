@@ -181,16 +181,15 @@ func newConfigurationStatus(status *Status) configurationStatus {
 		workspace = fmt.Sprintf("%s (default)", config.DefaultWorkspaceDir(status.cfg))
 	}
 
-	token := v.GetString("token")
 	cs := configurationStatus{
 		Home:      status.cfg.Home,
 		Workspace: workspace,
 		Dir:       status.cfg.Dir,
-		Token:     token,
+		Token:     v.GetString("token"),
 		TokenURL:  config.InferSiteURL(v.GetString("apibaseurl")) + "/my/settings",
 	}
-	if status.Censor && token != "" {
-		cs.Token = redact(token)
+	if status.Censor && cs.Token != "" {
+		cs.Token = redact(cs.Token)
 	}
 	return cs
 }
