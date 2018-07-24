@@ -107,6 +107,11 @@ func TestDownload(t *testing.T) {
 			expectedDir: filepath.Join("users", "alice"),
 			flags:       map[string]string{"uuid": "bogus-id"},
 		},
+		{
+			requester:   true,
+			expectedDir: filepath.Join("teams", "bogus-team"),
+			flags:       map[string]string{"exercise": "bogus-exercise", "track": "bogus-track", "team": "bogus-team"},
+		},
 	}
 
 	for _, tc := range testCases {
