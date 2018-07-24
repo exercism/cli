@@ -114,7 +114,7 @@ func (status *Status) check() (string, error) {
 	status.Version = newVersionStatus(status.cli)
 	status.System = newSystemStatus()
 	status.Configuration = newConfigurationStatus(status)
-	status.APIReachability = newAPIReachabilityStatus(status.cfg.UserViperConfig.GetString("apibaseurl"))
+	status.APIReachability = newAPIReachabilityStatus(status.cfg)
 
 	return status.compile()
 }
@@ -129,7 +129,11 @@ func (status *Status) compile() (string, error) {
 	return bb.String(), nil
 }
 
-func newAPIReachabilityStatus(baseURL string) apiReachabilityStatus {
+func newAPIReachabilityStatus(cfg config.Configuration) apiReachabilityStatus {
+	baseURL := cfg.UserViperConfig.GetString("apibaseurl")
+	if baseURL == "" {
+		baseURL = cfg.DefaultBaseURL
+	}
 	ar := apiReachabilityStatus{
 		Services: []*apiPing{
 			{Service: "GitHub", URL: "https://api.github.com"},
