@@ -186,7 +186,7 @@ func newConfigurationStatus(status *Status) configurationStatus {
 		Workspace: workspace,
 		Dir:       status.cfg.Dir,
 		Token:     v.GetString("token"),
-		TokenURL:  config.InferSiteURL(v.GetString("apibaseurl")) + "/my/settings",
+		TokenURL:  config.SettingsURL(v.GetString("apibaseurl")),
 	}
 	if status.Censor && cs.Token != "" {
 		cs.Token = redact(cs.Token)
