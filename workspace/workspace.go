@@ -212,7 +212,7 @@ func checkSolutionFile(path string) error {
 	var err error
 	if _, err = os.Lstat(solutionPath); err == nil {
 		return nil
-	} else if _, err := os.Lstat(legacySolutionPath); err == nil {
+	} else if _, err2 := os.Lstat(legacySolutionPath); err2 == nil {
 		return migrateLegacySolutionFile(legacySolutionPath, solutionPath)
 	}
 	return err
