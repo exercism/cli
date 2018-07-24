@@ -134,7 +134,7 @@ func TestDownload(t *testing.T) {
 		assert.NoError(t, err)
 
 		targetDir := filepath.Join(tmpDir, tc.expectedDir)
-		assertDownloadedCorrectFiles(t, targetDir, tc.requestor)
+		assertDownloadedCorrectFiles(t, targetDir)
 
 		metadata := `{
 			"track": "bogus-track",
@@ -182,7 +182,7 @@ func fakeDownloadServer(requestor string) *httptest.Server {
 	return server
 }
 
-func assertDownloadedCorrectFiles(t *testing.T, targetDir, requestor string) {
+func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
 	expectedFiles := []struct {
 		desc     string
 		path     string
