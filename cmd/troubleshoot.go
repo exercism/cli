@@ -42,7 +42,9 @@ command into a GitHub issue so we can help figure out what's going on.
 		// Ignore error. If the file doesn't exist, that is fine.
 		_ = v.ReadInConfig()
 
-		status := newStatus(c, v)
+		cfg.UserViperConfig = v
+
+		status := newStatus(c, cfg)
 		status.Censor = !fullAPIKey
 		s, err := status.check()
 		if err != nil {
@@ -61,8 +63,8 @@ type Status struct {
 	System          systemStatus
 	Configuration   configurationStatus
 	APIReachability apiReachabilityStatus
+	cfg             config.Configuration
 	cli             *cli.CLI
-	cfg             *viper.Viper
 }
 
 type versionStatus struct {
@@ -99,10 +101,10 @@ type apiPing struct {
 }
 
 // newStatus prepares a value to perform a diagnostic self-check.
-func newStatus(c *cli.CLI, v *viper.Viper) Status {
+func newStatus(cli *cli.CLI, cfg config.Configuration) Status {
 	status := Status{
-		cli: c,
-		cfg: v,
+		cfg: cfg,
+		cli: cli,
 	}
 	return status
 }
@@ -112,7 +114,7 @@ func (status *Status) check() (string, error) {
 	status.Version = newVersionStatus(status.cli)
 	status.System = newSystemStatus()
 	status.Configuration = newConfigurationStatus(status)
-	status.APIReachability = newAPIReachabilityStatus(status.cfg.GetString("apibaseurl"))
+	status.APIReachability = newAPIReachabilityStatus(status.cfg.UserViperConfig.GetString("apibaseurl"))
 
 	return status.compile()
 }
@@ -172,13 +174,14 @@ func newSystemStatus() systemStatus {
 }
 
 func newConfigurationStatus(status *Status) configurationStatus {
-	token := status.cfg.GetString("token")
+	v := status.cfg.UserViperConfig
+	token := v.GetString("token")
 	cs := configurationStatus{
-		Home:      status.cfg.GetString("home"),
-		Workspace: status.cfg.GetString("workspace"),
-		File:      status.cfg.ConfigFileUsed(),
+		Home:      v.GetString("home"),
+		Workspace: v.GetString("workspace"),
+		File:      v.ConfigFileUsed(),
 		Token:     token,
-		TokenURL:  config.InferSiteURL(status.cfg.GetString("apibaseurl")) + "/my/settings",
+		TokenURL:  config.InferSiteURL(v.GetString("apibaseurl")) + "/my/settings",
 	}
 	if status.Censor && token != "" {
 		cs.Token = redact(token)
