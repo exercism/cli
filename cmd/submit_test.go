@@ -42,6 +42,7 @@ func TestSubmitWithoutWorkspace(t *testing.T) {
 
 func TestSubmitNonExistentFile(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "submit-no-such-file")
+	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
 	v := viper.New()
@@ -70,6 +71,7 @@ func TestSubmitNonExistentFile(t *testing.T) {
 
 func TestSubmitExerciseWithoutSolutionMetadataFile(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "no-metadata-file")
+	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
@@ -96,6 +98,7 @@ func TestSubmitExerciseWithoutSolutionMetadataFile(t *testing.T) {
 
 func TestSubmitFilesAndDir(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "submit-no-such-file")
+	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
 	v := viper.New()
@@ -137,6 +140,7 @@ func TestSubmitFiles(t *testing.T) {
 	defer ts.Close()
 
 	tmpDir, err := ioutil.TempDir("", "submit-files")
+	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
@@ -196,6 +200,7 @@ func TestSubmitWithEmptyFile(t *testing.T) {
 	defer ts.Close()
 
 	tmpDir, err := ioutil.TempDir("", "empty-file")
+	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
@@ -236,6 +241,7 @@ func TestSubmitOnlyEmptyFile(t *testing.T) {
 	}()
 
 	tmpDir, err := ioutil.TempDir("", "just-an-empty-file")
+	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
@@ -262,6 +268,7 @@ func TestSubmitOnlyEmptyFile(t *testing.T) {
 
 func TestSubmitFilesFromDifferentSolutions(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "dir-1-submit")
+	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
 	dir1 := filepath.Join(tmpDir, "bogus-track", "bogus-exercise-1")
@@ -335,6 +342,7 @@ func TestSubmitRelativePath(t *testing.T) {
 	defer ts.Close()
 
 	tmpDir, err := ioutil.TempDir("", "relative-path")
+	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")

@@ -30,10 +30,12 @@ func TestSubmitFilesInSymlinkedPath(t *testing.T) {
 	defer ts.Close()
 
 	tmpDir, err := ioutil.TempDir("", "symlink-destination")
+	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 	dstDir := filepath.Join(tmpDir, "workspace")
 
 	srcDir, err := ioutil.TempDir("", "symlink-source")
+	defer os.RemoveAll(srcDir)
 	assert.NoError(t, err)
 
 	err = os.Symlink(srcDir, dstDir)

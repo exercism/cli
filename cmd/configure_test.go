@@ -374,6 +374,7 @@ func TestConfigureDefaultWorkspaceWithoutClobbering(t *testing.T) {
 	defer ts.Close()
 
 	tmpDir, err := ioutil.TempDir("", "no-clobber")
+	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
 	cfg := config.Configuration{
@@ -412,6 +413,7 @@ func TestConfigureExplicitWorkspaceWithoutClobberingNonDirectory(t *testing.T) {
 	}()
 
 	tmpDir, err := ioutil.TempDir("", "no-clobber")
+	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
 	v := viper.New()

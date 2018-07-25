@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -51,6 +52,7 @@ func TestIsSolutionPath(t *testing.T) {
 
 func TestResolveSolutionPath(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "resolve-solution-path")
+	defer os.RemoveAll(tmpDir)
 	ws, err := New(tmpDir)
 	assert.NoError(t, err)
 
