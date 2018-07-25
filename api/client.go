@@ -87,15 +87,18 @@ func (c *Client) TokenIsValid() (bool, error) {
 }
 
 // IsPingable calls the API /ping to determine whether the API can be reached.
-func (c *Client) IsPingable() (bool, error) {
+func (c *Client) IsPingable() error {
 	url := fmt.Sprintf("%s/ping", c.APIBaseURL)
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
-		return false, err
+		return err
 	}
 	resp, err := c.Do(req)
 	if err != nil {
-		return false, err
+		return err
 	}
-	return resp.StatusCode == http.StatusOK, nil
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("API returned %s", resp.Status)
+	}
+	return nil
 }
