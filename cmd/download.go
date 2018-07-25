@@ -32,7 +32,7 @@ latest solution.
 Download other people's solutions by providing the UUID.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg := config.NewConfiguration()
+		cfg := config.NewConfig()
 
 		v := viper.New()
 		v.AddConfigPath(cfg.Dir)
@@ -46,7 +46,7 @@ Download other people's solutions by providing the UUID.
 	},
 }
 
-func runDownload(cfg config.Configuration, flags *pflag.FlagSet, args []string) error {
+func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	usrCfg := cfg.UserViperConfig
 	if usrCfg.GetString("token") == "" {
 		return fmt.Errorf(msgWelcomePleaseConfigure, config.SettingsURL(usrCfg.GetString("apibaseurl")), BinaryName)

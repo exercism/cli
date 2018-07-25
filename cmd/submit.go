@@ -28,7 +28,7 @@ var submitCmd = &cobra.Command{
 	Call the command with the list of files you want to submit.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg := config.NewConfiguration()
+		cfg := config.NewConfig()
 
 		usrCfg := viper.New()
 		usrCfg.AddConfigPath(cfg.Dir)
@@ -49,7 +49,7 @@ var submitCmd = &cobra.Command{
 	},
 }
 
-func runSubmit(cfg config.Configuration, flags *pflag.FlagSet, args []string) error {
+func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	usrCfg := cfg.UserViperConfig
 
 	if usrCfg.GetString("token") == "" {

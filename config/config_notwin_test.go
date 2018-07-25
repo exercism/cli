@@ -11,15 +11,15 @@ import (
 
 func TestDefaultWorkspaceDir(t *testing.T) {
 	testCases := []struct {
-		cfg      Configuration
+		cfg      Config
 		expected string
 	}{
 		{
-			cfg:      Configuration{OS: "darwin", Home: "/User/charlie", DefaultDirName: "apple"},
+			cfg:      Config{OS: "darwin", Home: "/User/charlie", DefaultDirName: "apple"},
 			expected: "/User/charlie/Apple",
 		},
 		{
-			cfg:      Configuration{OS: "linux", Home: "/home/bob", DefaultDirName: "banana"},
+			cfg:      Config{OS: "linux", Home: "/home/bob", DefaultDirName: "banana"},
 			expected: "/home/bob/banana",
 		},
 	}

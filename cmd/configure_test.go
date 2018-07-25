@@ -33,7 +33,7 @@ func TestBareConfigure(t *testing.T) {
 	err := flags.Parse([]string{})
 	assert.NoError(t, err)
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: v,
 		DefaultBaseURL:  "http://example.com",
@@ -70,7 +70,7 @@ func TestConfigureShow(t *testing.T) {
 	err := flags.Parse(args)
 	assert.NoError(t, err)
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: v,
 	}
@@ -170,7 +170,7 @@ func TestConfigureToken(t *testing.T) {
 		err := flags.Parse(tc.args)
 		assert.NoError(t, err)
 
-		cfg := config.Configuration{
+		cfg := config.Config{
 			Persister:       config.InMemoryPersister{},
 			UserViperConfig: v,
 			DefaultBaseURL:  ts.URL,
@@ -258,7 +258,7 @@ func TestConfigureAPIBaseURL(t *testing.T) {
 		err := flags.Parse(tc.args)
 		assert.NoError(t, err)
 
-		cfg := config.Configuration{
+		cfg := config.Config{
 			Persister:       config.InMemoryPersister{},
 			UserViperConfig: v,
 			DefaultBaseURL:  ts.URL,
@@ -343,7 +343,7 @@ func TestConfigureWorkspace(t *testing.T) {
 		err := flags.Parse(tc.args)
 		assert.NoError(t, err)
 
-		cfg := config.Configuration{
+		cfg := config.Config{
 			Persister:       config.InMemoryPersister{},
 			UserViperConfig: v,
 			DefaultBaseURL:  ts.URL,
@@ -377,7 +377,7 @@ func TestConfigureDefaultWorkspaceWithoutClobbering(t *testing.T) {
 	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		OS:              "linux",
 		DefaultDirName:  "workspace",
 		Home:            tmpDir,
@@ -419,7 +419,7 @@ func TestConfigureExplicitWorkspaceWithoutClobberingNonDirectory(t *testing.T) {
 	v := viper.New()
 	v.Set("token", "abc123")
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		OS:              "linux",
 		DefaultDirName:  "workspace",
 		Home:            tmpDir,

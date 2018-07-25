@@ -31,7 +31,7 @@ places.
 You can also override certain default settings to suit your preferences.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		configuration := config.NewConfiguration()
+		configuration := config.NewConfig()
 
 		viperConfig.AddConfigPath(configuration.Dir)
 		viperConfig.SetConfigName("user")
@@ -44,7 +44,7 @@ You can also override certain default settings to suit your preferences.
 	},
 }
 
-func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) error {
+func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 	cfg := configuration.UserViperConfig
 
 	// Show the existing configuration and exit.
@@ -196,7 +196,7 @@ func runConfigure(configuration config.Configuration, flags *pflag.FlagSet) erro
 	return nil
 }
 
-func printCurrentConfig(configuration config.Configuration) {
+func printCurrentConfig(configuration config.Config) {
 	w := tabwriter.NewWriter(Err, 0, 0, 2, ' ', 0)
 	defer w.Flush()
 

@@ -9,6 +9,6 @@ import (
 )
 
 func TestDefaultWindowsWorkspaceDir(t *testing.T) {
-	cfg := Configuration{OS: "windows", Home: "C:\\Something", DefaultDirName: "basename"}
+	cfg := Config{OS: "windows", Home: "C:\\Something", DefaultDirName: "basename"}
 	assert.Equal(t, "C:\\Something\\Basename", DefaultWorkspaceDir(cfg))
 }

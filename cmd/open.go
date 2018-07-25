@@ -24,7 +24,7 @@ the solution you want to see on the website.
 	`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg := config.NewConfiguration()
+		cfg := config.NewConfig()
 
 		v := viper.New()
 		v.AddConfigPath(cfg.Dir)
