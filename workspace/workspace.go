@@ -198,9 +198,22 @@ func (ws Workspace) SolutionDir(s string) (string, error) {
 		if _, err := os.Lstat(path); os.IsNotExist(err) {
 			return "", err
 		}
-		if _, err := os.Lstat(filepath.Join(path, solutionFilename)); err == nil {
+		if err := checkSolutionFile(path); err == nil {
 			return path, nil
 		}
 		path = filepath.Dir(path)
 	}
+}
+
+func checkSolutionFile(path string) error {
+	legacySolutionPath := filepath.Join(path, ".solution.json")
+	solutionPath := filepath.Join(path, SolutionMetadataFilepath())
+
+	var err error
+	if _, err = os.Lstat(solutionPath); err == nil {
+		return nil
+	} else if _, err2 := os.Lstat(legacySolutionPath); err2 == nil {
+		return migrateLegacySolutionFile(legacySolutionPath, solutionPath)
+	}
+	return err
 }

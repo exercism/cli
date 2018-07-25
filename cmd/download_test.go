@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/exercism/cli/config"
+	ws "github.com/exercism/cli/workspace"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
@@ -148,7 +149,7 @@ func TestDownload(t *testing.T) {
 		metadata = fmt.Sprintf(metadata, tc.requestor)
 		metadata = compact(t, metadata)
 
-		path := filepath.Join(targetDir, "bogus-track", "bogus-exercise", ".solution.json")
+		path := filepath.Join(targetDir, "bogus-track", "bogus-exercise", ws.SolutionMetadataFilepath())
 		b, err := ioutil.ReadFile(path)
 		assert.NoError(t, err)
 		assert.Equal(t, metadata, string(b), "the solution metadata file")

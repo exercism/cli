@@ -59,7 +59,7 @@ func TestPrepareTrack(t *testing.T) {
 
 	expected := []string{
 		".*[.]md",
-		"[.]solution[.]json",
+		"[.]?solution[.]json",
 		"_spec[.]ext$",
 	}
 	track := cliCfg.Tracks["bogus"]
