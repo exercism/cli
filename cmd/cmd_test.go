@@ -61,6 +61,7 @@ type CommandTest struct {
 // fail the test if the creation of the temporary directory fails.
 func (test *CommandTest) Setup(t *testing.T) {
 	dir, err := ioutil.TempDir("", "command-test")
+	defer os.RemoveAll(dir)
 	assert.NoError(t, err)
 
 	test.TmpDir = dir
