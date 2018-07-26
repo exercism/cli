@@ -22,7 +22,6 @@ type Configuration struct {
 	DefaultBaseURL  string
 	DefaultDirName  string
 	UserViperConfig *viper.Viper
-	CLIConfig       *CLIConfig
 	Persister       Persister
 }
 
