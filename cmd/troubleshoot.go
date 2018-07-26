@@ -42,7 +42,9 @@ command into a GitHub issue so we can help figure out what's going on.
 		// Ignore error. If the file doesn't exist, that is fine.
 		_ = v.ReadInConfig()
 
-		status := newStatus(c, v)
+		cfg.UserViperConfig = v
+
+		status := newStatus(c, cfg)
 		status.Censor = !fullAPIKey
 		s, err := status.check()
 		if err != nil {
@@ -61,8 +63,8 @@ type Status struct {
 	System          systemStatus
 	Configuration   configurationStatus
 	APIReachability apiReachabilityStatus
+	cfg             config.Configuration
 	cli             *cli.CLI
-	cfg             *viper.Viper
 }
 
 type versionStatus struct {
@@ -82,7 +84,7 @@ type systemStatus struct {
 type configurationStatus struct {
 	Home      string
 	Workspace string
-	File      string
+	Dir       string
 	Token     string
 	TokenURL  string
 }
@@ -99,10 +101,10 @@ type apiPing struct {
 }
 
 // newStatus prepares a value to perform a diagnostic self-check.
-func newStatus(c *cli.CLI, v *viper.Viper) Status {
+func newStatus(cli *cli.CLI, cfg config.Configuration) Status {
 	status := Status{
-		cli: c,
-		cfg: v,
+		cfg: cfg,
+		cli: cli,
 	}
 	return status
 }
@@ -112,7 +114,7 @@ func (status *Status) check() (string, error) {
 	status.Version = newVersionStatus(status.cli)
 	status.System = newSystemStatus()
 	status.Configuration = newConfigurationStatus(status)
-	status.APIReachability = newAPIReachabilityStatus(status.cfg.GetString("apibaseurl"))
+	status.APIReachability = newAPIReachabilityStatus(status.cfg)
 
 	return status.compile()
 }
@@ -127,7 +129,11 @@ func (status *Status) compile() (string, error) {
 	return bb.String(), nil
 }
 
-func newAPIReachabilityStatus(baseURL string) apiReachabilityStatus {
+func newAPIReachabilityStatus(cfg config.Configuration) apiReachabilityStatus {
+	baseURL := cfg.UserViperConfig.GetString("apibaseurl")
+	if baseURL == "" {
+		baseURL = cfg.DefaultBaseURL
+	}
 	ar := apiReachabilityStatus{
 		Services: []*apiPing{
 			{Service: "GitHub", URL: "https://api.github.com"},
@@ -172,16 +178,22 @@ func newSystemStatus() systemStatus {
 }
 
 func newConfigurationStatus(status *Status) configurationStatus {
-	token := status.cfg.GetString("token")
-	cs := configurationStatus{
-		Home:      status.cfg.GetString("home"),
-		Workspace: status.cfg.GetString("workspace"),
-		File:      status.cfg.ConfigFileUsed(),
-		Token:     token,
-		TokenURL:  config.InferSiteURL(status.cfg.GetString("apibaseurl")) + "/my/settings",
+	v := status.cfg.UserViperConfig
+
+	workspace := v.GetString("workspace")
+	if workspace == "" {
+		workspace = fmt.Sprintf("%s (default)", config.DefaultWorkspaceDir(status.cfg))
 	}
-	if status.Censor && token != "" {
-		cs.Token = redact(token)
+
+	cs := configurationStatus{
+		Home:      status.cfg.Home,
+		Workspace: workspace,
+		Dir:       status.cfg.Dir,
+		Token:     v.GetString("token"),
+		TokenURL:  config.SettingsURL(v.GetString("apibaseurl")),
+	}
+	if status.Censor && cs.Token != "" {
+		cs.Token = redact(cs.Token)
 	}
 	return cs
 }
@@ -235,7 +247,7 @@ Configuration
 ----------------
 Home:      {{ .Configuration.Home }}
 Workspace: {{ .Configuration.Workspace }}
-Config:    {{ .Configuration.File }}
+Config:    {{ .Configuration.Dir }}
 API key:   {{ with .Configuration.Token }}{{ . }}{{ else }}<not configured>
 Find your API key at {{ .Configuration.TokenURL }}{{ end }}
 
