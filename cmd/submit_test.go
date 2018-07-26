@@ -230,6 +230,57 @@ func TestSubmitWithEmptyFile(t *testing.T) {
 	assert.Equal(t, "This is file 2.", submittedFiles[string(os.PathSeparator)+"file-2.txt"])
 }
 
+func TestSubmitFilesForTeamExercise(t *testing.T) {
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	Err = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+	}()
+	// The fake endpoint will populate this when it receives the call from the command.
+	submittedFiles := map[string]string{}
+	ts := fakeSubmitServer(t, submittedFiles)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "submit-files")
+	assert.NoError(t, err)
+
+	dir := filepath.Join(tmpDir, "teams", "bogus-team", "bogus-track", "bogus-exercise")
+	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
+	writeFakeSolution(t, dir, "bogus-track", "bogus-exercise")
+
+	file1 := filepath.Join(dir, "file-1.txt")
+	err = ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	file2 := filepath.Join(dir, "subdir", "file-2.txt")
+	err = ioutil.WriteFile(file2, []byte("This is file 2."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
+
+	cfg := config.Configuration{
+		Dir:             tmpDir,
+		UserViperConfig: v,
+	}
+
+	files := []string{
+		file1, file2,
+	}
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
+	assert.NoError(t, err)
+
+	assert.Equal(t, 2, len(submittedFiles))
+
+	assert.Equal(t, "This is file 1.", submittedFiles[string(os.PathSeparator)+"file-1.txt"])
+	assert.Equal(t, "This is file 2.", submittedFiles[string(os.PathSeparator)+filepath.Join("subdir", "file-2.txt")])
+}
+
 func TestSubmitOnlyEmptyFile(t *testing.T) {
 	oldOut := Out
 	oldErr := Err
