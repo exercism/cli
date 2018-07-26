@@ -19,6 +19,7 @@ type Solution struct {
 	Track       string     `json:"track"`
 	Exercise    string     `json:"exercise"`
 	ID          string     `json:"id"`
+	Team        string     `json:"team,omitempty"`
 	URL         string     `json:"url"`
 	Handle      string     `json:"handle"`
 	IsRequester bool       `json:"is_requester"`

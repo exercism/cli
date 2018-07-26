@@ -107,6 +107,11 @@ func TestDownload(t *testing.T) {
 			expectedDir: filepath.Join("users", "alice"),
 			flags:       map[string]string{"uuid": "bogus-id"},
 		},
+		{
+			requester:   true,
+			expectedDir: filepath.Join("teams", "bogus-team"),
+			flags:       map[string]string{"exercise": "bogus-exercise", "track": "bogus-track", "team": "bogus-team"},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -114,7 +119,7 @@ func TestDownload(t *testing.T) {
 		defer os.RemoveAll(tmpDir)
 		assert.NoError(t, err)
 
-		ts := fakeDownloadServer(strconv.FormatBool(tc.requester))
+		ts := fakeDownloadServer(strconv.FormatBool(tc.requester), tc.flags["team"])
 		defer ts.Close()
 
 		v := viper.New()
@@ -149,7 +154,7 @@ func TestDownload(t *testing.T) {
 	}
 }
 
-func fakeDownloadServer(requestor string) *httptest.Server {
+func fakeDownloadServer(requestor, teamSlug string) *httptest.Server {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 
@@ -165,11 +170,16 @@ func fakeDownloadServer(requestor string) *httptest.Server {
 		fmt.Fprint(w, "")
 	})
 
-	payloadBody := fmt.Sprintf(payloadTemplate, requestor, server.URL+"/")
 	mux.HandleFunc("/solutions/latest", func(w http.ResponseWriter, r *http.Request) {
+		team := "null"
+		if teamSlug := r.FormValue("team_id"); teamSlug != "" {
+			team = fmt.Sprintf(`{"name": "Bogus Team", "slug": "%s"}`, teamSlug)
+		}
+		payloadBody := fmt.Sprintf(payloadTemplate, requestor, team, server.URL+"/")
 		fmt.Fprint(w, payloadBody)
 	})
 	mux.HandleFunc("/solutions/bogus-id", func(w http.ResponseWriter, r *http.Request) {
+		payloadBody := fmt.Sprintf(payloadTemplate, requestor, "null", server.URL+"/")
 		fmt.Fprint(w, payloadBody)
 	})
 
@@ -215,6 +225,7 @@ const payloadTemplate = `
 			"handle": "alice",
 			"is_requester": %s
 		},
+		"team": %s,
 		"exercise": {
 			"id": "bogus-exercise",
 			"instructions_url": "http://example.com/bogus-exercise",
@@ -226,9 +237,9 @@ const payloadTemplate = `
 		},
 		"file_download_base_url": "%s",
 		"files": [
-		"/file-1.txt",
-		"/subdir/file-2.txt",
-		"/file-3.txt"
+			"/file-1.txt",
+			"/subdir/file-2.txt",
+			"/file-3.txt"
 		],
 		"iteration": {
 			"submitted_at": "2017-08-21t10:11:12.130z"

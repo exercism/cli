@@ -90,11 +90,19 @@ func runDownload(cfg config.Configuration, flags *pflag.FlagSet, args []string) 
 		return err
 	}
 
+	team, err := flags.GetString("team")
+	if err != nil {
+		return err
+	}
+
 	if uuid == "" {
 		q := req.URL.Query()
 		q.Add("exercise_id", exercise)
 		if track != "" {
 			q.Add("track_id", track)
+		}
+		if team != "" {
+			q.Add("team_id", team)
 		}
 		req.URL.RawQuery = q.Encode()
 	}
@@ -127,6 +135,7 @@ func runDownload(cfg config.Configuration, flags *pflag.FlagSet, args []string) 
 	solution := workspace.Solution{
 		AutoApprove: payload.Solution.Exercise.AutoApprove,
 		Track:       payload.Solution.Exercise.Track.ID,
+		Team:        payload.Solution.Team.Slug,
 		Exercise:    payload.Solution.Exercise.ID,
 		ID:          payload.Solution.ID,
 		URL:         payload.Solution.URL,
@@ -135,6 +144,9 @@ func runDownload(cfg config.Configuration, flags *pflag.FlagSet, args []string) 
 	}
 
 	dir := usrCfg.GetString("workspace")
+	if solution.Team != "" {
+		dir = filepath.Join(dir, "teams", solution.Team)
+	}
 	if !solution.IsRequester {
 		dir = filepath.Join(dir, "users", solution.Handle)
 	}
@@ -205,6 +217,10 @@ type downloadPayload struct {
 	Solution struct {
 		ID   string `json:"id"`
 		URL  string `json:"url"`
+		Team struct {
+			Name string `json:"name"`
+			Slug string `json:"slug"`
+		} `json:"team"`
 		User struct {
 			Handle      string `json:"handle"`
 			IsRequester bool   `json:"is_requester"`
@@ -235,6 +251,7 @@ func setupDownloadFlags(flags *pflag.FlagSet) {
 	flags.StringP("uuid", "u", "", "the solution UUID")
 	flags.StringP("track", "t", "", "the track ID")
 	flags.StringP("exercise", "e", "", "the exercise slug")
+	flags.StringP("team", "T", "", "the team slug")
 }
 
 func init() {
