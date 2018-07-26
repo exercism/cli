@@ -4,7 +4,7 @@ const msgWelcomePleaseConfigure = `
 
     Welcome to Exercism!
 
-    To get started, you need to configure the the tool with your API token.
+    To get started, you need to configure the tool with your API token.
     Find your token at
 
         %s
