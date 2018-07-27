@@ -66,7 +66,7 @@ You will need to configure the CLI with your [Exercism API Key](http://exercism.
 
 For more detailed instructions, see the [CLI page on Exercism](http://exercism.io/cli).
 
-#### Recent Changes
+#### Recent changes
 
 * ABC...
 * XYZ...
@@ -99,9 +99,9 @@ brew bump-formula-pr --strict exercism --url=https://github.com/exercism/cli/arc
 
 For more information see their [contribution guidelines](https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md#how-to-open-a-homebrew-pull-request-and-get-it-merged).
 
-## Update the Docs Site
+## Update the docs site
 
 If there are any significant changes, we should describe them on
-[cli.exercism.io](http://cli.exercism.io/).
+[exercism.io/cli]([https://exercism.io/cli).
 
-The codebase lives at [exercism/cli-www](https://github.com/exercism/cli-www).
+The codebase lives at [exercism/website-copy](https://github.com/exercism/website-copy) in `pages/cli.md`.
