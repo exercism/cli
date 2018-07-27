@@ -7,6 +7,15 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * **Your contribution here**
 
+## v3.0.6 (2018-07-17)
+* [#652](https://github.com/exercism/cli/pull/652) Add support for teams feature - [@kytrinyx]
+* [#683](https://github.com/exercism/cli/pull/683) Fix typo in welcome message - [@glebedel]
+* [#675](https://github.com/exercism/cli/pull/675) Improve output of troubleshoot command when CLI is unconfigured - [@kytrinyx]
+* [#679](https://github.com/exercism/cli/pull/679) Improve error message for failed /ping on configure - [@kytrinyx]
+* [#669](https://github.com/exercism/cli/pull/669) Add debug as alias for troubleshoot - [@kytrinyx]
+* [#647](https://github.com/exercism/cli/pull/647) Ensure welcome message has full link to settings page - [@kytrinyx]
+* [#667](https://github.com/exercism/cli/pull/667) Improve bash completion script - [@cookrn]
+
 ## v3.0.5 (2018-07-17)
 * [#646](https://github.com/exercism/cli/pull/646) Fix issue with upgrading on Windows - [@nywilken]
 
@@ -378,6 +387,7 @@ All changes by [@msgehard]
 [@blackerby]: https://github.com/blackerby
 [@broady]: https://github.com/broady
 [@ccnp123]: https://github.com/ccnp123
+[@cookrn]: https://github.com/cookrn
 [@daveyarwood]: https://github.com/daveyarwood
 [@devonestes]: https://github.com/devonestes
 [@djquan]: https://github.com/djquan
@@ -387,6 +397,7 @@ All changes by [@msgehard]
 [@ebautistabar]: https://github.com/ebautistabar
 [@elimisteve]: https://github.com/elimisteve
 [@ests]: https://github.com/ests
+[@glebedel]: https://github.com/glebedel
 [@harimp]: https://github.com/harimp
 [@hjljo]: https://github.com/hjljo
 [@isbadawi]: https://github.com/isbadawi
