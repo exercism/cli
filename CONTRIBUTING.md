@@ -3,10 +3,10 @@
 First, thank you! :tada:
 Exercism would be impossible without people like you being willing to spend time and effort making things better.
 
-## Docs
-Exercism has a [docs repo](https://github.com/exercism/docs) containing project-wide documentation.
-[glossary](https://github.com/exercism/docs/blob/master/about/glossary.md)
-[architecture](https://github.com/exercism/docs/blob/master/about/architecture.md)
+## Documentation
+* [Exercism Documentation Repository](https://github.com/exercism/docs)
+* [Exercism Glossary](https://github.com/exercism/docs/blob/master/about/glossary.md)
+* [Exercism Architecture](https://github.com/exercism/docs/blob/master/about/architecture.md)
 
 ## Dependencies
 
