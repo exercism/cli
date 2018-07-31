@@ -3,6 +3,11 @@
 First, thank you! :tada:
 Exercism would be impossible without people like you being willing to spend time and effort making things better.
 
+## Documentation
+* [Exercism Documentation Repository](https://github.com/exercism/docs)
+* [Exercism Glossary](https://github.com/exercism/docs/blob/master/about/glossary.md)
+* [Exercism Architecture](https://github.com/exercism/docs/blob/master/about/architecture.md)
+
 ## Dependencies
 
 You'll need Go version 1.9 or higher. Follow the directions on http://golang.org/doc/install
