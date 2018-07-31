@@ -238,7 +238,7 @@ const payloadTemplate = `
 		"file_download_base_url": "%s",
 		"files": [
 			"/file-1.txt",
-			"/subdir/file-2.txt",
+			"/subdir/file-2#.txt",
 			"/file-3.txt"
 		],
 		"iteration": {
