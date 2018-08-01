@@ -27,7 +27,7 @@ need to be on the same drive as your workspace directory. Otherwise
 nothing will happen.
 	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg := config.NewConfiguration()
+		cfg := config.NewConfig()
 
 		v := viper.New()
 		v.AddConfigPath(cfg.Dir)

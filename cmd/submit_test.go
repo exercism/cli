@@ -16,7 +16,7 @@ import (
 )
 
 func TestSubmitWithoutToken(t *testing.T) {
-	cfg := config.Configuration{
+	cfg := config.Config{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: viper.New(),
 	}
@@ -30,7 +30,7 @@ func TestSubmitWithoutWorkspace(t *testing.T) {
 	v := viper.New()
 	v.Set("token", "abc123")
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: v,
 		DefaultBaseURL:  "http://example.com",
@@ -49,7 +49,7 @@ func TestSubmitNonExistentFile(t *testing.T) {
 	v.Set("token", "abc123")
 	v.Set("workspace", tmpDir)
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: v,
 		DefaultBaseURL:  "http://example.com",
@@ -85,7 +85,7 @@ func TestSubmitExerciseWithoutSolutionMetadataFile(t *testing.T) {
 	v.Set("token", "abc123")
 	v.Set("workspace", tmpDir)
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		Persister:       config.InMemoryPersister{},
 		Dir:             tmpDir,
 		UserViperConfig: v,
@@ -105,7 +105,7 @@ func TestSubmitFilesAndDir(t *testing.T) {
 	v.Set("token", "abc123")
 	v.Set("workspace", tmpDir)
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: v,
 		DefaultBaseURL:  "http://example.com",
@@ -165,7 +165,7 @@ func TestSubmitFiles(t *testing.T) {
 	v.Set("workspace", tmpDir)
 	v.Set("apibaseurl", ts.URL)
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		Persister:       config.InMemoryPersister{},
 		Dir:             tmpDir,
 		UserViperConfig: v,
@@ -213,7 +213,7 @@ func TestSubmitWithEmptyFile(t *testing.T) {
 	v.Set("workspace", tmpDir)
 	v.Set("apibaseurl", ts.URL)
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: v,
 	}
@@ -264,7 +264,7 @@ func TestSubmitFilesForTeamExercise(t *testing.T) {
 	v.Set("workspace", tmpDir)
 	v.Set("apibaseurl", ts.URL)
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		Dir:             tmpDir,
 		UserViperConfig: v,
 	}
@@ -304,7 +304,7 @@ func TestSubmitOnlyEmptyFile(t *testing.T) {
 	v.Set("token", "abc123")
 	v.Set("workspace", tmpDir)
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: v,
 	}
@@ -342,7 +342,7 @@ func TestSubmitFilesFromDifferentSolutions(t *testing.T) {
 	v.Set("token", "abc123")
 	v.Set("workspace", tmpDir)
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		Persister:       config.InMemoryPersister{},
 		Dir:             tmpDir,
 		UserViperConfig: v,
@@ -406,7 +406,7 @@ func TestSubmitRelativePath(t *testing.T) {
 	v.Set("workspace", tmpDir)
 	v.Set("apibaseurl", ts.URL)
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: v,
 	}

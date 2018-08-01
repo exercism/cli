@@ -51,7 +51,7 @@ func TestSubmitFilesInSymlinkedPath(t *testing.T) {
 	v.Set("workspace", dstDir)
 	v.Set("apibaseurl", ts.URL)
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: v,
 	}

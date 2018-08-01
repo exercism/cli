@@ -33,7 +33,7 @@ command into a GitHub issue so we can help figure out what's going on.
 		cli.HTTPClient = &http.Client{Timeout: 20 * time.Second}
 		c := cli.New(Version)
 
-		cfg := config.NewConfiguration()
+		cfg := config.NewConfig()
 
 		v := viper.New()
 		v.AddConfigPath(cfg.Dir)
@@ -63,7 +63,7 @@ type Status struct {
 	System          systemStatus
 	Configuration   configurationStatus
 	APIReachability apiReachabilityStatus
-	cfg             config.Configuration
+	cfg             config.Config
 	cli             *cli.CLI
 }
 
@@ -101,7 +101,7 @@ type apiPing struct {
 }
 
 // newStatus prepares a value to perform a diagnostic self-check.
-func newStatus(cli *cli.CLI, cfg config.Configuration) Status {
+func newStatus(cli *cli.CLI, cfg config.Config) Status {
 	status := Status{
 		cfg: cfg,
 		cli: cli,
@@ -129,7 +129,7 @@ func (status *Status) compile() (string, error) {
 	return bb.String(), nil
 }
 
-func newAPIReachabilityStatus(cfg config.Configuration) apiReachabilityStatus {
+func newAPIReachabilityStatus(cfg config.Config) apiReachabilityStatus {
 	baseURL := cfg.UserViperConfig.GetString("apibaseurl")
 	if baseURL == "" {
 		baseURL = cfg.DefaultBaseURL

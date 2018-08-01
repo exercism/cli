@@ -19,7 +19,7 @@ import (
 )
 
 func TestDownloadWithoutToken(t *testing.T) {
-	cfg := config.Configuration{
+	cfg := config.Config{
 		UserViperConfig: viper.New(),
 	}
 
@@ -34,7 +34,7 @@ func TestDownloadWithoutToken(t *testing.T) {
 func TestDownloadWithoutWorkspace(t *testing.T) {
 	v := viper.New()
 	v.Set("token", "abc123")
-	cfg := config.Configuration{
+	cfg := config.Config{
 		UserViperConfig: v,
 	}
 
@@ -48,7 +48,7 @@ func TestDownloadWithoutBaseURL(t *testing.T) {
 	v := viper.New()
 	v.Set("token", "abc123")
 	v.Set("workspace", "/home/whatever")
-	cfg := config.Configuration{
+	cfg := config.Config{
 		UserViperConfig: v,
 	}
 
@@ -64,7 +64,7 @@ func TestDownloadWithoutFlags(t *testing.T) {
 	v.Set("workspace", "/home/username")
 	v.Set("apibaseurl", "http://example.com")
 
-	cfg := config.Configuration{
+	cfg := config.Config{
 		UserViperConfig: v,
 	}
 
@@ -127,7 +127,7 @@ func TestDownload(t *testing.T) {
 		v.Set("apibaseurl", ts.URL)
 		v.Set("token", "abc123")
 
-		cfg := config.Configuration{
+		cfg := config.Config{
 			UserViperConfig: v,
 		}
 		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
