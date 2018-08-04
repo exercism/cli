@@ -78,6 +78,27 @@ func (ws Workspace) PotentialExercises() ([]Exercise, error) {
 	return exercises, nil
 }
 
+// Exercises returns the user's exercises within the workspace.
+// This doesn't find legacy exercises where the metadata is missing.
+func (ws Workspace) Exercises() ([]Exercise, error) {
+	candidates, err := ws.PotentialExercises()
+	if err != nil {
+		return nil, err
+	}
+
+	exercises := make([]Exercise, 0, len(candidates))
+	for _, candidate := range candidates {
+		ok, err := candidate.HasMetadata()
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			exercises = append(exercises, candidate)
+		}
+	}
+	return exercises, nil
+}
+
 // Locate the matching directories within the workspace.
 // This will look for an exact match on absolute or relative paths.
 // If given the base name of a directory with no path information it

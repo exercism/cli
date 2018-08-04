@@ -49,6 +49,44 @@ func TestWorkspacePotentialExercises(t *testing.T) {
 	}
 }
 
+func TestWorkspaceExercises(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "walk-with-metadata")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	a1 := filepath.Join(tmpDir, "track-a", "exercise-one")
+	a2 := filepath.Join(tmpDir, "track-a", "exercise-two") // no metadata
+	b1 := filepath.Join(tmpDir, "track-b", "exercise-one")
+	b2 := filepath.Join(tmpDir, "track-b", "exercise-two")
+
+	for _, path := range []string{a1, a2, b1, b2} {
+		err := os.MkdirAll(path, os.FileMode(0755))
+		assert.NoError(t, err)
+
+		if path != a2 {
+			err = ioutil.WriteFile(filepath.Join(path, solutionFilename), []byte{}, os.FileMode(0600))
+			assert.NoError(t, err)
+		}
+	}
+
+	ws, err := New(tmpDir)
+	assert.NoError(t, err)
+
+	exercises, err := ws.Exercises()
+	assert.NoError(t, err)
+	if assert.Equal(t, 3, len(exercises)) {
+		paths := make([]string, len(exercises))
+		for i, e := range exercises {
+			paths[i] = e.Path()
+		}
+
+		sort.Strings(paths)
+		assert.Equal(t, paths[0], "track-a/exercise-one")
+		assert.Equal(t, paths[1], "track-b/exercise-one")
+		assert.Equal(t, paths[2], "track-b/exercise-two")
+	}
+}
+
 func TestSolutionPath(t *testing.T) {
 	root := filepath.Join("..", "fixtures", "solution-path", "creatures")
 	ws, err := New(root)
