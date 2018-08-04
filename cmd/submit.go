@@ -130,11 +130,11 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	sx, err := workspace.NewSolutions(dirs)
+	collection, err := workspace.NewMetadataCollection(dirs)
 	if err != nil {
 		return err
 	}
-	if len(sx) > 1 {
+	if len(collection) > 1 {
 		msg := `
 
     You are submitting files belonging to different solutions.
@@ -143,9 +143,9 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		`
 		return errors.New(msg)
 	}
-	solution := sx[0]
+	metadata := collection[0]
 
-	if !solution.IsRequester {
+	if !metadata.IsRequester {
 		// TODO: add test
 		msg := `
 
@@ -155,7 +155,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
         %s download --exercise=%s --track=%s
 
 		`
-		return fmt.Errorf(msg, BinaryName, solution.Exercise, solution.Track)
+		return fmt.Errorf(msg, BinaryName, metadata.Exercise, metadata.Track)
 	}
 
 	paths := make([]string, 0, len(args))
@@ -198,7 +198,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		}
 		defer file.Close()
 
-		dirname := fmt.Sprintf("%s%s%s", string(os.PathSeparator), solution.Exercise, string(os.PathSeparator))
+		dirname := fmt.Sprintf("%s%s%s", string(os.PathSeparator), metadata.Exercise, string(os.PathSeparator))
 		pieces := strings.Split(path, dirname)
 		filename := fmt.Sprintf("%s%s", string(os.PathSeparator), pieces[len(pieces)-1])
 
@@ -221,7 +221,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	if err != nil {
 		return err
 	}
-	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), solution.ID)
+	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), metadata.ID)
 	req, err := client.NewRequest("PATCH", url, body)
 	if err != nil {
 		return err
@@ -246,11 +246,11 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
     %s
 `
 	suffix := "View it at:\n\n    "
-	if solution.AutoApprove {
+	if metadata.AutoApprove {
 		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
 	}
 	fmt.Fprintf(Err, msg, suffix)
-	fmt.Fprintf(Out, "    %s\n\n", solution.URL)
+	fmt.Fprintf(Out, "    %s\n\n", metadata.URL)
 	return nil
 }
 

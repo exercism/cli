@@ -44,7 +44,7 @@ func TestSubmitFilesInSymlinkedPath(t *testing.T) {
 	dir := filepath.Join(dstDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
 
-	writeFakeSolution(t, dir, "bogus-track", "bogus-exercise")
+	writeFakeMetadata(t, dir, "bogus-track", "bogus-exercise")
 
 	v := viper.New()
 	v.Set("token", "abc123")
