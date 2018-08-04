@@ -3,6 +3,7 @@ package workspace
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -36,6 +37,66 @@ func New(dir string) (Workspace, error) {
 		return Workspace{}, err
 	}
 	return Workspace{Dir: dir}, nil
+}
+
+// PotentialExercises are a first-level guess at the user's exercises.
+// It looks at the workspace structurally, and guesses based on
+// the location of the directory. E.g. any top level directory
+// within the workspace (except 'users') is assumed to be a
+// track, and any directory within there again is assumed to
+// be an exercise.
+func (ws Workspace) PotentialExercises() ([]Exercise, error) {
+	exercises := []Exercise{}
+
+	topInfos, err := ioutil.ReadDir(ws.Dir)
+	if err != nil {
+		return nil, err
+	}
+	for _, topInfo := range topInfos {
+		if !topInfo.IsDir() {
+			continue
+		}
+
+		if topInfo.Name() == "users" {
+			continue
+		}
+
+		subInfos, err := ioutil.ReadDir(filepath.Join(ws.Dir, topInfo.Name()))
+		if err != nil {
+			return nil, err
+		}
+
+		for _, subInfo := range subInfos {
+			if !subInfo.IsDir() {
+				continue
+			}
+
+			exercises = append(exercises, Exercise{Track: topInfo.Name(), Slug: subInfo.Name(), Root: ws.Dir})
+		}
+	}
+
+	return exercises, nil
+}
+
+// Exercises returns the user's exercises within the workspace.
+// This doesn't find legacy exercises where the metadata is missing.
+func (ws Workspace) Exercises() ([]Exercise, error) {
+	candidates, err := ws.PotentialExercises()
+	if err != nil {
+		return nil, err
+	}
+
+	exercises := make([]Exercise, 0, len(candidates))
+	for _, candidate := range candidates {
+		ok, err := candidate.HasMetadata()
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			exercises = append(exercises, candidate)
+		}
+	}
+	return exercises, nil
 }
 
 // Locate the matching directories within the workspace.
