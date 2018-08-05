@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	netURL "net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -171,7 +172,15 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	for _, file := range payload.Solution.Files {
-		url := fmt.Sprintf("%s%s", payload.Solution.FileDownloadBaseURL, file)
+		unparsedUrl := fmt.Sprintf("%s%s", payload.Solution.FileDownloadBaseURL, file)
+		parsedUrl, err := netURL.ParseRequestURI(unparsedUrl)
+
+		if err != nil {
+			return err
+		}
+
+		url := parsedUrl.String()
+
 		req, err := client.NewRequest("GET", url, nil)
 		if err != nil {
 			return err

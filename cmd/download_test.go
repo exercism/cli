@@ -166,6 +166,10 @@ func fakeDownloadServer(requestor, teamSlug string) *httptest.Server {
 		fmt.Fprint(w, "this is file 2")
 	})
 
+	mux.HandleFunc("/special-char-filename#.txt", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "this is a special file")
+	})
+
 	mux.HandleFunc("/file-3.txt", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "")
 	})
@@ -201,6 +205,11 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
 			desc:     "a file in a subdirectory",
 			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "subdir", "file-2.txt"),
 			contents: "this is file 2",
+		},
+		{
+			desc:     "a file that requires URL encoding",
+			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "special-char-filename#.txt"),
+			contents: "this is a special file",
 		},
 	}
 
@@ -239,6 +248,7 @@ const payloadTemplate = `
 		"files": [
 			"/file-1.txt",
 			"/subdir/file-2.txt",
+			"/special-char-filename#.txt",
 			"/file-3.txt"
 		],
 		"iteration": {
