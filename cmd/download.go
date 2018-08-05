@@ -152,7 +152,10 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 	root = filepath.Join(root, solution.Track)
 
-	os.MkdirAll(root, os.FileMode(0755))
+	if err := os.MkdirAll(root, os.FileMode(0755)); err != nil {
+		return err
+	}
+
 	ws, err := workspace.New(root)
 	if err != nil {
 		return err
@@ -163,7 +166,9 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	os.MkdirAll(dir, os.FileMode(0755))
+	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
+		return err
+	}
 
 	err = solution.Write(dir)
 	if err != nil {
