@@ -150,21 +150,14 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	if !solution.IsRequester {
 		root = filepath.Join(root, "users", solution.Handle)
 	}
-	root = filepath.Join(root, solution.Track)
 
-	if err := os.MkdirAll(root, os.FileMode(0755)); err != nil {
-		return err
+	exercise := workspace.Exercise{
+		Root:  root,
+		Track: solution.Track,
+		Slug:  solution.Exercise,
 	}
 
-	ws, err := workspace.New(root)
-	if err != nil {
-		return err
-	}
-
-	dir, err := ws.SolutionPath(solution.Exercise, solution.ID)
-	if err != nil {
-		return err
-	}
+	dir := exercise.MetadataDir()
 
 	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
 		return err
