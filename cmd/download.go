@@ -67,13 +67,13 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return errors.New("need an --exercise name or a solution --uuid")
 	}
 
-	var slug string
+	var param string
 	if uuid == "" {
-		slug = "latest"
+		param = "latest"
 	} else {
-		slug = uuid
+		param = uuid
 	}
-	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), slug)
+	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), param)
 
 	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
 	if err != nil {
