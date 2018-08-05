@@ -125,25 +125,10 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		exerciseDir = dir
 	}
 
-	dirs, err := ws.Locate(exerciseDir)
+	solution, err := workspace.NewSolution(exerciseDir)
 	if err != nil {
 		return err
 	}
-
-	sx, err := workspace.NewSolutions(dirs)
-	if err != nil {
-		return err
-	}
-	if len(sx) > 1 {
-		msg := `
-
-    You are submitting files belonging to different solutions.
-    Please submit the files for one solution at a time.
-
-		`
-		return errors.New(msg)
-	}
-	solution := sx[0]
 
 	if !solution.IsRequester {
 		// TODO: add test
