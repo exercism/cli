@@ -59,11 +59,11 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	if err != nil {
 		return err
 	}
-	exercise, err := flags.GetString("exercise")
+	slug, err := flags.GetString("exercise")
 	if err != nil {
 		return err
 	}
-	if uuid == "" && exercise == "" {
+	if uuid == "" && slug == "" {
 		return errors.New("need an --exercise name or a solution --uuid")
 	}
 
@@ -97,7 +97,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 	if uuid == "" {
 		q := req.URL.Query()
-		q.Add("exercise_id", exercise)
+		q.Add("exercise_id", slug)
 		if track != "" {
 			q.Add("track_id", track)
 		}
