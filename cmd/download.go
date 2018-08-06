@@ -133,7 +133,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		}
 	}
 
-	solution := workspace.Solution{
+	metadata := workspace.Metadata{
 		AutoApprove: payload.Solution.Exercise.AutoApprove,
 		Track:       payload.Solution.Exercise.Track.ID,
 		Team:        payload.Solution.Team.Slug,
@@ -145,13 +145,13 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	dir := usrCfg.GetString("workspace")
-	if solution.Team != "" {
-		dir = filepath.Join(dir, "teams", solution.Team)
+	if metadata.Team != "" {
+		dir = filepath.Join(dir, "teams", metadata.Team)
 	}
-	if !solution.IsRequester {
-		dir = filepath.Join(dir, "users", solution.Handle)
+	if !metadata.IsRequester {
+		dir = filepath.Join(dir, "users", metadata.Handle)
 	}
-	dir = filepath.Join(dir, solution.Track)
+	dir = filepath.Join(dir, metadata.Track)
 
 	os.MkdirAll(dir, os.FileMode(0755))
 	ws, err := workspace.New(dir)
@@ -159,14 +159,14 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	dir, err = ws.SolutionPath(solution.Exercise, solution.ID)
+	dir, err = ws.SolutionPath(metadata.Exercise, metadata.ID)
 	if err != nil {
 		return err
 	}
 
 	os.MkdirAll(dir, os.FileMode(0755))
 
-	err = solution.Write(dir)
+	err = metadata.Write(dir)
 	if err != nil {
 		return err
 	}
@@ -204,10 +204,10 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
 		// TODO: handle --force flag to overwrite without asking.
 		relativePath := filepath.FromSlash(file)
-		dir := filepath.Join(solution.Dir, filepath.Dir(relativePath))
+		dir := filepath.Join(metadata.Dir, filepath.Dir(relativePath))
 		os.MkdirAll(dir, os.FileMode(0755))
 
-		f, err := os.Create(filepath.Join(solution.Dir, relativePath))
+		f, err := os.Create(filepath.Join(metadata.Dir, relativePath))
 		if err != nil {
 			return err
 		}
@@ -218,7 +218,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		}
 	}
 	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", solution.Dir)
+	fmt.Fprintf(Out, "%s\n", metadata.Dir)
 	return nil
 }
 

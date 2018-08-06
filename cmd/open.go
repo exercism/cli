@@ -43,28 +43,28 @@ the solution you want to see on the website.
 			return err
 		}
 
-		solutions, err := workspace.NewSolutions(paths)
+		collection, err := workspace.NewMetadataCollection(paths)
 		if err != nil {
 			return err
 		}
 
-		if len(solutions) == 0 {
+		if len(collection) == 0 {
 			return nil
 		}
 
-		if len(solutions) > 1 {
-			var mine []*workspace.Solution
-			for _, s := range solutions {
-				if s.IsRequester {
-					mine = append(mine, s)
+		if len(collection) > 1 {
+			var mine []*workspace.Metadata
+			for _, metadata := range collection {
+				if metadata.IsRequester {
+					mine = append(mine, metadata)
 				}
 			}
-			solutions = mine
+			collection = mine
 		}
 
 		selection := comms.NewSelection()
-		for _, solution := range solutions {
-			selection.Items = append(selection.Items, solution)
+		for _, metadata := range collection {
+			selection.Items = append(selection.Items, metadata)
 		}
 		for {
 			prompt := `
@@ -78,9 +78,9 @@ Type the number of the one you want to select.
 				fmt.Println(err)
 				continue
 			}
-			solution, ok := option.(*workspace.Solution)
+			metadata, ok := option.(*workspace.Metadata)
 			if ok {
-				browser.Open(solution.URL)
+				browser.Open(metadata.URL)
 				return nil
 			}
 			if err != nil {

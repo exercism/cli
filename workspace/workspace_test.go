@@ -64,7 +64,7 @@ func TestWorkspaceExercises(t *testing.T) {
 		assert.NoError(t, err)
 
 		if path != a2 {
-			err = ioutil.WriteFile(filepath.Join(path, solutionFilename), []byte{}, os.FileMode(0600))
+			err = ioutil.WriteFile(filepath.Join(path, metadataFilename), []byte{}, os.FileMode(0600))
 			assert.NoError(t, err)
 		}
 	}

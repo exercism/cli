@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-var errMissingMetadata = errors.New("no solution metadata file found")
+var errMissingMetadata = errors.New("no exercise metadata file found")
 
 // IsMissingMetadata verifies the type of error.
 func IsMissingMetadata(err error) bool {
@@ -200,14 +200,14 @@ func (ws Workspace) SolutionPath(exercise, solutionID string) (string, error) {
 
 // IsSolutionPath checks whether the given path contains the solution with the given ID.
 func IsSolutionPath(solutionID, path string) (bool, error) {
-	s, err := NewSolution(path)
+	metadata, err := NewMetadata(path)
 	if os.IsNotExist(err) {
 		return false, nil
 	}
 	if err != nil {
 		return false, err
 	}
-	return s.ID == solutionID, nil
+	return metadata.ID == solutionID, nil
 }
 
 // ResolveSolutionPath determines the path for the given exercise solution.
@@ -259,7 +259,7 @@ func (ws Workspace) SolutionDir(s string) (string, error) {
 		if _, err := os.Lstat(path); os.IsNotExist(err) {
 			return "", err
 		}
-		if _, err := os.Lstat(filepath.Join(path, solutionFilename)); err == nil {
+		if _, err := os.Lstat(filepath.Join(path, metadataFilename)); err == nil {
 			return path, nil
 		}
 		path = filepath.Dir(path)

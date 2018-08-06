@@ -144,13 +144,13 @@ func TestDownload(t *testing.T) {
 
 		path := filepath.Join(targetDir, "bogus-track", "bogus-exercise", ".solution.json")
 		b, err := ioutil.ReadFile(path)
-		var s workspace.Solution
-		err = json.Unmarshal(b, &s)
+		var metadata workspace.Metadata
+		err = json.Unmarshal(b, &metadata)
 		assert.NoError(t, err)
 
-		assert.Equal(t, "bogus-track", s.Track)
-		assert.Equal(t, "bogus-exercise", s.Exercise)
-		assert.Equal(t, tc.requester, s.IsRequester)
+		assert.Equal(t, "bogus-track", metadata.Track)
+		assert.Equal(t, "bogus-exercise", metadata.Exercise)
+		assert.Equal(t, tc.requester, metadata.IsRequester)
 	}
 }
 
