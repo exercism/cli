@@ -60,21 +60,19 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	if err != nil {
 		return err
 	}
-	exercise, err := flags.GetString("exercise")
+	slug, err := flags.GetString("exercise")
 	if err != nil {
 		return err
 	}
-	if uuid == "" && exercise == "" {
+	if uuid == "" && slug == "" {
 		return errors.New("need an --exercise name or a solution --uuid")
 	}
 
-	var slug string
-	if uuid == "" {
-		slug = "latest"
-	} else {
-		slug = uuid
+	param := "latest"
+	if param == "" {
+		param = uuid
 	}
-	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), slug)
+	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), param)
 
 	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
 	if err != nil {
@@ -98,7 +96,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 	if uuid == "" {
 		q := req.URL.Query()
-		q.Add("exercise_id", exercise)
+		q.Add("exercise_id", slug)
 		if track != "" {
 			q.Add("track_id", track)
 		}
@@ -144,27 +142,25 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		IsRequester: payload.Solution.User.IsRequester,
 	}
 
-	dir := usrCfg.GetString("workspace")
+	root := usrCfg.GetString("workspace")
 	if solution.Team != "" {
-		dir = filepath.Join(dir, "teams", solution.Team)
+		root = filepath.Join(root, "teams", solution.Team)
 	}
 	if !solution.IsRequester {
-		dir = filepath.Join(dir, "users", solution.Handle)
+		root = filepath.Join(root, "users", solution.Handle)
 	}
-	dir = filepath.Join(dir, solution.Track)
 
-	os.MkdirAll(dir, os.FileMode(0755))
-	ws, err := workspace.New(dir)
-	if err != nil {
+	exercise := workspace.Exercise{
+		Root:  root,
+		Track: solution.Track,
+		Slug:  solution.Exercise,
+	}
+
+	dir := exercise.MetadataDir()
+
+	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
 		return err
 	}
-
-	dir, err = ws.SolutionPath(solution.Exercise, solution.ID)
-	if err != nil {
-		return err
-	}
-
-	os.MkdirAll(dir, os.FileMode(0755))
 
 	err = solution.Write(dir)
 	if err != nil {

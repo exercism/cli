@@ -30,6 +30,12 @@ func (e Exercise) MetadataFilepath() string {
 	return filepath.Join(e.Filepath(), solutionFilename)
 }
 
+// MetadataDir returns the directory that the exercise metadata lives in.
+// For now this is the exercise directory.
+func (e Exercise) MetadataDir() string {
+	return e.Filepath()
+}
+
 // HasMetadata checks for the presence of an exercise metadata file.
 // If there is no such file, this may be a legacy exercise.
 // It could also be an unrelated directory.
