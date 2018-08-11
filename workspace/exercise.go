@@ -8,9 +8,10 @@ import (
 
 // Exercise is an implementation of a problem in a track.
 type Exercise struct {
-	Root  string
-	Track string
-	Slug  string
+	Root      string
+	Track     string
+	Slug      string
+	Documents []Document
 }
 
 // NewExerciseFromDir constructs an exercise given the exercise directory.
