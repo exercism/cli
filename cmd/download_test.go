@@ -170,6 +170,10 @@ func fakeDownloadServer(requestor, teamSlug string) *httptest.Server {
 		fmt.Fprint(w, "this is a special file")
 	})
 
+	mux.HandleFunc("/with-leading-slash.txt", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "this has a slash")
+	})
+
 	mux.HandleFunc("/file-3.txt", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "")
 	})
@@ -211,6 +215,11 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
 			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "special-char-filename#.txt"),
 			contents: "this is a special file",
 		},
+		{
+			desc:     "a file that has a leading slash",
+			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "with-leading-slash.txt"),
+			contents: "this has a slash",
+		},
 	}
 
 	for _, file := range expectedFiles {
@@ -246,10 +255,11 @@ const payloadTemplate = `
 		},
 		"file_download_base_url": "%s",
 		"files": [
-			"/file-1.txt",
-			"/subdir/file-2.txt",
-			"/special-char-filename#.txt",
-			"/file-3.txt"
+			"file-1.txt",
+			"subdir/file-2.txt",
+			"special-char-filename#.txt",
+			"/with-leading-slash.txt",
+			"file-3.txt"
 		],
 		"iteration": {
 			"submitted_at": "2017-08-21t10:11:12.130z"
