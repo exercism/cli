@@ -168,14 +168,14 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	for _, file := range payload.Solution.Files {
-		unparsedUrl := fmt.Sprintf("%s%s", payload.Solution.FileDownloadBaseURL, file)
-		parsedUrl, err := netURL.ParseRequestURI(unparsedUrl)
+		unparsedURL := fmt.Sprintf("%s%s", payload.Solution.FileDownloadBaseURL, file)
+		parsedURL, err := netURL.ParseRequestURI(unparsedURL)
 
 		if err != nil {
 			return err
 		}
 
-		url := parsedUrl.String()
+		url := parsedURL.String()
 
 		req, err := client.NewRequest("GET", url, nil)
 		if err != nil {
