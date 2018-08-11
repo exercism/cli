@@ -180,7 +180,7 @@ func TestSubmitFiles(t *testing.T) {
 	assert.Equal(t, 3, len(submittedFiles))
 
 	assert.Equal(t, "This is file 1.", submittedFiles["file-1.txt"])
-	assert.Equal(t, "This is file 2.", submittedFiles[filepath.Join("subdir", "file-2.txt")])
+	assert.Equal(t, "This is file 2.", submittedFiles["subdir/file-2.txt"])
 	assert.Equal(t, "This is the readme.", submittedFiles["README.md"])
 }
 
@@ -278,7 +278,7 @@ func TestSubmitFilesForTeamExercise(t *testing.T) {
 	assert.Equal(t, 2, len(submittedFiles))
 
 	assert.Equal(t, "This is file 1.", submittedFiles["file-1.txt"])
-	assert.Equal(t, "This is file 2.", submittedFiles[filepath.Join("subdir", "file-2.txt")])
+	assert.Equal(t, "This is file 2.", submittedFiles["subdir/file-2.txt"])
 }
 
 func TestSubmitOnlyEmptyFile(t *testing.T) {
