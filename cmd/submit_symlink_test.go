@@ -64,5 +64,5 @@ func TestSubmitFilesInSymlinkedPath(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, 1, len(submittedFiles))
-	assert.Equal(t, "This is a file.", submittedFiles["/file.txt"])
+	assert.Equal(t, "This is a file.", submittedFiles["file.txt"])
 }
