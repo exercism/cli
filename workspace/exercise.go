@@ -13,6 +13,15 @@ type Exercise struct {
 	Slug  string
 }
 
+// NewExerciseFromDir constructs an exercise given the exercise directory.
+func NewExerciseFromDir(dir string) Exercise {
+	slug := filepath.Base(dir)
+	dir = filepath.Dir(dir)
+	track := filepath.Base(dir)
+	root := filepath.Dir(dir)
+	return Exercise{Root: root, Track: track, Slug: slug}
+}
+
 // Path is the normalized relative path.
 // It always has forward slashes, regardless
 // of the operating system.

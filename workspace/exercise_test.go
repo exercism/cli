@@ -33,3 +33,12 @@ func TestHasMetadata(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, ok)
 }
+
+func TestNewFromDir(t *testing.T) {
+	dir := filepath.Join("something", "another", "whatever", "the-track", "the-exercise")
+
+	exercise := NewExerciseFromDir(dir)
+	assert.Equal(t, filepath.Join("something", "another", "whatever"), exercise.Root)
+	assert.Equal(t, "the-track", exercise.Track)
+	assert.Equal(t, "the-exercise", exercise.Slug)
+}
