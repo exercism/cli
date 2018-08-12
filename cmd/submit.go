@@ -185,7 +185,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 		dirname := fmt.Sprintf("%s%s%s", string(os.PathSeparator), solution.Exercise, string(os.PathSeparator))
 		pieces := strings.Split(path, dirname)
-		filename := fmt.Sprintf("%s%s", string(os.PathSeparator), pieces[len(pieces)-1])
+		filename := pieces[len(pieces)-1]
 
 		part, err := writer.CreateFormFile("files[]", filename)
 		if err != nil {

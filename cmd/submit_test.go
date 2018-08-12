@@ -179,9 +179,9 @@ func TestSubmitFiles(t *testing.T) {
 
 	assert.Equal(t, 3, len(submittedFiles))
 
-	assert.Equal(t, "This is file 1.", submittedFiles[string(os.PathSeparator)+"file-1.txt"])
-	assert.Equal(t, "This is file 2.", submittedFiles[string(os.PathSeparator)+filepath.Join("subdir", "file-2.txt")])
-	assert.Equal(t, "This is the readme.", submittedFiles[string(os.PathSeparator)+"README.md"])
+	assert.Equal(t, "This is file 1.", submittedFiles["file-1.txt"])
+	assert.Equal(t, "This is file 2.", submittedFiles[filepath.Join("subdir", "file-2.txt")])
+	assert.Equal(t, "This is the readme.", submittedFiles["README.md"])
 }
 
 func TestSubmitWithEmptyFile(t *testing.T) {
@@ -227,7 +227,7 @@ func TestSubmitWithEmptyFile(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, 1, len(submittedFiles))
-	assert.Equal(t, "This is file 2.", submittedFiles[string(os.PathSeparator)+"file-2.txt"])
+	assert.Equal(t, "This is file 2.", submittedFiles["file-2.txt"])
 }
 
 func TestSubmitFilesForTeamExercise(t *testing.T) {
@@ -277,8 +277,8 @@ func TestSubmitFilesForTeamExercise(t *testing.T) {
 
 	assert.Equal(t, 2, len(submittedFiles))
 
-	assert.Equal(t, "This is file 1.", submittedFiles[string(os.PathSeparator)+"file-1.txt"])
-	assert.Equal(t, "This is file 2.", submittedFiles[string(os.PathSeparator)+filepath.Join("subdir", "file-2.txt")])
+	assert.Equal(t, "This is file 1.", submittedFiles["file-1.txt"])
+	assert.Equal(t, "This is file 2.", submittedFiles[filepath.Join("subdir", "file-2.txt")])
 }
 
 func TestSubmitOnlyEmptyFile(t *testing.T) {
@@ -420,7 +420,7 @@ func TestSubmitRelativePath(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, 1, len(submittedFiles))
-	assert.Equal(t, "This is a file.", submittedFiles[string(os.PathSeparator)+"file.txt"])
+	assert.Equal(t, "This is a file.", submittedFiles["file.txt"])
 }
 
 func writeFakeSolution(t *testing.T, dir, trackID, exerciseSlug string) {
