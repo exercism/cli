@@ -61,7 +61,8 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 	// explain how to set the token.
 	if flags.NFlag() == 0 && cfg.GetString("token") == "" {
 		tokenURL := config.SettingsURL(cfg.GetString("apibaseurl"))
-		return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
+		fmt.Fprintf(Err, "There is no token configured. Find your token on %s, and call this command again with --token=<your-token>\n", tokenURL)
+		os.Exit(1)
 	}
 
 	// Determine the base API URL.
@@ -111,7 +112,8 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 
 	// If we don't have a token then explain how to set it and bail.
 	if token == "" {
-		return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
+		fmt.Fprintf(Err, "There is no token configured. Find your token on %s, and call this command again with --token=<your-token>\n", tokenURL)
+		os.Exit(1)
 	}
 
 	// Verify that the token is valid.
@@ -125,7 +127,8 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 			return err
 		}
 		if !ok {
-			return fmt.Errorf("The token '%s' is invalid. Find your token on %s.", token, tokenURL)
+			fmt.Fprintf(Err, "The token '%s' is invalid. Find your token on %s.\n", token, tokenURL)
+			os.Exit(1)
 		}
 	}
 
