@@ -1,6 +1,8 @@
 package workspace
 
 import (
+	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -8,7 +10,13 @@ import (
 )
 
 func TestNormalizedDocumentPath(t *testing.T) {
-	root := filepath.Join("the", "root", "path", "the-track", "the-exercise")
+	root, err := ioutil.TempDir("", "docpath")
+	assert.NoError(t, err)
+	defer os.RemoveAll(root)
+
+	err = os.MkdirAll(filepath.Join(root, "subdirectory"), os.FileMode(0755))
+	assert.NoError(t, err)
+
 	testCases := []struct {
 		filepath string
 		path     string
@@ -24,7 +32,12 @@ func TestNormalizedDocumentPath(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		doc := NewDocument(root, tc.filepath)
-		assert.Equal(t, tc.path, doc.Path())
+		err = ioutil.WriteFile(tc.filepath, []byte("a file"), os.FileMode(0600))
+		assert.NoError(t, err)
+
+		doc, err := NewDocument(root, tc.filepath)
+		assert.NoError(t, err)
+
+		assert.Equal(t, doc.Path(), tc.path)
 	}
 }

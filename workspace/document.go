@@ -1,31 +1,34 @@
 package workspace
 
-import (
-	"os"
-	"path/filepath"
-	"strings"
-)
+import "path/filepath"
 
 // Document is a file in a directory.
 type Document struct {
-	Root     string
-	Filepath string
+	Root         string
+	RelativePath string
 }
 
-// NewDocument creates a document from a filepath.
+// NewDocument creates a document from a relative filepath.
 // The root is typically the root of the exercise, and
 // path is the relative path to the file within the root directory.
-func NewDocument(root, path string) Document {
-	return Document{
-		Root:     root,
-		Filepath: path,
+func NewDocument(root, path string) (Document, error) {
+	path, err := filepath.Rel(root, path)
+	if err != nil {
+		return Document{}, err
 	}
+	return Document{
+		Root:         root,
+		RelativePath: path,
+	}, nil
+}
+
+// Filepath is the absolute path to the document on the filesystem.
+func (doc Document) Filepath() string {
+	return filepath.Join(doc.Root, doc.RelativePath)
 }
 
 // Path is the normalized path.
 // It uses forward slashes regardless of the operating system.
 func (doc Document) Path() string {
-	path := strings.Replace(doc.Filepath, doc.Root, "", 1)
-	path = strings.TrimLeft(path, string(os.PathSeparator))
-	return filepath.ToSlash(path)
+	return filepath.ToSlash(doc.RelativePath)
 }

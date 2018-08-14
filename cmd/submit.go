@@ -162,7 +162,11 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 			fmt.Fprintf(Err, msg, file)
 			continue
 		}
-		exercise.Documents = append(exercise.Documents, workspace.NewDocument(exercise.Filepath(), file))
+		doc, err := workspace.NewDocument(exercise.Filepath(), file)
+		if err != nil {
+			return err
+		}
+		exercise.Documents = append(exercise.Documents, doc)
 	}
 
 	if len(exercise.Documents) == 0 {
@@ -178,7 +182,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	writer := multipart.NewWriter(body)
 
 	for _, doc := range exercise.Documents {
-		file, err := os.Open(doc.Filepath)
+		file, err := os.Open(doc.Filepath())
 		if err != nil {
 			return err
 		}
