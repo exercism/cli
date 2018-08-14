@@ -59,8 +59,3 @@ func (e Exercise) HasMetadata() (bool, error) {
 	}
 	return false, err
 }
-
-// NewDocument creates a document relative to the exercise.
-func (e Exercise) NewDocument(file string) Document {
-	return NewDocument(e.Filepath(), file)
-}

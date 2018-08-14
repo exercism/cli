@@ -162,7 +162,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 			fmt.Fprintf(Err, msg, file)
 			continue
 		}
-		exercise.Documents = append(exercise.Documents, exercise.NewDocument(file))
+		exercise.Documents = append(exercise.Documents, workspace.NewDocument(exercise.Filepath(), file))
 	}
 
 	if len(exercise.Documents) == 0 {
