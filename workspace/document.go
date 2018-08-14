@@ -13,10 +13,12 @@ type Document struct {
 }
 
 // NewDocument creates a document from a filepath.
-func NewDocument(root, file string) Document {
+// The root is typically the root of the exercise, and
+// path is the relative path to the file within the root directory.
+func NewDocument(root, path string) Document {
 	return Document{
 		Root:     root,
-		Filepath: file,
+		Filepath: path,
 	}
 }
 
