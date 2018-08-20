@@ -8,9 +8,9 @@ type Document struct {
 	RelativePath string
 }
 
-// NewDocument creates a document from a relative filepath.
+// NewDocument creates a document from the filepath.
 // The root is typically the root of the exercise, and
-// path is the relative path to the file within the root directory.
+// path is the absolute path to the file.
 func NewDocument(root, path string) (Document, error) {
 	path, err := filepath.Rel(root, path)
 	if err != nil {
