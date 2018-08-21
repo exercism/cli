@@ -8,9 +8,19 @@ import (
 
 // Exercise is an implementation of a problem in a track.
 type Exercise struct {
-	Root  string
-	Track string
-	Slug  string
+	Root      string
+	Track     string
+	Slug      string
+	Documents []Document
+}
+
+// NewExerciseFromDir constructs an exercise given the exercise directory.
+func NewExerciseFromDir(dir string) Exercise {
+	slug := filepath.Base(dir)
+	dir = filepath.Dir(dir)
+	track := filepath.Base(dir)
+	root := filepath.Dir(dir)
+	return Exercise{Root: root, Track: track, Slug: slug}
 }
 
 // Path is the normalized relative path.

@@ -8,7 +8,6 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
@@ -125,6 +124,8 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		exerciseDir = dir
 	}
 
+	exercise := workspace.NewExerciseFromDir(exerciseDir)
+
 	solution, err := workspace.NewSolution(exerciseDir)
 	if err != nil {
 		return err
@@ -143,7 +144,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return fmt.Errorf(msg, BinaryName, solution.Exercise, solution.Track)
 	}
 
-	paths := make([]string, 0, len(args))
+	exercise.Documents = make([]workspace.Document, 0, len(args))
 	for _, file := range args {
 		// Don't submit empty files
 		info, err := os.Stat(file)
@@ -161,10 +162,14 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 			fmt.Fprintf(Err, msg, file)
 			continue
 		}
-		paths = append(paths, file)
+		doc, err := workspace.NewDocument(exercise.Filepath(), file)
+		if err != nil {
+			return err
+		}
+		exercise.Documents = append(exercise.Documents, doc)
 	}
 
-	if len(paths) == 0 {
+	if len(exercise.Documents) == 0 {
 		msg := `
 
     No files found to submit.
@@ -176,18 +181,14 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
-	for _, path := range paths {
-		file, err := os.Open(path)
+	for _, doc := range exercise.Documents {
+		file, err := os.Open(doc.Filepath())
 		if err != nil {
 			return err
 		}
 		defer file.Close()
 
-		dirname := fmt.Sprintf("%s%s%s", string(os.PathSeparator), solution.Exercise, string(os.PathSeparator))
-		pieces := strings.Split(path, dirname)
-		filename := pieces[len(pieces)-1]
-
-		part, err := writer.CreateFormFile("files[]", filename)
+		part, err := writer.CreateFormFile("files[]", doc.Path())
 		if err != nil {
 			return err
 		}
