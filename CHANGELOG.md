@@ -7,6 +7,10 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * **Your contribution here**
 
+## v3.0.7 (2018-08-21)
+* [#705](https://github.com/exercism/cli/pull/705) Fix confusion about path and filepath - [@kytrinyx]
+* [#650](https://github.com/exercism/cli/pull/650) Fix encoding problem in filenames - [@williandrade]
+
 ## v3.0.6 (2018-07-17)
 * [#652](https://github.com/exercism/cli/pull/652) Add support for teams feature - [@kytrinyx]
 * [#683](https://github.com/exercism/cli/pull/683) Fix typo in welcome message - [@glebedel]
@@ -421,4 +425,5 @@ All changes by [@msgehard]
 [@rprouse]: https://github.com/rprouse
 [@simonjefford]: https://github.com/simonjefford
 [@srt32]: https://github.com/srt32
+[@williandrade]: https://github.com/williandrade
 [@zabawaba99]: https://github.com/zabawaba99
