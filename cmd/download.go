@@ -69,7 +69,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	param := "latest"
-	if param == "" {
+	if uuid != "" {
 		param = uuid
 	}
 	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), param)
