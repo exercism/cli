@@ -7,6 +7,9 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * **Your contribution here**
 
+## v3.0.8 (2018-08-22)
+* [#713](https://github.com/exercism/cli/pull/713) Fix broken support for uuid flag on download command - [@nywilken]
+
 ## v3.0.7 (2018-08-21)
 * [#705](https://github.com/exercism/cli/pull/705) Fix confusion about path and filepath - [@kytrinyx]
 * [#650](https://github.com/exercism/cli/pull/650) Fix encoding problem in filenames - [@williandrade]
