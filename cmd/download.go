@@ -64,12 +64,22 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	if err != nil {
 		return err
 	}
-	if uuid == "" && slug == "" {
+	if uuid != "" && slug != "" || uuid == slug {
 		return errors.New("need an --exercise name or a solution --uuid")
 	}
 
+	track, err := flags.GetString("track")
+	if err != nil {
+		return err
+	}
+
+	team, err := flags.GetString("team")
+	if err != nil {
+		return err
+	}
+
 	param := "latest"
-	if param == "" {
+	if uuid != "" {
 		param = uuid
 	}
 	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), param)
@@ -80,16 +90,6 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	req, err := client.NewRequest("GET", url, nil)
-	if err != nil {
-		return err
-	}
-
-	track, err := flags.GetString("track")
-	if err != nil {
-		return err
-	}
-
-	team, err := flags.GetString("team")
 	if err != nil {
 		return err
 	}
