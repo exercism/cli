@@ -14,8 +14,8 @@ var (
 	// It's overridden from the root command so that we can set the version.
 	UserAgent = "github.com/exercism/cli"
 
-	// DefaultHTTPClient configures a timeout to use by default.
-	DefaultHTTPClient = &http.Client{Timeout: 10 * time.Second}
+	// HTTPClient configures a timeout to use by default.
+	HTTPClient = &http.Client{Timeout: 10 * time.Second}
 )
 
 // Client is an http client that is configured for Exercism.
@@ -29,7 +29,7 @@ type Client struct {
 // NewClient returns an Exercism API client.
 func NewClient(token, baseURL string) (*Client, error) {
 	return &Client{
-		Client:     DefaultHTTPClient,
+		Client:     HTTPClient,
 		Token:      token,
 		APIBaseURL: baseURL,
 	}, nil
@@ -38,7 +38,7 @@ func NewClient(token, baseURL string) (*Client, error) {
 // NewRequest returns an http.Request with information for the Exercism API.
 func (c *Client) NewRequest(method, url string, body io.Reader) (*http.Request, error) {
 	if c.Client == nil {
-		c.Client = DefaultHTTPClient
+		c.Client = HTTPClient
 	}
 
 	req, err := http.NewRequest(method, url, body)
