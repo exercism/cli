@@ -7,6 +7,7 @@ import (
 	"runtime"
 
 	"github.com/exercism/cli/api"
+	"github.com/exercism/cli/cli"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/debug"
 	"github.com/spf13/cobra"
@@ -39,6 +40,10 @@ Download exercises and submit your solutions.`,
 		if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
 			debug.Verbose = verbose
 		}
+		if timeout, _ := cmd.Flags().GetInt("timeout"); timeout > 0 {
+			cli.TimeoutInSeconds = timeout
+			api.TimeoutInSeconds = timeout
+		}
 	},
 }
 
@@ -57,4 +62,5 @@ func init() {
 	In = os.Stdin
 	api.UserAgent = fmt.Sprintf("github.com/exercism/cli v%s (%s/%s)", Version, runtime.GOOS, runtime.GOARCH)
 	RootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
+	RootCmd.PersistentFlags().IntP("timeout", "", 0, "override the default HTTP timeout (seconds)")
 }
