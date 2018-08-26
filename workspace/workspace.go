@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 )
 
@@ -15,8 +14,6 @@ var errMissingMetadata = errors.New("no solution metadata file found")
 func IsMissingMetadata(err error) bool {
 	return err == errMissingMetadata
 }
-
-var rgxSerialSuffix = regexp.MustCompile(`-\d*$`)
 
 // Workspace represents a user's Exercism workspace.
 // It may contain a user's own exercises, and other people's
