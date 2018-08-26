@@ -43,8 +43,10 @@ var (
 )
 
 var (
+	// TimeoutInSeconds is the timeout the default HTTP client will use.
+	TimeoutInSeconds = 10
 	// HTTPClient is the client used to make HTTP calls in the cli package.
-	HTTPClient = &http.Client{Timeout: 10 * time.Second}
+	HTTPClient = &http.Client{Timeout: time.Duration(TimeoutInSeconds) * time.Second}
 	// ReleaseURL is the endpoint that provides information about cli releases.
 	ReleaseURL = "https://api.github.com/repos/exercism/cli/releases"
 )

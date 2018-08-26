@@ -14,8 +14,10 @@ var (
 	// It's overridden from the root command so that we can set the version.
 	UserAgent = "github.com/exercism/cli"
 
-	// HTTPClient configures a timeout to use by default.
-	HTTPClient = &http.Client{Timeout: 10 * time.Second}
+	// TimeoutInSeconds is the timeout the default HTTP client will use.
+	TimeoutInSeconds = 10
+	// HTTPClient is the client used to make HTTP calls in the cli package.
+	HTTPClient = &http.Client{Timeout: time.Duration(TimeoutInSeconds) * time.Second}
 )
 
 // Client is an http client that is configured for Exercism.
