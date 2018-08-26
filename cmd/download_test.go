@@ -170,6 +170,13 @@ func fakeDownloadServer(requestor, teamSlug string) *httptest.Server {
 		fmt.Fprint(w, "this is a special file")
 	})
 
+	mux.HandleFunc("/\\with-leading-backslash.txt", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "with backslash in name")
+	})
+	mux.HandleFunc("/\\with\\backslashes\\in\\path.txt", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "with backslash in path")
+	})
+
 	mux.HandleFunc("/with-leading-slash.txt", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "this has a slash")
 	})
@@ -220,6 +227,16 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
 			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "with-leading-slash.txt"),
 			contents: "this has a slash",
 		},
+		{
+			desc:     "a file with a leading backslash",
+			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "with-leading-backslash.txt"),
+			contents: "with backslash in name",
+		},
+		{
+			desc:     "a file with backslashes in path",
+			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "with", "backslashes", "in", "path.txt"),
+			contents: "with backslash in path",
+		},
 	}
 
 	for _, file := range expectedFiles {
@@ -259,6 +276,8 @@ const payloadTemplate = `
 			"subdir/file-2.txt",
 			"special-char-filename#.txt",
 			"/with-leading-slash.txt",
+			"\\with-leading-backslash.txt",
+			"\\with\\backslashes\\in\\path.txt",
 			"file-3.txt"
 		],
 		"iteration": {

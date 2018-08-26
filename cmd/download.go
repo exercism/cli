@@ -199,6 +199,10 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
 		// TODO: handle --force flag to overwrite without asking.
+
+		// Rewrite paths submitted with an older, buggy client where the Windows path is being treated as part of the filename.
+		file = strings.Replace(file, "\\", "/", -1)
+
 		relativePath := filepath.FromSlash(file)
 		dir := filepath.Join(solution.Dir, filepath.Dir(relativePath))
 		os.MkdirAll(dir, os.FileMode(0755))
