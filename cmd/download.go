@@ -9,6 +9,7 @@ import (
 	netURL "net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/exercism/cli/api"
@@ -199,6 +200,15 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
 		// TODO: handle --force flag to overwrite without asking.
+
+		// Work around a path bug due to an early design decision (later reversed) to
+		// allow numeric suffixes for exercise directories, allowing people to have
+		// multiple parallel versions of an exercise.
+		pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, solution.Exercise)
+		rgxNumericSuffix := regexp.MustCompile(pattern)
+		if rgxNumericSuffix.MatchString(file) {
+			file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
+		}
 
 		// Rewrite paths submitted with an older, buggy client where the Windows path is being treated as part of the filename.
 		file = strings.Replace(file, "\\", "/", -1)
