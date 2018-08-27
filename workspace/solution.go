@@ -11,6 +11,7 @@ import (
 )
 
 const solutionFilename = "solution.json"
+const legacySolutionFilename = ".solution.json"
 const ignoreSubdir = ".exercism"
 
 // Solution contains metadata about a user's solution.
@@ -96,6 +97,25 @@ func createIgnoreSubdir(path string) error {
 		if err := os.Mkdir(path, os.FileMode(0755)); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func migrateLegacySolutionFile(legacyMetadataPath string, metadataPath string) error {
+	if _, err := os.Lstat(legacyMetadataPath); err != nil {
+		return err
+	}
+	if err := createIgnoreSubdir(filepath.Dir(legacyMetadataPath)); err != nil {
+		return err
+	}
+	if _, err := os.Lstat(metadataPath); err != nil {
+		if err := os.Rename(legacyMetadataPath, metadataPath); err != nil {
+			return err
+		}
+		fmt.Fprintf(os.Stderr, "\nMigrated solution metadata to %s\n", metadataPath)
+	} else {
+		// TODO: decide how to handle case where both legacy and modern metadata files exist
+		fmt.Fprintf(os.Stderr, "\nAttempted to migrate solution metadata to %s but file already exists\n", metadataPath)
 	}
 	return nil
 }

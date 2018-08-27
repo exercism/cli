@@ -113,9 +113,22 @@ func (ws Workspace) SolutionDir(s string) (string, error) {
 		if _, err := os.Lstat(path); os.IsNotExist(err) {
 			return "", err
 		}
-		if _, err := os.Lstat(filepath.Join(path, ignoreSubdirMetadataFilepath())); err == nil {
+		if err := checkMetadataFile(path); err == nil {
 			return path, nil
 		}
 		path = filepath.Dir(path)
 	}
+}
+
+func checkMetadataFile(path string) error {
+	metadataPath := filepath.Join(path, ignoreSubdirMetadataFilepath())
+	legacyMetadataPath := filepath.Join(path, legacySolutionFilename)
+
+	var err error
+	if _, err = os.Lstat(metadataPath); err == nil {
+		return nil
+	} else if _, err2 := os.Lstat(legacyMetadataPath); err2 == nil {
+		return migrateLegacySolutionFile(legacyMetadataPath, metadataPath)
+	}
+	return err
 }
