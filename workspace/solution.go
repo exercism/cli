@@ -8,11 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/exercism/cli/visibility"
 )
 
-const solutionFilename = ".solution.json"
+const solutionFilename = "solution.json"
+const ignoreSubdir = ".exercism"
 
 // Solution contains metadata about a user's solution.
 type Solution struct {
@@ -30,7 +29,7 @@ type Solution struct {
 
 // NewSolution reads solution metadata from a file in the given directory.
 func NewSolution(dir string) (*Solution, error) {
-	path := filepath.Join(dir, solutionFilename)
+	path := filepath.Join(dir, ignoreSubdirMetadataFilepath())
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return &Solution{}, err
@@ -67,17 +66,15 @@ func (s *Solution) Write(dir string) error {
 	if err != nil {
 		return err
 	}
-
-	path := filepath.Join(dir, solutionFilename)
-
-	// Hack because ioutil.WriteFile fails on hidden files
-	visibility.ShowFile(path)
-
-	if err := ioutil.WriteFile(path, b, os.FileMode(0600)); err != nil {
+	if err = createIgnoreSubdir(dir); err != nil {
+		return err
+	}
+	exercise := NewExerciseFromDir(dir)
+	if err = ioutil.WriteFile(exercise.MetadataFilepath(), b, os.FileMode(0600)); err != nil {
 		return err
 	}
 	s.Dir = dir
-	return visibility.HideFile(path)
+	return nil
 }
 
 // PathToParent is the relative path from the workspace to the parent dir.
@@ -87,4 +84,18 @@ func (s *Solution) PathToParent() string {
 		dir = filepath.Join("users")
 	}
 	return filepath.Join(dir, s.Track)
+}
+
+func ignoreSubdirMetadataFilepath() string {
+	return filepath.Join(ignoreSubdir, solutionFilename)
+}
+
+func createIgnoreSubdir(path string) error {
+	path = filepath.Join(path, ignoreSubdir)
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		if err := os.Mkdir(path, os.FileMode(0755)); err != nil {
+			return err
+		}
+	}
+	return nil
 }

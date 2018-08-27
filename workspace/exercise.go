@@ -37,7 +37,7 @@ func (e Exercise) Filepath() string {
 
 // MetadataFilepath is the absolute path to the exercise metadata.
 func (e Exercise) MetadataFilepath() string {
-	return filepath.Join(e.Filepath(), solutionFilename)
+	return filepath.Join(e.Filepath(), ignoreSubdirMetadataFilepath())
 }
 
 // MetadataDir returns the directory that the exercise metadata lives in.
