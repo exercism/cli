@@ -42,3 +42,19 @@ func TestNewFromDir(t *testing.T) {
 	assert.Equal(t, "the-track", exercise.Track)
 	assert.Equal(t, "the-exercise", exercise.Slug)
 }
+
+func TestMigrateLegacyMetadataFile(t *testing.T) {
+	ws, err := ioutil.TempDir("", "fake-workspace")
+	defer os.RemoveAll(ws)
+	assert.NoError(t, err)
+
+	exerciseLegacy := Exercise{Root: ws, Track: "bogus-track", Slug: "legacy"}
+	exerciseModern := Exercise{Root: ws, Track: "bogus-track", Slug: "modern"}
+
+	err = os.MkdirAll(filepath.Dir(exerciseLegacy.LegacyMetadataFilepath()), os.FileMode(0755))
+	assert.NoError(t, err)
+	err = os.MkdirAll(filepath.Dir(exerciseModern.MetadataFilepath()), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	// TODO
+}

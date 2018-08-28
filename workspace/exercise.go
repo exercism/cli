@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -63,4 +64,29 @@ func (e Exercise) HasMetadata() (bool, error) {
 		return true, nil
 	}
 	return false, err
+}
+
+// MigrateLegacyMetadataFile migrates a legacy metadata to the modern location.
+// This is a noop if the metadata file isn't legacy.
+// If both legacy and modern metadata files exist, the legacy file will be deleted.
+func (e Exercise) MigrateLegacyMetadataFile() error {
+	legacyMetadataFilepath := e.LegacyMetadataFilepath()
+	metadataFilepath := e.MetadataFilepath()
+
+	if _, err := os.Lstat(legacyMetadataFilepath); err != nil {
+		return nil
+	}
+	if err := createIgnoreSubdir(filepath.Dir(legacyMetadataFilepath)); err != nil {
+		return err
+	}
+	if _, err := os.Lstat(metadataFilepath); err != nil {
+		if err := os.Rename(legacyMetadataFilepath, metadataFilepath); err != nil {
+			return err
+		}
+		fmt.Fprintf(os.Stderr, "\nMigrated solution metadata to %s\n", metadataFilepath)
+	} else {
+		// TODO: decide how to handle case where both legacy and modern metadata files exist
+		fmt.Fprintf(os.Stderr, "\nAttempted to migrate solution metadata to %s but file already exists\n", metadataFilepath)
+	}
+	return nil
 }
