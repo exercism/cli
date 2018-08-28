@@ -35,6 +35,31 @@ func TestHasMetadata(t *testing.T) {
 	assert.False(t, ok)
 }
 
+func TestHasLegacyMetadata(t *testing.T) {
+	ws, err := ioutil.TempDir("", "fake-workspace")
+	defer os.RemoveAll(ws)
+	assert.NoError(t, err)
+
+	exerciseA := Exercise{Root: ws, Track: "bogus-track", Slug: "apple"}
+	exerciseB := Exercise{Root: ws, Track: "bogus-track", Slug: "banana"}
+
+	err = os.MkdirAll(filepath.Dir(exerciseA.LegacyMetadataFilepath()), os.FileMode(0755))
+	assert.NoError(t, err)
+	err = os.MkdirAll(filepath.Dir(exerciseB.LegacyMetadataFilepath()), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	err = ioutil.WriteFile(exerciseA.LegacyMetadataFilepath(), []byte{}, os.FileMode(0600))
+	assert.NoError(t, err)
+
+	ok, err := exerciseA.HasLegacyMetadata()
+	assert.NoError(t, err)
+	assert.True(t, ok)
+
+	ok, err = exerciseB.HasLegacyMetadata()
+	assert.NoError(t, err)
+	assert.False(t, ok)
+}
+
 func TestNewFromDir(t *testing.T) {
 	dir := filepath.Join("something", "another", "whatever", "the-track", "the-exercise")
 
