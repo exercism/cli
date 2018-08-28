@@ -166,6 +166,10 @@ func fakeDownloadServer(requestor, teamSlug string) *httptest.Server {
 		fmt.Fprint(w, "this is file 2")
 	})
 
+	mux.HandleFunc("/full/path/with/numeric-suffix/bogus-track/bogus-exercise-12345/subdir/numeric.txt", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "with numeric suffix")
+	})
+
 	mux.HandleFunc("/special-char-filename#.txt", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "this is a special file")
 	})
@@ -216,6 +220,11 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
 			desc:     "a file in a subdirectory",
 			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "subdir", "file-2.txt"),
 			contents: "this is file 2",
+		},
+		{
+			desc:     "a path with a numeric suffix",
+			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "subdir", "numeric.txt"),
+			contents: "with numeric suffix",
 		},
 		{
 			desc:     "a file that requires URL encoding",
@@ -278,7 +287,8 @@ const payloadTemplate = `
 			"/with-leading-slash.txt",
 			"\\with-leading-backslash.txt",
 			"\\with\\backslashes\\in\\path.txt",
-			"file-3.txt"
+			"file-3.txt",
+			"/full/path/with/numeric-suffix/bogus-track/bogus-exercise-12345/subdir/numeric.txt"
 		],
 		"iteration": {
 			"submitted_at": "2017-08-21t10:11:12.130z"
