@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
-	"net/http"
 	"runtime"
 	"strings"
 	"sync"
@@ -30,7 +29,7 @@ If you're running into trouble, copy and paste the output from the troubleshoot
 command into a GitHub issue so we can help figure out what's going on.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cli.HTTPClient = &http.Client{Timeout: 20 * time.Second}
+		cli.TimeoutInSeconds = cli.TimeoutInSeconds * 2
 		c := cli.New(Version)
 
 		cfg := config.NewConfig()
