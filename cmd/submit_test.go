@@ -205,7 +205,20 @@ func TestLegacySolutionMetadataMigration(t *testing.T) {
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
-	writeFakeLegacySolution(t, dir, "bogus-track", "bogus-exercise")
+
+	// Write fake legacy solution
+	solution := &workspace.Solution{
+		ID:          "bogus-solution-uuid",
+		Track:       "bogus-track",
+		Exercise:    "bogus-exercise",
+		URL:         "http://example.com/bogus-url",
+		IsRequester: true,
+	}
+	b, err := json.Marshal(solution)
+	assert.NoError(t, err)
+	exercise := workspace.NewExerciseFromDir(dir)
+	err = ioutil.WriteFile(exercise.LegacyMetadataFilepath(), b, os.FileMode(0600))
+	assert.NoError(t, err)
 
 	file := filepath.Join(dir, "file.txt")
 	err = ioutil.WriteFile(file, []byte("This is a file."), os.FileMode(0755))
@@ -220,7 +233,6 @@ func TestLegacySolutionMetadataMigration(t *testing.T) {
 		Dir:             tmpDir,
 		UserViperConfig: v,
 	}
-	exercise := workspace.NewExerciseFromDir(dir)
 	expectedPathAfterMigration := exercise.MetadataFilepath()
 	_, err = os.Stat(expectedPathAfterMigration)
 	assert.Error(t, err)
@@ -231,6 +243,8 @@ func TestLegacySolutionMetadataMigration(t *testing.T) {
 
 	_, err = os.Stat(expectedPathAfterMigration)
 	assert.NoError(t, err)
+	_, err = os.Stat(exercise.LegacyMetadataFilepath())
+	assert.Error(t, err)
 }
 
 func TestSubmitWithEmptyFile(t *testing.T) {
@@ -481,21 +495,5 @@ func writeFakeSolution(t *testing.T, dir, trackID, exerciseSlug string) {
 		IsRequester: true,
 	}
 	err := solution.Write(dir)
-	assert.NoError(t, err)
-}
-
-func writeFakeLegacySolution(t *testing.T, dir, trackID, exerciseSlug string) {
-	solution := &workspace.Solution{
-		ID:          "bogus-solution-uuid",
-		Track:       trackID,
-		Exercise:    exerciseSlug,
-		URL:         "http://example.com/bogus-url",
-		IsRequester: true,
-	}
-	b, err := json.Marshal(solution)
-	assert.NoError(t, err)
-
-	exercise := workspace.NewExerciseFromDir(dir)
-	err = ioutil.WriteFile(exercise.LegacyMetadataFilepath(), b, os.FileMode(0600))
 	assert.NoError(t, err)
 }
