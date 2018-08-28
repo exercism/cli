@@ -17,9 +17,9 @@ func TestHasMetadata(t *testing.T) {
 	exerciseA := Exercise{Root: ws, Track: "bogus-track", Slug: "apple"}
 	exerciseB := Exercise{Root: ws, Track: "bogus-track", Slug: "banana"}
 
-	err = os.MkdirAll(filepath.Join(exerciseA.Filepath(), ignoreSubdir), os.FileMode(0755))
+	err = os.MkdirAll(filepath.Dir(exerciseA.MetadataFilepath()), os.FileMode(0755))
 	assert.NoError(t, err)
-	err = os.MkdirAll(filepath.Join(exerciseB.Filepath(), ignoreSubdir), os.FileMode(0755))
+	err = os.MkdirAll(filepath.Dir(exerciseB.MetadataFilepath()), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	err = ioutil.WriteFile(exerciseA.MetadataFilepath(), []byte{}, os.FileMode(0600))
