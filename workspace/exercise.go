@@ -38,7 +38,7 @@ func (e Exercise) Filepath() string {
 
 // MetadataFilepath is the absolute path to the exercise metadata.
 func (e Exercise) MetadataFilepath() string {
-	return filepath.Join(e.Filepath(), ignoreSubdirMetadataFilepath())
+	return filepath.Join(e.Filepath(), metadataFilepath)
 }
 
 // LegacyMetadataFilepath is the absolute path to the legacy exercise metadata.
@@ -83,10 +83,12 @@ func (e Exercise) MigrateLegacyMetadataFile() error {
 		if err := os.Rename(legacyMetadataFilepath, metadataFilepath); err != nil {
 			return err
 		}
-		fmt.Fprintf(os.Stderr, "\nMigrated solution metadata to %s\n", metadataFilepath)
+		fmt.Fprintf(os.Stderr, "\nMigrated metadata to %s\n", metadataFilepath)
 	} else {
-		// TODO: decide how to handle case where both legacy and modern metadata files exist
-		fmt.Fprintf(os.Stderr, "\nAttempted to migrate solution metadata to %s but file already exists\n", metadataFilepath)
+		if err := os.Remove(legacyMetadataFilepath); err != nil {
+			return err
+		}
+		fmt.Fprintf(os.Stderr, "\nRemoved legacy metadata: %s\n", legacyMetadataFilepath)
 	}
 	return nil
 }

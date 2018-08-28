@@ -14,6 +14,8 @@ const solutionFilename = "solution.json"
 const legacySolutionFilename = ".solution.json"
 const ignoreSubdir = ".exercism"
 
+var metadataFilepath = filepath.Join(ignoreSubdir, solutionFilename)
+
 // Solution contains metadata about a user's solution.
 type Solution struct {
 	Track       string     `json:"track"`
@@ -30,7 +32,7 @@ type Solution struct {
 
 // NewSolution reads solution metadata from a file in the given directory.
 func NewSolution(dir string) (*Solution, error) {
-	path := filepath.Join(dir, ignoreSubdirMetadataFilepath())
+	path := filepath.Join(dir, metadataFilepath)
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return &Solution{}, err
@@ -85,10 +87,6 @@ func (s *Solution) PathToParent() string {
 		dir = filepath.Join("users")
 	}
 	return filepath.Join(dir, s.Track)
-}
-
-func ignoreSubdirMetadataFilepath() string {
-	return filepath.Join(ignoreSubdir, solutionFilename)
 }
 
 func createIgnoreSubdir(path string) error {
