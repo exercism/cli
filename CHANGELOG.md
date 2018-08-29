@@ -6,6 +6,8 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## Next Release
 * **Your contribution here**
+
+## v3.0.9 (2018-08-29)
 * [#720](https://github.com/exercism/cli/pull/720) Make the timeout configurable globally - [@kytrinyx]
 * [#721](https://github.com/exercism/cli/pull/721) Handle windows filepaths that accidentally got submitted to the server - [@kytrinyx]
 * [#722](https://github.com/exercism/cli/pull/722) Handle exercise directories with numeric suffixes - [@kytrinyx]
