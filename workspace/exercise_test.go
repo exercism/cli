@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -81,13 +80,17 @@ func TestMigrateLegacyMetadataFileWithoutLegacy(t *testing.T) {
 
 	err = ioutil.WriteFile(metadataFilepath, []byte{}, os.FileMode(0600))
 	assert.NoError(t, err)
-	ok, _ := exercise.HasMetadata()
+
+	ok, _ := exercise.HasLegacyMetadata()
+	assert.False(t, ok)
+	ok, _ = exercise.HasMetadata()
 	assert.True(t, ok)
 
-	stderr, err := exercise.MigrateLegacyMetadataFile()
-
+	err = exercise.MigrateLegacyMetadataFile()
 	assert.Nil(t, err)
-	assert.Equal(t, "", stderr)
+
+	ok, _ = exercise.HasLegacyMetadata()
+	assert.False(t, ok)
 	ok, _ = exercise.HasMetadata()
 	assert.True(t, ok)
 }
@@ -98,22 +101,21 @@ func TestMigrateLegacyMetadataFileWithLegacy(t *testing.T) {
 	assert.NoError(t, err)
 
 	exercise := Exercise{Root: ws, Track: "bogus-track", Slug: "legacy"}
-	metadataFilepath := exercise.MetadataFilepath()
 	legacyMetadataFilepath := exercise.LegacyMetadataFilepath()
 	err = os.MkdirAll(filepath.Dir(legacyMetadataFilepath), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	err = ioutil.WriteFile(legacyMetadataFilepath, []byte{}, os.FileMode(0600))
 	assert.NoError(t, err)
+
 	ok, _ := exercise.HasLegacyMetadata()
 	assert.True(t, ok)
 	ok, _ = exercise.HasMetadata()
 	assert.False(t, ok)
 
-	stderr, err := exercise.MigrateLegacyMetadataFile()
-
-	assert.Equal(t, fmt.Sprintf("\nMigrated metadata to %s\n", metadataFilepath), stderr)
+	err = exercise.MigrateLegacyMetadataFile()
 	assert.NoError(t, err)
+
 	ok, _ = exercise.HasLegacyMetadata()
 	assert.False(t, ok)
 	ok, _ = exercise.HasMetadata()
@@ -137,15 +139,15 @@ func TestMigrateLegacyMetadataFileWithLegacyAndModern(t *testing.T) {
 	assert.NoError(t, err)
 	err = ioutil.WriteFile(metadataFilepath, []byte{}, os.FileMode(0600))
 	assert.NoError(t, err)
+
 	ok, _ := exercise.HasLegacyMetadata()
 	assert.True(t, ok)
 	ok, _ = exercise.HasMetadata()
 	assert.True(t, ok)
 
-	stderr, err := exercise.MigrateLegacyMetadataFile()
-
-	assert.Equal(t, fmt.Sprintf("\nRemoved legacy metadata: %s\n", legacyMetadataFilepath), stderr)
+	err = exercise.MigrateLegacyMetadataFile()
 	assert.NoError(t, err)
+
 	ok, _ = exercise.HasLegacyMetadata()
 	assert.False(t, ok)
 	ok, _ = exercise.HasMetadata()

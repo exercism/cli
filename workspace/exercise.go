@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -82,30 +81,25 @@ func (e Exercise) HasLegacyMetadata() (bool, error) {
 // MigrateLegacyMetadataFile migrates a legacy metadata to the modern location.
 // This is a noop if the metadata file isn't legacy.
 // If both legacy and modern metadata files exist, the legacy file will be deleted.
-func (e Exercise) MigrateLegacyMetadataFile() (string, error) {
-	var str string
+func (e Exercise) MigrateLegacyMetadataFile() error {
 	legacyMetadataFilepath := e.LegacyMetadataFilepath()
 	metadataFilepath := e.MetadataFilepath()
 
 	if _, err := os.Lstat(legacyMetadataFilepath); err != nil {
-		return "", nil
+		return nil
 	}
 	dir := filepath.Join(filepath.Dir(legacyMetadataFilepath), ignoreSubdir)
 	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
-		return "", err
+		return err
 	}
 	if _, err := os.Lstat(metadataFilepath); err != nil {
 		if err := os.Rename(legacyMetadataFilepath, metadataFilepath); err != nil {
-			return "", err
+			return err
 		}
-		str = fmt.Sprintf("\nMigrated metadata to %s\n", metadataFilepath)
-		fmt.Fprintf(os.Stderr, str)
 	} else {
 		if err := os.Remove(legacyMetadataFilepath); err != nil {
-			return "", err
+			return err
 		}
-		str = fmt.Sprintf("\nRemoved legacy metadata: %s\n", legacyMetadataFilepath)
-		fmt.Fprintf(os.Stderr, str)
 	}
-	return str, nil
+	return nil
 }
