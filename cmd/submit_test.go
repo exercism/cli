@@ -230,6 +230,48 @@ func TestSubmitWithEmptyFile(t *testing.T) {
 	assert.Equal(t, "This is file 2.", submittedFiles["file-2.txt"])
 }
 
+func TestSubmitWithEnormousFile(t *testing.T) {
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	Err = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+	}()
+
+	// The fake endpoint will populate this when it receives the call from the command.
+	submittedFiles := map[string]string{}
+	ts := fakeSubmitServer(t, submittedFiles)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "enormous-file")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
+	os.MkdirAll(dir, os.FileMode(0755))
+
+	writeFakeSolution(t, dir, "bogus-track", "bogus-exercise")
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
+
+	cfg := config.Config{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+	}
+
+	file := filepath.Join(dir, "file.txt")
+	err = ioutil.WriteFile(file, make([]byte, 65535), os.FileMode(0755))
+
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file})
+
+	assert.Regexp(t, "Please reduce the file to below 65535 bytes and try again.", err.Error())
+}
+
 func TestSubmitFilesForTeamExercise(t *testing.T) {
 	oldOut := Out
 	oldErr := Err
