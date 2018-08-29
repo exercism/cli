@@ -95,7 +95,8 @@ func (e Exercise) MigrateLegacyMetadataFile() error {
 		if err := os.Rename(legacyMetadataFilepath, e.MetadataFilepath()); err != nil {
 			return err
 		}
-	} else {
+	}
+	if ok, _ := e.HasLegacyMetadata(); ok {
 		if err := os.Remove(legacyMetadataFilepath); err != nil {
 			return err
 		}
