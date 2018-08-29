@@ -90,7 +90,8 @@ func (e Exercise) MigrateLegacyMetadataFile() (string, error) {
 	if _, err := os.Lstat(legacyMetadataFilepath); err != nil {
 		return "", nil
 	}
-	if err := createIgnoreSubdir(filepath.Dir(legacyMetadataFilepath)); err != nil {
+	dir := filepath.Join(filepath.Dir(legacyMetadataFilepath), ignoreSubdir)
+	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
 		return "", err
 	}
 	if _, err := os.Lstat(metadataFilepath); err != nil {

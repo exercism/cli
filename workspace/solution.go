@@ -69,7 +69,7 @@ func (s *Solution) Write(dir string) error {
 	if err != nil {
 		return err
 	}
-	if err = createIgnoreSubdir(dir); err != nil {
+	if err = os.MkdirAll(filepath.Join(dir, ignoreSubdir), os.FileMode(0755)); err != nil {
 		return err
 	}
 	exercise := NewExerciseFromDir(dir)
@@ -87,14 +87,4 @@ func (s *Solution) PathToParent() string {
 		dir = filepath.Join("users")
 	}
 	return filepath.Join(dir, s.Track)
-}
-
-func createIgnoreSubdir(path string) error {
-	path = filepath.Join(path, ignoreSubdir)
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		if err := os.Mkdir(path, os.FileMode(0755)); err != nil {
-			return err
-		}
-	}
-	return nil
 }
