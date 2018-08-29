@@ -82,18 +82,17 @@ func (e Exercise) HasLegacyMetadata() (bool, error) {
 // This is a noop if the metadata file isn't legacy.
 // If both legacy and modern metadata files exist, the legacy file will be deleted.
 func (e Exercise) MigrateLegacyMetadataFile() error {
-	legacyMetadataFilepath := e.LegacyMetadataFilepath()
-	metadataFilepath := e.MetadataFilepath()
-
-	if _, err := os.Lstat(legacyMetadataFilepath); err != nil {
+	if ok, _ := e.HasLegacyMetadata(); !ok {
 		return nil
 	}
-	dir := filepath.Join(filepath.Dir(legacyMetadataFilepath), ignoreSubdir)
-	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
+	legacyMetadataFilepath := e.LegacyMetadataFilepath()
+	if err := os.MkdirAll(
+		filepath.Join(filepath.Dir(legacyMetadataFilepath), ignoreSubdir),
+		os.FileMode(0755)); err != nil {
 		return err
 	}
-	if _, err := os.Lstat(metadataFilepath); err != nil {
-		if err := os.Rename(legacyMetadataFilepath, metadataFilepath); err != nil {
+	if ok, _ := e.HasMetadata(); !ok {
+		if err := os.Rename(legacyMetadataFilepath, e.MetadataFilepath()); err != nil {
 			return err
 		}
 	} else {
