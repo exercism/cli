@@ -91,7 +91,7 @@ const (
 	MigrationStatusRemoved
 )
 
-// MigrateLegacyMetadataFile migrates a legacy metadata to the modern location.
+// MigrateLegacyMetadataFile migrates a legacy metadata file to the modern location.
 // This is a noop if the metadata file isn't legacy.
 // If both legacy and modern metadata files exist, the legacy file will be deleted.
 func (e Exercise) MigrateLegacyMetadataFile() (MigrationStatus, error) {
