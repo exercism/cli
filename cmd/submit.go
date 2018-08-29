@@ -87,10 +87,10 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
         %s
 
-    Please provide the path to the file you wish to submit, e.g. : exercism submit FILENAME
+    Please provide the path to the file you wish to submit, e.g. : %s submit FILENAME
 
 			`
-			return fmt.Errorf(msg, arg)
+			return fmt.Errorf(msg, arg, BinaryName)
 		}
 
 		src, err := filepath.EvalSymlinks(arg)
