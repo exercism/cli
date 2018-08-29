@@ -83,9 +83,9 @@ type MigrationStatus int
 
 // MigrationStatus
 const (
-	MigrationStatusMkdirError MigrationStatus = iota
-	MigrationStatusRenameError
-	MigrationStatusRemoveError
+	MigrationStatusErrorMkdir MigrationStatus = iota
+	MigrationStatusErrorRename
+	MigrationStatusErrorRemove
 	MigrationStatusNoop
 	MigrationStatusMigrated
 	MigrationStatusRemoved
@@ -102,16 +102,16 @@ func (e Exercise) MigrateLegacyMetadataFile() (MigrationStatus, error) {
 	if err := os.MkdirAll(
 		filepath.Join(filepath.Dir(legacyMetadataFilepath), ignoreSubdir),
 		os.FileMode(0755)); err != nil {
-		return MigrationStatusMkdirError, err
+		return MigrationStatusErrorMkdir, err
 	}
 	if ok, _ := e.HasMetadata(); !ok {
 		if err := os.Rename(legacyMetadataFilepath, e.MetadataFilepath()); err != nil {
-			return MigrationStatusRenameError, err
+			return MigrationStatusErrorRename, err
 		}
 		return MigrationStatusMigrated, nil
 	}
 	if err := os.Remove(legacyMetadataFilepath); err != nil {
-		return MigrationStatusRemoveError, err
+		return MigrationStatusErrorRemove, err
 	}
 	return MigrationStatusRemoved, nil
 }
