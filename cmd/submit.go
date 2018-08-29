@@ -125,7 +125,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	exercise := workspace.NewExerciseFromDir(exerciseDir)
-	if err = exercise.MigrateLegacyMetadataFile(); err != nil {
+	if _, err = exercise.MigrateLegacyMetadataFile(); err != nil {
 		return err
 	}
 	solution, err := workspace.NewSolution(exerciseDir)

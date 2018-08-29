@@ -78,28 +78,44 @@ func (e Exercise) HasLegacyMetadata() (bool, error) {
 	return false, err
 }
 
+// MigrationStatus represents the result of migrating a legacy metadata file.
+type MigrationStatus int
+
+// MigrationStatus
+const (
+	MigrationStatusMkdirError MigrationStatus = iota
+	MigrationStatusRenameError
+	MigrationStatusRemoveError
+	MigrationStatusNoop
+	MigrationStatusMigrated
+	MigrationStatusRemoved
+)
+
 // MigrateLegacyMetadataFile migrates a legacy metadata to the modern location.
 // This is a noop if the metadata file isn't legacy.
 // If both legacy and modern metadata files exist, the legacy file will be deleted.
-func (e Exercise) MigrateLegacyMetadataFile() error {
+func (e Exercise) MigrateLegacyMetadataFile() (MigrationStatus, error) {
 	if ok, _ := e.HasLegacyMetadata(); !ok {
-		return nil
+		return MigrationStatusNoop, nil
 	}
+	var status MigrationStatus
 	legacyMetadataFilepath := e.LegacyMetadataFilepath()
 	if err := os.MkdirAll(
 		filepath.Join(filepath.Dir(legacyMetadataFilepath), ignoreSubdir),
 		os.FileMode(0755)); err != nil {
-		return err
+		return MigrationStatusMkdirError, err
 	}
 	if ok, _ := e.HasMetadata(); !ok {
 		if err := os.Rename(legacyMetadataFilepath, e.MetadataFilepath()); err != nil {
-			return err
+			return MigrationStatusRenameError, err
 		}
+		status = MigrationStatusMigrated
 	}
 	if ok, _ := e.HasLegacyMetadata(); ok {
 		if err := os.Remove(legacyMetadataFilepath); err != nil {
-			return err
+			return MigrationStatusRemoveError, err
 		}
+		status = MigrationStatusRemoved
 	}
-	return nil
+	return status, nil
 }
