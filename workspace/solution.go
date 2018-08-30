@@ -32,8 +32,7 @@ type Solution struct {
 
 // NewSolution reads solution metadata from a file in the given directory.
 func NewSolution(dir string) (*Solution, error) {
-	path := filepath.Join(dir, metadataFilepath)
-	b, err := ioutil.ReadFile(path)
+	b, err := ioutil.ReadFile(filepath.Join(dir, metadataFilepath))
 	if err != nil {
 		return &Solution{}, err
 	}
