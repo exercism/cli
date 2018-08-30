@@ -232,17 +232,20 @@ func TestLegacySolutionMetadataMigration(t *testing.T) {
 		Dir:             tmpDir,
 		UserViperConfig: v,
 	}
-	_, err = os.Stat(exercise.MetadataFilepath())
-	assert.Error(t, err)
+
+	ok, _ := exercise.HasLegacyMetadata()
+	assert.True(t, ok)
+	ok, _ = exercise.HasMetadata()
+	assert.False(t, ok)
 
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file})
 	assert.NoError(t, err)
 	assert.Equal(t, "This is a file.", submittedFiles["file.txt"])
 
-	_, err = os.Stat(exercise.MetadataFilepath())
-	assert.NoError(t, err)
-	_, err = os.Stat(exercise.LegacyMetadataFilepath())
-	assert.Error(t, err)
+	ok, _ = exercise.HasLegacyMetadata()
+	assert.False(t, ok)
+	ok, _ = exercise.HasMetadata()
+	assert.True(t, ok)
 }
 
 func TestSubmitWithEmptyFile(t *testing.T) {
