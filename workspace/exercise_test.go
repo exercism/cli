@@ -87,7 +87,7 @@ func TestMigrateLegacyMetadataFileWithoutLegacy(t *testing.T) {
 	assert.True(t, ok)
 
 	status, err := exercise.MigrateLegacyMetadataFile()
-	assert.Equal(t, MigrationStatus(MigrationStatusNoop), status)
+	assert.Equal(t, MigrationStatusNoop, status)
 	assert.Nil(t, err)
 
 	ok, _ = exercise.HasLegacyMetadata()
@@ -115,7 +115,7 @@ func TestMigrateLegacyMetadataFileWithLegacy(t *testing.T) {
 	assert.False(t, ok)
 
 	status, err := exercise.MigrateLegacyMetadataFile()
-	assert.Equal(t, MigrationStatus(MigrationStatusMigrated), status)
+	assert.Equal(t, MigrationStatusMigrated, status)
 	assert.NoError(t, err)
 
 	ok, _ = exercise.HasLegacyMetadata()
@@ -148,7 +148,7 @@ func TestMigrateLegacyMetadataFileWithLegacyAndModern(t *testing.T) {
 	assert.True(t, ok)
 
 	status, err := exercise.MigrateLegacyMetadataFile()
-	assert.Equal(t, MigrationStatus(MigrationStatusRemoved), status)
+	assert.Equal(t, MigrationStatusRemoved, status)
 	assert.NoError(t, err)
 
 	ok, _ = exercise.HasLegacyMetadata()

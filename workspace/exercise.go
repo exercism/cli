@@ -98,19 +98,17 @@ func (e Exercise) MigrateLegacyMetadataFile() (MigrationStatus, error) {
 	if ok, _ := e.HasLegacyMetadata(); !ok {
 		return MigrationStatusNoop, nil
 	}
-	legacyMetadataFilepath := e.LegacyMetadataFilepath()
-	metadataFilepath := e.MetadataFilepath()
-	if err := os.MkdirAll(filepath.Dir(metadataFilepath), os.FileMode(0755)); err != nil {
-		return MigrationStatusErrorMkdir, err
+	if err := os.MkdirAll(filepath.Dir(e.MetadataFilepath()), os.FileMode(0755)); err != nil {
+		return MigrationStatusNoop, err
 	}
 	if ok, _ := e.HasMetadata(); !ok {
-		if err := os.Rename(legacyMetadataFilepath, metadataFilepath); err != nil {
-			return MigrationStatusErrorRename, err
+		if err := os.Rename(e.LegacyMetadataFilepath(), e.MetadataFilepath()); err != nil {
+			return MigrationStatusNoop, err
 		}
 		return MigrationStatusMigrated, nil
 	}
-	if err := os.Remove(legacyMetadataFilepath); err != nil {
-		return MigrationStatusErrorRemove, err
+	if err := os.Remove(e.LegacyMetadataFilepath()); err != nil {
+		return MigrationStatusNoop, err
 	}
 	return MigrationStatusRemoved, nil
 }
