@@ -72,8 +72,8 @@ func (s *Solution) Write(dir string) error {
 	if err = os.MkdirAll(filepath.Join(dir, ignoreSubdir), os.FileMode(0755)); err != nil {
 		return err
 	}
-	exercise := NewExerciseFromDir(dir)
-	if err = ioutil.WriteFile(exercise.MetadataFilepath(), b, os.FileMode(0600)); err != nil {
+	if err = ioutil.WriteFile(NewExerciseFromDir(dir).MetadataFilepath(), b,
+		os.FileMode(0600)); err != nil {
 		return err
 	}
 	s.Dir = dir

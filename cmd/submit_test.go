@@ -206,7 +206,6 @@ func TestLegacySolutionMetadataMigration(t *testing.T) {
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
 
-	// Write fake legacy solution
 	solution := &workspace.Solution{
 		ID:          "bogus-solution-uuid",
 		Track:       "bogus-track",
@@ -233,15 +232,14 @@ func TestLegacySolutionMetadataMigration(t *testing.T) {
 		Dir:             tmpDir,
 		UserViperConfig: v,
 	}
-	expectedPathAfterMigration := exercise.MetadataFilepath()
-	_, err = os.Stat(expectedPathAfterMigration)
+	_, err = os.Stat(exercise.MetadataFilepath())
 	assert.Error(t, err)
 
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file})
 	assert.NoError(t, err)
 	assert.Equal(t, "This is a file.", submittedFiles["file.txt"])
 
-	_, err = os.Stat(expectedPathAfterMigration)
+	_, err = os.Stat(exercise.MetadataFilepath())
 	assert.NoError(t, err)
 	_, err = os.Stat(exercise.LegacyMetadataFilepath())
 	assert.Error(t, err)
