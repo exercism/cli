@@ -123,7 +123,7 @@ func TestSubmitFilesAndDir(t *testing.T) {
 	}
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
 	assert.Regexp(t, "submitting a directory", err.Error())
-	assert.Regexp(t, "Please provide the path to the file you wish to submit", err.Error())
+	assert.Regexp(t, "Please change into the directory and provide the path to the file\(s\) you wish to submit", err.Error())
 }
 
 func TestSubmitFiles(t *testing.T) {
