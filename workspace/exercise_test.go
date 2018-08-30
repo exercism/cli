@@ -100,7 +100,7 @@ func TestMigrateLegacyMetadataFileWithoutLegacy(t *testing.T) {
 
 	status, err := exercise.MigrateLegacyMetadataFile()
 	assert.Equal(t, MigrationStatusNoop, status)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	ok, _ = exercise.HasLegacyMetadata()
 	assert.False(t, ok)
