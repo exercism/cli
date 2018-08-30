@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -66,6 +67,17 @@ func TestNewFromDir(t *testing.T) {
 	assert.Equal(t, filepath.Join("something", "another", "whatever"), exercise.Root)
 	assert.Equal(t, "the-track", exercise.Track)
 	assert.Equal(t, "the-exercise", exercise.Slug)
+}
+
+func TestMigrationStatusString(t *testing.T) {
+	exercise := Exercise{Root: "", Track: "bogus-track", Slug: "banana"}
+
+	assert.Equal(t, fmt.Sprintf("\nMigrated metadata to %s\n", exercise.MetadataFilepath()),
+		MigrationStatusMigrated.String(exercise))
+	assert.Equal(t, fmt.Sprintf("\nRemoved legacy metadata at %s\n", exercise.LegacyMetadataFilepath()),
+		MigrationStatusRemoved.String(exercise))
+	assert.Equal(t, "", MigrationStatusNoop.String(exercise))
+	assert.Equal(t, "", MigrationStatus(-1).String(exercise))
 }
 
 func TestMigrateLegacyMetadataFileWithoutLegacy(t *testing.T) {

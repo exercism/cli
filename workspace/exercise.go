@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -83,13 +84,21 @@ type MigrationStatus int
 
 // MigrationStatus
 const (
-	MigrationStatusErrorMkdir MigrationStatus = iota
-	MigrationStatusErrorRename
-	MigrationStatusErrorRemove
-	MigrationStatusNoop
+	MigrationStatusNoop MigrationStatus = iota
 	MigrationStatusMigrated
 	MigrationStatusRemoved
 )
+
+func (m MigrationStatus) String(e Exercise) string {
+	switch m {
+	case MigrationStatusMigrated:
+		return fmt.Sprintf("\nMigrated metadata to %s\n", e.MetadataFilepath())
+	case MigrationStatusRemoved:
+		return fmt.Sprintf("\nRemoved legacy metadata at %s\n", e.LegacyMetadataFilepath())
+	default:
+		return ""
+	}
+}
 
 // MigrateLegacyMetadataFile migrates a legacy metadata file to the modern location.
 // This is a noop if the metadata file isn't legacy.
