@@ -266,10 +266,14 @@ func TestSubmitWithEnormousFile(t *testing.T) {
 
 	file := filepath.Join(dir, "file.txt")
 	err = ioutil.WriteFile(file, make([]byte, 65535), os.FileMode(0755))
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file})
 
-	assert.Regexp(t, "Please reduce the file to below 65535 bytes and try again.", err.Error())
+	assert.Error(t, err)
+	assert.Regexp(t, "Please reduce the size of the file and try again.", err.Error())
 }
 
 func TestSubmitFilesForTeamExercise(t *testing.T) {
