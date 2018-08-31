@@ -91,7 +91,7 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 			return err
 		}
 
-		if err := client.IsPingable(); err != nil {
+		if err := client.Ping(); err != nil {
 			return fmt.Errorf("The base API URL '%s' cannot be reached.\n\n%s", baseURL, err)
 		}
 	}
@@ -120,7 +120,7 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 		if err != nil {
 			return err
 		}
-		ok, err := client.TokenIsValid()
+		ok, err := client.ValidateToken()
 		if err != nil {
 			return err
 		}

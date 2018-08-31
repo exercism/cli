@@ -1,4 +1,4 @@
-package debug
+package api
 
 import (
 	"bytes"

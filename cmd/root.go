@@ -3,12 +3,13 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/debug"
 	"github.com/exercism/cli/pkg/cli"
 	"github.com/spf13/cobra"
 )
@@ -26,6 +27,12 @@ var (
 	Err io.Writer
 	// In is used to provide mocked test input (i.e. for prompts).
 	In io.Reader
+
+	// TimeoutInSeconds is the timeout the default HTTP client will use.
+	TimeoutInSeconds = 60
+
+	// httpClient is the client used to make HTTP calls in the cli package.
+	httpClient = &http.Client{Timeout: time.Duration(TimeoutInSeconds) * time.Second}
 )
 
 // RootCmd represents the base command when called without any subcommands.
@@ -38,12 +45,16 @@ Download exercises and submit your solutions.`,
 	SilenceUsage: true,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
-			debug.Verbose = verbose
+			api.Verbose = verbose
 		}
 		if timeout, _ := cmd.Flags().GetInt("timeout"); timeout > 0 {
-			cli.TimeoutInSeconds = timeout
-			api.TimeoutInSeconds = timeout
+			TimeoutInSeconds = timeout
 		}
+
+		httpClient = &http.Client{Timeout: time.Duration(TimeoutInSeconds) * time.Second}
+		// share the configured HTTPClient with other web related services
+		api.HTTPClient = httpClient
+		cli.HTTPClient = httpClient
 	},
 }
 

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"net/http"
 	"runtime"
 	"strings"
 	"sync"
@@ -29,9 +30,6 @@ If you're running into trouble, copy and paste the output from the troubleshoot
 command into a GitHub issue so we can help figure out what's going on.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cli.TimeoutInSeconds = cli.TimeoutInSeconds * 2
-		c := cli.New(Version)
-
 		cfg := config.NewConfig()
 
 		v := viper.New()
@@ -43,6 +41,11 @@ command into a GitHub issue so we can help figure out what's going on.
 
 		cfg.UserViperConfig = v
 
+		// Increase timeout of HTTPClient for troubleshooting purposes.
+		TimeoutInSeconds = TimeoutInSeconds * 2
+		httpClient = &http.Client{Timeout: time.Duration(TimeoutInSeconds) * time.Second}
+
+		c := cli.New(Version)
 		status := newStatus(c, cfg)
 		status.Censor = !fullAPIKey
 		s, err := status.check()
@@ -201,7 +204,7 @@ func (ping *apiPing) Call(wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	now := time.Now()
-	res, err := cli.HTTPClient.Get(ping.URL)
+	res, err := httpClient.Get(ping.URL)
 	delta := time.Since(now)
 	ping.Latency = delta
 	if err != nil {

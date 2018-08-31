@@ -10,6 +10,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewClient(t *testing.T) {
+	c, err := NewClient("fake-token", "fake-base-url")
+	assert.NoError(t, err)
+	assert.NotNil(t, c.Client)
+	assert.Equal(t, "fake-token", c.Token)
+	assert.Equal(t, "fake-base-url", c.APIBaseURL)
+}
+
 func TestNewRequestSetsDefaultHeaders(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, `ok`)
