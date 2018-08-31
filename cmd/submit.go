@@ -87,8 +87,12 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
         %s
 
+    Please change into the directory and provide the path to the file(s) you wish to submit
+
+        %s submit FILENAME
+
 			`
-			return fmt.Errorf(msg, arg)
+			return fmt.Errorf(msg, arg, BinaryName)
 		}
 
 		src, err := filepath.EvalSymlinks(arg)
