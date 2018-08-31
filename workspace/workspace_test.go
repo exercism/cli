@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"sort"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -61,12 +60,12 @@ func TestWorkspaceExercises(t *testing.T) {
 	b2 := filepath.Join(tmpDir, "track-b", "exercise-two")
 
 	for _, path := range []string{a1, a2, b1, b2} {
-		path := filepath.Dir(NewExerciseFromDir(path).MetadataFilepath())
-		err := os.MkdirAll(path, os.FileMode(0755))
+		metadataAbsoluteFilepath := filepath.Join(path, metadataFilepath)
+		err := os.MkdirAll(filepath.Dir(metadataAbsoluteFilepath), os.FileMode(0755))
 		assert.NoError(t, err)
 
-		if !strings.HasPrefix(path, a2) {
-			err = ioutil.WriteFile(filepath.Join(path, solutionFilename), []byte{}, os.FileMode(0600))
+		if path != a2 {
+			err = ioutil.WriteFile(metadataAbsoluteFilepath, []byte{}, os.FileMode(0600))
 			assert.NoError(t, err)
 		}
 	}
