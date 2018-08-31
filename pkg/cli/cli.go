@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/blang/semver"
-	"github.com/exercism/cli/debug"
 	update "github.com/inconshreveable/go-update"
 )
 
@@ -43,10 +42,8 @@ var (
 )
 
 var (
-	// TimeoutInSeconds is the timeout the default HTTP client will use.
-	TimeoutInSeconds = 60
 	// HTTPClient is the client used to make HTTP calls in the cli package.
-	HTTPClient = &http.Client{Timeout: time.Duration(TimeoutInSeconds) * time.Second}
+	HTTPClient = &http.Client{Timeout: 60 * time.Second}
 	// ReleaseURL is the endpoint that provides information about cli releases.
 	ReleaseURL = "https://api.github.com/repos/exercism/cli/releases"
 )
@@ -112,7 +109,6 @@ func (c *CLI) Upgrade() error {
 	var downloadRC *bytes.Reader
 	for _, a := range c.LatestRelease.Assets {
 		if strings.Contains(a.Name, buildName) {
-			debug.Printf("Downloading %s\n", a.Name)
 			var err error
 			downloadRC, err = a.download()
 			if err != nil {

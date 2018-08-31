@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/exercism/cli/cli"
 	"github.com/exercism/cli/config"
+	"github.com/exercism/cli/pkg/cli"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

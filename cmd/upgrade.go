@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/exercism/cli/cli"
+	"github.com/exercism/cli/pkg/cli"
 	"github.com/spf13/cobra"
 )
 

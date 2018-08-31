@@ -7,9 +7,9 @@ import (
 	"runtime"
 
 	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/cli"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/debug"
+	"github.com/exercism/cli/pkg/cli"
 	"github.com/spf13/cobra"
 )
 
