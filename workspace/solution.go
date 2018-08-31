@@ -68,7 +68,7 @@ func (s *Solution) Write(dir string) error {
 	if err != nil {
 		return err
 	}
-	metadataAbsoluteFilepath := NewExerciseFromDir(dir).MetadataFilepath()
+	metadataAbsoluteFilepath := filepath.Join(dir, metadataFilepath)
 	if err = os.MkdirAll(filepath.Dir(metadataAbsoluteFilepath), os.FileMode(0755)); err != nil {
 		return err
 	}
