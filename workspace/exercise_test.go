@@ -70,14 +70,10 @@ func TestNewFromDir(t *testing.T) {
 }
 
 func TestMigrationStatusString(t *testing.T) {
-	exercise := Exercise{Root: "", Track: "bogus-track", Slug: "banana"}
-
-	assert.Equal(t, fmt.Sprintf("\nMigrated metadata to %s\n", exercise.MetadataFilepath()),
-		MigrationStatusMigrated.String(exercise))
-	assert.Equal(t, fmt.Sprintf("\nRemoved legacy metadata at %s\n", exercise.LegacyMetadataFilepath()),
-		MigrationStatusRemoved.String(exercise))
-	assert.Equal(t, "", MigrationStatusNoop.String(exercise))
-	assert.Equal(t, "", MigrationStatus(-1).String(exercise))
+	assert.Equal(t, fmt.Sprintf("\nMigrated metadata\n"), MigrationStatusMigrated.String())
+	assert.Equal(t, fmt.Sprintf("\nRemoved legacy metadata\n"), MigrationStatusRemoved.String())
+	assert.Equal(t, "", MigrationStatusNoop.String())
+	assert.Equal(t, "", MigrationStatus(-1).String())
 }
 
 func TestMigrateLegacyMetadataFileWithoutLegacy(t *testing.T) {

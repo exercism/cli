@@ -89,12 +89,12 @@ const (
 	MigrationStatusRemoved
 )
 
-func (m MigrationStatus) String(e Exercise) string {
+func (m MigrationStatus) String() string {
 	switch m {
 	case MigrationStatusMigrated:
-		return fmt.Sprintf("\nMigrated metadata to %s\n", e.MetadataFilepath())
+		return fmt.Sprintf("\nMigrated metadata\n")
 	case MigrationStatusRemoved:
-		return fmt.Sprintf("\nRemoved legacy metadata at %s\n", e.LegacyMetadataFilepath())
+		return fmt.Sprintf("\nRemoved legacy metadata\n")
 	default:
 		return ""
 	}
