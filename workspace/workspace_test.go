@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -103,6 +104,10 @@ func TestSolutionDir(t *testing.T) {
 			ok:   true,
 		},
 		{
+			path: strings.ToUpper(filepath.Join(ws.Dir, "exercise")),
+			ok:   true,
+		},
+		{
 			path: filepath.Join(ws.Dir, "exercise", "file.txt"),
 			ok:   true,
 		},
@@ -130,10 +135,13 @@ func TestSolutionDir(t *testing.T) {
 
 	for _, test := range tests {
 		dir, err := ws.SolutionDir(test.path)
+
 		if !test.ok {
 			assert.Error(t, err, test.path)
 			continue
 		}
+
+		assert.NoError(t, err)
 		assert.Equal(t, filepath.Join(ws.Dir, "exercise"), dir, test.path)
 	}
 }
