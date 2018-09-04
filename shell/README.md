@@ -27,4 +27,7 @@ the following snippet
       source ~/.config/exercism/exercism_completion.zsh
     fi
 
-**Note:** If you are using the popular [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) framework to manage your zsh plugins, you don't need to add the above snippet, all you need to do is create a file `exercism_completion.zsh` inside the `~/.oh-my-zsh/custom`.
+
+#### Oh my Zsh
+
+If you are using the popular [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) framework to manage your zsh plugins, move the file `exercism_completion.zsh` into `~/.oh-my-zsh/custom`.
