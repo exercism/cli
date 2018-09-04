@@ -129,7 +129,13 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	exercise := workspace.NewExerciseFromDir(exerciseDir)
-
+	migrationStatus, err := exercise.MigrateLegacyMetadataFile()
+	if err != nil {
+		return err
+	}
+	if verbose, _ := flags.GetBool("verbose"); verbose {
+		fmt.Fprintf(os.Stderr, migrationStatus.String())
+	}
 	solution, err := workspace.NewSolution(exerciseDir)
 	if err != nil {
 		return err

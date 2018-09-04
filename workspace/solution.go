@@ -8,11 +8,13 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/exercism/cli/visibility"
 )
 
-const solutionFilename = ".solution.json"
+const solutionFilename = "solution.json"
+const legacySolutionFilename = ".solution.json"
+const ignoreSubdir = ".exercism"
+
+var metadataFilepath = filepath.Join(ignoreSubdir, solutionFilename)
 
 // Solution contains metadata about a user's solution.
 type Solution struct {
@@ -30,8 +32,7 @@ type Solution struct {
 
 // NewSolution reads solution metadata from a file in the given directory.
 func NewSolution(dir string) (*Solution, error) {
-	path := filepath.Join(dir, solutionFilename)
-	b, err := ioutil.ReadFile(path)
+	b, err := ioutil.ReadFile(filepath.Join(dir, metadataFilepath))
 	if err != nil {
 		return &Solution{}, err
 	}
@@ -67,17 +68,15 @@ func (s *Solution) Write(dir string) error {
 	if err != nil {
 		return err
 	}
-
-	path := filepath.Join(dir, solutionFilename)
-
-	// Hack because ioutil.WriteFile fails on hidden files
-	visibility.ShowFile(path)
-
-	if err := ioutil.WriteFile(path, b, os.FileMode(0600)); err != nil {
+	metadataAbsoluteFilepath := filepath.Join(dir, metadataFilepath)
+	if err = os.MkdirAll(filepath.Dir(metadataAbsoluteFilepath), os.FileMode(0755)); err != nil {
+		return err
+	}
+	if err = ioutil.WriteFile(metadataAbsoluteFilepath, b, os.FileMode(0600)); err != nil {
 		return err
 	}
 	s.Dir = dir
-	return visibility.HideFile(path)
+	return nil
 }
 
 // PathToParent is the relative path from the workspace to the parent dir.

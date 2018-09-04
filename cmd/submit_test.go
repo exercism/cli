@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -183,6 +184,69 @@ func TestSubmitFiles(t *testing.T) {
 	assert.Equal(t, "This is file 1.", submittedFiles["file-1.txt"])
 	assert.Equal(t, "This is file 2.", submittedFiles["subdir/file-2.txt"])
 	assert.Equal(t, "This is the readme.", submittedFiles["README.md"])
+}
+
+func TestLegacySolutionMetadataMigration(t *testing.T) {
+	oldOut := Out
+	oldErr := Err
+	Out = ioutil.Discard
+	Err = ioutil.Discard
+	defer func() {
+		Out = oldOut
+		Err = oldErr
+	}()
+	// The fake endpoint will populate this when it receives the call from the command.
+	submittedFiles := map[string]string{}
+	ts := fakeSubmitServer(t, submittedFiles)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "legacy-metadata-file")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
+	os.MkdirAll(dir, os.FileMode(0755))
+
+	solution := &workspace.Solution{
+		ID:          "bogus-solution-uuid",
+		Track:       "bogus-track",
+		Exercise:    "bogus-exercise",
+		URL:         "http://example.com/bogus-url",
+		IsRequester: true,
+	}
+	b, err := json.Marshal(solution)
+	assert.NoError(t, err)
+	exercise := workspace.NewExerciseFromDir(dir)
+	err = ioutil.WriteFile(exercise.LegacyMetadataFilepath(), b, os.FileMode(0600))
+	assert.NoError(t, err)
+
+	file := filepath.Join(dir, "file.txt")
+	err = ioutil.WriteFile(file, []byte("This is a file."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
+	cfg := config.Config{
+		Persister:       config.InMemoryPersister{},
+		Dir:             tmpDir,
+		UserViperConfig: v,
+	}
+
+	ok, _ := exercise.HasLegacyMetadata()
+	assert.True(t, ok)
+	ok, _ = exercise.HasMetadata()
+	assert.False(t, ok)
+
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file})
+	assert.NoError(t, err)
+	assert.Equal(t, "This is a file.", submittedFiles["file.txt"])
+
+	ok, _ = exercise.HasLegacyMetadata()
+	assert.False(t, ok)
+	ok, _ = exercise.HasMetadata()
+	assert.True(t, ok)
 }
 
 func TestSubmitWithEmptyFile(t *testing.T) {

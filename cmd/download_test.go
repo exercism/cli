@@ -142,8 +142,8 @@ func TestDownload(t *testing.T) {
 		targetDir := filepath.Join(tmpDir, tc.expectedDir)
 		assertDownloadedCorrectFiles(t, targetDir)
 
-		path := filepath.Join(targetDir, "bogus-track", "bogus-exercise", ".solution.json")
-		b, err := ioutil.ReadFile(path)
+		dir := filepath.Join(targetDir, "bogus-track", "bogus-exercise")
+		b, err := ioutil.ReadFile(workspace.NewExerciseFromDir(dir).MetadataFilepath())
 		var s workspace.Solution
 		err = json.Unmarshal(b, &s)
 		assert.NoError(t, err)

@@ -37,7 +37,12 @@ func (e Exercise) Filepath() string {
 
 // MetadataFilepath is the absolute path to the exercise metadata.
 func (e Exercise) MetadataFilepath() string {
-	return filepath.Join(e.Filepath(), solutionFilename)
+	return filepath.Join(e.Filepath(), metadataFilepath)
+}
+
+// LegacyMetadataFilepath is the absolute path to the legacy exercise metadata.
+func (e Exercise) LegacyMetadataFilepath() string {
+	return filepath.Join(e.Filepath(), legacySolutionFilename)
 }
 
 // MetadataDir returns the directory that the exercise metadata lives in.
@@ -58,4 +63,60 @@ func (e Exercise) HasMetadata() (bool, error) {
 		return true, nil
 	}
 	return false, err
+}
+
+// HasLegacyMetadata checks for the presence of a legacy exercise metadata file.
+// If there is no such file, it could also be an unrelated directory.
+func (e Exercise) HasLegacyMetadata() (bool, error) {
+	_, err := os.Lstat(e.LegacyMetadataFilepath())
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	if err == nil {
+		return true, nil
+	}
+	return false, err
+}
+
+// MigrationStatus represents the result of migrating a legacy metadata file.
+type MigrationStatus int
+
+// MigrationStatus
+const (
+	MigrationStatusNoop MigrationStatus = iota
+	MigrationStatusMigrated
+	MigrationStatusRemoved
+)
+
+func (m MigrationStatus) String() string {
+	switch m {
+	case MigrationStatusMigrated:
+		return "\nMigrated metadata\n"
+	case MigrationStatusRemoved:
+		return "\nRemoved legacy metadata\n"
+	default:
+		return ""
+	}
+}
+
+// MigrateLegacyMetadataFile migrates a legacy metadata file to the modern location.
+// This is a noop if the metadata file isn't legacy.
+// If both legacy and modern metadata files exist, the legacy file will be deleted.
+func (e Exercise) MigrateLegacyMetadataFile() (MigrationStatus, error) {
+	if ok, _ := e.HasLegacyMetadata(); !ok {
+		return MigrationStatusNoop, nil
+	}
+	if err := os.MkdirAll(filepath.Dir(e.MetadataFilepath()), os.FileMode(0755)); err != nil {
+		return MigrationStatusNoop, err
+	}
+	if ok, _ := e.HasMetadata(); !ok {
+		if err := os.Rename(e.LegacyMetadataFilepath(), e.MetadataFilepath()); err != nil {
+			return MigrationStatusNoop, err
+		}
+		return MigrationStatusMigrated, nil
+	}
+	if err := os.Remove(e.LegacyMetadataFilepath()); err != nil {
+		return MigrationStatusNoop, err
+	}
+	return MigrationStatusRemoved, nil
 }
