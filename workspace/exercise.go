@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -92,9 +91,9 @@ const (
 func (m MigrationStatus) String() string {
 	switch m {
 	case MigrationStatusMigrated:
-		return fmt.Sprintf("\nMigrated metadata\n")
+		return "\nMigrated metadata\n"
 	case MigrationStatusRemoved:
-		return fmt.Sprintf("\nRemoved legacy metadata\n")
+		return "\nRemoved legacy metadata\n"
 	default:
 		return ""
 	}
