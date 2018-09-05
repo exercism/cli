@@ -151,14 +151,14 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		if err != nil {
 			return err
 		}
-		const MaxFileSize int64 = 65535
-		if info.Size() >= MaxFileSize {
+		const maxFileSize int64 = 65535
+		if info.Size() >= maxFileSize {
 			msg :=`
 
       The submitted file is larger than the max allowed file size of %d bytes. Please reduce the size of the file and try again.
 
 			`
-			return fmt.Errorf(msg, MaxFileSize)
+			return fmt.Errorf(msg, maxFileSize)
 		}
 		if info.Size() == 0 {
 
