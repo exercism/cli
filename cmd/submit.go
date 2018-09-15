@@ -136,12 +136,12 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	if verbose, _ := flags.GetBool("verbose"); verbose {
 		fmt.Fprintf(os.Stderr, migrationStatus.String())
 	}
-	solution, err := workspace.NewSolution(exerciseDir)
+	metadata, err := workspace.NewMetadata(exerciseDir)
 	if err != nil {
 		return err
 	}
 
-	if !solution.IsRequester {
+	if !metadata.IsRequester {
 		// TODO: add test
 		msg := `
 
@@ -151,7 +151,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
         %s download --exercise=%s --track=%s
 
 		`
-		return fmt.Errorf(msg, BinaryName, solution.Exercise, solution.Track)
+		return fmt.Errorf(msg, BinaryName, metadata.Exercise, metadata.Track)
 	}
 
 	exercise.Documents = make([]workspace.Document, 0, len(args))
@@ -226,7 +226,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	if err != nil {
 		return err
 	}
-	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), solution.ID)
+	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), metadata.ID)
 	req, err := client.NewRequest("PATCH", url, body)
 	if err != nil {
 		return err
@@ -251,11 +251,11 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
     %s
 `
 	suffix := "View it at:\n\n    "
-	if solution.AutoApprove {
+	if metadata.AutoApprove {
 		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
 	}
 	fmt.Fprintf(Err, msg, suffix)
-	fmt.Fprintf(Out, "    %s\n\n", solution.URL)
+	fmt.Fprintf(Out, "    %s\n\n", metadata.URL)
 	return nil
 }
 

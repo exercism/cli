@@ -10,14 +10,14 @@ import (
 	"time"
 )
 
-const solutionFilename = "solution.json"
-const legacySolutionFilename = ".solution.json"
+const metadataFilename = "metadata.json"
+const legacyMetadataFilename = ".solution.json"
 const ignoreSubdir = ".exercism"
 
-var metadataFilepath = filepath.Join(ignoreSubdir, solutionFilename)
+var metadataFilepath = filepath.Join(ignoreSubdir, metadataFilename)
 
-// Solution contains metadata about a user's solution.
-type Solution struct {
+// Metadata contains metadata about a user's solution.
+type Metadata struct {
 	Track       string     `json:"track"`
 	Exercise    string     `json:"exercise"`
 	ID          string     `json:"id"`
@@ -30,15 +30,15 @@ type Solution struct {
 	AutoApprove bool       `json:"auto_approve"`
 }
 
-// NewSolution reads solution metadata from a file in the given directory.
-func NewSolution(dir string) (*Solution, error) {
+// NewMetadata reads solution metadata from a file in the given directory.
+func NewMetadata(dir string) (*Metadata, error) {
 	b, err := ioutil.ReadFile(filepath.Join(dir, metadataFilepath))
 	if err != nil {
-		return &Solution{}, err
+		return &Metadata{}, err
 	}
-	var s Solution
+	var s Metadata
 	if err := json.Unmarshal(b, &s); err != nil {
-		return &Solution{}, err
+		return &Metadata{}, err
 	}
 	s.Dir = dir
 	return &s, nil
@@ -47,11 +47,11 @@ func NewSolution(dir string) (*Solution, error) {
 // Suffix is the serial numeric value appended to an exercise directory.
 // This is appended to avoid name conflicts, and does not indicate a particular
 // iteration.
-func (s *Solution) Suffix() string {
+func (s *Metadata) Suffix() string {
 	return strings.Trim(strings.Replace(filepath.Base(s.Dir), s.Exercise, "", 1), "-.")
 }
 
-func (s *Solution) String() string {
+func (s *Metadata) String() string {
 	str := fmt.Sprintf("%s/%s", s.Track, s.Exercise)
 	if s.Suffix() != "" {
 		str = fmt.Sprintf("%s (%s)", str, s.Suffix())
@@ -63,7 +63,7 @@ func (s *Solution) String() string {
 }
 
 // Write stores solution metadata to a file.
-func (s *Solution) Write(dir string) error {
+func (s *Metadata) Write(dir string) error {
 	b, err := json.Marshal(s)
 	if err != nil {
 		return err
@@ -80,7 +80,7 @@ func (s *Solution) Write(dir string) error {
 }
 
 // PathToParent is the relative path from the workspace to the parent dir.
-func (s *Solution) PathToParent() string {
+func (s *Metadata) PathToParent() string {
 	var dir string
 	if !s.IsRequester {
 		dir = filepath.Join("users")

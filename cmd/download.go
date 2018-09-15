@@ -132,7 +132,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		}
 	}
 
-	solution := workspace.Solution{
+	metadata := workspace.Metadata{
 		AutoApprove: payload.Solution.Exercise.AutoApprove,
 		Track:       payload.Solution.Exercise.Track.ID,
 		Team:        payload.Solution.Team.Slug,
@@ -144,17 +144,17 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	root := usrCfg.GetString("workspace")
-	if solution.Team != "" {
-		root = filepath.Join(root, "teams", solution.Team)
+	if metadata.Team != "" {
+		root = filepath.Join(root, "teams", metadata.Team)
 	}
-	if !solution.IsRequester {
-		root = filepath.Join(root, "users", solution.Handle)
+	if !metadata.IsRequester {
+		root = filepath.Join(root, "users", metadata.Handle)
 	}
 
 	exercise := workspace.Exercise{
 		Root:  root,
-		Track: solution.Track,
-		Slug:  solution.Exercise,
+		Track: metadata.Track,
+		Slug:  metadata.Exercise,
 	}
 
 	dir := exercise.MetadataDir()
@@ -163,7 +163,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	err = solution.Write(dir)
+	err = metadata.Write(dir)
 	if err != nil {
 		return err
 	}
@@ -204,7 +204,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		// Work around a path bug due to an early design decision (later reversed) to
 		// allow numeric suffixes for exercise directories, allowing people to have
 		// multiple parallel versions of an exercise.
-		pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, solution.Exercise)
+		pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, metadata.Exercise)
 		rgxNumericSuffix := regexp.MustCompile(pattern)
 		if rgxNumericSuffix.MatchString(file) {
 			file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
@@ -214,10 +214,10 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		file = strings.Replace(file, "\\", "/", -1)
 
 		relativePath := filepath.FromSlash(file)
-		dir := filepath.Join(solution.Dir, filepath.Dir(relativePath))
+		dir := filepath.Join(metadata.Dir, filepath.Dir(relativePath))
 		os.MkdirAll(dir, os.FileMode(0755))
 
-		f, err := os.Create(filepath.Join(solution.Dir, relativePath))
+		f, err := os.Create(filepath.Join(metadata.Dir, relativePath))
 		if err != nil {
 			return err
 		}
@@ -228,7 +228,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		}
 	}
 	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", solution.Dir)
+	fmt.Fprintf(Out, "%s\n", metadata.Dir)
 	return nil
 }
 
