@@ -207,7 +207,7 @@ func TestLegacyMetadataMigration(t *testing.T) {
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
 
-	metadata := &workspace.Metadata{
+	metadata := &workspace.ExerciseMetadata{
 		ID:          "bogus-solution-uuid",
 		Track:       "bogus-track",
 		Exercise:    "bogus-exercise",
@@ -535,7 +535,7 @@ func TestSubmitRelativePath(t *testing.T) {
 }
 
 func writeFakeMetadata(t *testing.T, dir, trackID, exerciseSlug string) {
-	metadata := &workspace.Metadata{
+	metadata := &workspace.ExerciseMetadata{
 		ID:          "bogus-solution-uuid",
 		Track:       trackID,
 		Exercise:    exerciseSlug,

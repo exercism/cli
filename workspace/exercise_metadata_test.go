@@ -9,12 +9,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMetadata(t *testing.T) {
+func TestExerciseMetadata(t *testing.T) {
 	dir, err := ioutil.TempDir("", "solution")
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
 
-	s1 := &Metadata{
+	s1 := &ExerciseMetadata{
 		Track:       "a-track",
 		Exercise:    "bogus-exercise",
 		ID:          "abc",
@@ -26,7 +26,7 @@ func TestMetadata(t *testing.T) {
 	err = s1.Write(dir)
 	assert.NoError(t, err)
 
-	s2, err := NewMetadata(dir)
+	s2, err := NewExerciseMetadata(dir)
 	assert.NoError(t, err)
 	assert.Nil(t, s2.SubmittedAt)
 	assert.Equal(t, s1, s2)
@@ -37,39 +37,39 @@ func TestMetadata(t *testing.T) {
 	err = s2.Write(dir)
 	assert.NoError(t, err)
 
-	s3, err := NewMetadata(dir)
+	s3, err := NewExerciseMetadata(dir)
 	assert.NoError(t, err)
 	assert.Equal(t, s2, s3)
 }
 
 func TestSuffix(t *testing.T) {
 	testCases := []struct {
-		metadata Metadata
+		metadata ExerciseMetadata
 		suffix   string
 	}{
 		{
-			metadata: Metadata{
+			metadata: ExerciseMetadata{
 				Exercise: "bat",
 				Dir:      "",
 			},
 			suffix: "",
 		},
 		{
-			metadata: Metadata{
+			metadata: ExerciseMetadata{
 				Exercise: "bat",
 				Dir:      "/path/to/bat",
 			},
 			suffix: "",
 		},
 		{
-			metadata: Metadata{
+			metadata: ExerciseMetadata{
 				Exercise: "bat",
 				Dir:      "/path/to/bat-2",
 			},
 			suffix: "2",
 		},
 		{
-			metadata: Metadata{
+			metadata: ExerciseMetadata{
 				Exercise: "bat",
 				Dir:      "/path/to/bat-200",
 			},
@@ -85,13 +85,13 @@ func TestSuffix(t *testing.T) {
 	}
 }
 
-func TestMetadataString(t *testing.T) {
+func TestExerciseMetadataString(t *testing.T) {
 	testCases := []struct {
-		metadata Metadata
+		metadata ExerciseMetadata
 		desc     string
 	}{
 		{
-			metadata: Metadata{
+			metadata: ExerciseMetadata{
 				Track:    "elixir",
 				Exercise: "secret-handshake",
 				Handle:   "",
@@ -100,7 +100,7 @@ func TestMetadataString(t *testing.T) {
 			desc: "elixir/secret-handshake",
 		},
 		{
-			metadata: Metadata{
+			metadata: ExerciseMetadata{
 				Track:       "cpp",
 				Exercise:    "clock",
 				Handle:      "alice",
@@ -109,7 +109,7 @@ func TestMetadataString(t *testing.T) {
 			desc: "cpp/clock",
 		},
 		{
-			metadata: Metadata{
+			metadata: ExerciseMetadata{
 				Track:       "cpp",
 				Exercise:    "clock",
 				Handle:      "alice",
@@ -119,7 +119,7 @@ func TestMetadataString(t *testing.T) {
 			desc: "cpp/clock (2)",
 		},
 		{
-			metadata: Metadata{
+			metadata: ExerciseMetadata{
 				Track:       "fsharp",
 				Exercise:    "hello-world",
 				Handle:      "bob",
@@ -128,7 +128,7 @@ func TestMetadataString(t *testing.T) {
 			desc: "fsharp/hello-world by @bob",
 		},
 		{
-			metadata: Metadata{
+			metadata: ExerciseMetadata{
 				Track:       "haskell",
 				Exercise:    "allergies",
 				Handle:      "charlie",

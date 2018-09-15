@@ -109,7 +109,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 	var exerciseDir string
 	for _, arg := range args {
-		dir, err := ws.SolutionDir(arg)
+		dir, err := ws.ExerciseDir(arg)
 		if err != nil {
 			if workspace.IsMissingMetadata(err) {
 				return errors.New(msgMissingMetadata)
@@ -136,7 +136,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	if verbose, _ := flags.GetBool("verbose"); verbose {
 		fmt.Fprintf(os.Stderr, migrationStatus.String())
 	}
-	metadata, err := workspace.NewMetadata(exerciseDir)
+	metadata, err := workspace.NewExerciseMetadata(exerciseDir)
 	if err != nil {
 		return err
 	}

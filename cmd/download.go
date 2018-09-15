@@ -132,7 +132,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		}
 	}
 
-	metadata := workspace.Metadata{
+	metadata := workspace.ExerciseMetadata{
 		AutoApprove: payload.Solution.Exercise.AutoApprove,
 		Track:       payload.Solution.Exercise.Track.ID,
 		Team:        payload.Solution.Team.Slug,

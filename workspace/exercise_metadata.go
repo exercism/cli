@@ -16,8 +16,8 @@ const ignoreSubdir = ".exercism"
 
 var metadataFilepath = filepath.Join(ignoreSubdir, metadataFilename)
 
-// Metadata contains metadata about a user's solution.
-type Metadata struct {
+// ExerciseMetadata contains metadata about a user's exercise.
+type ExerciseMetadata struct {
 	Track       string     `json:"track"`
 	Exercise    string     `json:"exercise"`
 	ID          string     `json:"id"`
@@ -30,15 +30,15 @@ type Metadata struct {
 	AutoApprove bool       `json:"auto_approve"`
 }
 
-// NewMetadata reads solution metadata from a file in the given directory.
-func NewMetadata(dir string) (*Metadata, error) {
+// NewExerciseMetadata reads exercise metadata from a file in the given directory.
+func NewExerciseMetadata(dir string) (*ExerciseMetadata, error) {
 	b, err := ioutil.ReadFile(filepath.Join(dir, metadataFilepath))
 	if err != nil {
-		return &Metadata{}, err
+		return &ExerciseMetadata{}, err
 	}
-	var s Metadata
+	var s ExerciseMetadata
 	if err := json.Unmarshal(b, &s); err != nil {
-		return &Metadata{}, err
+		return &ExerciseMetadata{}, err
 	}
 	s.Dir = dir
 	return &s, nil
@@ -47,11 +47,11 @@ func NewMetadata(dir string) (*Metadata, error) {
 // Suffix is the serial numeric value appended to an exercise directory.
 // This is appended to avoid name conflicts, and does not indicate a particular
 // iteration.
-func (s *Metadata) Suffix() string {
+func (s *ExerciseMetadata) Suffix() string {
 	return strings.Trim(strings.Replace(filepath.Base(s.Dir), s.Exercise, "", 1), "-.")
 }
 
-func (s *Metadata) String() string {
+func (s *ExerciseMetadata) String() string {
 	str := fmt.Sprintf("%s/%s", s.Track, s.Exercise)
 	if s.Suffix() != "" {
 		str = fmt.Sprintf("%s (%s)", str, s.Suffix())
@@ -62,8 +62,8 @@ func (s *Metadata) String() string {
 	return str
 }
 
-// Write stores solution metadata to a file.
-func (s *Metadata) Write(dir string) error {
+// Write stores exercise metadata to a file.
+func (s *ExerciseMetadata) Write(dir string) error {
 	b, err := json.Marshal(s)
 	if err != nil {
 		return err
@@ -80,7 +80,7 @@ func (s *Metadata) Write(dir string) error {
 }
 
 // PathToParent is the relative path from the workspace to the parent dir.
-func (s *Metadata) PathToParent() string {
+func (s *ExerciseMetadata) PathToParent() string {
 	var dir string
 	if !s.IsRequester {
 		dir = filepath.Join("users")

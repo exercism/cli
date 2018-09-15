@@ -17,7 +17,7 @@ Pass the path to the directory that contains the solution you want to see on the
 	`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		metadata, err := workspace.NewMetadata(args[0])
+		metadata, err := workspace.NewExerciseMetadata(args[0])
 		if err != nil {
 			return err
 		}
