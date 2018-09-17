@@ -144,13 +144,13 @@ func TestDownload(t *testing.T) {
 
 		dir := filepath.Join(targetDir, "bogus-track", "bogus-exercise")
 		b, err := ioutil.ReadFile(workspace.NewExerciseFromDir(dir).MetadataFilepath())
-		var s workspace.ExerciseMetadata
-		err = json.Unmarshal(b, &s)
+		var metadata workspace.ExerciseMetadata
+		err = json.Unmarshal(b, &metadata)
 		assert.NoError(t, err)
 
-		assert.Equal(t, "bogus-track", s.Track)
-		assert.Equal(t, "bogus-exercise", s.Exercise)
-		assert.Equal(t, tc.requester, s.IsRequester)
+		assert.Equal(t, "bogus-track", metadata.Track)
+		assert.Equal(t, "bogus-exercise", metadata.Exercise)
+		assert.Equal(t, tc.requester, metadata.IsRequester)
 	}
 }
 

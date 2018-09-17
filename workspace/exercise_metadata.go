@@ -36,35 +36,35 @@ func NewExerciseMetadata(dir string) (*ExerciseMetadata, error) {
 	if err != nil {
 		return &ExerciseMetadata{}, err
 	}
-	var s ExerciseMetadata
-	if err := json.Unmarshal(b, &s); err != nil {
+	var metadata ExerciseMetadata
+	if err := json.Unmarshal(b, &metadata); err != nil {
 		return &ExerciseMetadata{}, err
 	}
-	s.Dir = dir
-	return &s, nil
+	metadata.Dir = dir
+	return &metadata, nil
 }
 
 // Suffix is the serial numeric value appended to an exercise directory.
 // This is appended to avoid name conflicts, and does not indicate a particular
 // iteration.
-func (s *ExerciseMetadata) Suffix() string {
-	return strings.Trim(strings.Replace(filepath.Base(s.Dir), s.Exercise, "", 1), "-.")
+func (em *ExerciseMetadata) Suffix() string {
+	return strings.Trim(strings.Replace(filepath.Base(em.Dir), em.Exercise, "", 1), "-.")
 }
 
-func (s *ExerciseMetadata) String() string {
-	str := fmt.Sprintf("%s/%s", s.Track, s.Exercise)
-	if s.Suffix() != "" {
-		str = fmt.Sprintf("%s (%s)", str, s.Suffix())
+func (em *ExerciseMetadata) String() string {
+	str := fmt.Sprintf("%s/%s", em.Track, em.Exercise)
+	if em.Suffix() != "" {
+		str = fmt.Sprintf("%s (%s)", str, em.Suffix())
 	}
-	if !s.IsRequester && s.Handle != "" {
-		str = fmt.Sprintf("%s by @%s", str, s.Handle)
+	if !em.IsRequester && em.Handle != "" {
+		str = fmt.Sprintf("%s by @%s", str, em.Handle)
 	}
 	return str
 }
 
 // Write stores exercise metadata to a file.
-func (s *ExerciseMetadata) Write(dir string) error {
-	b, err := json.Marshal(s)
+func (em *ExerciseMetadata) Write(dir string) error {
+	b, err := json.Marshal(em)
 	if err != nil {
 		return err
 	}
@@ -75,15 +75,15 @@ func (s *ExerciseMetadata) Write(dir string) error {
 	if err = ioutil.WriteFile(metadataAbsoluteFilepath, b, os.FileMode(0600)); err != nil {
 		return err
 	}
-	s.Dir = dir
+	em.Dir = dir
 	return nil
 }
 
 // PathToParent is the relative path from the workspace to the parent dir.
-func (s *ExerciseMetadata) PathToParent() string {
+func (em *ExerciseMetadata) PathToParent() string {
 	var dir string
-	if !s.IsRequester {
+	if !em.IsRequester {
 		dir = filepath.Join("users")
 	}
-	return filepath.Join(dir, s.Track)
+	return filepath.Join(dir, em.Track)
 }

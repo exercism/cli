@@ -14,7 +14,7 @@ func TestExerciseMetadata(t *testing.T) {
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
 
-	s1 := &ExerciseMetadata{
+	em1 := &ExerciseMetadata{
 		Track:       "a-track",
 		Exercise:    "bogus-exercise",
 		ID:          "abc",
@@ -23,23 +23,23 @@ func TestExerciseMetadata(t *testing.T) {
 		IsRequester: true,
 		Dir:         dir,
 	}
-	err = s1.Write(dir)
+	err = em1.Write(dir)
 	assert.NoError(t, err)
 
-	s2, err := NewExerciseMetadata(dir)
+	em2, err := NewExerciseMetadata(dir)
 	assert.NoError(t, err)
-	assert.Nil(t, s2.SubmittedAt)
-	assert.Equal(t, s1, s2)
+	assert.Nil(t, em2.SubmittedAt)
+	assert.Equal(t, em1, em2)
 
 	ts := time.Date(2000, 1, 2, 3, 4, 5, 6, time.UTC)
-	s2.SubmittedAt = &ts
+	em2.SubmittedAt = &ts
 
-	err = s2.Write(dir)
+	err = em2.Write(dir)
 	assert.NoError(t, err)
 
-	s3, err := NewExerciseMetadata(dir)
+	em3, err := NewExerciseMetadata(dir)
 	assert.NoError(t, err)
-	assert.Equal(t, s2, s3)
+	assert.Equal(t, em2, em3)
 }
 
 func TestSuffix(t *testing.T) {
