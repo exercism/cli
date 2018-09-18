@@ -389,19 +389,19 @@ All changes by [@msgehard]
 * Implement login and logout
 * Build on Travis
 
-[@Dparker1990]: https://github.com/Dparker1990
-[@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
-[@Tonkpils]: https://github.com/Tonkpils
-[@TrevorBramble]: https://github.com/TrevorBramble
+[@alebaffa]: https://github.com/alebaffa
+[@AlexWheeler]: https://github.com/AlexWheeler
 [@ambroff]: https://github.com/ambroff
 [@andrewsardone]: https://github.com/andrewsardone
 [@anxiousmodernman]: https://github.com/anxiousmodernman
+[@beanieboi]: https://github.com/beanieboi
 [@blackerby]: https://github.com/blackerby
 [@broady]: https://github.com/broady
 [@ccnp123]: https://github.com/ccnp123
 [@cookrn]: https://github.com/cookrn
 [@daveyarwood]: https://github.com/daveyarwood
 [@devonestes]: https://github.com/devonestes
+[@Dparker1990]: https://github.com/Dparker1990
 [@djquan]: https://github.com/djquan
 [@dmmulroy]: https://github.com/dmmulroy
 [@dpritchett]: https://github.com/dpritchett
@@ -414,18 +414,22 @@ All changes by [@msgehard]
 [@hjljo]: https://github.com/hjljo
 [@isbadawi]: https://github.com/isbadawi
 [@jdsutherland]: https://github.com/jdsutherland
+[@jbaiter]: https://github.com/jbaiter
 [@jgsqware]: https://github.com/jgsqware
 [@jish]: https://github.com/jish
 [@jppunnett]: https://github.com/jppunnett
 [@kytrinyx]: https://github.com/kytrinyx
 [@lcowell]: https://github.com/lcowell
+[@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
 [@manusajith]: https://github.com/manusajith
 [@morphatic]: https://github.com/morphatic
+[@mrageh]: https://github.com/mrageh
 [@msgehard]: https://github.com/msgehard
 [@narqo]: https://github.com/narqo
 [@neslom]: https://github.com/neslom
 [@nf]: https://github.com/nf
 [@nilbus]: https://github.com/nilbus
+[@nywilken]: https://github.com/nywilken
 [@petertseng]: https://github.com/petertseng
 [@pminten]: https://github.com/pminten
 [@queuebit]: https://github.com/queuebit
@@ -433,5 +437,7 @@ All changes by [@msgehard]
 [@rprouse]: https://github.com/rprouse
 [@simonjefford]: https://github.com/simonjefford
 [@srt32]: https://github.com/srt32
+[@Tonkpils]: https://github.com/Tonkpils
+[@TrevorBramble]: https://github.com/TrevorBramble
 [@williandrade]: https://github.com/williandrade
 [@zabawaba99]: https://github.com/zabawaba99
