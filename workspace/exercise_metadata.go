@@ -34,11 +34,11 @@ type ExerciseMetadata struct {
 func NewExerciseMetadata(dir string) (*ExerciseMetadata, error) {
 	b, err := ioutil.ReadFile(filepath.Join(dir, metadataFilepath))
 	if err != nil {
-		return &ExerciseMetadata{}, err
+		return nil, err
 	}
 	var metadata ExerciseMetadata
 	if err := json.Unmarshal(b, &metadata); err != nil {
-		return &ExerciseMetadata{}, err
+		return nil, err
 	}
 	metadata.Dir = dir
 	return &metadata, nil

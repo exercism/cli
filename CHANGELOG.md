@@ -5,7 +5,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
-* **Your contribution here**
+* [#736](https://github.com/exercism/cli/pull/736) Metadata file .solution.json renamed to metadata.json
 
 ## v3.0.9 (2018-08-29)
 * [#720](https://github.com/exercism/cli/pull/720) Make the timeout configurable globally - [@kytrinyx]

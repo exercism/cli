@@ -5,12 +5,12 @@ type ExerciseMetadataCollection []*ExerciseMetadata
 
 // NewExerciseMetadataCollection loads up the exercise metadata for each of the provided paths.
 func NewExerciseMetadataCollection(paths []string) (ExerciseMetadataCollection, error) {
-	var metadataCollection []*ExerciseMetadata
+	var metadataCollection ExerciseMetadataCollection
 
 	for _, path := range paths {
 		metadata, err := NewExerciseMetadata(path)
 		if err != nil {
-			return []*ExerciseMetadata{}, err
+			return nil, err
 		}
 		metadataCollection = append(metadataCollection, metadata)
 	}
