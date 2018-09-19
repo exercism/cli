@@ -5,7 +5,17 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
+* **Your contribution here**
+
+## v3.0.10-alpha.1 (2018-09-21)
+* [#739](https://github.com/exercism/cli/pull/739) update maxFileSize error to include filename - [@nywilken]
 * [#736](https://github.com/exercism/cli/pull/736) Metadata file .solution.json renamed to metadata.json - [@jdsutherland]
+* [#738](https://github.com/exercism/cli/pull/738) Add missing contributor URLs to CHANGELOG - [@nywilken]
+* [#737](https://github.com/exercism/cli/pull/737) Remove unused solutions type - [@jdsutherland]
+* [#729](https://github.com/exercism/cli/pull/729) Update Oh My Zsh instructions - [@katrinleinweber]
+* [#725](https://github.com/exercism/cli/pull/725) Do not allow submission of enormous files  - [@sfairchild]
+* [#724](https://github.com/exercism/cli/pull/724) Update submit error message when submitting a directory - [@sfairchild]
+* [#723](https://github.com/exercism/cli/pull/720) Move .solution.json to hidden subdirectory - [@jdsutherland]
 
 ## v3.0.9 (2018-08-29)
 * [#720](https://github.com/exercism/cli/pull/720) Make the timeout configurable globally - [@kytrinyx]
@@ -419,6 +429,7 @@ All changes by [@msgehard]
 [@jish]: https://github.com/jish
 [@jppunnett]: https://github.com/jppunnett
 [@kytrinyx]: https://github.com/kytrinyx
+[@katrinleinweber]: https://github.com/katrinleinweber
 [@lcowell]: https://github.com/lcowell
 [@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
 [@manusajith]: https://github.com/manusajith
@@ -435,6 +446,7 @@ All changes by [@msgehard]
 [@queuebit]: https://github.com/queuebit
 [@rcode5]: https://github.com/rcode5
 [@rprouse]: https://github.com/rprouse
+[@sfairchild]: https://github.com/sfairchild
 [@simonjefford]: https://github.com/simonjefford
 [@srt32]: https://github.com/srt32
 [@Tonkpils]: https://github.com/Tonkpils
