@@ -9,12 +9,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSolution(t *testing.T) {
+func TestExerciseMetadata(t *testing.T) {
 	dir, err := ioutil.TempDir("", "solution")
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
 
-	s1 := &Solution{
+	em1 := &ExerciseMetadata{
 		Track:       "a-track",
 		Exercise:    "bogus-exercise",
 		ID:          "abc",
@@ -23,53 +23,53 @@ func TestSolution(t *testing.T) {
 		IsRequester: true,
 		Dir:         dir,
 	}
-	err = s1.Write(dir)
+	err = em1.Write(dir)
 	assert.NoError(t, err)
 
-	s2, err := NewSolution(dir)
+	em2, err := NewExerciseMetadata(dir)
 	assert.NoError(t, err)
-	assert.Nil(t, s2.SubmittedAt)
-	assert.Equal(t, s1, s2)
+	assert.Nil(t, em2.SubmittedAt)
+	assert.Equal(t, em1, em2)
 
 	ts := time.Date(2000, 1, 2, 3, 4, 5, 6, time.UTC)
-	s2.SubmittedAt = &ts
+	em2.SubmittedAt = &ts
 
-	err = s2.Write(dir)
+	err = em2.Write(dir)
 	assert.NoError(t, err)
 
-	s3, err := NewSolution(dir)
+	em3, err := NewExerciseMetadata(dir)
 	assert.NoError(t, err)
-	assert.Equal(t, s2, s3)
+	assert.Equal(t, em2, em3)
 }
 
 func TestSuffix(t *testing.T) {
 	testCases := []struct {
-		solution Solution
+		metadata ExerciseMetadata
 		suffix   string
 	}{
 		{
-			solution: Solution{
+			metadata: ExerciseMetadata{
 				Exercise: "bat",
 				Dir:      "",
 			},
 			suffix: "",
 		},
 		{
-			solution: Solution{
+			metadata: ExerciseMetadata{
 				Exercise: "bat",
 				Dir:      "/path/to/bat",
 			},
 			suffix: "",
 		},
 		{
-			solution: Solution{
+			metadata: ExerciseMetadata{
 				Exercise: "bat",
 				Dir:      "/path/to/bat-2",
 			},
 			suffix: "2",
 		},
 		{
-			solution: Solution{
+			metadata: ExerciseMetadata{
 				Exercise: "bat",
 				Dir:      "/path/to/bat-200",
 			},
@@ -78,20 +78,20 @@ func TestSuffix(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		testName := "Suffix of '" + tc.solution.Dir + "' should be " + tc.suffix
+		testName := "Suffix of '" + tc.metadata.Dir + "' should be " + tc.suffix
 		t.Run(testName, func(t *testing.T) {
-			assert.Equal(t, tc.suffix, tc.solution.Suffix(), testName)
+			assert.Equal(t, tc.suffix, tc.metadata.Suffix(), testName)
 		})
 	}
 }
 
-func TestSolutionString(t *testing.T) {
+func TestExerciseMetadataString(t *testing.T) {
 	testCases := []struct {
-		solution Solution
+		metadata ExerciseMetadata
 		desc     string
 	}{
 		{
-			solution: Solution{
+			metadata: ExerciseMetadata{
 				Track:    "elixir",
 				Exercise: "secret-handshake",
 				Handle:   "",
@@ -100,7 +100,7 @@ func TestSolutionString(t *testing.T) {
 			desc: "elixir/secret-handshake",
 		},
 		{
-			solution: Solution{
+			metadata: ExerciseMetadata{
 				Track:       "cpp",
 				Exercise:    "clock",
 				Handle:      "alice",
@@ -109,7 +109,7 @@ func TestSolutionString(t *testing.T) {
 			desc: "cpp/clock",
 		},
 		{
-			solution: Solution{
+			metadata: ExerciseMetadata{
 				Track:       "cpp",
 				Exercise:    "clock",
 				Handle:      "alice",
@@ -119,7 +119,7 @@ func TestSolutionString(t *testing.T) {
 			desc: "cpp/clock (2)",
 		},
 		{
-			solution: Solution{
+			metadata: ExerciseMetadata{
 				Track:       "fsharp",
 				Exercise:    "hello-world",
 				Handle:      "bob",
@@ -128,7 +128,7 @@ func TestSolutionString(t *testing.T) {
 			desc: "fsharp/hello-world by @bob",
 		},
 		{
-			solution: Solution{
+			metadata: ExerciseMetadata{
 				Track:       "haskell",
 				Exercise:    "allergies",
 				Handle:      "charlie",
@@ -142,7 +142,7 @@ func TestSolutionString(t *testing.T) {
 	for _, tc := range testCases {
 		testName := "should stringify to '" + tc.desc + "'"
 		t.Run(testName, func(t *testing.T) {
-			assert.Equal(t, tc.desc, tc.solution.String())
+			assert.Equal(t, tc.desc, tc.metadata.String())
 		})
 	}
 }

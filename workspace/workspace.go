@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-var errMissingMetadata = errors.New("no solution metadata file found")
+var errMissingMetadata = errors.New("no exercise metadata file found")
 
 // IsMissingMetadata verifies the type of error.
 func IsMissingMetadata(err error) bool {
@@ -95,9 +95,9 @@ func (ws Workspace) Exercises() ([]Exercise, error) {
 	return exercises, nil
 }
 
-// SolutionDir determines the root directory of a solution.
-// This is the directory that contains the solution metadata file.
-func (ws Workspace) SolutionDir(s string) (string, error) {
+// ExerciseDir determines the root directory of an exercise.
+// This is the directory that contains the exercise metadata file.
+func (ws Workspace) ExerciseDir(s string) (string, error) {
 	if !strings.HasPrefix(s, ws.Dir) {
 		return "", errors.New("not in workspace")
 	}
@@ -113,7 +113,7 @@ func (ws Workspace) SolutionDir(s string) (string, error) {
 		if _, err := os.Lstat(filepath.Join(path, metadataFilepath)); err == nil {
 			return path, nil
 		}
-		if _, err := os.Lstat(filepath.Join(path, legacySolutionFilename)); err == nil {
+		if _, err := os.Lstat(filepath.Join(path, legacyMetadataFilename)); err == nil {
 			return path, nil
 		}
 		path = filepath.Dir(path)

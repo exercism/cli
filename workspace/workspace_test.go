@@ -88,7 +88,7 @@ func TestWorkspaceExercises(t *testing.T) {
 	}
 }
 
-func TestSolutionDir(t *testing.T) {
+func TestExerciseDir(t *testing.T) {
 	_, cwd, _, _ := runtime.Caller(0)
 	root := filepath.Join(cwd, "..", "..", "fixtures", "solution-dir")
 
@@ -130,7 +130,7 @@ func TestSolutionDir(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		dir, err := ws.SolutionDir(test.path)
+		dir, err := ws.ExerciseDir(test.path)
 		if !test.ok {
 			assert.Error(t, err, test.path)
 			continue

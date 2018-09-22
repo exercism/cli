@@ -10,14 +10,14 @@ import (
 	"time"
 )
 
-const solutionFilename = "solution.json"
-const legacySolutionFilename = ".solution.json"
+const metadataFilename = "metadata.json"
+const legacyMetadataFilename = ".solution.json"
 const ignoreSubdir = ".exercism"
 
-var metadataFilepath = filepath.Join(ignoreSubdir, solutionFilename)
+var metadataFilepath = filepath.Join(ignoreSubdir, metadataFilename)
 
-// Solution contains metadata about a user's solution.
-type Solution struct {
+// ExerciseMetadata contains metadata about a user's exercise.
+type ExerciseMetadata struct {
 	Track       string     `json:"track"`
 	Exercise    string     `json:"exercise"`
 	ID          string     `json:"id"`
@@ -30,41 +30,41 @@ type Solution struct {
 	AutoApprove bool       `json:"auto_approve"`
 }
 
-// NewSolution reads solution metadata from a file in the given directory.
-func NewSolution(dir string) (*Solution, error) {
+// NewExerciseMetadata reads exercise metadata from a file in the given directory.
+func NewExerciseMetadata(dir string) (*ExerciseMetadata, error) {
 	b, err := ioutil.ReadFile(filepath.Join(dir, metadataFilepath))
 	if err != nil {
-		return &Solution{}, err
+		return nil, err
 	}
-	var s Solution
-	if err := json.Unmarshal(b, &s); err != nil {
-		return &Solution{}, err
+	var metadata ExerciseMetadata
+	if err := json.Unmarshal(b, &metadata); err != nil {
+		return nil, err
 	}
-	s.Dir = dir
-	return &s, nil
+	metadata.Dir = dir
+	return &metadata, nil
 }
 
 // Suffix is the serial numeric value appended to an exercise directory.
 // This is appended to avoid name conflicts, and does not indicate a particular
 // iteration.
-func (s *Solution) Suffix() string {
-	return strings.Trim(strings.Replace(filepath.Base(s.Dir), s.Exercise, "", 1), "-.")
+func (em *ExerciseMetadata) Suffix() string {
+	return strings.Trim(strings.Replace(filepath.Base(em.Dir), em.Exercise, "", 1), "-.")
 }
 
-func (s *Solution) String() string {
-	str := fmt.Sprintf("%s/%s", s.Track, s.Exercise)
-	if s.Suffix() != "" {
-		str = fmt.Sprintf("%s (%s)", str, s.Suffix())
+func (em *ExerciseMetadata) String() string {
+	str := fmt.Sprintf("%s/%s", em.Track, em.Exercise)
+	if em.Suffix() != "" {
+		str = fmt.Sprintf("%s (%s)", str, em.Suffix())
 	}
-	if !s.IsRequester && s.Handle != "" {
-		str = fmt.Sprintf("%s by @%s", str, s.Handle)
+	if !em.IsRequester && em.Handle != "" {
+		str = fmt.Sprintf("%s by @%s", str, em.Handle)
 	}
 	return str
 }
 
-// Write stores solution metadata to a file.
-func (s *Solution) Write(dir string) error {
-	b, err := json.Marshal(s)
+// Write stores exercise metadata to a file.
+func (em *ExerciseMetadata) Write(dir string) error {
+	b, err := json.Marshal(em)
 	if err != nil {
 		return err
 	}
@@ -75,15 +75,15 @@ func (s *Solution) Write(dir string) error {
 	if err = ioutil.WriteFile(metadataAbsoluteFilepath, b, os.FileMode(0600)); err != nil {
 		return err
 	}
-	s.Dir = dir
+	em.Dir = dir
 	return nil
 }
 
 // PathToParent is the relative path from the workspace to the parent dir.
-func (s *Solution) PathToParent() string {
+func (em *ExerciseMetadata) PathToParent() string {
 	var dir string
-	if !s.IsRequester {
+	if !em.IsRequester {
 		dir = filepath.Join("users")
 	}
-	return filepath.Join(dir, s.Track)
+	return filepath.Join(dir, em.Track)
 }

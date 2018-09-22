@@ -42,7 +42,7 @@ func (e Exercise) MetadataFilepath() string {
 
 // LegacyMetadataFilepath is the absolute path to the legacy exercise metadata.
 func (e Exercise) LegacyMetadataFilepath() string {
-	return filepath.Join(e.Filepath(), legacySolutionFilename)
+	return filepath.Join(e.Filepath(), legacyMetadataFilename)
 }
 
 // MetadataDir returns the directory that the exercise metadata lives in.
