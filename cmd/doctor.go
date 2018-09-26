@@ -17,7 +17,7 @@ var doctorCmd = &cobra.Command{
 	Short:   "Doctor reports workspace cleanup tasks.",
 	Long: `Doctor reports workspace cleanup tasks.
 
-	use --fixup to execute reported tasks.
+	Use --fixup to run reported tasks.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.NewConfig()
@@ -52,9 +52,17 @@ func runDoctor(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
+	exercises, err := ws.PotentialExercises()
+	fmt.Printf("\texercises: \n%+v\n", exercises)
+
 	return nil
+}
+
+func setupDoctorFlags(flags *pflag.FlagSet) {
+	flags.BoolP("fixup", "f", false, "run tasks")
 }
 
 func init() {
 	RootCmd.AddCommand(doctorCmd)
+	setupDoctorFlags(doctorCmd.Flags())
 }
