@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestExerciseHasMetadataDoesNotOverwrite(t *testing.T) {
+func TestExerciseWithMetadataDoesNotOverwrite(t *testing.T) {
 	// * Test setup: an exercise directory with a metadata file
 	// * Verify: it doesn't get overwritten
 
@@ -36,8 +36,8 @@ func TestExerciseHasMetadataDoesNotOverwrite(t *testing.T) {
 
 	// get metadata modtime
 	exercise := workspace.NewExerciseFromDir(dir)
-	info, err := os.Lstat(exercise.MetadataFilepath())
-	preDoctorMetadataModTime := info.ModTime()
+	fileInfo, err := os.Lstat(exercise.MetadataFilepath())
+	preDoctorMetadataModTime := fileInfo.ModTime()
 
 	v := viper.New()
 	v.Set("token", "abc123")
@@ -48,11 +48,20 @@ func TestExerciseHasMetadataDoesNotOverwrite(t *testing.T) {
 		DefaultBaseURL:  "http://example.com",
 	}
 
-	err = runDoctor(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), nil)
+	// configure fixup flag
+	args := []string{
+		"--fixup",
+	}
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	setupDoctorFlags(flags)
+	err = flags.Parse(args)
 	assert.NoError(t, err)
 
-	info, err = os.Lstat(exercise.MetadataFilepath())
-	postDoctorMetadataModTime := info.ModTime()
+	err = runDoctor(cfg, flags)
+	assert.NoError(t, err)
+
+	fileInfo, err = os.Lstat(exercise.MetadataFilepath())
+	postDoctorMetadataModTime := fileInfo.ModTime()
 	assert.Equal(t, preDoctorMetadataModTime, postDoctorMetadataModTime)
 }
 
@@ -63,36 +72,51 @@ func TestExerciseWithoutMetadataWritesMetadataWithoutTouchingExerciseFiles(t *te
 
 	// TODO: necessary to fake a test server?
 
-	tmpDir, err := ioutil.TempDir("", "has-metadata")
+	tmpDir, err := ioutil.TempDir("", "no-metadata")
 	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
+
+	// TODO: extract from cmd/download?
+	ts := fakeDownloadServer("true", "bogus-team")
+	defer ts.Close()
 
 	v := viper.New()
 	v.Set("token", "abc123")
 	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
 	cfg := config.Config{
 		Persister:       config.InMemoryPersister{},
 		UserViperConfig: v,
 		DefaultBaseURL:  "http://example.com",
 	}
+
+	// configure fixup flag
+	args := []string{
+		"--fixup",
+	}
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	setupDoctorFlags(flags)
+	err = flags.Parse(args)
+
+	assert.NoError(t, err)
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
 	exercise := workspace.NewExerciseFromDir(dir)
 
 	testFilepath := filepath.Join(dir, "file.txt")
 	err = ioutil.WriteFile(testFilepath, []byte("This is a file."), os.FileMode(0755))
-	info, err := os.Lstat(testFilepath)
-	preDoctorTestFileModTime := info.ModTime()
+	fileInfo, err := os.Lstat(testFilepath)
+	preDoctorTestFileModTime := fileInfo.ModTime()
 
 	ok, err := exercise.HasMetadata()
 	assert.NoError(t, err)
 	assert.False(t, ok)
 
-	err = runDoctor(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), nil)
+	err = runDoctor(cfg, flags)
 	assert.NoError(t, err)
 
-	info, err = os.Lstat(testFilepath)
-	postDoctorTestFileModTime := info.ModTime()
+	fileInfo, err = os.Lstat(testFilepath)
+	postDoctorTestFileModTime := fileInfo.ModTime()
 	assert.Equal(t, preDoctorTestFileModTime, postDoctorTestFileModTime)
 
 	ok, err = exercise.HasMetadata()
