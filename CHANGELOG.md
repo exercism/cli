@@ -7,6 +7,9 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * **Your contribution here**
 
+## v3.0.10 (2018-10-03)
+* official release of v3.0.10-alpha.1 - [@nywilken]
+
 ## v3.0.10-alpha.1 (2018-09-21)
 * [#739](https://github.com/exercism/cli/pull/739) update maxFileSize error to include filename - [@nywilken]
 * [#736](https://github.com/exercism/cli/pull/736) Metadata file .solution.json renamed to metadata.json - [@jdsutherland]
