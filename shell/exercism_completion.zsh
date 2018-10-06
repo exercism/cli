@@ -6,7 +6,7 @@ _exercism() {
     options=(debug:"Outputs useful debug information."
              configure:"Writes config values to a JSON file."
              demo:"Fetches a demo problem for each language track on exercism.io."
-             fetch:"Fetches your current problems on exercism.ios well as the next unstarted problem in each language."
+             fetch:"Fetches your current problems on exercism.io, as well as the next unstarted problem in each language."
              restore:"Restores completed and current problems on from exercism.iolong with your most recent iteration for each."
              submit:"Submits a new iteration to a problem on exercism.io."
              unsubmit:"Deletes the most recently submitted iteration."
