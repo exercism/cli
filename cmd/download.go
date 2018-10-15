@@ -229,6 +229,8 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 	fmt.Fprintf(Err, "\nDownloaded to\n")
 	fmt.Fprintf(Out, "%s\n", metadata.Dir)
+	fmt.Fprintf(Err, "\nExercism relies on volunteer mentors. If you would like to be a mentor, sign up at:\n")
+	fmt.Fprintf(Err, "\nhttps://exercism.io/mentor\n")
 	return nil
 }
 
