@@ -257,6 +257,8 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 	fmt.Fprintf(Err, msg, suffix)
 	fmt.Fprintf(Out, "    %s\n\n", metadata.URL)
+	fmt.Fprintf(Err, "\nExercism relies on volunteer mentors. If you would like to be a mentor, sign up at:\n")
+	fmt.Fprintf(Err, "\nhttps://exercism.io/mentor\n")
 	return nil
 }
 
