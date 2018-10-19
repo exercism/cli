@@ -10,7 +10,7 @@ Exercism would be impossible without people like you being willing to spend time
 
 ## Dependencies
 
-You'll need Go version 1.9 or higher. Follow the directions on http://golang.org/doc/install
+You'll need Go version 1.10 or higher. Follow the directions on http://golang.org/doc/install
 
 You will also need `dep`, the Go dependency management tool. Follow the directions on https://golang.github.io/dep/docs/installation.html
 
