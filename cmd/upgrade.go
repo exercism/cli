@@ -23,7 +23,14 @@ You can always delete this file.
 	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c := cli.New(Version)
-		return updateCLI(c)
+		err := updateCLI(c)
+		if err != nil {
+			err = fmt.Errorf(`We were not able to upgrade the cli because we encountered an error: %s
+Please check the FAQ for solutions to common upgrading issues.
+
+https://exercism.io/faqs`, err)
+		}
+		return err
 	},
 }
 
