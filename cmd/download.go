@@ -76,58 +76,126 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	param := "latest"
+	urlParam := "latest"
 	if uuid != "" {
-		param = uuid
+		urlParam = uuid
 	}
-	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), param)
+
+	params := downloadParams{
+		cfg:      cfg,
+		uuid:     uuid,
+		slug:     slug,
+		track:    track,
+		team:     team,
+		urlParam: urlParam,
+	}
+	payload, err := getDownloadPayload(params)
+	if err != nil {
+		return err
+	}
+
+	if err := writeMetadataFromPayload(payload, cfg); err != nil {
+		return err
+	}
+
+	if err := writeSolutionFilesFromPayload(payload, cfg); err != nil {
+		return err
+	}
+
+	fmt.Fprintf(Err, "\nDownloaded to\n%s\n", getExerciseDirFromPayload(payload, cfg))
+	return nil
+}
+
+func getExerciseDirFromPayload(payload *downloadPayload, cfg config.Config) string {
+	usrCfg := cfg.UserViperConfig
+
+	root := usrCfg.GetString("workspace")
+	if payload.Solution.Team.Slug != "" {
+		root = filepath.Join(root, "teams", payload.Solution.Team.Slug)
+	}
+	if !payload.Solution.User.IsRequester {
+		root = filepath.Join(root, "users", payload.Solution.User.Handle)
+	}
+	exercise := workspace.Exercise{
+		Root:  root,
+		Track: payload.Solution.Exercise.Track.ID,
+		Slug:  payload.Solution.Exercise.ID,
+	}
+	return exercise.MetadataDir()
+}
+
+type downloadParams struct {
+	cfg      config.Config
+	uuid     string
+	slug     string
+	track    string
+	team     string
+	urlParam string
+}
+
+func getDownloadPayload(params downloadParams) (*downloadPayload, error) {
+	usrCfg := params.cfg.UserViperConfig
+
+	url := fmt.Sprintf("%s/solutions/%s",
+		usrCfg.GetString("apibaseurl"),
+		params.urlParam,
+	)
 
 	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	req, err := client.NewRequest("GET", url, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if uuid == "" {
+	if params.uuid == "" {
 		q := req.URL.Query()
-		q.Add("exercise_id", slug)
-		if track != "" {
-			q.Add("track_id", track)
+		q.Add("exercise_id", params.slug)
+		if params.track != "" {
+			q.Add("track_id", params.track)
 		}
-		if team != "" {
-			q.Add("team_id", team)
+		if params.team != "" {
+			q.Add("team_id", params.team)
 		}
 		req.URL.RawQuery = q.Encode()
 	}
 
 	res, err := client.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	var payload downloadPayload
+	var payload *downloadPayload
 	defer res.Body.Close()
 	if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
-		return fmt.Errorf("unable to parse API response - %s", err)
+		return nil, fmt.Errorf("unable to parse API response - %s", err)
 	}
 
 	if res.StatusCode == http.StatusUnauthorized {
 		siteURL := config.InferSiteURL(usrCfg.GetString("apibaseurl"))
-		return fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
+		return nil, fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
 	}
 
 	if res.StatusCode != http.StatusOK {
 		switch payload.Error.Type {
 		case "track_ambiguous":
-			return fmt.Errorf("%s: %s", payload.Error.Message, strings.Join(payload.Error.PossibleTrackIDs, ", "))
+			return nil, fmt.Errorf("%s: %s", payload.Error.Message, strings.Join(payload.Error.PossibleTrackIDs, ", "))
 		default:
-			return errors.New(payload.Error.Message)
+			return nil, errors.New(payload.Error.Message)
 		}
 	}
+
+	return payload, nil
+}
+
+func writeMetadataFromPayload(payload *downloadPayload, cfg config.Config) error {
+	if payload.Error.Message != "" {
+		return errors.New(payload.Error.Message)
+	}
+	usrCfg := cfg.UserViperConfig
 
 	metadata := workspace.ExerciseMetadata{
 		AutoApprove: payload.Solution.Exercise.AutoApprove,
@@ -160,22 +228,41 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	err = metadata.Write(dir)
-	if err != nil {
+	if err := metadata.Write(dir); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func writeSolutionFilesFromPayload(payload *downloadPayload, cfg config.Config) error {
+	if payload.Error.Message != "" {
+		return errors.New(payload.Error.Message)
+	}
+	usrCfg := cfg.UserViperConfig
+
+	root := usrCfg.GetString("workspace")
+	if payload.Solution.Team.Slug != "" {
+		root = filepath.Join(root, "teams", payload.Solution.Team.Slug)
+	}
+	if !payload.Solution.User.IsRequester {
+		root = filepath.Join(root, "users", payload.Solution.User.Handle)
+	}
+	exercise := workspace.Exercise{
+		Root:  root,
+		Track: payload.Solution.Exercise.Track.ID,
+		Slug:  payload.Solution.Exercise.ID,
 	}
 
 	for _, file := range payload.Solution.Files {
 		unparsedURL := fmt.Sprintf("%s%s", payload.Solution.FileDownloadBaseURL, file)
 		parsedURL, err := netURL.ParseRequestURI(unparsedURL)
-
 		if err != nil {
 			return err
 		}
 
-		url := parsedURL.String()
-
-		req, err := client.NewRequest("GET", url, nil)
+		client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
+		req, err := client.NewRequest("GET", parsedURL.String(), nil)
 		if err != nil {
 			return err
 		}
@@ -201,7 +288,8 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		// Work around a path bug due to an early design decision (later reversed) to
 		// allow numeric suffixes for exercise directories, allowing people to have
 		// multiple parallel versions of an exercise.
-		pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, metadata.Exercise)
+		// pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, metadata.Exercise)
+		pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, payload.Solution.Exercise.ID)
 		rgxNumericSuffix := regexp.MustCompile(pattern)
 		if rgxNumericSuffix.MatchString(file) {
 			file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
@@ -211,21 +299,22 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		file = strings.Replace(file, "\\", "/", -1)
 
 		relativePath := filepath.FromSlash(file)
-		dir := filepath.Join(metadata.Dir, filepath.Dir(relativePath))
-		os.MkdirAll(dir, os.FileMode(0755))
 
-		f, err := os.Create(filepath.Join(metadata.Dir, relativePath))
+		dir := filepath.Join(exercise.MetadataDir(), filepath.Dir(relativePath))
+		if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
+			return err
+		}
+
+		f, err := os.Create(filepath.Join(exercise.MetadataDir(), relativePath))
 		if err != nil {
 			return err
 		}
 		defer f.Close()
-		_, err = io.Copy(f, res.Body)
-		if err != nil {
+		if _, err := io.Copy(f, res.Body); err != nil {
 			return err
 		}
 	}
-	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", metadata.Dir)
+
 	return nil
 }
 
