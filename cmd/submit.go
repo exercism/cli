@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+    "github.com/exercism/cli/debug"
 )
 
 // submitCmd lets people upload a solution to the website.
@@ -43,6 +44,7 @@ var submitCmd = &cobra.Command{
 		v.SetConfigType("json")
 		// Ignore error. If the file doesn't exist, that is fine.
 		_ = v.ReadInConfig()
+        debug.Println("This will submit your exercise.\nPass the valid path to the exercise that is to be submitted. ")
 
 		return runSubmit(cfg, cmd.Flags(), args)
 	},

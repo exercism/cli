@@ -13,6 +13,7 @@ import (
 	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+    "github.com/exercism/cli/debug"
 )
 
 // fullAPIKey flag for troubleshoot command.
@@ -31,6 +32,8 @@ command into a GitHub issue so we can help figure out what's going on.
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cli.TimeoutInSeconds = cli.TimeoutInSeconds * 2
 		c := cli.New(Version)
+
+        debug.Printf("Troubleshoot command provides output to help with troubleshooting ")
 
 		cfg := config.NewConfig()
 

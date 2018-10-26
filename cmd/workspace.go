@@ -6,6 +6,7 @@ import (
 	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+    "github.com/exercism/cli/debug"
 )
 
 // workspaceCmd outputs the path to the person's workspace directory.
@@ -37,6 +38,7 @@ nothing will happen.
 		_ = v.ReadInConfig()
 
 		fmt.Fprintf(Out, "%s\n", v.GetString("workspace"))
+        debug.Printf("This directory is the workspace for your exercise.\nYou have to work and submit from the same drive.Otherwise nothing will hapen.\n")
 		return nil
 	},
 }

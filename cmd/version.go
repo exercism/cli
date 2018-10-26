@@ -5,6 +5,7 @@ import (
 
 	"github.com/exercism/cli/cli"
 	"github.com/spf13/cobra"
+    "github.com/exercism/cli/debug"
 )
 
 // Version is the version of the current build.
@@ -37,6 +38,8 @@ To check for the latest available version, call the command with the
 
 			fmt.Println(l)
 		}
+
+        debug.Printf("You are working on %s version of Exercism.\nTo check for the latest available version, call the command with the --latest flag\n",Version)
 
 		return nil
 	},
