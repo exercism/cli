@@ -153,32 +153,9 @@ func writeMetadataFromPayload(payload *downloadPayload, cfg config.Config) error
 	if payload.Error.Message != "" {
 		return errors.New(payload.Error.Message)
 	}
-	usrCfg := cfg.UserViperConfig
 
-	metadata := workspace.ExerciseMetadata{
-		AutoApprove: payload.Solution.Exercise.AutoApprove,
-		Track:       payload.Solution.Exercise.Track.ID,
-		Team:        payload.Solution.Team.Slug,
-		Exercise:    payload.Solution.Exercise.ID,
-		ID:          payload.Solution.ID,
-		URL:         payload.Solution.URL,
-		Handle:      payload.Solution.User.Handle,
-		IsRequester: payload.Solution.User.IsRequester,
-	}
-
-	root := usrCfg.GetString("workspace")
-	if metadata.Team != "" {
-		root = filepath.Join(root, "teams", metadata.Team)
-	}
-	if !metadata.IsRequester {
-		root = filepath.Join(root, "users", metadata.Handle)
-	}
-
-	exercise := workspace.Exercise{
-		Root:  root,
-		Track: metadata.Track,
-		Slug:  metadata.Exercise,
-	}
+	metadata := getMetadataFromPayload(payload)
+	exercise := getExerciseFromMetadata(metadata, cfg)
 
 	if err := metadata.Write(exercise.MetadataDir()); err != nil {
 		return err
@@ -193,18 +170,7 @@ func writeSolutionFilesFromPayload(payload *downloadPayload, cfg config.Config) 
 	}
 	usrCfg := cfg.UserViperConfig
 
-	root := usrCfg.GetString("workspace")
-	if payload.Solution.Team.Slug != "" {
-		root = filepath.Join(root, "teams", payload.Solution.Team.Slug)
-	}
-	if !payload.Solution.User.IsRequester {
-		root = filepath.Join(root, "users", payload.Solution.User.Handle)
-	}
-	exercise := workspace.Exercise{
-		Root:  root,
-		Track: payload.Solution.Exercise.Track.ID,
-		Slug:  payload.Solution.Exercise.ID,
-	}
+	exercise := getExerciseFromPayload(payload, cfg)
 
 	for _, file := range payload.Solution.Files {
 		unparsedURL := fmt.Sprintf("%s%s", payload.Solution.FileDownloadBaseURL, file)
@@ -267,6 +233,42 @@ func writeSolutionFilesFromPayload(payload *downloadPayload, cfg config.Config) 
 	}
 
 	return nil
+}
+
+func getMetadataFromPayload(payload *downloadPayload) workspace.ExerciseMetadata {
+	return workspace.ExerciseMetadata{
+		AutoApprove: payload.Solution.Exercise.AutoApprove,
+		Track:       payload.Solution.Exercise.Track.ID,
+		Team:        payload.Solution.Team.Slug,
+		Exercise:    payload.Solution.Exercise.ID,
+		ID:          payload.Solution.ID,
+		URL:         payload.Solution.URL,
+		Handle:      payload.Solution.User.Handle,
+		IsRequester: payload.Solution.User.IsRequester,
+	}
+}
+
+func getExerciseFromMetadata(metadata workspace.ExerciseMetadata, cfg config.Config) workspace.Exercise {
+	usrCfg := cfg.UserViperConfig
+
+	root := usrCfg.GetString("workspace")
+	if metadata.Team != "" {
+		root = filepath.Join(root, "teams", metadata.Team)
+	}
+	if !metadata.IsRequester {
+		root = filepath.Join(root, "users", metadata.Handle)
+	}
+
+	return workspace.Exercise{
+		Root:  root,
+		Track: metadata.Track,
+		Slug:  metadata.Exercise,
+	}
+}
+
+func getExerciseFromPayload(payload *downloadPayload, cfg config.Config) workspace.Exercise {
+	metadata := getMetadataFromPayload(payload)
+	return getExerciseFromMetadata(metadata, cfg)
 }
 
 type downloadPayload struct {

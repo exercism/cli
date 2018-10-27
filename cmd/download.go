@@ -3,10 +3,8 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"path/filepath"
 
 	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/workspace"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -88,26 +86,10 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	fmt.Fprintf(Err, "\nDownloaded to\n%s\n", getExerciseDirFromPayload(payload, cfg))
+	dir := getExerciseFromPayload(payload, cfg).MetadataDir()
+	fmt.Fprintf(Err, "\nDownloaded to\n%s\n", dir)
+
 	return nil
-}
-
-func getExerciseDirFromPayload(payload *downloadPayload, cfg config.Config) string {
-	usrCfg := cfg.UserViperConfig
-
-	root := usrCfg.GetString("workspace")
-	if payload.Solution.Team.Slug != "" {
-		root = filepath.Join(root, "teams", payload.Solution.Team.Slug)
-	}
-	if !payload.Solution.User.IsRequester {
-		root = filepath.Join(root, "users", payload.Solution.User.Handle)
-	}
-	exercise := workspace.Exercise{
-		Root:  root,
-		Track: payload.Solution.Exercise.Track.ID,
-		Slug:  payload.Solution.Exercise.ID,
-	}
-	return exercise.MetadataDir()
 }
 
 func setupDownloadFlags(flags *pflag.FlagSet) {
