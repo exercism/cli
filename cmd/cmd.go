@@ -180,13 +180,7 @@ func writeMetadataFromPayload(payload *downloadPayload, cfg config.Config) error
 		Slug:  metadata.Exercise,
 	}
 
-	dir := exercise.MetadataDir()
-
-	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
-		return err
-	}
-
-	if err := metadata.Write(dir); err != nil {
+	if err := metadata.Write(exercise.MetadataDir()); err != nil {
 		return err
 	}
 
