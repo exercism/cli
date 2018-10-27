@@ -68,18 +68,12 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	urlParam := "latest"
-	if uuid != "" {
-		urlParam = uuid
-	}
-
 	params := downloadParams{
-		cfg:      cfg,
-		uuid:     uuid,
-		slug:     slug,
-		track:    track,
-		team:     team,
-		urlParam: urlParam,
+		cfg:   cfg,
+		uuid:  uuid,
+		slug:  slug,
+		track: track,
+		team:  team,
 	}
 	payload, err := getDownloadPayload(params)
 	if err != nil {

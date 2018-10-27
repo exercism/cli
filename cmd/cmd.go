@@ -82,21 +82,22 @@ func validateUserConfig(cfg *viper.Viper) error {
 }
 
 type downloadParams struct {
-	cfg      config.Config
-	uuid     string
-	slug     string
-	track    string
-	team     string
-	urlParam string
+	cfg   config.Config
+	uuid  string
+	slug  string
+	track string
+	team  string
 }
 
 func getDownloadPayload(params downloadParams) (*downloadPayload, error) {
 	usrCfg := params.cfg.UserViperConfig
 
-	url := fmt.Sprintf("%s/solutions/%s",
-		usrCfg.GetString("apibaseurl"),
-		params.urlParam,
-	)
+	solutionURL := "latest"
+	if params.uuid != "" {
+		solutionURL = params.uuid
+	}
+
+	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), solutionURL)
 
 	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
 	if err != nil {
