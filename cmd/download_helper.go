@@ -85,20 +85,20 @@ func newDownloadPayload(params downloadParams) (*downloadPayload, error) {
 	return payload, nil
 }
 
-func (payload *downloadPayload) validate() error {
-	if payload.Error.Message != "" {
-		return errors.New(payload.Error.Message)
+func (dp *downloadPayload) validate() error {
+	if dp.Error.Message != "" {
+		return errors.New(dp.Error.Message)
 	}
 	return nil
 }
 
-func (payload *downloadPayload) writeMetadata(cfg config.Config) error {
-	if err := payload.validate(); err != nil {
+func (dp *downloadPayload) writeMetadata(cfg config.Config) error {
+	if err := dp.validate(); err != nil {
 		return err
 	}
 
-	metadata := payload.getMetadata()
-	exercise := payload.getExercise(cfg)
+	metadata := dp.getMetadata()
+	exercise := dp.getExercise(cfg)
 
 	if err := metadata.Write(exercise.MetadataDir()); err != nil {
 		return err
@@ -107,16 +107,16 @@ func (payload *downloadPayload) writeMetadata(cfg config.Config) error {
 	return nil
 }
 
-func (payload *downloadPayload) writeSolutionFiles(cfg config.Config) error {
-	if err := payload.validate(); err != nil {
+func (dp *downloadPayload) writeSolutionFiles(cfg config.Config) error {
+	if err := dp.validate(); err != nil {
 		return err
 	}
 	usrCfg := cfg.UserViperConfig
 
-	exercise := payload.getExercise(cfg)
+	exercise := dp.getExercise(cfg)
 
-	for _, file := range payload.Solution.Files {
-		unparsedURL := fmt.Sprintf("%s%s", payload.Solution.FileDownloadBaseURL, file)
+	for _, file := range dp.Solution.Files {
+		unparsedURL := fmt.Sprintf("%s%s", dp.Solution.FileDownloadBaseURL, file)
 		parsedURL, err := netURL.ParseRequestURI(unparsedURL)
 		if err != nil {
 			return err
@@ -149,7 +149,7 @@ func (payload *downloadPayload) writeSolutionFiles(cfg config.Config) error {
 		// Work around a path bug due to an early design decision (later reversed) to
 		// allow numeric suffixes for exercise directories, allowing people to have
 		// multiple parallel versions of an exercise.
-		pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, payload.Solution.Exercise.ID)
+		pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, dp.Solution.Exercise.ID)
 		rgxNumericSuffix := regexp.MustCompile(pattern)
 		if rgxNumericSuffix.MatchString(file) {
 			file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
@@ -178,34 +178,34 @@ func (payload *downloadPayload) writeSolutionFiles(cfg config.Config) error {
 	return nil
 }
 
-func (payload *downloadPayload) getMetadata() workspace.ExerciseMetadata {
+func (dp *downloadPayload) getMetadata() workspace.ExerciseMetadata {
 	return workspace.ExerciseMetadata{
-		AutoApprove: payload.Solution.Exercise.AutoApprove,
-		Track:       payload.Solution.Exercise.Track.ID,
-		Team:        payload.Solution.Team.Slug,
-		Exercise:    payload.Solution.Exercise.ID,
-		ID:          payload.Solution.ID,
-		URL:         payload.Solution.URL,
-		Handle:      payload.Solution.User.Handle,
-		IsRequester: payload.Solution.User.IsRequester,
+		AutoApprove: dp.Solution.Exercise.AutoApprove,
+		Track:       dp.Solution.Exercise.Track.ID,
+		Team:        dp.Solution.Team.Slug,
+		Exercise:    dp.Solution.Exercise.ID,
+		ID:          dp.Solution.ID,
+		URL:         dp.Solution.URL,
+		Handle:      dp.Solution.User.Handle,
+		IsRequester: dp.Solution.User.IsRequester,
 	}
 }
 
-func (payload *downloadPayload) getExercise(cfg config.Config) workspace.Exercise {
+func (dp *downloadPayload) getExercise(cfg config.Config) workspace.Exercise {
 	usrCfg := cfg.UserViperConfig
 
 	root := usrCfg.GetString("workspace")
-	if payload.Solution.Team.Slug != "" {
-		root = filepath.Join(root, "teams", payload.Solution.Team.Slug)
+	if dp.Solution.Team.Slug != "" {
+		root = filepath.Join(root, "teams", dp.Solution.Team.Slug)
 	}
-	if !payload.Solution.User.IsRequester {
-		root = filepath.Join(root, "users", payload.Solution.User.Handle)
+	if !dp.Solution.User.IsRequester {
+		root = filepath.Join(root, "users", dp.Solution.User.Handle)
 	}
 
 	return workspace.Exercise{
 		Root:  root,
-		Track: payload.Solution.Exercise.Track.ID,
-		Slug:  payload.Solution.Exercise.ID,
+		Track: dp.Solution.Exercise.Track.ID,
+		Slug:  dp.Solution.Exercise.ID,
 	}
 }
 
