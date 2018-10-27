@@ -85,9 +85,16 @@ func newDownloadPayload(params downloadParams) (*downloadPayload, error) {
 	return payload, nil
 }
 
-func (payload *downloadPayload) writeMetadata(cfg config.Config) error {
+func (payload *downloadPayload) validate() error {
 	if payload.Error.Message != "" {
 		return errors.New(payload.Error.Message)
+	}
+	return nil
+}
+
+func (payload *downloadPayload) writeMetadata(cfg config.Config) error {
+	if err := payload.validate(); err != nil {
+		return err
 	}
 
 	metadata := payload.getMetadata()
@@ -101,8 +108,8 @@ func (payload *downloadPayload) writeMetadata(cfg config.Config) error {
 }
 
 func (payload *downloadPayload) writeSolutionFiles(cfg config.Config) error {
-	if payload.Error.Message != "" {
-		return errors.New(payload.Error.Message)
+	if err := payload.validate(); err != nil {
+		return err
 	}
 	usrCfg := cfg.UserViperConfig
 
