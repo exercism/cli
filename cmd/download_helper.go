@@ -28,12 +28,12 @@ type downloadParams struct {
 func newDownloadPayload(params downloadParams) (*downloadPayload, error) {
 	usrCfg := params.cfg.UserViperConfig
 
-	solutionURL := "latest"
+	id := "latest"
 	if params.uuid != "" {
-		solutionURL = params.uuid
+		id = params.uuid
 	}
 
-	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), solutionURL)
+	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), id)
 
 	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
 	if err != nil {
