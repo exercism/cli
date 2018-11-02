@@ -149,7 +149,7 @@ func (dp *downloadPayload) writeSolutionFiles(cfg config.Config) error {
 		// Work around a path bug due to an early design decision (later reversed) to
 		// allow numeric suffixes for exercise directories, allowing people to have
 		// multiple parallel versions of an exercise.
-		pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, dp.Solution.Exercise.ID)
+		pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, exercise.Slug)
 		rgxNumericSuffix := regexp.MustCompile(pattern)
 		if rgxNumericSuffix.MatchString(file) {
 			file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
