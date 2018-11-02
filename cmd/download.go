@@ -87,7 +87,8 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	dir := payload.getExercise(cfg).MetadataDir()
-	fmt.Fprintf(Err, "\nDownloaded to\n%s\n", dir)
+	fmt.Fprintf(Err, "\nDownloaded to\n")
+	fmt.Fprintf(Out, "%s\n", dir)
 
 	return nil
 }
