@@ -15,32 +15,31 @@ import (
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/workspace"
+	"github.com/spf13/viper"
 )
 
 type downloadParams struct {
-	cfg   *config.Config
-	uuid  string
-	slug  string
-	track string
-	team  string
+	usrCfg *viper.Viper
+	uuid   string
+	slug   string
+	track  string
+	team   string
 }
 
 type downloadPayloadContext struct {
-	cfg     *config.Config
+	usrCfg  *viper.Viper
 	payload *downloadPayload
 }
 
 func newDownloadPayload(params downloadParams) (*downloadPayloadContext, error) {
-	usrCfg := params.cfg.UserViperConfig
-
 	id := "latest"
 	if params.uuid != "" {
 		id = params.uuid
 	}
 
-	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), id)
+	url := fmt.Sprintf("%s/solutions/%s", params.usrCfg.GetString("apibaseurl"), id)
 
-	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
+	client, err := api.NewClient(params.usrCfg.GetString("token"), params.usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return nil, err
 	}
@@ -66,15 +65,15 @@ func newDownloadPayload(params downloadParams) (*downloadPayloadContext, error) 
 	if err != nil {
 		return nil, err
 	}
+	defer res.Body.Close()
 
 	var payload *downloadPayload
-	defer res.Body.Close()
 	if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
 		return nil, fmt.Errorf("unable to parse API response - %s", err)
 	}
 
 	if res.StatusCode == http.StatusUnauthorized {
-		siteURL := config.InferSiteURL(usrCfg.GetString("apibaseurl"))
+		siteURL := config.InferSiteURL(params.usrCfg.GetString("apibaseurl"))
 		return nil, fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
 	}
 
@@ -87,7 +86,7 @@ func newDownloadPayload(params downloadParams) (*downloadPayloadContext, error) 
 		}
 	}
 
-	return &downloadPayloadContext{cfg: params.cfg, payload: payload}, nil
+	return &downloadPayloadContext{usrCfg: params.usrCfg, payload: payload}, nil
 }
 
 func (d *downloadPayloadContext) validate() error {
@@ -116,8 +115,6 @@ func (d *downloadPayloadContext) writeSolutionFiles() error {
 	if err := d.validate(); err != nil {
 		return err
 	}
-	usrCfg := d.cfg.UserViperConfig
-
 	exercise := d.getExercise()
 
 	for _, file := range d.payload.Solution.Files {
@@ -127,7 +124,7 @@ func (d *downloadPayloadContext) writeSolutionFiles() error {
 			return err
 		}
 
-		client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
+		client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
 		req, err := client.NewRequest("GET", parsedURL.String(), nil)
 		if err != nil {
 			return err
@@ -197,9 +194,7 @@ func (d *downloadPayloadContext) getMetadata() workspace.ExerciseMetadata {
 }
 
 func (d *downloadPayloadContext) getExercise() workspace.Exercise {
-	usrCfg := d.cfg.UserViperConfig
-
-	root := usrCfg.GetString("workspace")
+	root := d.usrCfg.GetString("workspace")
 	if d.payload.Solution.Team.Slug != "" {
 		root = filepath.Join(root, "teams", d.payload.Solution.Team.Slug)
 	}
