@@ -67,7 +67,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	params := downloadParams{
-		cfg:   cfg,
+		cfg:   &cfg,
 		uuid:  uuid,
 		slug:  slug,
 		track: track,
@@ -78,15 +78,15 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	if err := payload.writeMetadata(cfg); err != nil {
+	if err := payload.writeMetadata(); err != nil {
 		return err
 	}
 
-	if err := payload.writeSolutionFiles(cfg); err != nil {
+	if err := payload.writeSolutionFiles(); err != nil {
 		return err
 	}
 
-	dir := payload.getExercise(cfg).MetadataDir()
+	dir := payload.getExercise().MetadataDir()
 	fmt.Fprintf(Err, "\nDownloaded to\n")
 	fmt.Fprintf(Out, "%s\n", dir)
 

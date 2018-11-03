@@ -18,14 +18,19 @@ import (
 )
 
 type downloadParams struct {
-	cfg   config.Config
+	cfg   *config.Config
 	uuid  string
 	slug  string
 	track string
 	team  string
 }
 
-func newDownloadPayload(params downloadParams) (*downloadPayload, error) {
+type downloadPayloadContext struct {
+	cfg     *config.Config
+	payload *downloadPayload
+}
+
+func newDownloadPayload(params downloadParams) (*downloadPayloadContext, error) {
 	usrCfg := params.cfg.UserViperConfig
 
 	id := "latest"
@@ -82,23 +87,23 @@ func newDownloadPayload(params downloadParams) (*downloadPayload, error) {
 		}
 	}
 
-	return payload, nil
+	return &downloadPayloadContext{cfg: params.cfg, payload: payload}, nil
 }
 
-func (dp *downloadPayload) validate() error {
-	if dp.Error.Message != "" {
-		return errors.New(dp.Error.Message)
+func (d *downloadPayloadContext) validate() error {
+	if d.payload.Error.Message != "" {
+		return errors.New(d.payload.Error.Message)
 	}
 	return nil
 }
 
-func (dp *downloadPayload) writeMetadata(cfg config.Config) error {
-	if err := dp.validate(); err != nil {
+func (d *downloadPayloadContext) writeMetadata() error {
+	if err := d.validate(); err != nil {
 		return err
 	}
 
-	metadata := dp.getMetadata()
-	exercise := dp.getExercise(cfg)
+	metadata := d.getMetadata()
+	exercise := d.getExercise()
 
 	if err := metadata.Write(exercise.MetadataDir()); err != nil {
 		return err
@@ -107,16 +112,16 @@ func (dp *downloadPayload) writeMetadata(cfg config.Config) error {
 	return nil
 }
 
-func (dp *downloadPayload) writeSolutionFiles(cfg config.Config) error {
-	if err := dp.validate(); err != nil {
+func (d *downloadPayloadContext) writeSolutionFiles() error {
+	if err := d.validate(); err != nil {
 		return err
 	}
-	usrCfg := cfg.UserViperConfig
+	usrCfg := d.cfg.UserViperConfig
 
-	exercise := dp.getExercise(cfg)
+	exercise := d.getExercise()
 
-	for _, file := range dp.Solution.Files {
-		unparsedURL := fmt.Sprintf("%s%s", dp.Solution.FileDownloadBaseURL, file)
+	for _, file := range d.payload.Solution.Files {
+		unparsedURL := fmt.Sprintf("%s%s", d.payload.Solution.FileDownloadBaseURL, file)
 		parsedURL, err := netURL.ParseRequestURI(unparsedURL)
 		if err != nil {
 			return err
@@ -178,34 +183,34 @@ func (dp *downloadPayload) writeSolutionFiles(cfg config.Config) error {
 	return nil
 }
 
-func (dp *downloadPayload) getMetadata() workspace.ExerciseMetadata {
+func (d *downloadPayloadContext) getMetadata() workspace.ExerciseMetadata {
 	return workspace.ExerciseMetadata{
-		AutoApprove: dp.Solution.Exercise.AutoApprove,
-		Track:       dp.Solution.Exercise.Track.ID,
-		Team:        dp.Solution.Team.Slug,
-		Exercise:    dp.Solution.Exercise.ID,
-		ID:          dp.Solution.ID,
-		URL:         dp.Solution.URL,
-		Handle:      dp.Solution.User.Handle,
-		IsRequester: dp.Solution.User.IsRequester,
+		AutoApprove: d.payload.Solution.Exercise.AutoApprove,
+		Track:       d.payload.Solution.Exercise.Track.ID,
+		Team:        d.payload.Solution.Team.Slug,
+		Exercise:    d.payload.Solution.Exercise.ID,
+		ID:          d.payload.Solution.ID,
+		URL:         d.payload.Solution.URL,
+		Handle:      d.payload.Solution.User.Handle,
+		IsRequester: d.payload.Solution.User.IsRequester,
 	}
 }
 
-func (dp *downloadPayload) getExercise(cfg config.Config) workspace.Exercise {
-	usrCfg := cfg.UserViperConfig
+func (d *downloadPayloadContext) getExercise() workspace.Exercise {
+	usrCfg := d.cfg.UserViperConfig
 
 	root := usrCfg.GetString("workspace")
-	if dp.Solution.Team.Slug != "" {
-		root = filepath.Join(root, "teams", dp.Solution.Team.Slug)
+	if d.payload.Solution.Team.Slug != "" {
+		root = filepath.Join(root, "teams", d.payload.Solution.Team.Slug)
 	}
-	if !dp.Solution.User.IsRequester {
-		root = filepath.Join(root, "users", dp.Solution.User.Handle)
+	if !d.payload.Solution.User.IsRequester {
+		root = filepath.Join(root, "users", d.payload.Solution.User.Handle)
 	}
 
 	return workspace.Exercise{
 		Root:  root,
-		Track: dp.Solution.Exercise.Track.ID,
-		Slug:  dp.Solution.Exercise.ID,
+		Track: d.payload.Solution.Exercise.Track.ID,
+		Slug:  d.payload.Solution.Exercise.ID,
 	}
 }
 
