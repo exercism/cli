@@ -4,6 +4,7 @@ _exercism () {
   COMPREPLY=()   # Array variable storing the possible completions.
   cur=${COMP_WORDS[COMP_CWORD]}
   prev=${COMP_WORDS[COMP_CWORD-1]}
+  opts="--verbose --timeout"
 
   commands="configure download open
   submit troubleshoot upgrade version workspace help"
@@ -11,8 +12,16 @@ _exercism () {
   version_opts="--latest"
 
   if [ "${#COMP_WORDS[@]}" -eq 2 ]; then
-    COMPREPLY=( $( compgen -W  "${commands}" "${cur}" ) )
-    return 0
+    case "${cur}" in
+      -*)
+        COMPREPLY=( $( compgen -W  "${opts}" -- "${cur}" ) )
+        return 0
+        ;;
+      *)
+        COMPREPLY=( $( compgen -W  "${commands}" "${cur}" ) )
+        return 0
+        ;;
+    esac
   fi
 
   if [ "${#COMP_WORDS[@]}" -eq 3 ]; then
