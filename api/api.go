@@ -57,7 +57,7 @@ func (c *Client) NewRequest(method, url string, body io.Reader) (*http.Request, 
 	return req, nil
 }
 
-// Do performs an http.Request and optionally parses the response body into the given interface.
+// Do performs an http.Request.
 func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	DumpRequest(req)
 
