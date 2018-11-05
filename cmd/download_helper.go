@@ -26,12 +26,12 @@ type downloadParams struct {
 	team   string
 }
 
-type downloadPayloadContext struct {
+type downloadContext struct {
 	usrCfg  *viper.Viper
 	payload *downloadPayload
 }
 
-func newDownloadPayload(params downloadParams) (*downloadPayloadContext, error) {
+func newDownloadPayload(params downloadParams) (*downloadContext, error) {
 	id := "latest"
 	if params.uuid != "" {
 		id = params.uuid
@@ -86,17 +86,17 @@ func newDownloadPayload(params downloadParams) (*downloadPayloadContext, error) 
 		}
 	}
 
-	return &downloadPayloadContext{usrCfg: params.usrCfg, payload: payload}, nil
+	return &downloadContext{usrCfg: params.usrCfg, payload: payload}, nil
 }
 
-func (d *downloadPayloadContext) validate() error {
+func (d *downloadContext) validate() error {
 	if d.payload.Error.Message != "" {
 		return errors.New(d.payload.Error.Message)
 	}
 	return nil
 }
 
-func (d *downloadPayloadContext) writeMetadata() error {
+func (d *downloadContext) writeMetadata() error {
 	if err := d.validate(); err != nil {
 		return err
 	}
@@ -111,7 +111,7 @@ func (d *downloadPayloadContext) writeMetadata() error {
 	return nil
 }
 
-func (d *downloadPayloadContext) writeSolutionFiles() error {
+func (d *downloadContext) writeSolutionFiles() error {
 	if err := d.validate(); err != nil {
 		return err
 	}
@@ -180,7 +180,7 @@ func (d *downloadPayloadContext) writeSolutionFiles() error {
 	return nil
 }
 
-func (d *downloadPayloadContext) getMetadata() workspace.ExerciseMetadata {
+func (d *downloadContext) getMetadata() workspace.ExerciseMetadata {
 	return workspace.ExerciseMetadata{
 		AutoApprove: d.payload.Solution.Exercise.AutoApprove,
 		Track:       d.payload.Solution.Exercise.Track.ID,
@@ -193,7 +193,7 @@ func (d *downloadPayloadContext) getMetadata() workspace.ExerciseMetadata {
 	}
 }
 
-func (d *downloadPayloadContext) getExercise() workspace.Exercise {
+func (d *downloadContext) getExercise() workspace.Exercise {
 	root := d.usrCfg.GetString("workspace")
 	if d.payload.Solution.Team.Slug != "" {
 		root = filepath.Join(root, "teams", d.payload.Solution.Team.Slug)
