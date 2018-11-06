@@ -90,14 +90,12 @@ type downloadContext struct {
 }
 
 func newDownload(ctx *downloadContext) error {
-	url := ctx.requestURL()
-
 	client, err := api.NewClient(ctx.usrCfg.GetString("token"), ctx.usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return err
 	}
 
-	req, err := client.NewRequest("GET", url, nil)
+	req, err := client.NewRequest("GET", ctx.requestURL(), nil)
 	if err != nil {
 		return err
 	}
