@@ -127,35 +127,6 @@ func newDownload(ctx *downloadContext) error {
 			return errors.New(ctx.payload.Error.Message)
 		}
 	}
-
-	return nil
-}
-
-func (d *downloadContext) requestURL() string {
-	id := "latest"
-	if d.uuid != "" {
-		id = d.uuid
-	}
-
-	return fmt.Sprintf("%s/solutions/%s", d.usrCfg.GetString("apibaseurl"), id)
-}
-
-func (d *downloadContext) buildQuery(query netURL.Values) {
-	if d.uuid == "" {
-		query.Add("exercise_id", d.slug)
-		if d.track != "" {
-			query.Add("track_id", d.track)
-		}
-		if d.team != "" {
-			query.Add("team_id", d.team)
-		}
-	}
-}
-
-func (d *downloadContext) validate() error {
-	if d.payload.Error.Message != "" {
-		return errors.New(d.payload.Error.Message)
-	}
 	return nil
 }
 
@@ -163,14 +134,11 @@ func (d *downloadContext) writeMetadata() error {
 	if err := d.validate(); err != nil {
 		return err
 	}
-
 	metadata := d.getMetadata()
 	exercise := d.getExercise()
-
 	if err := metadata.Write(exercise.MetadataDir()); err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -179,7 +147,6 @@ func (d *downloadContext) writeSolutionFiles() error {
 		return err
 	}
 	exercise := d.getExercise()
-
 	for _, file := range d.payload.Solution.Files {
 		unparsedURL := fmt.Sprintf("%s%s", d.payload.Solution.FileDownloadBaseURL, file)
 		parsedURL, err := netURL.ParseRequestURI(unparsedURL)
@@ -239,8 +206,22 @@ func (d *downloadContext) writeSolutionFiles() error {
 			return err
 		}
 	}
-
 	return nil
+}
+
+func (d *downloadContext) getExercise() workspace.Exercise {
+	root := d.usrCfg.GetString("workspace")
+	if d.payload.Solution.Team.Slug != "" {
+		root = filepath.Join(root, "teams", d.payload.Solution.Team.Slug)
+	}
+	if !d.payload.Solution.User.IsRequester {
+		root = filepath.Join(root, "users", d.payload.Solution.User.Handle)
+	}
+	return workspace.Exercise{
+		Root:  root,
+		Track: d.payload.Solution.Exercise.Track.ID,
+		Slug:  d.payload.Solution.Exercise.ID,
+	}
 }
 
 func (d *downloadContext) getMetadata() workspace.ExerciseMetadata {
@@ -256,19 +237,30 @@ func (d *downloadContext) getMetadata() workspace.ExerciseMetadata {
 	}
 }
 
-func (d *downloadContext) getExercise() workspace.Exercise {
-	root := d.usrCfg.GetString("workspace")
-	if d.payload.Solution.Team.Slug != "" {
-		root = filepath.Join(root, "teams", d.payload.Solution.Team.Slug)
+func (d *downloadContext) validate() error {
+	if d.payload.Error.Message != "" {
+		return errors.New(d.payload.Error.Message)
 	}
-	if !d.payload.Solution.User.IsRequester {
-		root = filepath.Join(root, "users", d.payload.Solution.User.Handle)
-	}
+	return nil
+}
 
-	return workspace.Exercise{
-		Root:  root,
-		Track: d.payload.Solution.Exercise.Track.ID,
-		Slug:  d.payload.Solution.Exercise.ID,
+func (d *downloadContext) requestURL() string {
+	id := "latest"
+	if d.uuid != "" {
+		id = d.uuid
+	}
+	return fmt.Sprintf("%s/solutions/%s", d.usrCfg.GetString("apibaseurl"), id)
+}
+
+func (d *downloadContext) buildQuery(query netURL.Values) {
+	if d.uuid == "" {
+		query.Add("exercise_id", d.slug)
+		if d.track != "" {
+			query.Add("track_id", d.track)
+		}
+		if d.team != "" {
+			query.Add("team_id", d.team)
+		}
 	}
 }
 

@@ -76,18 +76,14 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	if err := newDownload(download); err != nil {
 		return err
 	}
-
 	if err := download.writeMetadata(); err != nil {
 		return err
 	}
-
 	if err := download.writeSolutionFiles(); err != nil {
 		return err
 	}
-
 	fmt.Fprintf(Err, "\nDownloaded to\n")
 	fmt.Fprintf(Out, "%s\n", download.getExercise().MetadataDir())
-
 	return nil
 }
 
