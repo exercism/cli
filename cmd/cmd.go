@@ -89,7 +89,7 @@ type downloadContext struct {
 	payload *downloadPayload
 }
 
-func newDownloadPayload(ctx *downloadContext) (*downloadContext, error) {
+func newDownload(ctx *downloadContext) (*downloadContext, error) {
 	url := ctx.requestURL()
 
 	client, err := api.NewClient(ctx.usrCfg.GetString("token"), ctx.usrCfg.GetString("apibaseurl"))

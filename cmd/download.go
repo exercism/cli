@@ -66,7 +66,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	payload, err := newDownloadPayload(&downloadContext{
+	payload, err := newDownload(&downloadContext{
 		usrCfg:  usrCfg,
 		uuid:    uuid,
 		slug:    slug,
