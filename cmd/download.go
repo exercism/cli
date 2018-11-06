@@ -72,7 +72,6 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		slug:    slug,
 		track:   track,
 		team:    team,
-		payload: nil,
 	}
 	if err := newDownload(download); err != nil {
 		return err
