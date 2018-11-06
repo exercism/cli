@@ -89,17 +89,17 @@ type downloadContext struct {
 	payload *downloadPayload
 }
 
-func newDownload(ctx *downloadContext) (*downloadContext, error) {
+func newDownload(ctx *downloadContext) error {
 	url := ctx.requestURL()
 
 	client, err := api.NewClient(ctx.usrCfg.GetString("token"), ctx.usrCfg.GetString("apibaseurl"))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	req, err := client.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	query := req.URL.Query()
@@ -108,30 +108,29 @@ func newDownload(ctx *downloadContext) (*downloadContext, error) {
 
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer res.Body.Close()
 
-	var payload *downloadPayload
-	if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
-		return nil, fmt.Errorf("unable to parse API response - %s", err)
+	if err := json.NewDecoder(res.Body).Decode(&ctx.payload); err != nil {
+		return fmt.Errorf("unable to parse API response - %s", err)
 	}
 
 	if res.StatusCode == http.StatusUnauthorized {
 		siteURL := config.InferSiteURL(ctx.usrCfg.GetString("apibaseurl"))
-		return nil, fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
+		return fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
 	}
 
 	if res.StatusCode != http.StatusOK {
-		switch payload.Error.Type {
+		switch ctx.payload.Error.Type {
 		case "track_ambiguous":
-			return nil, fmt.Errorf("%s: %s", payload.Error.Message, strings.Join(payload.Error.PossibleTrackIDs, ", "))
+			return fmt.Errorf("%s: %s", ctx.payload.Error.Message, strings.Join(ctx.payload.Error.PossibleTrackIDs, ", "))
 		default:
-			return nil, errors.New(payload.Error.Message)
+			return errors.New(ctx.payload.Error.Message)
 		}
 	}
 
-	return &downloadContext{usrCfg: ctx.usrCfg, payload: payload}, nil
+	return nil
 }
 
 func (d *downloadContext) requestURL() string {
