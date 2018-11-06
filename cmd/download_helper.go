@@ -26,18 +26,34 @@ type downloadParams struct {
 	team   string
 }
 
+func (d *downloadParams) requestURL() string {
+	id := "latest"
+	if d.uuid != "" {
+		id = d.uuid
+	}
+
+	return fmt.Sprintf("%s/solutions/%s", d.usrCfg.GetString("apibaseurl"), id)
+}
+
+func (d *downloadParams) buildQuery(query netURL.Values) {
+	if d.uuid == "" {
+		query.Add("exercise_id", d.slug)
+		if d.track != "" {
+			query.Add("track_id", d.track)
+		}
+		if d.team != "" {
+			query.Add("team_id", d.team)
+		}
+	}
+}
+
 type downloadContext struct {
 	usrCfg  *viper.Viper
 	payload *downloadPayload
 }
 
 func newDownloadPayload(params downloadParams) (*downloadContext, error) {
-	id := "latest"
-	if params.uuid != "" {
-		id = params.uuid
-	}
-
-	url := fmt.Sprintf("%s/solutions/%s", params.usrCfg.GetString("apibaseurl"), id)
+	url := params.requestURL()
 
 	client, err := api.NewClient(params.usrCfg.GetString("token"), params.usrCfg.GetString("apibaseurl"))
 	if err != nil {
@@ -49,17 +65,9 @@ func newDownloadPayload(params downloadParams) (*downloadContext, error) {
 		return nil, err
 	}
 
-	if params.uuid == "" {
-		q := req.URL.Query()
-		q.Add("exercise_id", params.slug)
-		if params.track != "" {
-			q.Add("track_id", params.track)
-		}
-		if params.team != "" {
-			q.Add("team_id", params.team)
-		}
-		req.URL.RawQuery = q.Encode()
-	}
+	query := req.URL.Query()
+	params.buildQuery(query)
+	req.URL.RawQuery = query.Encode()
 
 	res, err := client.Do(req)
 	if err != nil {
