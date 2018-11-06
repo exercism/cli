@@ -66,14 +66,14 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	params := downloadParams{
-		usrCfg: usrCfg,
-		uuid:   uuid,
-		slug:   slug,
-		track:  track,
-		team:   team,
-	}
-	payload, err := newDownloadPayload(params)
+	payload, err := newDownloadPayload(&downloadContext{
+		usrCfg:  usrCfg,
+		uuid:    uuid,
+		slug:    slug,
+		track:   track,
+		team:    team,
+		payload: nil,
+	})
 	if err != nil {
 		return err
 	}

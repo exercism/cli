@@ -18,44 +18,19 @@ import (
 	"github.com/spf13/viper"
 )
 
-type downloadParams struct {
-	usrCfg *viper.Viper
-	uuid   string
-	slug   string
-	track  string
-	team   string
-}
-
-func (d *downloadParams) requestURL() string {
-	id := "latest"
-	if d.uuid != "" {
-		id = d.uuid
-	}
-
-	return fmt.Sprintf("%s/solutions/%s", d.usrCfg.GetString("apibaseurl"), id)
-}
-
-func (d *downloadParams) buildQuery(query netURL.Values) {
-	if d.uuid == "" {
-		query.Add("exercise_id", d.slug)
-		if d.track != "" {
-			query.Add("track_id", d.track)
-		}
-		if d.team != "" {
-			query.Add("team_id", d.team)
-		}
-	}
-}
-
 type downloadContext struct {
 	usrCfg  *viper.Viper
+	uuid    string
+	slug    string
+	track   string
+	team    string
 	payload *downloadPayload
 }
 
-func newDownloadPayload(params downloadParams) (*downloadContext, error) {
-	url := params.requestURL()
+func newDownloadPayload(ctx *downloadContext) (*downloadContext, error) {
+	url := ctx.requestURL()
 
-	client, err := api.NewClient(params.usrCfg.GetString("token"), params.usrCfg.GetString("apibaseurl"))
+	client, err := api.NewClient(ctx.usrCfg.GetString("token"), ctx.usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +41,7 @@ func newDownloadPayload(params downloadParams) (*downloadContext, error) {
 	}
 
 	query := req.URL.Query()
-	params.buildQuery(query)
+	ctx.buildQuery(query)
 	req.URL.RawQuery = query.Encode()
 
 	res, err := client.Do(req)
@@ -81,7 +56,7 @@ func newDownloadPayload(params downloadParams) (*downloadContext, error) {
 	}
 
 	if res.StatusCode == http.StatusUnauthorized {
-		siteURL := config.InferSiteURL(params.usrCfg.GetString("apibaseurl"))
+		siteURL := config.InferSiteURL(ctx.usrCfg.GetString("apibaseurl"))
 		return nil, fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
 	}
 
@@ -94,7 +69,28 @@ func newDownloadPayload(params downloadParams) (*downloadContext, error) {
 		}
 	}
 
-	return &downloadContext{usrCfg: params.usrCfg, payload: payload}, nil
+	return &downloadContext{usrCfg: ctx.usrCfg, payload: payload}, nil
+}
+
+func (d *downloadContext) requestURL() string {
+	id := "latest"
+	if d.uuid != "" {
+		id = d.uuid
+	}
+
+	return fmt.Sprintf("%s/solutions/%s", d.usrCfg.GetString("apibaseurl"), id)
+}
+
+func (d *downloadContext) buildQuery(query netURL.Values) {
+	if d.uuid == "" {
+		query.Add("exercise_id", d.slug)
+		if d.track != "" {
+			query.Add("track_id", d.track)
+		}
+		if d.team != "" {
+			query.Add("team_id", d.team)
+		}
+	}
 }
 
 func (d *downloadContext) validate() error {
