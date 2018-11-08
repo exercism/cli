@@ -100,7 +100,7 @@ func download(d *downloadContext) error {
 		return err
 	}
 
-	req.URL.RawQuery = d.query(req.URL)
+	d.buildQuery(req.URL)
 	res, err := client.Do(req)
 	if err != nil {
 		return err
@@ -247,7 +247,7 @@ func (d *downloadContext) requestURL() string {
 	return fmt.Sprintf("%s/solutions/%s", d.usrCfg.GetString("apibaseurl"), id)
 }
 
-func (d *downloadContext) query(url *netURL.URL) string {
+func (d *downloadContext) buildQuery(url *netURL.URL) {
 	query := url.Query()
 	if d.uuid == "" {
 		query.Add("exercise_id", d.slug)
@@ -258,7 +258,7 @@ func (d *downloadContext) query(url *netURL.URL) string {
 			query.Add("team_id", d.team)
 		}
 	}
-	return query.Encode()
+	url.RawQuery = query.Encode()
 }
 
 type downloadPayload struct {
