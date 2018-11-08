@@ -18,6 +18,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+    "github.com/exercism/cli/debug"
 )
 
 // downloadCmd represents the download command
@@ -66,6 +67,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 	if uuid != "" && slug != "" || uuid == slug {
+        debug.Printf("need to go in exercism website ,open the track and choose the exercise, \nthen copy the available link for download.\n ")
 		return errors.New("need an --exercise name or a solution --uuid")
 	}
 
