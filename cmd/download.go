@@ -66,24 +66,24 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	var download = &downloadContext{
+	var downloadContext = &downloadContext{
 		usrCfg:  usrCfg,
 		uuid:    uuid,
 		slug:    slug,
 		track:   track,
 		team:    team,
 	}
-	if err := newDownload(download); err != nil {
+	if err := download(downloadContext); err != nil {
 		return err
 	}
-	if err := download.writeMetadata(); err != nil {
+	if err := downloadContext.writeMetadata(); err != nil {
 		return err
 	}
-	if err := download.writeSolutionFiles(); err != nil {
+	if err := downloadContext.writeSolutionFiles(); err != nil {
 		return err
 	}
 	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", download.getExercise().MetadataDir())
+	fmt.Fprintf(Out, "%s\n", downloadContext.exercise().MetadataDir())
 	return nil
 }
 

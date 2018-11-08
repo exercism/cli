@@ -89,19 +89,19 @@ type downloadContext struct {
 	payload *downloadPayload
 }
 
-func newDownload(ctx *downloadContext) error {
-	client, err := api.NewClient(ctx.usrCfg.GetString("token"), ctx.usrCfg.GetString("apibaseurl"))
+func download(d *downloadContext) error {
+	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return err
 	}
 
-	req, err := client.NewRequest("GET", ctx.requestURL(), nil)
+	req, err := client.NewRequest("GET", d.requestURL(), nil)
 	if err != nil {
 		return err
 	}
 
 	query := req.URL.Query()
-	ctx.buildQuery(query)
+	d.buildQuery(query)
 	req.URL.RawQuery = query.Encode()
 
 	res, err := client.Do(req)
@@ -110,21 +110,21 @@ func newDownload(ctx *downloadContext) error {
 	}
 	defer res.Body.Close()
 
-	if err := json.NewDecoder(res.Body).Decode(&ctx.payload); err != nil {
+	if err := json.NewDecoder(res.Body).Decode(&d.payload); err != nil {
 		return fmt.Errorf("unable to parse API response - %s", err)
 	}
 
 	if res.StatusCode == http.StatusUnauthorized {
-		siteURL := config.InferSiteURL(ctx.usrCfg.GetString("apibaseurl"))
+		siteURL := config.InferSiteURL(d.usrCfg.GetString("apibaseurl"))
 		return fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
 	}
 
 	if res.StatusCode != http.StatusOK {
-		switch ctx.payload.Error.Type {
+		switch d.payload.Error.Type {
 		case "track_ambiguous":
-			return fmt.Errorf("%s: %s", ctx.payload.Error.Message, strings.Join(ctx.payload.Error.PossibleTrackIDs, ", "))
+			return fmt.Errorf("%s: %s", d.payload.Error.Message, strings.Join(d.payload.Error.PossibleTrackIDs, ", "))
 		default:
-			return errors.New(ctx.payload.Error.Message)
+			return errors.New(d.payload.Error.Message)
 		}
 	}
 	return nil
@@ -134,8 +134,8 @@ func (d *downloadContext) writeMetadata() error {
 	if err := d.validate(); err != nil {
 		return err
 	}
-	metadata := d.getMetadata()
-	exercise := d.getExercise()
+	metadata := d.metadata()
+	exercise := d.exercise()
 	if err := metadata.Write(exercise.MetadataDir()); err != nil {
 		return err
 	}
@@ -146,7 +146,7 @@ func (d *downloadContext) writeSolutionFiles() error {
 	if err := d.validate(); err != nil {
 		return err
 	}
-	exercise := d.getExercise()
+	exercise := d.exercise()
 	for _, file := range d.payload.Solution.Files {
 		unparsedURL := fmt.Sprintf("%s%s", d.payload.Solution.FileDownloadBaseURL, file)
 		parsedURL, err := netURL.ParseRequestURI(unparsedURL)
@@ -209,7 +209,7 @@ func (d *downloadContext) writeSolutionFiles() error {
 	return nil
 }
 
-func (d *downloadContext) getExercise() workspace.Exercise {
+func (d *downloadContext) exercise() workspace.Exercise {
 	root := d.usrCfg.GetString("workspace")
 	if d.payload.Solution.Team.Slug != "" {
 		root = filepath.Join(root, "teams", d.payload.Solution.Team.Slug)
@@ -224,7 +224,7 @@ func (d *downloadContext) getExercise() workspace.Exercise {
 	}
 }
 
-func (d *downloadContext) getMetadata() workspace.ExerciseMetadata {
+func (d *downloadContext) metadata() workspace.ExerciseMetadata {
 	return workspace.ExerciseMetadata{
 		AutoApprove: d.payload.Solution.Exercise.AutoApprove,
 		Track:       d.payload.Solution.Exercise.Track.ID,
