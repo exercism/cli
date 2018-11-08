@@ -12,4 +12,5 @@ install:
   - dep ensure
 
 script:
+  - ./.travis.gofmt.sh
   - go test -cover ./...
