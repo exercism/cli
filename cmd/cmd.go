@@ -100,10 +100,7 @@ func download(d *downloadContext) error {
 		return err
 	}
 
-	query := req.URL.Query()
-	d.buildQuery(query)
-	req.URL.RawQuery = query.Encode()
-
+	req.URL.RawQuery = d.query(req.URL)
 	res, err := client.Do(req)
 	if err != nil {
 		return err
@@ -113,12 +110,10 @@ func download(d *downloadContext) error {
 	if err := json.NewDecoder(res.Body).Decode(&d.payload); err != nil {
 		return fmt.Errorf("unable to parse API response - %s", err)
 	}
-
 	if res.StatusCode == http.StatusUnauthorized {
 		siteURL := config.InferSiteURL(d.usrCfg.GetString("apibaseurl"))
 		return fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
 	}
-
 	if res.StatusCode != http.StatusOK {
 		switch d.payload.Error.Type {
 		case "track_ambiguous":
@@ -252,7 +247,8 @@ func (d *downloadContext) requestURL() string {
 	return fmt.Sprintf("%s/solutions/%s", d.usrCfg.GetString("apibaseurl"), id)
 }
 
-func (d *downloadContext) buildQuery(query netURL.Values) {
+func (d *downloadContext) query(url *netURL.URL) string {
+	query := url.Query()
 	if d.uuid == "" {
 		query.Add("exercise_id", d.slug)
 		if d.track != "" {
@@ -262,6 +258,7 @@ func (d *downloadContext) buildQuery(query netURL.Values) {
 			query.Add("team_id", d.team)
 		}
 	}
+	return query.Encode()
 }
 
 type downloadPayload struct {
