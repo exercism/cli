@@ -77,6 +77,79 @@ func TestDownloadWithoutFlags(t *testing.T) {
 	}
 }
 
+func TestDownloadInferringFlags(t *testing.T) {
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
+
+	originalCwd, err := os.Getwd()
+	defer os.Chdir(originalCwd)
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		cwd   string
+		flags map[string]string
+		ok    bool
+	}{
+		{
+			cwd:   "bogus-track",
+			flags: map[string]string{"exercise": "bogus-exercise"},
+			ok:    true,
+		},
+		{
+			cwd:   "bogus-track/bogus-exercise",
+			flags: nil,
+			ok:    true,
+		},
+		{
+			cwd:   "teams/bogus-team/bogus-track/bogus-exercise",
+			flags: nil,
+			ok:    false,
+		},
+		{
+			cwd:   "users/bogus-user/bogus-track/bogus-exercise",
+			flags: nil,
+			ok:    false,
+		},
+	}
+
+	for _, tc := range testCases {
+		tmpDir, err := ioutil.TempDir("", "download-infer")
+		defer os.RemoveAll(tmpDir)
+		assert.NoError(t, err)
+
+		subdir := filepath.Join(tmpDir, tc.cwd)
+		err = os.MkdirAll(subdir, 0755)
+		assert.NoError(t, err)
+		os.Chdir(subdir)
+
+		ts := fakeDownloadServer(strconv.FormatBool(true), "")
+		defer ts.Close()
+
+		v := viper.New()
+		v.Set("workspace", tmpDir)
+		v.Set("apibaseurl", ts.URL)
+		v.Set("token", "abc123")
+
+		cfg := config.Config{
+			UserViperConfig: v,
+		}
+		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+		setupDownloadFlags(flags)
+		for name, value := range tc.flags {
+			flags.Set(name, value)
+		}
+
+		err = runDownload(cfg, flags, []string{})
+		if tc.ok {
+			assert.NoError(t, err)
+			assertDownloadedCorrectFiles(t, tmpDir)
+		} else {
+			assert.Error(t, err)
+		}
+	}
+}
+
 func TestSolutionFile(t *testing.T) {
 	testCases := []struct {
 		name, file, expectedPath, expectedURL string
