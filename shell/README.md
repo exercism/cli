@@ -31,3 +31,10 @@ the following snippet
 #### Oh my Zsh
 
 If you are using the popular [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) framework to manage your zsh plugins, move the file `exercism_completion.zsh` into `~/.oh-my-zsh/custom`.
+
+### Fish
+
+Completions must go in the user defined `$fish_complete_path`. By default, this is `~/.config/fish/completions`
+
+    mv ../shell/exercism.fish ~/.config/fish/exercism.fish
+
