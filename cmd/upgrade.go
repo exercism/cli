@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/exercism/cli/cli"
+	"github.com/exercism/cli/debug"
 	"github.com/spf13/cobra"
-    "github.com/exercism/cli/debug"
 )
 
 // upgradeCmd downloads and installs the most recent version of the CLI.
@@ -24,8 +24,8 @@ You can always delete this file.
 	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c := cli.New(Version)
-        updateCLI(c)
-        debug.Printf("Upgrade command finds and downloads the latest release, if you don't already have it \n",)
+		updateCLI(c)
+		debug.Printf("Upgrade command finds and downloads the latest release, if you don't already have it \n")
 		return nil
 	},
 }

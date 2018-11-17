@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"github.com/exercism/cli/browser"
+	"github.com/exercism/cli/debug"
 	"github.com/exercism/cli/workspace"
 	"github.com/spf13/cobra"
-    "github.com/exercism/cli/debug"
 )
 
 // openCmd opens the designated exercise in the browser.
@@ -18,9 +18,9 @@ Pass the path to the directory that contains the solution you want to see on the
 	`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-        debug.Printf("This command will open your exercise on the website.\nYou have to pass corrent workspace directory as the argument\n")
+		debug.Printf("This command will open your exercise on the website.\nYou have to pass corrent workspace directory as the argument\n")
 		metadata, err := workspace.NewExerciseMetadata(args[0])
-        if err != nil {
+		if err != nil {
 			return err
 		}
 		browser.Open(metadata.URL)

@@ -1,9 +1,9 @@
 package cmd
 
 import (
-    "github.com/spf13/cobra"
-    "github.com/exercism/cli/debug"
-    )
+	"github.com/exercism/cli/debug"
+	"github.com/spf13/cobra"
+)
 
 // prepareCmd does necessary setup for Exercism and its tracks.
 var prepareCmd = &cobra.Command{
@@ -13,7 +13,7 @@ var prepareCmd = &cobra.Command{
 	Long: `Prepare downloads settings and dependencies for Exercism and the language tracks.
 	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-        debug.Printf("download settings and dependencies for Exercism and the language tracks.\n")
+		debug.Printf("download settings and dependencies for Exercism and the language tracks.\n")
 		return nil
 	},
 }
