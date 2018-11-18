@@ -29,7 +29,7 @@ https://github.com/exercism/cli/compare/$PREVIOUS_RELEASE...master
 
 ## Bump the version
 
-Edit the `Version` constant in `exercism/main.go`, and edit the Changelog.
+Edit the `Version` constant in `cmd/version.go`, and edit the Changelog.
 
 All the changes in the "next release" section should be moved to a new section
 that describes the version number, and gives it a date.
