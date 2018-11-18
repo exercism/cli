@@ -7,6 +7,12 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * **Your contribution here**
 
+## v3.0.11 (2018-11-18)
+* [#752](https://github.com/exercism/cli/pull/752) Improve error message on upgrade command - [@farisj]
+* [#759](https://github.com/exercism/cli/pull/759) Update shell tab completion for bash and zsh - [@nywilken]
+* [#762](https://github.com/exercism/cli/pull/762) Improve usage documentation - [@Smarticles101]
+* [#766](https://github.com/exercism/cli/pull/766) Tweak messaging to work for teams edition - [@kytrinyx]
+
 ## v3.0.10 (2018-10-03)
 * official release of v3.0.10-alpha.1 - [@nywilken]
 
@@ -402,8 +408,12 @@ All changes by [@msgehard]
 * Implement login and logout
 * Build on Travis
 
-[@alebaffa]: https://github.com/alebaffa
 [@AlexWheeler]: https://github.com/AlexWheeler
+[@Dparker1990]: https://github.com/Dparker1990
+[@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
+[@Tonkpils]: https://github.com/Tonkpils
+[@TrevorBramble]: https://github.com/TrevorBramble
+[@alebaffa]: https://github.com/alebaffa
 [@ambroff]: https://github.com/ambroff
 [@andrewsardone]: https://github.com/andrewsardone
 [@anxiousmodernman]: https://github.com/anxiousmodernman
@@ -414,7 +424,6 @@ All changes by [@msgehard]
 [@cookrn]: https://github.com/cookrn
 [@daveyarwood]: https://github.com/daveyarwood
 [@devonestes]: https://github.com/devonestes
-[@Dparker1990]: https://github.com/Dparker1990
 [@djquan]: https://github.com/djquan
 [@dmmulroy]: https://github.com/dmmulroy
 [@dpritchett]: https://github.com/dpritchett
@@ -422,19 +431,19 @@ All changes by [@msgehard]
 [@ebautistabar]: https://github.com/ebautistabar
 [@elimisteve]: https://github.com/elimisteve
 [@ests]: https://github.com/ests
+[@farisj]: https://github.com/farisj
 [@glebedel]: https://github.com/glebedel
 [@harimp]: https://github.com/harimp
 [@hjljo]: https://github.com/hjljo
 [@isbadawi]: https://github.com/isbadawi
-[@jdsutherland]: https://github.com/jdsutherland
 [@jbaiter]: https://github.com/jbaiter
+[@jdsutherland]: https://github.com/jdsutherland
 [@jgsqware]: https://github.com/jgsqware
 [@jish]: https://github.com/jish
 [@jppunnett]: https://github.com/jppunnett
-[@kytrinyx]: https://github.com/kytrinyx
 [@katrinleinweber]: https://github.com/katrinleinweber
+[@kytrinyx]: https://github.com/kytrinyx
 [@lcowell]: https://github.com/lcowell
-[@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
 [@manusajith]: https://github.com/manusajith
 [@morphatic]: https://github.com/morphatic
 [@mrageh]: https://github.com/mrageh
@@ -452,7 +461,6 @@ All changes by [@msgehard]
 [@sfairchild]: https://github.com/sfairchild
 [@simonjefford]: https://github.com/simonjefford
 [@srt32]: https://github.com/srt32
-[@Tonkpils]: https://github.com/Tonkpils
-[@TrevorBramble]: https://github.com/TrevorBramble
 [@williandrade]: https://github.com/williandrade
 [@zabawaba99]: https://github.com/zabawaba99
+[@Smarticles101]: https://github.com/Smarticles101
