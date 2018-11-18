@@ -54,25 +54,15 @@ VERSION matches the value of the `Version` constant.
 
 Upload all the binaries from `release/*`.
 
-Paste the release text and describe the new changes (`tail -n +57 RELEASE.md | head -n 16 | pbcopy`):
+Paste the release text and describe the new changes.
 
 ```
-### Exercism Command-Line Interface (CLI)
+To install, follow the interactive installation instructions at https://exercism.io/cli-walkthrough
 
-Exercism takes place in two places: the discussions happen on the website, and you work on exercises locally. The CLI bridges the gap, allowing you to fetch exercises and submit solutions to the site.
+---
 
-This is a stand-alone binary, which means that you don't need to install any particular language or environment in order to use it.
+[describe changes in this release]
 
-To install, download the archive that matches your operating system and architecture, unpack the archive, and put the binary somewhere on your path.
-
-You will need to configure the CLI with your [Exercism API Key](http://exercism.io/account/key) before submitting.
-
-For more detailed instructions, see the [CLI page on Exercism](http://exercism.io/cli).
-
-#### Recent changes
-
-* ABC...
-* XYZ...
 ```
 
 ## Update Homebrew
