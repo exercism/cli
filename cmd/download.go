@@ -67,11 +67,11 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	var downloadContext = &downloadContext{
-		usrCfg:  usrCfg,
-		uuid:    uuid,
-		slug:    slug,
-		track:   track,
-		team:    team,
+		usrCfg: usrCfg,
+		uuid:   uuid,
+		slug:   slug,
+		track:  track,
+		team:   team,
 	}
 	if err := download(downloadContext); err != nil {
 		return err
