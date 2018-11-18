@@ -24,6 +24,9 @@ $ sudo GCO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=5 ./make.bash --no-clean
 Make sure all the recent changes are reflected in the "next release" section
 of the Changelog. Make this a separate commit from bumping the version.
 
+You can view changes using the /compare/ view:
+https://github.com/exercism/cli/compare/$PREVIOUS_RELEASE...master
+
 ## Bump the version
 
 Edit the `Version` constant in `exercism/main.go`, and edit the Changelog.
