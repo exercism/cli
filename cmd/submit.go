@@ -252,7 +252,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
     %s
 `
 	suffix := "View it at:\n\n    "
-	if metadata.AutoApprove {
+	if metadata.AutoApprove && metadata.Team == "" {
 		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
 	}
 	fmt.Fprintf(Err, msg, suffix)
