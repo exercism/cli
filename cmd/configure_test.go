@@ -41,8 +41,7 @@ func TestConfigureShow(t *testing.T) {
 		Err = oldErr
 	}()
 
-	var buf bytes.Buffer
-	Err = &buf
+	Err = &bytes.Buffer{}
 
 	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
 	setupConfigureFlags(flags)
