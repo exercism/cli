@@ -18,14 +18,6 @@ import (
 )
 
 func TestBareConfigure(t *testing.T) {
-	oldErr := Err
-	defer func() {
-		Err = oldErr
-	}()
-
-	var buf bytes.Buffer
-	Err = &buf
-
 	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
 	setupConfigureFlags(flags)
 
@@ -150,17 +142,12 @@ func TestConfigureToken(t *testing.T) {
 	defer ts.Close()
 
 	oldOut := Out
-	oldErr := Err
 	Out = ioutil.Discard
 	defer func() {
 		Out = oldOut
-		Err = oldErr
 	}()
 
 	for _, tc := range testCases {
-		var buf bytes.Buffer
-		Err = &buf
-
 		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
 		setupConfigureFlags(flags)
 
@@ -238,17 +225,12 @@ func TestConfigureAPIBaseURL(t *testing.T) {
 	}
 
 	oldOut := Out
-	oldErr := Err
 	Out = ioutil.Discard
 	defer func() {
 		Out = oldOut
-		Err = oldErr
 	}()
 
 	for _, tc := range testCases {
-		var buf bytes.Buffer
-		Err = &buf
-
 		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
 		setupConfigureFlags(flags)
 
