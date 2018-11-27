@@ -143,32 +143,14 @@ func (d *downloadContext) writeSolutionFiles() error {
 	}
 	exercise := d.exercise()
 	for _, file := range d.payload.Solution.Files {
-		unparsedURL := fmt.Sprintf("%s%s", d.payload.Solution.FileDownloadBaseURL, file)
-		parsedURL, err := netURL.ParseRequestURI(unparsedURL)
+		res, err := d.makeSolutionFileRequest(file)
 		if err != nil {
 			return err
 		}
-
-		client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
-		req, err := client.NewRequest("GET", parsedURL.String(), nil)
-		if err != nil {
-			return err
-		}
-
-		res, err := client.Do(req)
-		if err != nil {
-			return err
+		if res == nil {
+			continue
 		}
 		defer res.Body.Close()
-
-		if res.StatusCode != http.StatusOK {
-			// TODO: deal with it
-			continue
-		}
-		// Don't bother with empty files.
-		if res.Header.Get("Content-Length") == "0" {
-			continue
-		}
 
 		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
 		// TODO: handle --force flag to overwrite without asking.
@@ -189,6 +171,36 @@ func (d *downloadContext) writeSolutionFiles() error {
 		}
 	}
 	return nil
+}
+
+func (d *downloadContext) makeSolutionFileRequest(file string) (*http.Response, error) {
+	unparsedURL := fmt.Sprintf("%s%s", d.payload.Solution.FileDownloadBaseURL, file)
+	parsedURL, err := netURL.ParseRequestURI(unparsedURL)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
+	req, err := client.NewRequest("GET", parsedURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		// TODO: deal with it
+		return nil, nil
+	}
+	// Don't bother with empty files.
+	if res.Header.Get("Content-Length") == "0" {
+		return nil, nil
+	}
+
+	return res, nil
 }
 
 func (d *downloadContext) exercise() workspace.Exercise {
