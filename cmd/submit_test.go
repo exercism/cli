@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -187,15 +188,12 @@ func TestSubmitFiles(t *testing.T) {
 }
 
 func TestLegacyMetadataMigration(t *testing.T) {
-	oldOut := Out
 	oldErr := Err
-	Out = ioutil.Discard
-	Err = ioutil.Discard
 	defer func() {
-		Out = oldOut
 		Err = oldErr
 	}()
-	// The fake endpoint will populate this when it receives the call from the command.
+	Err = &bytes.Buffer{}
+
 	submittedFiles := map[string]string{}
 	ts := fakeSubmitServer(t, submittedFiles)
 	defer ts.Close()
@@ -239,7 +237,10 @@ func TestLegacyMetadataMigration(t *testing.T) {
 	ok, _ = exercise.HasMetadata()
 	assert.False(t, ok)
 
-	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file})
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	flags.Bool("verbose", true, "")
+
+	err = runSubmit(cfg, flags, []string{file})
 	assert.NoError(t, err)
 	assert.Equal(t, "This is a file.", submittedFiles["file.txt"])
 
@@ -247,6 +248,7 @@ func TestLegacyMetadataMigration(t *testing.T) {
 	assert.False(t, ok)
 	ok, _ = exercise.HasMetadata()
 	assert.True(t, ok)
+	assert.Regexp(t, "Migrated metadata", Err)
 }
 
 func TestSubmitWithEmptyFile(t *testing.T) {

@@ -134,7 +134,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 	if verbose, _ := flags.GetBool("verbose"); verbose {
-		fmt.Fprintf(os.Stderr, migrationStatus.String())
+		fmt.Fprintf(Err, migrationStatus.String())
 	}
 	metadata, err := workspace.NewExerciseMetadata(exerciseDir)
 	if err != nil {
