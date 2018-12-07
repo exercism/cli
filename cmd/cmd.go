@@ -232,6 +232,9 @@ func (d *downloadContext) metadata() workspace.ExerciseMetadata {
 }
 
 func (d *downloadContext) validate() error {
+	if d.payload == nil {
+		return errors.New("download payload is empty")
+	}
 	if d.payload.Error.Message != "" {
 		return errors.New(d.payload.Error.Message)
 	}
