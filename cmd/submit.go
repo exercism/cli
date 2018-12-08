@@ -141,6 +141,11 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
+	if exercise.Slug != metadata.Exercise {
+		// TODO: error msg should suggest running future doctor command
+		return errors.New("exercise directory does not match exercise slug in metadata")
+	}
+
 	if !metadata.IsRequester {
 		// TODO: add test
 		msg := `
