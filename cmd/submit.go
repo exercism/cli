@@ -57,6 +57,66 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
+	if err := sanitizeArgs(args); err != nil {
+		return err
+	}
+
+	ws, err := workspace.New(usrCfg.GetString("workspace"))
+	if err != nil {
+		return err
+	}
+
+	exerciseDir, err := findExerciseDir(ws, args)
+	if err != nil {
+		return err
+	}
+
+	exercise := workspace.NewExerciseFromDir(exerciseDir)
+
+	migrationStatus, err := exercise.MigrateLegacyMetadataFile()
+	if err != nil {
+		return err
+	}
+	if verbose, _ := flags.GetBool("verbose"); verbose {
+		fmt.Fprintf(Err, migrationStatus.String())
+	}
+
+	metadata, err := metadata(exerciseDir)
+	if err != nil {
+		return err
+	}
+
+	exercise.Documents, err = documents(exercise, args)
+	if err != nil {
+		return err
+	}
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	if err := writeFormFiles(writer, exercise); err != nil {
+		return err
+	}
+
+	if err := submitRequest(usrCfg, metadata, writer, body); err != nil {
+		return err
+	}
+
+	msg := `
+
+	Your solution has been submitted successfully.
+	%s
+`
+	suffix := "View it at:\n\n    "
+	if metadata.AutoApprove && metadata.Team == "" {
+		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
+	}
+	fmt.Fprintf(Err, msg, suffix)
+	fmt.Fprintf(Out, "    %s\n\n", metadata.URL)
+	return nil
+}
+
+func sanitizeArgs(args []string) error {
 	for i, arg := range args {
 		var err error
 		arg, err = filepath.Abs(arg)
@@ -69,9 +129,9 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 			if os.IsNotExist(err) {
 				msg := `
 
-    The file you are trying to submit cannot be found.
+	The file you are trying to submit cannot be found.
 
-        %s
+		%s
 
 		`
 				return fmt.Errorf(msg, arg)
@@ -81,13 +141,13 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		if info.IsDir() {
 			msg := `
 
-    You are submitting a directory, which is not currently supported.
+	You are submitting a directory, which is not currently supported.
 
-        %s
+		%s
 
-    Please change into the directory and provide the path to the file(s) you wish to submit
+	Please change into the directory and provide the path to the file(s) you wish to submit
 
-        %s submit FILENAME
+		%s submit FILENAME
 
 			`
 			return fmt.Errorf(msg, arg, BinaryName)
@@ -99,78 +159,40 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		}
 		args[i] = src
 	}
+	return nil
+}
 
-	ws, err := workspace.New(usrCfg.GetString("workspace"))
-	if err != nil {
-		return err
-	}
-
+func findExerciseDir(ws workspace.Workspace, args []string) (string, error) {
 	var exerciseDir string
 	for _, arg := range args {
 		dir, err := ws.ExerciseDir(arg)
 		if err != nil {
 			if workspace.IsMissingMetadata(err) {
-				return errors.New(msgMissingMetadata)
+				return "", errors.New(msgMissingMetadata)
 			}
-			return err
+			return "", err
 		}
 		if exerciseDir != "" && dir != exerciseDir {
 			msg := `
 
-    You are submitting files belonging to different solutions.
-    Please submit the files for one solution at a time.
+	You are submitting files belonging to different solutions.
+	Please submit the files for one solution at a time.
 
 		`
-			return errors.New(msg)
+			return "", errors.New(msg)
 		}
 		exerciseDir = dir
 	}
+	return exerciseDir, nil
+}
 
-	exercise := workspace.NewExerciseFromDir(exerciseDir)
-	migrationStatus, err := exercise.MigrateLegacyMetadataFile()
-	if err != nil {
-		return err
-	}
-	if verbose, _ := flags.GetBool("verbose"); verbose {
-		fmt.Fprintf(Err, migrationStatus.String())
-	}
-	metadata, err := workspace.NewExerciseMetadata(exerciseDir)
-	if err != nil {
-		return err
-	}
-
-	if exercise.Slug != metadata.Exercise {
-		// TODO: error msg should suggest running future doctor command
-		msg := `
-
-	The exercise directory does not match exercise slug in metadata:
-
-		expected '%[1]s' but got '%[2]s'
-
-	Please rename the directory '%[1]s' to '%[2]s' and try again.
-
-		`
-		return fmt.Errorf(msg, exercise.Slug, metadata.Exercise)
-	}
-
-	if !metadata.IsRequester {
-		msg := `
-
-    The solution you are submitting is not connected to your account.
-    Please re-download the exercise to make sure it has the data it needs.
-
-        %s download --exercise=%s --track=%s
-
-		`
-		return fmt.Errorf(msg, BinaryName, metadata.Exercise, metadata.Track)
-	}
-
-	exercise.Documents = make([]workspace.Document, 0, len(args))
+func documents(exercise workspace.Exercise, args []string) ([]workspace.Document, error) {
+	docs := make([]workspace.Document, 0, len(args))
 	for _, file := range args {
 		// Don't submit empty files
 		info, err := os.Stat(file)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		const maxFileSize int64 = 65535
 		if info.Size() >= maxFileSize {
@@ -180,7 +202,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
       Please reduce the size of the file and try again.
 
 			`
-			return fmt.Errorf(msg, file, maxFileSize)
+			return nil, fmt.Errorf(msg, file, maxFileSize)
 		}
 		if info.Size() == 0 {
 
@@ -195,23 +217,58 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		}
 		doc, err := workspace.NewDocument(exercise.Filepath(), file)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		exercise.Documents = append(exercise.Documents, doc)
+		docs = append(docs, doc)
 	}
-
-	if len(exercise.Documents) == 0 {
+	if len(docs) == 0 {
 		msg := `
 
-    No files found to submit.
+	No files found to submit.
 
 		`
-		return errors.New(msg)
+		return nil, errors.New(msg)
+	}
+	return docs, nil
+}
+
+func metadata(exerciseDir string) (*workspace.ExerciseMetadata, error) {
+	metadata, err := workspace.NewExerciseMetadata(exerciseDir)
+	if err != nil {
+		return nil, err
 	}
 
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
+	exercise := workspace.NewExerciseFromDir(exerciseDir)
+	if exercise.Slug != metadata.Exercise {
+		// TODO: error msg should suggest running future doctor command
+		msg := `
 
+	The exercise directory does not match exercise slug in metadata:
+
+		expected '%[1]s' but got '%[2]s'
+
+	Please rename the directory '%[1]s' to '%[2]s' and try again.
+
+		`
+		return nil, fmt.Errorf(msg, exercise.Slug, metadata.Exercise)
+	}
+
+	if !metadata.IsRequester {
+		// TODO: add test
+		msg := `
+
+	The solution you are submitting is not connected to your account.
+	Please re-download the exercise to make sure it has the data it needs.
+
+		%s download --exercise=%s --track=%s
+
+		`
+		return nil, fmt.Errorf(msg, BinaryName, metadata.Exercise, metadata.Track)
+	}
+	return metadata, nil
+}
+
+func writeFormFiles(writer *multipart.Writer, exercise workspace.Exercise) error {
 	for _, doc := range exercise.Documents {
 		file, err := os.Open(doc.Filepath())
 		if err != nil {
@@ -228,12 +285,18 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 			return err
 		}
 	}
-
-	err = writer.Close()
-	if err != nil {
+	if err := writer.Close(); err != nil {
 		return err
 	}
+	return nil
+}
 
+func submitRequest(
+	usrCfg *viper.Viper,
+	metadata *workspace.ExerciseMetadata,
+	writer *multipart.Writer,
+	body *bytes.Buffer,
+) error {
 	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return err
@@ -265,18 +328,6 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	if err != nil {
 		return err
 	}
-
-	msg := `
-
-    Your solution has been submitted successfully.
-    %s
-`
-	suffix := "View it at:\n\n    "
-	if metadata.AutoApprove && metadata.Team == "" {
-		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
-	}
-	fmt.Fprintf(Err, msg, suffix)
-	fmt.Fprintf(Out, "    %s\n\n", metadata.URL)
 	return nil
 }
 
