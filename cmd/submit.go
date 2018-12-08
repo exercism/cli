@@ -93,14 +93,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-
-	if err := ctx.writeFormFiles(writer, exercise.Documents); err != nil {
-		return err
-	}
-
-	if err := ctx.submitRequest(metadata.ID, writer, body); err != nil {
+	if err := ctx.submitRequest(metadata.ID, exercise.Documents); err != nil {
 		return err
 	}
 
@@ -275,13 +268,13 @@ func (ctx *submitContext) documents(exerciseDir string) ([]workspace.Document, e
 	return docs, nil
 }
 
-func (ctx *submitContext) writeFormFiles(writer *multipart.Writer, docs []workspace.Document) error {
-	if writer == nil {
-		return errors.New("writer is empty")
-	}
+func (ctx *submitContext) submitRequest(id string, docs []workspace.Document) error {
 	if len(docs) == 0 {
 		return errors.New("docs is empty")
 	}
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
 
 	for _, doc := range docs {
 		file, err := os.Open(doc.Filepath())
@@ -301,16 +294,6 @@ func (ctx *submitContext) writeFormFiles(writer *multipart.Writer, docs []worksp
 	}
 	if err := writer.Close(); err != nil {
 		return err
-	}
-	return nil
-}
-
-func (ctx *submitContext) submitRequest(id string, writer *multipart.Writer, body *bytes.Buffer) error {
-	if writer == nil {
-		return errors.New("writer is empty")
-	}
-	if body.Len() == 0 {
-		return errors.New("body is empty")
 	}
 
 	client, err := api.NewClient(ctx.usrCfg.GetString("token"), ctx.usrCfg.GetString("apibaseurl"))
