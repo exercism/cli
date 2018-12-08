@@ -50,23 +50,29 @@ var submitCmd = &cobra.Command{
 	},
 }
 
+type submitContext struct {
+	args   []string
+	usrCfg *viper.Viper
+}
+
 func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	usrCfg := cfg.UserViperConfig
 
 	if err := validateUserConfig(usrCfg); err != nil {
 		return err
 	}
-
-	if err := sanitizeArgs(args); err != nil {
-		return err
-	}
-
 	ws, err := workspace.New(usrCfg.GetString("workspace"))
 	if err != nil {
 		return err
 	}
 
-	exerciseDir, err := findExerciseDir(ws, args)
+	ctx := &submitContext{args: args, usrCfg: usrCfg}
+
+	if err := ctx.sanitizeArgs(); err != nil {
+		return err
+	}
+
+	exerciseDir, err := ctx.exerciseDir(ws)
 	if err != nil {
 		return err
 	}
@@ -81,12 +87,12 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		fmt.Fprintf(Err, migrationStatus.String())
 	}
 
-	metadata, err := metadata(exerciseDir)
+	metadata, err := ctx.metadata(exerciseDir)
 	if err != nil {
 		return err
 	}
 
-	exercise.Documents, err = documents(exercise, args)
+	exercise.Documents, err = ctx.documents(exercise)
 	if err != nil {
 		return err
 	}
@@ -94,11 +100,11 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
-	if err := writeFormFiles(writer, exercise); err != nil {
+	if err := ctx.writeFormFiles(writer, exercise); err != nil {
 		return err
 	}
 
-	if err := submitRequest(usrCfg, metadata, writer, body); err != nil {
+	if err := ctx.submitRequest(metadata, writer, body); err != nil {
 		return err
 	}
 
@@ -116,8 +122,8 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	return nil
 }
 
-func sanitizeArgs(args []string) error {
-	for i, arg := range args {
+func (ctx *submitContext) sanitizeArgs() error {
+	for i, arg := range ctx.args {
 		var err error
 		arg, err = filepath.Abs(arg)
 		if err != nil {
@@ -157,14 +163,14 @@ func sanitizeArgs(args []string) error {
 		if err != nil {
 			return err
 		}
-		args[i] = src
+		ctx.args[i] = src
 	}
 	return nil
 }
 
-func findExerciseDir(ws workspace.Workspace, args []string) (string, error) {
+func (ctx *submitContext) exerciseDir(ws workspace.Workspace) (string, error) {
 	var exerciseDir string
-	for _, arg := range args {
+	for _, arg := range ctx.args {
 		dir, err := ws.ExerciseDir(arg)
 		if err != nil {
 			if workspace.IsMissingMetadata(err) {
@@ -186,9 +192,45 @@ func findExerciseDir(ws workspace.Workspace, args []string) (string, error) {
 	return exerciseDir, nil
 }
 
-func documents(exercise workspace.Exercise, args []string) ([]workspace.Document, error) {
-	docs := make([]workspace.Document, 0, len(args))
-	for _, file := range args {
+func (ctx *submitContext) metadata(exerciseDir string) (*workspace.ExerciseMetadata, error) {
+	metadata, err := workspace.NewExerciseMetadata(exerciseDir)
+	if err != nil {
+		return nil, err
+	}
+
+	exercise := workspace.NewExerciseFromDir(exerciseDir)
+	if exercise.Slug != metadata.Exercise {
+		// TODO: error msg should suggest running future doctor command
+		msg := `
+
+	The exercise directory does not match exercise slug in metadata:
+
+		expected '%[1]s' but got '%[2]s'
+
+	Please rename the directory '%[1]s' to '%[2]s' and try again.
+
+		`
+		return nil, fmt.Errorf(msg, exercise.Slug, metadata.Exercise)
+	}
+
+	if !metadata.IsRequester {
+		// TODO: add test
+		msg := `
+
+	The solution you are submitting is not connected to your account.
+	Please re-download the exercise to make sure it has the data it needs.
+
+		%s download --exercise=%s --track=%s
+
+		`
+		return nil, fmt.Errorf(msg, BinaryName, metadata.Exercise, metadata.Track)
+	}
+	return metadata, nil
+}
+
+func (ctx *submitContext) documents(exercise workspace.Exercise) ([]workspace.Document, error) {
+	docs := make([]workspace.Document, 0, len(ctx.args))
+	for _, file := range ctx.args {
 		// Don't submit empty files
 		info, err := os.Stat(file)
 		if err != nil {
@@ -232,43 +274,7 @@ func documents(exercise workspace.Exercise, args []string) ([]workspace.Document
 	return docs, nil
 }
 
-func metadata(exerciseDir string) (*workspace.ExerciseMetadata, error) {
-	metadata, err := workspace.NewExerciseMetadata(exerciseDir)
-	if err != nil {
-		return nil, err
-	}
-
-	exercise := workspace.NewExerciseFromDir(exerciseDir)
-	if exercise.Slug != metadata.Exercise {
-		// TODO: error msg should suggest running future doctor command
-		msg := `
-
-	The exercise directory does not match exercise slug in metadata:
-
-		expected '%[1]s' but got '%[2]s'
-
-	Please rename the directory '%[1]s' to '%[2]s' and try again.
-
-		`
-		return nil, fmt.Errorf(msg, exercise.Slug, metadata.Exercise)
-	}
-
-	if !metadata.IsRequester {
-		// TODO: add test
-		msg := `
-
-	The solution you are submitting is not connected to your account.
-	Please re-download the exercise to make sure it has the data it needs.
-
-		%s download --exercise=%s --track=%s
-
-		`
-		return nil, fmt.Errorf(msg, BinaryName, metadata.Exercise, metadata.Track)
-	}
-	return metadata, nil
-}
-
-func writeFormFiles(writer *multipart.Writer, exercise workspace.Exercise) error {
+func (ctx *submitContext) writeFormFiles(writer *multipart.Writer, exercise workspace.Exercise) error {
 	for _, doc := range exercise.Documents {
 		file, err := os.Open(doc.Filepath())
 		if err != nil {
@@ -291,17 +297,12 @@ func writeFormFiles(writer *multipart.Writer, exercise workspace.Exercise) error
 	return nil
 }
 
-func submitRequest(
-	usrCfg *viper.Viper,
-	metadata *workspace.ExerciseMetadata,
-	writer *multipart.Writer,
-	body *bytes.Buffer,
-) error {
-	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
+func (ctx *submitContext) submitRequest(metadata *workspace.ExerciseMetadata, writer *multipart.Writer, body *bytes.Buffer) error {
+	client, err := api.NewClient(ctx.usrCfg.GetString("token"), ctx.usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return err
 	}
-	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), metadata.ID)
+	url := fmt.Sprintf("%s/solutions/%s", ctx.usrCfg.GetString("apibaseurl"), metadata.ID)
 	req, err := client.NewRequest("PATCH", url, body)
 	if err != nil {
 		return err
