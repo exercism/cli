@@ -100,7 +100,9 @@ func download(d *downloadContext) error {
 		return err
 	}
 
-	d.buildQuery(req.URL)
+	if err := d.buildQuery(req.URL); err != nil {
+		return err
+	}
 	res, err := client.Do(req)
 	if err != nil {
 		return err
@@ -173,8 +175,12 @@ func (d *downloadContext) writeSolutionFiles() error {
 	return nil
 }
 
-func (d *downloadContext) submitRequest(file string) (*http.Response, error) {
-	unparsedURL := fmt.Sprintf("%s%s", d.payload.Solution.FileDownloadBaseURL, file)
+func (d *downloadContext) submitRequest(filename string) (*http.Response, error) {
+	if filename == "" {
+		return nil, errors.New("filename is empty")
+	}
+
+	unparsedURL := fmt.Sprintf("%s%s", d.payload.Solution.FileDownloadBaseURL, filename)
 	parsedURL, err := netURL.ParseRequestURI(unparsedURL)
 	if err != nil {
 		return nil, err
@@ -249,7 +255,11 @@ func (d *downloadContext) requestURL() string {
 	return fmt.Sprintf("%s/solutions/%s", d.usrCfg.GetString("apibaseurl"), id)
 }
 
-func (d *downloadContext) buildQuery(url *netURL.URL) {
+func (d *downloadContext) buildQuery(url *netURL.URL) error {
+	if url == nil {
+		return errors.New("url is empty")
+	}
+
 	query := url.Query()
 	if d.uuid == "" {
 		query.Add("exercise_id", d.slug)
@@ -261,6 +271,8 @@ func (d *downloadContext) buildQuery(url *netURL.URL) {
 		}
 	}
 	url.RawQuery = query.Encode()
+
+	return nil
 }
 
 // Work around a path bug due to an early design decision (later reversed) to
