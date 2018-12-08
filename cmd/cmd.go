@@ -155,7 +155,7 @@ func (d *downloadContext) writeSolutionFiles() error {
 		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
 		// TODO: handle --force flag to overwrite without asking.
 
-		relativePath := sanitizeLegacyFilepath(file, exercise.Slug)
+		relativePath := d.sanitizeLegacyFilepath(file, exercise.Slug)
 		dir := filepath.Join(exercise.MetadataDir(), filepath.Dir(relativePath))
 		if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
 			return err
@@ -266,7 +266,7 @@ func (d *downloadContext) buildQuery(url *netURL.URL) {
 // Work around a path bug due to an early design decision (later reversed) to
 // allow numeric suffixes for exercise directories, allowing people to have
 // multiple parallel versions of an exercise.
-func sanitizeLegacyFilepath(file, slug string) string {
+func (d *downloadContext) sanitizeLegacyFilepath(file, slug string) string {
 	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, slug)
 	rgxNumericSuffix := regexp.MustCompile(pattern)
 	if rgxNumericSuffix.MatchString(file) {
