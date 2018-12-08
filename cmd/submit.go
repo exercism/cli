@@ -61,10 +61,6 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	if err := validateUserConfig(usrCfg); err != nil {
 		return err
 	}
-	ws, err := workspace.New(usrCfg.GetString("workspace"))
-	if err != nil {
-		return err
-	}
 
 	ctx := &submitContext{args: args, usrCfg: usrCfg}
 
@@ -72,7 +68,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	exerciseDir, err := ctx.exerciseDir(ws)
+	exerciseDir, err := ctx.exerciseDir()
 	if err != nil {
 		return err
 	}
@@ -168,7 +164,12 @@ func (ctx *submitContext) sanitizeArgs() error {
 	return nil
 }
 
-func (ctx *submitContext) exerciseDir(ws workspace.Workspace) (string, error) {
+func (ctx *submitContext) exerciseDir() (string, error) {
+	ws, err := workspace.New(ctx.usrCfg.GetString("workspace"))
+	if err != nil {
+		return "", err
+	}
+
 	var exerciseDir string
 	for _, arg := range ctx.args {
 		dir, err := ws.ExerciseDir(arg)
