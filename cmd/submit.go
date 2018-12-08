@@ -276,6 +276,13 @@ func (ctx *submitContext) documents(exerciseDir string) ([]workspace.Document, e
 }
 
 func (ctx *submitContext) writeFormFiles(writer *multipart.Writer, docs []workspace.Document) error {
+	if writer == nil {
+		return errors.New("writer is empty")
+	}
+	if len(docs) == 0 {
+		return errors.New("docs is empty")
+	}
+
 	for _, doc := range docs {
 		file, err := os.Open(doc.Filepath())
 		if err != nil {
@@ -299,6 +306,13 @@ func (ctx *submitContext) writeFormFiles(writer *multipart.Writer, docs []worksp
 }
 
 func (ctx *submitContext) submitRequest(id string, writer *multipart.Writer, body *bytes.Buffer) error {
+	if writer == nil {
+		return errors.New("writer is empty")
+	}
+	if body.Len() == 0 {
+		return errors.New("body is empty")
+	}
+
 	client, err := api.NewClient(ctx.usrCfg.GetString("token"), ctx.usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return err
