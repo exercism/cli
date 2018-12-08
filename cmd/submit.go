@@ -96,11 +96,11 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
-	if err := ctx.writeFormFiles(writer, exercise); err != nil {
+	if err := ctx.writeFormFiles(writer, exercise.Documents); err != nil {
 		return err
 	}
 
-	if err := ctx.submitRequest(metadata, writer, body); err != nil {
+	if err := ctx.submitRequest(metadata.ID, writer, body); err != nil {
 		return err
 	}
 
@@ -275,8 +275,8 @@ func (ctx *submitContext) documents(exercise workspace.Exercise) ([]workspace.Do
 	return docs, nil
 }
 
-func (ctx *submitContext) writeFormFiles(writer *multipart.Writer, exercise workspace.Exercise) error {
-	for _, doc := range exercise.Documents {
+func (ctx *submitContext) writeFormFiles(writer *multipart.Writer, docs []workspace.Document) error {
+	for _, doc := range docs {
 		file, err := os.Open(doc.Filepath())
 		if err != nil {
 			return err
@@ -298,12 +298,12 @@ func (ctx *submitContext) writeFormFiles(writer *multipart.Writer, exercise work
 	return nil
 }
 
-func (ctx *submitContext) submitRequest(metadata *workspace.ExerciseMetadata, writer *multipart.Writer, body *bytes.Buffer) error {
+func (ctx *submitContext) submitRequest(id string, writer *multipart.Writer, body *bytes.Buffer) error {
 	client, err := api.NewClient(ctx.usrCfg.GetString("token"), ctx.usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return err
 	}
-	url := fmt.Sprintf("%s/solutions/%s", ctx.usrCfg.GetString("apibaseurl"), metadata.ID)
+	url := fmt.Sprintf("%s/solutions/%s", ctx.usrCfg.GetString("apibaseurl"), id)
 	req, err := client.NewRequest("PATCH", url, body)
 	if err != nil {
 		return err
