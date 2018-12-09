@@ -68,12 +68,10 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	exerciseDir, err := ctx.exerciseDir()
+	exercise, err := ctx.exercise()
 	if err != nil {
 		return err
 	}
-
-	exercise := workspace.NewExerciseFromDir(exerciseDir)
 
 	migrationStatus, err := exercise.MigrateLegacyMetadataFile()
 	if err != nil {
@@ -83,12 +81,12 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		fmt.Fprintf(Err, migrationStatus.String())
 	}
 
-	metadata, err := ctx.metadata(exerciseDir)
+	metadata, err := ctx.metadata(exercise.Filepath())
 	if err != nil {
 		return err
 	}
 
-	exercise.Documents, err = ctx.documents(exerciseDir)
+	exercise.Documents, err = ctx.documents(exercise.Filepath())
 	if err != nil {
 		return err
 	}
@@ -157,10 +155,10 @@ func (ctx *submitContext) sanitizeArgs() error {
 	return nil
 }
 
-func (ctx *submitContext) exerciseDir() (string, error) {
+func (ctx *submitContext) exercise() (workspace.Exercise, error) {
 	ws, err := workspace.New(ctx.usrCfg.GetString("workspace"))
 	if err != nil {
-		return "", err
+		return workspace.Exercise{}, err
 	}
 
 	var exerciseDir string
@@ -168,9 +166,9 @@ func (ctx *submitContext) exerciseDir() (string, error) {
 		dir, err := ws.ExerciseDir(arg)
 		if err != nil {
 			if workspace.IsMissingMetadata(err) {
-				return "", errors.New(msgMissingMetadata)
+				return workspace.Exercise{}, errors.New(msgMissingMetadata)
 			}
-			return "", err
+			return workspace.Exercise{}, err
 		}
 		if exerciseDir != "" && dir != exerciseDir {
 			msg := `
@@ -179,11 +177,12 @@ func (ctx *submitContext) exerciseDir() (string, error) {
 	Please submit the files for one solution at a time.
 
 		`
-			return "", errors.New(msg)
+			return workspace.Exercise{}, errors.New(msg)
 		}
 		exerciseDir = dir
 	}
-	return exerciseDir, nil
+
+	return workspace.NewExerciseFromDir(exerciseDir), nil
 }
 
 func (ctx *submitContext) metadata(exerciseDir string) (*workspace.ExerciseMetadata, error) {
