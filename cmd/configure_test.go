@@ -32,7 +32,9 @@ func TestBareConfigure(t *testing.T) {
 	}
 
 	err = runConfigure(cfg, flags)
-	assert.Regexp(t, "no token configured", err.Error())
+	if assert.Error(t, err) {
+		assert.Regexp(t, "no token configured", err.Error())
+	}
 }
 
 func TestConfigureShow(t *testing.T) {
@@ -379,8 +381,9 @@ func TestConfigureDefaultWorkspaceWithoutClobbering(t *testing.T) {
 	assert.NoError(t, err)
 
 	err = runConfigure(cfg, flags)
-	assert.Error(t, err)
-	assert.Regexp(t, "already something", err.Error())
+	if assert.Error(t, err) {
+		assert.Regexp(t, "already something", err.Error())
+	}
 }
 
 func TestConfigureExplicitWorkspaceWithoutClobberingNonDirectory(t *testing.T) {
