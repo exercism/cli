@@ -565,9 +565,9 @@ func TestExerciseDirnameMatchesMetadataSlug(t *testing.T) {
 	}
 
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file1})
-
-	assert.Error(t, err)
-	assert.Regexp(t, "directory does not match exercise slug", err.Error())
+	if assert.Error(t, err) {
+		assert.Regexp(t, "directory does not match exercise slug", err.Error())
+	}
 }
 
 func writeFakeMetadata(t *testing.T, dir, trackID, exerciseSlug string) {
