@@ -548,6 +548,49 @@ func TestSubmitRelativePath(t *testing.T) {
 	assert.Equal(t, "This is a file.", submittedFiles["file.txt"])
 }
 
+func TestSubmissionNotConnectedToRequesterAccount(t *testing.T) {
+	submittedFiles := map[string]string{}
+	ts := fakeSubmitServer(t, submittedFiles)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "submit-files")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
+	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
+
+	metadata := &workspace.ExerciseMetadata{
+		ID:          "bogus-solution-uuid",
+		Track:       "bogus-track",
+		Exercise:    "bogus-exercise",
+		URL:         "http://example.com/bogus-url",
+		IsRequester: false,
+	}
+	err = metadata.Write(dir)
+	assert.NoError(t, err)
+
+	file1 := filepath.Join(dir, "file-1.txt")
+	err = ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
+
+	cfg := config.Config{
+		Persister:       config.InMemoryPersister{},
+		Dir:             tmpDir,
+		UserViperConfig: v,
+	}
+
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file1})
+	if assert.Error(t, err) {
+		assert.Regexp(t, "not connected to your account", err.Error())
+	}
+}
+
 func TestExerciseDirnameMatchesMetadataSlug(t *testing.T) {
 	submittedFiles := map[string]string{}
 	ts := fakeSubmitServer(t, submittedFiles)
