@@ -103,10 +103,12 @@ func newDownloadContext(cfg config.Config, flags *pflag.FlagSet) (*downloadConte
 	if err != nil {
 		return nil, err
 	}
+
 	slug, err := flags.GetString("exercise")
 	if err != nil {
 		return nil, err
 	}
+
 	if uuid != "" && slug != "" || uuid == slug {
 		return nil, errors.New("need an --exercise name or a solution --uuid")
 	}
