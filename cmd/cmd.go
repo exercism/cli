@@ -15,6 +15,7 @@ import (
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/workspace"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -87,6 +88,46 @@ type downloadContext struct {
 	track   string
 	team    string
 	payload *downloadPayload
+}
+
+func newDownloadContext(cfg config.Config, flags *pflag.FlagSet) (*downloadContext, error) {
+	usrCfg := cfg.UserViperConfig
+	if usrCfg.GetString("token") == "" {
+		return nil, fmt.Errorf(msgWelcomePleaseConfigure, config.SettingsURL(usrCfg.GetString("apibaseurl")), BinaryName)
+	}
+	if usrCfg.GetString("workspace") == "" || usrCfg.GetString("apibaseurl") == "" {
+		return nil, fmt.Errorf(msgRerunConfigure, BinaryName)
+	}
+
+	uuid, err := flags.GetString("uuid")
+	if err != nil {
+		return nil, err
+	}
+	slug, err := flags.GetString("exercise")
+	if err != nil {
+		return nil, err
+	}
+	if uuid != "" && slug != "" || uuid == slug {
+		return nil, errors.New("need an --exercise name or a solution --uuid")
+	}
+
+	track, err := flags.GetString("track")
+	if err != nil {
+		return nil, err
+	}
+
+	team, err := flags.GetString("team")
+	if err != nil {
+		return nil, err
+	}
+
+	return &downloadContext{
+		usrCfg: usrCfg,
+		uuid:   uuid,
+		slug:   slug,
+		track:  track,
+		team:   team,
+	}, nil
 }
 
 func download(d *downloadContext) error {

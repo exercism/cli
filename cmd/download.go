@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/exercism/cli/config"
@@ -39,49 +38,23 @@ Download other people's solutions by providing the UUID.
 }
 
 func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
-	usrCfg := cfg.UserViperConfig
-	if err := validateUserConfig(usrCfg); err != nil {
-		return err
-	}
-
-	uuid, err := flags.GetString("uuid")
-	if err != nil {
-		return err
-	}
-	slug, err := flags.GetString("exercise")
-	if err != nil {
-		return err
-	}
-	if uuid != "" && slug != "" || uuid == slug {
-		return errors.New("need an --exercise name or a solution --uuid")
-	}
-
-	track, err := flags.GetString("track")
+	downloadContext, err := newDownloadContext(cfg, flags)
 	if err != nil {
 		return err
 	}
 
-	team, err := flags.GetString("team")
-	if err != nil {
-		return err
-	}
-
-	var downloadContext = &downloadContext{
-		usrCfg: usrCfg,
-		uuid:   uuid,
-		slug:   slug,
-		track:  track,
-		team:   team,
-	}
 	if err := download(downloadContext); err != nil {
 		return err
 	}
+
 	if err := downloadContext.writeMetadata(); err != nil {
 		return err
 	}
+
 	if err := downloadContext.writeSolutionFiles(); err != nil {
 		return err
 	}
+
 	fmt.Fprintf(Err, "\nDownloaded to\n")
 	fmt.Fprintf(Out, "%s\n", downloadContext.exercise().MetadataDir())
 	return nil
