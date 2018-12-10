@@ -52,6 +52,7 @@ var submitCmd = &cobra.Command{
 
 type submitContext struct {
 	usrCfg *viper.Viper
+	flags  *pflag.FlagSet
 	args   []string
 }
 
@@ -62,7 +63,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	ctx := &submitContext{args: args, usrCfg: usrCfg}
+	ctx := &submitContext{args: args, flags: flags, usrCfg: usrCfg}
 
 	if err := ctx.sanitizeArgs(); err != nil {
 		return err
@@ -81,7 +82,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		fmt.Fprintf(Err, migrationStatus.String())
 	}
 
-	metadata, err := ctx.metadata(exercise.Filepath())
+	metadata, err := ctx.metadata(exercise)
 	if err != nil {
 		return err
 	}
@@ -189,13 +190,24 @@ func (s *submitContext) exercise() (workspace.Exercise, error) {
 	return workspace.NewExerciseFromDir(exerciseDir), nil
 }
 
-func (s *submitContext) metadata(exerciseDir string) (*workspace.ExerciseMetadata, error) {
-	metadata, err := workspace.NewExerciseMetadata(exerciseDir)
+func (s *submitContext) migrateLegacyMetadata(exercise workspace.Exercise) error {
+	migrationStatus, err := exercise.MigrateLegacyMetadataFile()
+	if err != nil {
+		return err
+	}
+	if verbose, _ := s.flags.GetBool("verbose"); verbose {
+		fmt.Fprintf(Err, migrationStatus.String())
+	}
+	return nil
+}
+
+func (s *submitContext) metadata(exercise workspace.Exercise) (*workspace.ExerciseMetadata, error) {
+	metadata, err := workspace.NewExerciseMetadata(exercise.Filepath())
+
 	if err != nil {
 		return nil, err
 	}
 
-	exercise := workspace.NewExerciseFromDir(exerciseDir)
 	if exercise.Slug != metadata.Exercise {
 		// TODO: error msg should suggest running future doctor command
 		msg := `
