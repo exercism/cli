@@ -187,7 +187,7 @@ func (d *downloadContext) writeSolutionFiles() error {
 	}
 	exercise := d.exercise()
 	for _, filename := range d.payload.Solution.Files {
-		res, err := d.request(filename)
+		res, err := d.requestFile(filename)
 		if err != nil {
 			return err
 		}
@@ -217,7 +217,7 @@ func (d *downloadContext) writeSolutionFiles() error {
 	return nil
 }
 
-func (d *downloadContext) request(filename string) (*http.Response, error) {
+func (d *downloadContext) requestFile(filename string) (*http.Response, error) {
 	if filename == "" {
 		return nil, errors.New("filename is empty")
 	}
