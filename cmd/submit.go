@@ -95,17 +95,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	msg := `
-
-    Your solution has been submitted successfully.
-    %s
-`
-	suffix := "View it at:\n\n    "
-	if metadata.AutoApprove && metadata.Team == "" {
-		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
-	}
-	fmt.Fprintf(Err, msg, suffix)
-	fmt.Fprintf(Out, "    %s\n\n", metadata.URL)
+	ctx.printResult(metadata)
 	return nil
 }
 
@@ -340,6 +330,20 @@ func (ctx *submitContext) submitRequest(id string, docs []workspace.Document) er
 		return err
 	}
 	return nil
+}
+
+func (ctx *submitContext) printResult(metadata *workspace.ExerciseMetadata) {
+	msg := `
+
+    Your solution has been submitted successfully.
+    %s
+`
+	suffix := "View it at:\n\n    "
+	if metadata.AutoApprove && metadata.Team == "" {
+		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
+	}
+	fmt.Fprintf(Err, msg, suffix)
+	fmt.Fprintf(Out, "    %s\n\n", metadata.URL)
 }
 
 func init() {
