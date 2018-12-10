@@ -109,6 +109,16 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	return nil
 }
 
+func (ctx *submitContext) validateUserConfig() error {
+	if ctx.usrCfg.GetString("token") == "" {
+		return fmt.Errorf(msgWelcomePleaseConfigure, config.SettingsURL(ctx.usrCfg.GetString("apibaseurl")), BinaryName)
+	}
+	if ctx.usrCfg.GetString("workspace") == "" {
+		return fmt.Errorf(msgRerunConfigure, BinaryName)
+	}
+	return nil
+}
+
 func (ctx *submitContext) sanitizeArgs() error {
 	for i, arg := range ctx.args {
 		var err error
