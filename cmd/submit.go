@@ -26,7 +26,7 @@ var submitCmd = &cobra.Command{
 	Short:   "Submit your solution to an exercise.",
 	Long: `Submit your solution to an Exercism exercise.
 
-	Call the command with the list of files you want to submit.
+    Call the command with the list of files you want to submit.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.NewConfig()
@@ -97,8 +97,8 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 	msg := `
 
-	Your solution has been submitted successfully.
-	%s
+    Your solution has been submitted successfully.
+    %s
 `
 	suffix := "View it at:\n\n    "
 	if metadata.AutoApprove && metadata.Team == "" {
@@ -122,11 +122,11 @@ func (ctx *submitContext) sanitizeArgs() error {
 			if os.IsNotExist(err) {
 				msg := `
 
-	The file you are trying to submit cannot be found.
+    The file you are trying to submit cannot be found.
 
-		%s
+        %s
 
-		`
+        `
 				return fmt.Errorf(msg, arg)
 			}
 			return err
@@ -134,15 +134,15 @@ func (ctx *submitContext) sanitizeArgs() error {
 		if info.IsDir() {
 			msg := `
 
-	You are submitting a directory, which is not currently supported.
+    You are submitting a directory, which is not currently supported.
 
-		%s
+        %s
 
-	Please change into the directory and provide the path to the file(s) you wish to submit
+    Please change into the directory and provide the path to the file(s) you wish to submit
 
-		%s submit FILENAME
+        %s submit FILENAME
 
-			`
+            `
 			return fmt.Errorf(msg, arg, BinaryName)
 		}
 
@@ -173,10 +173,10 @@ func (ctx *submitContext) exercise() (workspace.Exercise, error) {
 		if exerciseDir != "" && dir != exerciseDir {
 			msg := `
 
-	You are submitting files belonging to different solutions.
-	Please submit the files for one solution at a time.
+    You are submitting files belonging to different solutions.
+    Please submit the files for one solution at a time.
 
-		`
+        `
 			return workspace.Exercise{}, errors.New(msg)
 		}
 		exerciseDir = dir
@@ -210,12 +210,12 @@ func (ctx *submitContext) metadata(exerciseDir string) (*workspace.ExerciseMetad
 		// TODO: add test
 		msg := `
 
-	The solution you are submitting is not connected to your account.
-	Please re-download the exercise to make sure it has the data it needs.
+    The solution you are submitting is not connected to your account.
+    Please re-download the exercise to make sure it has the data it needs.
 
-		%s download --exercise=%s --track=%s
+        %s download --exercise=%s --track=%s
 
-		`
+        `
 		return nil, fmt.Errorf(msg, BinaryName, metadata.Exercise, metadata.Track)
 	}
 	return metadata, nil
@@ -236,7 +236,7 @@ func (ctx *submitContext) documents(exerciseDir string) ([]workspace.Document, e
       The submitted file '%s' is larger than the max allowed file size of %d bytes.
       Please reduce the size of the file and try again.
 
-			`
+            `
 			return nil, fmt.Errorf(msg, file, maxFileSize)
 		}
 		if info.Size() == 0 {
@@ -246,7 +246,7 @@ func (ctx *submitContext) documents(exerciseDir string) ([]workspace.Document, e
     WARNING: Skipping empty file
              %s
 
-		`
+        `
 			fmt.Fprintf(Err, msg, file)
 			continue
 		}
@@ -259,9 +259,9 @@ func (ctx *submitContext) documents(exerciseDir string) ([]workspace.Document, e
 	if len(docs) == 0 {
 		msg := `
 
-	No files found to submit.
+    No files found to submit.
 
-		`
+        `
 		return nil, errors.New(msg)
 	}
 	return docs, nil
