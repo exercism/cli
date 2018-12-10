@@ -38,25 +38,25 @@ Download other people's solutions by providing the UUID.
 }
 
 func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
-	downloadContext, err := newDownloadContext(cfg, flags)
+	ctx, err := newDownloadContext(cfg, flags)
 	if err != nil {
 		return err
 	}
 
-	if err := download(downloadContext); err != nil {
+	if err := download(ctx); err != nil {
 		return err
 	}
 
-	if err := downloadContext.writeMetadata(); err != nil {
+	if err := ctx.writeMetadata(); err != nil {
 		return err
 	}
 
-	if err := downloadContext.writeSolutionFiles(); err != nil {
+	if err := ctx.writeSolutionFiles(); err != nil {
 		return err
 	}
 
 	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", downloadContext.exercise().MetadataDir())
+	fmt.Fprintf(Out, "%s\n", ctx.exercise().MetadataDir())
 	return nil
 }
 
