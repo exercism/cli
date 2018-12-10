@@ -43,7 +43,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	if err := download(ctx); err != nil {
+	if err := ctx.requestPayload(); err != nil {
 		return err
 	}
 

@@ -132,7 +132,7 @@ func newDownloadContext(cfg config.Config, flags *pflag.FlagSet) (*downloadConte
 	}, nil
 }
 
-func download(d *downloadContext) error {
+func (d *downloadContext) requestPayload() error {
 	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return err
