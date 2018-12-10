@@ -51,8 +51,8 @@ var submitCmd = &cobra.Command{
 }
 
 type submitContext struct {
-	args   []string
 	usrCfg *viper.Viper
+	args   []string
 }
 
 func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
@@ -99,14 +99,18 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	return nil
 }
 
-func (s *submitContext) validateUserConfig() error {
-	if s.usrCfg.GetString("token") == "" {
-		return fmt.Errorf(msgWelcomePleaseConfigure, config.SettingsURL(s.usrCfg.GetString("apibaseurl")), BinaryName)
+func newSubmitContext(usrCfg *viper.Viper, args []string) (*submitContext, error) {
+	if usrCfg.GetString("token") == "" {
+		return nil, fmt.Errorf(
+			msgWelcomePleaseConfigure,
+			config.SettingsURL(usrCfg.GetString("apibaseurl")),
+			BinaryName,
+		)
 	}
-	if s.usrCfg.GetString("workspace") == "" {
-		return fmt.Errorf(msgRerunConfigure, BinaryName)
+	if usrCfg.GetString("workspace") == "" {
+		return nil, fmt.Errorf(msgRerunConfigure, BinaryName)
 	}
-	return nil
+	return &submitContext{args: args, usrCfg: usrCfg}, nil
 }
 
 func (s *submitContext) sanitizeArgs() error {
