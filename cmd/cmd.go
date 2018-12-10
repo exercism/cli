@@ -90,8 +90,7 @@ type downloadContext struct {
 	payload *downloadPayload
 }
 
-func newDownloadContext(cfg config.Config, flags *pflag.FlagSet) (*downloadContext, error) {
-	usrCfg := cfg.UserViperConfig
+func newDownloadContext(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadContext, error) {
 	if usrCfg.GetString("token") == "" {
 		return nil, fmt.Errorf(msgWelcomePleaseConfigure, config.SettingsURL(usrCfg.GetString("apibaseurl")), BinaryName)
 	}

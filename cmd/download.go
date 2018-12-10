@@ -38,7 +38,7 @@ Download other people's solutions by providing the UUID.
 }
 
 func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
-	ctx, err := newDownloadContext(cfg, flags)
+	ctx, err := newDownloadContext(cfg.UserViperConfig, flags)
 	if err != nil {
 		return err
 	}
