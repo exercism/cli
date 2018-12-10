@@ -187,8 +187,8 @@ func (d *downloadContext) writeSolutionFiles() error {
 		return err
 	}
 	exercise := d.exercise()
-	for _, file := range d.payload.Solution.Files {
-		res, err := d.submitRequest(file)
+	for _, filename := range d.payload.Solution.Files {
+		res, err := d.request(filename)
 		if err != nil {
 			return err
 		}
@@ -200,7 +200,7 @@ func (d *downloadContext) writeSolutionFiles() error {
 		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
 		// TODO: handle --force flag to overwrite without asking.
 
-		relativePath := d.sanitizeLegacyFilepath(file, exercise.Slug)
+		relativePath := d.sanitizeLegacyFilepath(filename, exercise.Slug)
 		dir := filepath.Join(exercise.MetadataDir(), filepath.Dir(relativePath))
 		if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
 			return err
@@ -218,7 +218,7 @@ func (d *downloadContext) writeSolutionFiles() error {
 	return nil
 }
 
-func (d *downloadContext) submitRequest(filename string) (*http.Response, error) {
+func (d *downloadContext) request(filename string) (*http.Response, error) {
 	if filename == "" {
 		return nil, errors.New("filename is empty")
 	}
