@@ -99,18 +99,18 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	return nil
 }
 
-func (ctx *submitContext) validateUserConfig() error {
-	if ctx.usrCfg.GetString("token") == "" {
-		return fmt.Errorf(msgWelcomePleaseConfigure, config.SettingsURL(ctx.usrCfg.GetString("apibaseurl")), BinaryName)
+func (s *submitContext) validateUserConfig() error {
+	if s.usrCfg.GetString("token") == "" {
+		return fmt.Errorf(msgWelcomePleaseConfigure, config.SettingsURL(s.usrCfg.GetString("apibaseurl")), BinaryName)
 	}
-	if ctx.usrCfg.GetString("workspace") == "" {
+	if s.usrCfg.GetString("workspace") == "" {
 		return fmt.Errorf(msgRerunConfigure, BinaryName)
 	}
 	return nil
 }
 
-func (ctx *submitContext) sanitizeArgs() error {
-	for i, arg := range ctx.args {
+func (s *submitContext) sanitizeArgs() error {
+	for i, arg := range s.args {
 		var err error
 		arg, err = filepath.Abs(arg)
 		if err != nil {
@@ -150,19 +150,19 @@ func (ctx *submitContext) sanitizeArgs() error {
 		if err != nil {
 			return err
 		}
-		ctx.args[i] = src
+		s.args[i] = src
 	}
 	return nil
 }
 
-func (ctx *submitContext) exercise() (workspace.Exercise, error) {
-	ws, err := workspace.New(ctx.usrCfg.GetString("workspace"))
+func (s *submitContext) exercise() (workspace.Exercise, error) {
+	ws, err := workspace.New(s.usrCfg.GetString("workspace"))
 	if err != nil {
 		return workspace.Exercise{}, err
 	}
 
 	var exerciseDir string
-	for _, arg := range ctx.args {
+	for _, arg := range s.args {
 		dir, err := ws.ExerciseDir(arg)
 		if err != nil {
 			if workspace.IsMissingMetadata(err) {
@@ -185,7 +185,7 @@ func (ctx *submitContext) exercise() (workspace.Exercise, error) {
 	return workspace.NewExerciseFromDir(exerciseDir), nil
 }
 
-func (ctx *submitContext) metadata(exerciseDir string) (*workspace.ExerciseMetadata, error) {
+func (s *submitContext) metadata(exerciseDir string) (*workspace.ExerciseMetadata, error) {
 	metadata, err := workspace.NewExerciseMetadata(exerciseDir)
 	if err != nil {
 		return nil, err
@@ -221,9 +221,9 @@ func (ctx *submitContext) metadata(exerciseDir string) (*workspace.ExerciseMetad
 	return metadata, nil
 }
 
-func (ctx *submitContext) documents(exerciseDir string) ([]workspace.Document, error) {
-	docs := make([]workspace.Document, 0, len(ctx.args))
-	for _, file := range ctx.args {
+func (s *submitContext) documents(exerciseDir string) ([]workspace.Document, error) {
+	docs := make([]workspace.Document, 0, len(s.args))
+	for _, file := range s.args {
 		// Don't submit empty files
 		info, err := os.Stat(file)
 		if err != nil {
@@ -267,7 +267,7 @@ func (ctx *submitContext) documents(exerciseDir string) ([]workspace.Document, e
 	return docs, nil
 }
 
-func (ctx *submitContext) submitRequest(id string, docs []workspace.Document) error {
+func (s *submitContext) submitRequest(id string, docs []workspace.Document) error {
 	if id == "" {
 		return errors.New("id is empty")
 	}
@@ -298,11 +298,11 @@ func (ctx *submitContext) submitRequest(id string, docs []workspace.Document) er
 		return err
 	}
 
-	client, err := api.NewClient(ctx.usrCfg.GetString("token"), ctx.usrCfg.GetString("apibaseurl"))
+	client, err := api.NewClient(s.usrCfg.GetString("token"), s.usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return err
 	}
-	url := fmt.Sprintf("%s/solutions/%s", ctx.usrCfg.GetString("apibaseurl"), id)
+	url := fmt.Sprintf("%s/solutions/%s", s.usrCfg.GetString("apibaseurl"), id)
 	req, err := client.NewRequest("PATCH", url, body)
 	if err != nil {
 		return err
@@ -332,7 +332,7 @@ func (ctx *submitContext) submitRequest(id string, docs []workspace.Document) er
 	return nil
 }
 
-func (ctx *submitContext) printResult(metadata *workspace.ExerciseMetadata) {
+func (s *submitContext) printResult(metadata *workspace.ExerciseMetadata) {
 	msg := `
 
     Your solution has been submitted successfully.
