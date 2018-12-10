@@ -169,7 +169,7 @@ func download(d *downloadContext) error {
 }
 
 func (d *downloadContext) writeMetadata() error {
-	if err := d.validate(); err != nil {
+	if err := d.validatePayload(); err != nil {
 		return err
 	}
 	metadata := d.metadata()
@@ -181,7 +181,7 @@ func (d *downloadContext) writeMetadata() error {
 }
 
 func (d *downloadContext) writeSolutionFiles() error {
-	if err := d.validate(); err != nil {
+	if err := d.validatePayload(); err != nil {
 		return err
 	}
 	exercise := d.exercise()
@@ -278,7 +278,7 @@ func (d *downloadContext) metadata() workspace.ExerciseMetadata {
 	}
 }
 
-func (d *downloadContext) validate() error {
+func (d *downloadContext) validatePayload() error {
 	if d.payload == nil {
 		return errors.New("download payload is empty")
 	}
