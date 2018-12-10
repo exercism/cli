@@ -86,12 +86,12 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	exercise.Documents, err = ctx.documents(exercise.Filepath())
+	documents, err := ctx.documents(exercise.Filepath())
 	if err != nil {
 		return err
 	}
 
-	if err := ctx.submitRequest(metadata.ID, exercise.Documents); err != nil {
+	if err := ctx.submitRequest(metadata.ID, documents); err != nil {
 		return err
 	}
 
