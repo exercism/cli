@@ -268,6 +268,9 @@ func (ctx *submitContext) documents(exerciseDir string) ([]workspace.Document, e
 }
 
 func (ctx *submitContext) submitRequest(id string, docs []workspace.Document) error {
+	if id == "" {
+		return errors.New("id is empty")
+	}
 	if len(docs) == 0 {
 		return errors.New("docs is empty")
 	}
