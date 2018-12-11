@@ -55,8 +55,13 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
+	exercise, err := ctx.exercise()
+	if err != nil {
+		return err
+	}
+
 	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", ctx.exercise().MetadataDir())
+	fmt.Fprintf(Out, "%s\n", exercise.Filepath())
 	return nil
 }
 

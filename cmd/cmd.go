@@ -173,8 +173,16 @@ func (d *downloadContext) writeMetadata() error {
 	if err := d.validatePayload(); err != nil {
 		return err
 	}
-	metadata := d.metadata()
-	exercise := d.exercise()
+
+	metadata, err := d.metadata()
+	if err != nil {
+		return err
+	}
+	exercise, err := d.exercise()
+	if err != nil {
+		return err
+	}
+
 	if err := metadata.Write(exercise.MetadataDir()); err != nil {
 		return err
 	}
@@ -185,7 +193,12 @@ func (d *downloadContext) writeSolutionFiles() error {
 	if err := d.validatePayload(); err != nil {
 		return err
 	}
-	exercise := d.exercise()
+
+	exercise, err := d.exercise()
+	if err != nil {
+		return err
+	}
+
 	for _, filename := range d.payload.Solution.Files {
 		res, err := d.requestFile(filename)
 		if err != nil {
@@ -218,6 +231,9 @@ func (d *downloadContext) writeSolutionFiles() error {
 }
 
 func (d *downloadContext) requestFile(filename string) (*http.Response, error) {
+	if err := d.validatePayload(); err != nil {
+		return nil, err
+	}
 	if filename == "" {
 		return nil, errors.New("filename is empty")
 	}
@@ -251,7 +267,11 @@ func (d *downloadContext) requestFile(filename string) (*http.Response, error) {
 	return res, nil
 }
 
-func (d *downloadContext) exercise() workspace.Exercise {
+func (d *downloadContext) exercise() (workspace.Exercise, error) {
+	if err := d.validatePayload(); err != nil {
+		return workspace.Exercise{}, err
+	}
+
 	root := d.usrCfg.GetString("workspace")
 	if d.payload.Solution.Team.Slug != "" {
 		root = filepath.Join(root, "teams", d.payload.Solution.Team.Slug)
@@ -263,10 +283,14 @@ func (d *downloadContext) exercise() workspace.Exercise {
 		Root:  root,
 		Track: d.payload.Solution.Exercise.Track.ID,
 		Slug:  d.payload.Solution.Exercise.ID,
-	}
+	}, nil
 }
 
-func (d *downloadContext) metadata() workspace.ExerciseMetadata {
+func (d *downloadContext) metadata() (workspace.ExerciseMetadata, error) {
+	if err := d.validatePayload(); err != nil {
+		return workspace.ExerciseMetadata{}, err
+	}
+
 	return workspace.ExerciseMetadata{
 		AutoApprove: d.payload.Solution.Exercise.AutoApprove,
 		Track:       d.payload.Solution.Exercise.Track.ID,
@@ -276,7 +300,7 @@ func (d *downloadContext) metadata() workspace.ExerciseMetadata {
 		URL:         d.payload.Solution.URL,
 		Handle:      d.payload.Solution.User.Handle,
 		IsRequester: d.payload.Solution.User.IsRequester,
-	}
+	}, nil
 }
 
 func (d *downloadContext) validatePayload() error {
