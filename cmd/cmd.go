@@ -90,6 +90,7 @@ type downloadContext struct {
 	payload *downloadPayload
 }
 
+// newDownloadContext creates a downloadContext and requests the required payload.
 func newDownloadContext(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadContext, error) {
 	if usrCfg.GetString("token") == "" {
 		return nil, fmt.Errorf(msgWelcomePleaseConfigure, config.SettingsURL(usrCfg.GetString("apibaseurl")), BinaryName)
@@ -122,13 +123,15 @@ func newDownloadContext(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadCon
 		return nil, err
 	}
 
-	return &downloadContext{
+	ctx := &downloadContext{
 		usrCfg: usrCfg,
 		uuid:   uuid,
 		slug:   slug,
 		track:  track,
 		team:   team,
-	}, nil
+	}
+
+	return ctx, ctx.requestPayload()
 }
 
 // requestPayload makes an HTTP request decoding the response to populate the payload field.
