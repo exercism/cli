@@ -357,6 +357,11 @@ func (d *downloadContext) sanitizeLegacyFilepath(file, slug string) string {
 	return filepath.FromSlash(file)
 }
 
+func (d *downloadContext) printResult(exercise workspace.Exercise) {
+	fmt.Fprintf(Err, "\nDownloaded to\n")
+	fmt.Fprintf(Out, "%s\n", exercise.Filepath())
+}
+
 type downloadPayload struct {
 	Solution struct {
 		ID   string `json:"id"`

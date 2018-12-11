@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -60,8 +58,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", exercise.Filepath())
+	ctx.printResult(exercise)
 	return nil
 }
 
