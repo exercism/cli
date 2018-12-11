@@ -41,7 +41,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	if err := ctx.requestPayload(); err != nil {
+	if err = ctx.requestPayload(); err != nil {
 		return err
 	}
 
@@ -50,7 +50,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	if err := ctx.writeSolutionFiles(exercise); err != nil {
+	if err = ctx.writeSolutionFiles(exercise); err != nil {
 		return err
 	}
 
