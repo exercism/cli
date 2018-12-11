@@ -154,6 +154,7 @@ func (d *downloadContext) requestPayload() error {
 	if err := json.NewDecoder(res.Body).Decode(&d.payload); err != nil {
 		return fmt.Errorf("unable to parse API response - %s", err)
 	}
+
 	if res.StatusCode == http.StatusUnauthorized {
 		siteURL := config.InferSiteURL(d.usrCfg.GetString("apibaseurl"))
 		return fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
@@ -166,36 +167,33 @@ func (d *downloadContext) requestPayload() error {
 			return errors.New(d.payload.Error.Message)
 		}
 	}
-	return nil
-}
 
-func (d *downloadContext) writeMetadata() error {
 	if err := d.validatePayload(); err != nil {
 		return err
 	}
 
-	metadata, err := d.metadata()
-	if err != nil {
-		return err
-	}
-	exercise, err := d.exercise()
-	if err != nil {
-		return err
-	}
+	return nil
+}
 
+func (d *downloadContext) validatePayload() error {
+	if d.payload == nil {
+		return errors.New("download payload is empty")
+	}
+	if d.payload.Error.Message != "" {
+		return errors.New(d.payload.Error.Message)
+	}
+	return nil
+}
+
+func (d *downloadContext) writeMetadata(metadata workspace.ExerciseMetadata, exercise workspace.Exercise) error {
 	if err := metadata.Write(exercise.MetadataDir()); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (d *downloadContext) writeSolutionFiles() error {
+func (d *downloadContext) writeSolutionFiles(exercise workspace.Exercise) error {
 	if err := d.validatePayload(); err != nil {
-		return err
-	}
-
-	exercise, err := d.exercise()
-	if err != nil {
 		return err
 	}
 
@@ -301,16 +299,6 @@ func (d *downloadContext) metadata() (workspace.ExerciseMetadata, error) {
 		Handle:      d.payload.Solution.User.Handle,
 		IsRequester: d.payload.Solution.User.IsRequester,
 	}, nil
-}
-
-func (d *downloadContext) validatePayload() error {
-	if d.payload == nil {
-		return errors.New("download payload is empty")
-	}
-	if d.payload.Error.Message != "" {
-		return errors.New(d.payload.Error.Message)
-	}
-	return nil
 }
 
 func (d *downloadContext) requestURL() string {

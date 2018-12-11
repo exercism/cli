@@ -45,16 +45,21 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	if err := ctx.writeMetadata(); err != nil {
-		return err
-	}
-
-	if err := ctx.writeSolutionFiles(); err != nil {
+	metadata, err := ctx.metadata()
+	if err != nil {
 		return err
 	}
 
 	exercise, err := ctx.exercise()
 	if err != nil {
+		return err
+	}
+
+	if err := ctx.writeMetadata(metadata, exercise); err != nil {
+		return err
+	}
+
+	if err := ctx.writeSolutionFiles(exercise); err != nil {
 		return err
 	}
 
