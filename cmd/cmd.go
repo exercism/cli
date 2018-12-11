@@ -244,7 +244,12 @@ func (d *downloadContext) requestFile(filename string) (*http.Response, error) {
 	return res, nil
 }
 
-func (d *downloadContext) writeMetadata(metadata workspace.ExerciseMetadata, exercise workspace.Exercise) error {
+func (d *downloadContext) writeMetadata(exercise workspace.Exercise) error {
+	metadata, err := d.metadata()
+	if err != nil {
+		return err
+	}
+
 	if err := metadata.Write(exercise.MetadataDir()); err != nil {
 		return err
 	}

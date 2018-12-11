@@ -54,12 +54,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	metadata, err := ctx.metadata()
-	if err != nil {
-		return err
-	}
-
-	if err := ctx.writeMetadata(metadata, exercise); err != nil {
+	if err := ctx.writeMetadata(exercise); err != nil {
 		return err
 	}
 
