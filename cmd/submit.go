@@ -50,6 +50,7 @@ var submitCmd = &cobra.Command{
 	},
 }
 
+// submitContext is a context for submitting solutions to the API.
 type submitContext struct {
 	usrCfg *viper.Viper
 	flags  *pflag.FlagSet
@@ -89,7 +90,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	return nil
 }
 
-// newSubmitContext creates a submitContext and sanitizes the arguments.
+// newSubmitContext creates a submitContext, sanitizing given args.
 func newSubmitContext(usrCfg *viper.Viper, flags *pflag.FlagSet, args []string) (*submitContext, error) {
 	if usrCfg.GetString("token") == "" {
 		return nil, fmt.Errorf(
@@ -106,6 +107,7 @@ func newSubmitContext(usrCfg *viper.Viper, flags *pflag.FlagSet, args []string) 
 	return ctx, ctx.sanitizeArgs()
 }
 
+// sanitizeArgs validates args and replaces with evaluated symlink paths.
 func (s *submitContext) sanitizeArgs() error {
 	for i, arg := range s.args {
 		var err error
@@ -229,6 +231,7 @@ func (s *submitContext) metadata(exercise workspace.Exercise) (*workspace.Exerci
 	return metadata, nil
 }
 
+// documents creates a document for each internal arg upon validation, returning the collection.
 func (s *submitContext) documents(exercise workspace.Exercise) ([]workspace.Document, error) {
 	docs := make([]workspace.Document, 0, len(s.args))
 	for _, file := range s.args {
@@ -275,6 +278,7 @@ func (s *submitContext) documents(exercise workspace.Exercise) ([]workspace.Docu
 	return docs, nil
 }
 
+// submitRequest submits an HTTP request for each document.
 func (s *submitContext) submitRequest(metadata *workspace.ExerciseMetadata, docs []workspace.Document) error {
 	if metadata.ID == "" {
 		return errors.New("id is empty")
