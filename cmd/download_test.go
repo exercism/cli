@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -81,6 +82,8 @@ func TestDownload(t *testing.T) {
 	co := newCapturedOutput()
 	co.override()
 	defer co.reset()
+	Out = &bytes.Buffer{}
+	Err = &bytes.Buffer{}
 
 	testCases := []struct {
 		requester   bool
@@ -141,11 +144,15 @@ func TestDownload(t *testing.T) {
 		b, err := ioutil.ReadFile(workspace.NewExerciseFromDir(dir).MetadataFilepath())
 		var metadata workspace.ExerciseMetadata
 		err = json.Unmarshal(b, &metadata)
-		assert.NoError(t, err)
 
-		assert.Equal(t, "bogus-track", metadata.Track)
-		assert.Equal(t, "bogus-exercise", metadata.Exercise)
-		assert.Equal(t, tc.requester, metadata.IsRequester)
+		if assert.NoError(t, err) {
+			assert.Equal(t, "bogus-track", metadata.Track)
+			assert.Equal(t, "bogus-exercise", metadata.Exercise)
+			assert.Equal(t, tc.requester, metadata.IsRequester)
+
+			assert.Regexp(t, "Downloaded to", Err)
+			assert.Regexp(t, dir, Out)
+		}
 	}
 }
 

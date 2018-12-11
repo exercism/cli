@@ -343,7 +343,7 @@ func (d *downloadContext) sanitizeLegacyFilepath(file, slug string) string {
 
 func (d *downloadContext) printResult(exercise workspace.Exercise) {
 	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", exercise.Filepath())
+	fmt.Fprintf(Out, "%s\n", exercise.MetadataDir())
 }
 
 type downloadPayload struct {
