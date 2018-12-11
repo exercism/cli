@@ -74,12 +74,8 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	migrationStatus, err := exercise.MigrateLegacyMetadataFile()
-	if err != nil {
+	if err = ctx.migrateLegacyMetadata(exercise); err != nil {
 		return err
-	}
-	if verbose, _ := flags.GetBool("verbose"); verbose {
-		fmt.Fprintf(Err, migrationStatus.String())
 	}
 
 	metadata, err := ctx.metadata(exercise)
