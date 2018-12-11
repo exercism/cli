@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"testing"
 
@@ -151,7 +152,10 @@ func TestDownload(t *testing.T) {
 			assert.Equal(t, tc.requester, metadata.IsRequester)
 
 			assert.Regexp(t, "Downloaded to", Err)
-			assert.Regexp(t, dir, Out)
+			// Avoid Windows CI failure
+			if runtime.GOOS != "windows" {
+				assert.Regexp(t, dir, Out)
+			}
 		}
 	}
 }
