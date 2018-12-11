@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// downloadCmd represents the download command
+// downloadCmd represents the download command.
 var downloadCmd = &cobra.Command{
 	Use:     "download",
 	Aliases: []string{"d"},

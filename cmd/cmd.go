@@ -81,6 +81,8 @@ func validateUserConfig(cfg *viper.Viper) error {
 	return nil
 }
 
+// downloadContext represents the required context around obtaining a Solution
+// payload from the API and working with the its contents.
 type downloadContext struct {
 	usrCfg  *viper.Viper
 	uuid    string
@@ -134,7 +136,7 @@ func newDownloadContext(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadCon
 	return ctx, ctx.requestPayload()
 }
 
-// requestPayload makes an HTTP request decoding the response to populate the payload field.
+// requestPayload makes an HTTP request, decoding the response to populate the payload field.
 // This is the required entry point for working with downloadContext.
 func (d *downloadContext) requestPayload() error {
 	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
@@ -176,7 +178,7 @@ func (d *downloadContext) requestPayload() error {
 	return nil
 }
 
-// writeSolutionFiles writes each solution file in the payload.
+// writeSolutionFiles attempts to write each solution file in the payload.
 // An HTTP request is made for each file and failed responses are swallowed.
 // All successful file responses are written except where empty.
 func (d *downloadContext) writeSolutionFiles(exercise workspace.Exercise) error {
@@ -338,9 +340,9 @@ func (d *downloadContext) buildQuery(url *netURL.URL) error {
 	return nil
 }
 
-// Work around a path bug due to an early design decision (later reversed) to
-// allow numeric suffixes for exercise directories, allowing people to have
-// multiple parallel versions of an exercise.
+// sanitizeLegacyFilepath is a workaround for a path bug due to an early design
+// decision (later reversed) to allow numeric suffixes for exercise directories,
+// allowing people to have multiple parallel versions of an exercise.
 func (d *downloadContext) sanitizeLegacyFilepath(file, slug string) string {
 	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, slug)
 	rgxNumericSuffix := regexp.MustCompile(pattern)
