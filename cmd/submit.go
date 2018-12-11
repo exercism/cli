@@ -83,7 +83,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	documents, err := ctx.documents(exercise.Filepath())
+	documents, err := ctx.documents(exercise)
 	if err != nil {
 		return err
 	}
@@ -233,7 +233,7 @@ func (s *submitContext) metadata(exercise workspace.Exercise) (*workspace.Exerci
 	return metadata, nil
 }
 
-func (s *submitContext) documents(exerciseDir string) ([]workspace.Document, error) {
+func (s *submitContext) documents(exercise workspace.Exercise) ([]workspace.Document, error) {
 	docs := make([]workspace.Document, 0, len(s.args))
 	for _, file := range s.args {
 		// Don't submit empty files
@@ -262,7 +262,7 @@ func (s *submitContext) documents(exerciseDir string) ([]workspace.Document, err
 			fmt.Fprintf(Err, msg, file)
 			continue
 		}
-		doc, err := workspace.NewDocument(exerciseDir, file)
+		doc, err := workspace.NewDocument(exercise.Filepath(), file)
 		if err != nil {
 			return nil, err
 		}
