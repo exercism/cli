@@ -145,6 +145,7 @@ func TestSubmitFiles(t *testing.T) {
 	co := newCapturedOutput()
 	co.override()
 	defer co.reset()
+	Err = &bytes.Buffer{}
 
 	// The fake endpoint will populate this when it receives the call from the command.
 	submittedFiles := map[string]string{}
@@ -186,14 +187,16 @@ func TestSubmitFiles(t *testing.T) {
 	files := []string{
 		file1, file2, readme,
 	}
+
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
-	assert.NoError(t, err)
 
-	assert.Equal(t, 3, len(submittedFiles))
-
-	assert.Equal(t, "This is file 1.", submittedFiles["file-1.txt"])
-	assert.Equal(t, "This is file 2.", submittedFiles["subdir/file-2.txt"])
-	assert.Equal(t, "This is the readme.", submittedFiles["README.md"])
+	if assert.NoError(t, err) {
+		assert.Equal(t, 3, len(submittedFiles))
+		assert.Equal(t, "This is file 1.", submittedFiles["file-1.txt"])
+		assert.Equal(t, "This is file 2.", submittedFiles["subdir/file-2.txt"])
+		assert.Equal(t, "This is the readme.", submittedFiles["README.md"])
+		assert.Regexp(t, "submitted successfully", Err)
+	}
 }
 
 func TestLegacyMetadataMigration(t *testing.T) {
