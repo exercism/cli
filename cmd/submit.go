@@ -57,15 +57,8 @@ type submitContext struct {
 }
 
 func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
-	usrCfg := cfg.UserViperConfig
-
-	if err := validateUserConfig(usrCfg); err != nil {
-		return err
-	}
-
-	ctx := &submitContext{args: args, flags: flags, usrCfg: usrCfg}
-
-	if err := ctx.sanitizeArgs(); err != nil {
+	ctx, err := newSubmitContext(cfg.UserViperConfig, flags, args)
+	if err != nil {
 		return err
 	}
 
@@ -96,7 +89,8 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	return nil
 }
 
-func newSubmitContext(usrCfg *viper.Viper, args []string) (*submitContext, error) {
+// newSubmitContext creates a submitContext and sanitizes the arguments.
+func newSubmitContext(usrCfg *viper.Viper, flags *pflag.FlagSet, args []string) (*submitContext, error) {
 	if usrCfg.GetString("token") == "" {
 		return nil, fmt.Errorf(
 			msgWelcomePleaseConfigure,
@@ -107,7 +101,9 @@ func newSubmitContext(usrCfg *viper.Viper, args []string) (*submitContext, error
 	if usrCfg.GetString("workspace") == "" {
 		return nil, fmt.Errorf(msgRerunConfigure, BinaryName)
 	}
-	return &submitContext{args: args, usrCfg: usrCfg}, nil
+
+	ctx := &submitContext{usrCfg: usrCfg, flags: flags, args: args}
+	return ctx, ctx.sanitizeArgs()
 }
 
 func (s *submitContext) sanitizeArgs() error {
