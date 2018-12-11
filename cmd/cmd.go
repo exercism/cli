@@ -175,13 +175,6 @@ func (d *downloadContext) requestPayload() error {
 	return nil
 }
 
-func (d *downloadContext) writeMetadata(metadata workspace.ExerciseMetadata, exercise workspace.Exercise) error {
-	if err := metadata.Write(exercise.MetadataDir()); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (d *downloadContext) writeSolutionFiles(exercise workspace.Exercise) error {
 	if err := d.validatePayload(); err != nil {
 		return err
@@ -214,6 +207,50 @@ func (d *downloadContext) writeSolutionFiles(exercise workspace.Exercise) error 
 		if _, err := io.Copy(f, res.Body); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (d *downloadContext) requestFile(filename string) (*http.Response, error) {
+	if err := d.validatePayload(); err != nil {
+		return nil, err
+	}
+	if filename == "" {
+		return nil, errors.New("filename is empty")
+	}
+
+	unparsedURL := fmt.Sprintf("%s%s", d.payload.Solution.FileDownloadBaseURL, filename)
+	parsedURL, err := netURL.ParseRequestURI(unparsedURL)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
+	req, err := client.NewRequest("GET", parsedURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		// TODO: deal with it
+		return nil, nil
+	}
+	// Don't bother with empty files.
+	if res.Header.Get("Content-Length") == "0" {
+		return nil, nil
+	}
+
+	return res, nil
+}
+
+func (d *downloadContext) writeMetadata(metadata workspace.ExerciseMetadata, exercise workspace.Exercise) error {
+	if err := metadata.Write(exercise.MetadataDir()); err != nil {
+		return err
 	}
 	return nil
 }
@@ -252,43 +289,6 @@ func (d *downloadContext) metadata() (workspace.ExerciseMetadata, error) {
 		Handle:      d.payload.Solution.User.Handle,
 		IsRequester: d.payload.Solution.User.IsRequester,
 	}, nil
-}
-
-func (d *downloadContext) requestFile(filename string) (*http.Response, error) {
-	if err := d.validatePayload(); err != nil {
-		return nil, err
-	}
-	if filename == "" {
-		return nil, errors.New("filename is empty")
-	}
-
-	unparsedURL := fmt.Sprintf("%s%s", d.payload.Solution.FileDownloadBaseURL, filename)
-	parsedURL, err := netURL.ParseRequestURI(unparsedURL)
-	if err != nil {
-		return nil, err
-	}
-
-	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
-	req, err := client.NewRequest("GET", parsedURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	if res.StatusCode != http.StatusOK {
-		// TODO: deal with it
-		return nil, nil
-	}
-	// Don't bother with empty files.
-	if res.Header.Get("Content-Length") == "0" {
-		return nil, nil
-	}
-
-	return res, nil
 }
 
 func (d *downloadContext) validatePayload() error {
