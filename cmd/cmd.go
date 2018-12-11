@@ -175,16 +175,6 @@ func (d *downloadContext) requestPayload() error {
 	return nil
 }
 
-func (d *downloadContext) validatePayload() error {
-	if d.payload == nil {
-		return errors.New("download payload is empty")
-	}
-	if d.payload.Error.Message != "" {
-		return errors.New(d.payload.Error.Message)
-	}
-	return nil
-}
-
 func (d *downloadContext) writeMetadata(metadata workspace.ExerciseMetadata, exercise workspace.Exercise) error {
 	if err := metadata.Write(exercise.MetadataDir()); err != nil {
 		return err
@@ -228,6 +218,42 @@ func (d *downloadContext) writeSolutionFiles(exercise workspace.Exercise) error 
 	return nil
 }
 
+func (d *downloadContext) exercise() (workspace.Exercise, error) {
+	if err := d.validatePayload(); err != nil {
+		return workspace.Exercise{}, err
+	}
+
+	root := d.usrCfg.GetString("workspace")
+	if d.payload.Solution.Team.Slug != "" {
+		root = filepath.Join(root, "teams", d.payload.Solution.Team.Slug)
+	}
+	if !d.payload.Solution.User.IsRequester {
+		root = filepath.Join(root, "users", d.payload.Solution.User.Handle)
+	}
+	return workspace.Exercise{
+		Root:  root,
+		Track: d.payload.Solution.Exercise.Track.ID,
+		Slug:  d.payload.Solution.Exercise.ID,
+	}, nil
+}
+
+func (d *downloadContext) metadata() (workspace.ExerciseMetadata, error) {
+	if err := d.validatePayload(); err != nil {
+		return workspace.ExerciseMetadata{}, err
+	}
+
+	return workspace.ExerciseMetadata{
+		AutoApprove: d.payload.Solution.Exercise.AutoApprove,
+		Track:       d.payload.Solution.Exercise.Track.ID,
+		Team:        d.payload.Solution.Team.Slug,
+		Exercise:    d.payload.Solution.Exercise.ID,
+		ID:          d.payload.Solution.ID,
+		URL:         d.payload.Solution.URL,
+		Handle:      d.payload.Solution.User.Handle,
+		IsRequester: d.payload.Solution.User.IsRequester,
+	}, nil
+}
+
 func (d *downloadContext) requestFile(filename string) (*http.Response, error) {
 	if err := d.validatePayload(); err != nil {
 		return nil, err
@@ -265,40 +291,14 @@ func (d *downloadContext) requestFile(filename string) (*http.Response, error) {
 	return res, nil
 }
 
-func (d *downloadContext) exercise() (workspace.Exercise, error) {
-	if err := d.validatePayload(); err != nil {
-		return workspace.Exercise{}, err
+func (d *downloadContext) validatePayload() error {
+	if d.payload == nil {
+		return errors.New("download payload is empty")
 	}
-
-	root := d.usrCfg.GetString("workspace")
-	if d.payload.Solution.Team.Slug != "" {
-		root = filepath.Join(root, "teams", d.payload.Solution.Team.Slug)
+	if d.payload.Error.Message != "" {
+		return errors.New(d.payload.Error.Message)
 	}
-	if !d.payload.Solution.User.IsRequester {
-		root = filepath.Join(root, "users", d.payload.Solution.User.Handle)
-	}
-	return workspace.Exercise{
-		Root:  root,
-		Track: d.payload.Solution.Exercise.Track.ID,
-		Slug:  d.payload.Solution.Exercise.ID,
-	}, nil
-}
-
-func (d *downloadContext) metadata() (workspace.ExerciseMetadata, error) {
-	if err := d.validatePayload(); err != nil {
-		return workspace.ExerciseMetadata{}, err
-	}
-
-	return workspace.ExerciseMetadata{
-		AutoApprove: d.payload.Solution.Exercise.AutoApprove,
-		Track:       d.payload.Solution.Exercise.Track.ID,
-		Team:        d.payload.Solution.Team.Slug,
-		Exercise:    d.payload.Solution.Exercise.ID,
-		ID:          d.payload.Solution.ID,
-		URL:         d.payload.Solution.URL,
-		Handle:      d.payload.Solution.User.Handle,
-		IsRequester: d.payload.Solution.User.IsRequester,
-	}, nil
+	return nil
 }
 
 func (d *downloadContext) requestURL() string {
