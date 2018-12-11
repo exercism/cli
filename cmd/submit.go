@@ -88,7 +88,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	if err := ctx.submitRequest(metadata.ID, documents); err != nil {
+	if err := ctx.submitRequest(metadata, documents); err != nil {
 		return err
 	}
 
@@ -279,8 +279,8 @@ func (s *submitContext) documents(exercise workspace.Exercise) ([]workspace.Docu
 	return docs, nil
 }
 
-func (s *submitContext) submitRequest(id string, docs []workspace.Document) error {
-	if id == "" {
+func (s *submitContext) submitRequest(metadata *workspace.ExerciseMetadata, docs []workspace.Document) error {
+	if metadata.ID == "" {
 		return errors.New("id is empty")
 	}
 	if len(docs) == 0 {
@@ -314,7 +314,7 @@ func (s *submitContext) submitRequest(id string, docs []workspace.Document) erro
 	if err != nil {
 		return err
 	}
-	url := fmt.Sprintf("%s/solutions/%s", s.usrCfg.GetString("apibaseurl"), id)
+	url := fmt.Sprintf("%s/solutions/%s", s.usrCfg.GetString("apibaseurl"), metadata.ID)
 	req, err := client.NewRequest("PATCH", url, body)
 	if err != nil {
 		return err
