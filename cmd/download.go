@@ -42,12 +42,12 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	setup, err := newDownloadCmdSetup(flags)
+	downloadParams, err := newDownloadParams(flags)
 	if err != nil {
 		return err
 	}
 
-	ctx, err := newDownloadContext(cfg.UserViperConfig, setup.downloadArgs)
+	ctx, err := newDownloadContext(cfg.UserViperConfig, downloadParams.params)
 	if err != nil {
 		return err
 	}
@@ -69,16 +69,17 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	return nil
 }
 
-type downloadCmdSetup struct {
-	downloadArgs map[string]string
+type downloadParams struct {
+	params map[string]string
 }
 
-func newDownloadCmdSetup(flags *pflag.FlagSet) (*downloadCmdSetup, error) {
-	setup := &downloadCmdSetup{}
-	return setup, setup.populateDownloadArgs(flags)
+// newDownloadParams creates downloadParams from flags.
+func newDownloadParams(flags *pflag.FlagSet) (*downloadParams, error) {
+	downloadParams := &downloadParams{}
+	return downloadParams, downloadParams.populate(flags)
 }
 
-func (d *downloadCmdSetup) populateDownloadArgs(flags *pflag.FlagSet) error {
+func (d *downloadParams) populate(flags *pflag.FlagSet) error {
 	uuid, err := flags.GetString("uuid")
 	if err != nil {
 		return err
@@ -89,7 +90,7 @@ func (d *downloadCmdSetup) populateDownloadArgs(flags *pflag.FlagSet) error {
 		return err
 	}
 
-	if err := validateDownloadArgs(d, uuid, slug); err != nil {
+	if err = validateDownloadParams(d, uuid, slug); err != nil {
 		return err
 	}
 
@@ -103,7 +104,7 @@ func (d *downloadCmdSetup) populateDownloadArgs(flags *pflag.FlagSet) error {
 		return err
 	}
 
-	d.downloadArgs = map[string]string{
+	d.params = map[string]string{
 		"uuid":  uuid,
 		"slug":  slug,
 		"track": track,
@@ -113,7 +114,7 @@ func (d *downloadCmdSetup) populateDownloadArgs(flags *pflag.FlagSet) error {
 	return nil
 }
 
-func (d *downloadCmdSetup) downloadArgsError() error {
+func (d *downloadParams) downloadParamsError() error {
 	return errors.New("missing flags: need an --exercise name or a solution --uuid")
 }
 

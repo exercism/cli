@@ -80,14 +80,14 @@ func validateUserConfig(cfg *viper.Viper) error {
 	return nil
 }
 
-type downloadArgsError interface {
-	downloadArgsError() error
+type downloadParamsError interface {
+	downloadParamsError() error
 }
 
-// validateDownloadArgs validates download args, returning implementation specific error.
-func validateDownloadArgs(err downloadArgsError, slug, uuid string) error {
+// validateDownloadParams validates download params, returning implementation specific error.
+func validateDownloadParams(err downloadParamsError, slug, uuid string) error {
 	if uuid != "" && slug != "" || uuid == slug {
-		return err.downloadArgsError()
+		return err.downloadParamsError()
 	}
 	return nil
 }
@@ -113,7 +113,7 @@ func newDownloadContext(usrCfg *viper.Viper, params map[string]string) (*downloa
 		team:   params["team"],
 	}
 
-	if err := validateDownloadArgs(ctx, ctx.slug, ctx.uuid); err != nil {
+	if err := validateDownloadParams(ctx, ctx.slug, ctx.uuid); err != nil {
 		return nil, err
 	}
 
@@ -346,7 +346,7 @@ func (d *downloadContext) printResult(exercise workspace.Exercise) {
 	fmt.Fprintf(Out, "%s\n", exercise.MetadataDir())
 }
 
-func (d *downloadContext) downloadArgsError() error {
+func (d *downloadContext) downloadParamsError() error {
 	return errors.New("need a 'slug' or a 'uuid'")
 }
 
