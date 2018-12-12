@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -36,7 +39,12 @@ Download other people's solutions by providing the UUID.
 }
 
 func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
-	ctx, err := newDownloadContext(cfg.UserViperConfig, flags)
+	setup, err := newDownloadCmdSetup(cfg.UserViperConfig, flags)
+	if err != nil {
+		return err
+	}
+
+	ctx, err := newDownloadContext(cfg.UserViperConfig, setup.downloadArgs)
 	if err != nil {
 		return err
 	}
@@ -55,6 +63,66 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	ctx.printResult(exercise)
+	return nil
+}
+
+type downloadCmdSetup struct {
+	downloadArgs map[string]string
+}
+
+func newDownloadCmdSetup(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadCmdSetup, error) {
+	setup := &downloadCmdSetup{}
+	if err := setup.validateConfig(usrCfg); err != nil {
+		return nil, err
+	}
+	if err := setup.populateDownloadArgs(flags); err != nil {
+		return nil, err
+	}
+	return setup, nil
+}
+
+func (d *downloadCmdSetup) validateConfig(usrCfg *viper.Viper) error {
+	if usrCfg.GetString("token") == "" {
+		return fmt.Errorf(msgWelcomePleaseConfigure, config.SettingsURL(usrCfg.GetString("apibaseurl")), BinaryName)
+	}
+	if usrCfg.GetString("workspace") == "" || usrCfg.GetString("apibaseurl") == "" {
+		return fmt.Errorf(msgRerunConfigure, BinaryName)
+	}
+	return nil
+}
+
+func (d *downloadCmdSetup) populateDownloadArgs(flags *pflag.FlagSet) error {
+	uuid, err := flags.GetString("uuid")
+	if err != nil {
+		return err
+	}
+
+	slug, err := flags.GetString("exercise")
+	if err != nil {
+		return err
+	}
+
+	if uuid != "" && slug != "" || uuid == slug {
+		return errors.New("need an --exercise name or a solution --uuid")
+	}
+
+	track, err := flags.GetString("track")
+	if err != nil {
+		return err
+	}
+
+	team, err := flags.GetString("team")
+	if err != nil {
+		return err
+	}
+
+	d.downloadArgs = map[string]string{
+		"uuid":  uuid,
+		"slug":  slug,
+		"track": track,
+		"team":  team,
+	}
+
 	return nil
 }
 
