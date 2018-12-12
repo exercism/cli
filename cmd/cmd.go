@@ -84,7 +84,7 @@ type downloadArgsError interface {
 	downloadArgsError() error
 }
 
-// validateDownloadArgs validates download args, returning implementation specific errors
+// validateDownloadArgs validates download args, returning implementation specific error.
 func validateDownloadArgs(err downloadArgsError, slug, uuid string) error {
 	if uuid != "" && slug != "" || uuid == slug {
 		return err.downloadArgsError()
@@ -103,7 +103,7 @@ type downloadContext struct {
 	payload *downloadPayload
 }
 
-// newDownloadContext creates a downloadContext and issues an HTTP request to populate the payload.
+// newDownloadContext creates a downloadContext, issuing an HTTP request getting the payload.
 func newDownloadContext(usrCfg *viper.Viper, params map[string]string) (*downloadContext, error) {
 	ctx := &downloadContext{
 		usrCfg: usrCfg,
@@ -120,7 +120,7 @@ func newDownloadContext(usrCfg *viper.Viper, params map[string]string) (*downloa
 	return ctx, ctx.requestPayload()
 }
 
-// requestPayload makes an HTTP request, decoding the response to populate the payload field.
+// requestPayload makes an HTTP request to populate the context payload.
 // This is the required entry point for working with downloadContext.
 func (d *downloadContext) requestPayload() error {
 	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
@@ -334,7 +334,8 @@ func (d *downloadContext) sanitizeLegacyFilepath(file, slug string) string {
 		file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
 	}
 
-	// Rewrite paths submitted with an older, buggy client where the Windows path is being treated as part of the filename.
+	// Rewrite paths submitted with an older, buggy client where the Windows
+	// path is being treated as part of the filename.
 	file = strings.Replace(file, "\\", "/", -1)
 
 	return filepath.FromSlash(file)
