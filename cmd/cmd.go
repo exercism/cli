@@ -341,11 +341,6 @@ func (d *downloadContext) sanitizeLegacyFilepath(file, slug string) string {
 	return filepath.FromSlash(file)
 }
 
-func (d *downloadContext) printResult(exercise workspace.Exercise) {
-	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", exercise.MetadataDir())
-}
-
 func (d *downloadContext) downloadParamsError() error {
 	return errors.New("need a 'slug' or a 'uuid'")
 }

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
@@ -65,7 +66,9 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	ctx.printResult(exercise)
+	fmt.Fprintf(Err, "\nDownloaded to\n")
+	fmt.Fprintf(Out, "%s\n", exercise.MetadataDir())
+
 	return nil
 }
 
