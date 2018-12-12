@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/exercism/cli/config"
 	"github.com/spf13/cobra"
@@ -39,7 +38,11 @@ Download other people's solutions by providing the UUID.
 }
 
 func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
-	setup, err := newDownloadCmdSetup(cfg.UserViperConfig, flags)
+	if err := validateUserConfig(cfg.UserViperConfig); err != nil {
+		return err
+	}
+
+	setup, err := newDownloadCmdSetup(flags)
 	if err != nil {
 		return err
 	}
@@ -70,25 +73,9 @@ type downloadCmdSetup struct {
 	downloadArgs map[string]string
 }
 
-func newDownloadCmdSetup(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadCmdSetup, error) {
+func newDownloadCmdSetup(flags *pflag.FlagSet) (*downloadCmdSetup, error) {
 	setup := &downloadCmdSetup{}
-	if err := setup.validateConfig(usrCfg); err != nil {
-		return nil, err
-	}
-	if err := setup.populateDownloadArgs(flags); err != nil {
-		return nil, err
-	}
-	return setup, nil
-}
-
-func (d *downloadCmdSetup) validateConfig(usrCfg *viper.Viper) error {
-	if usrCfg.GetString("token") == "" {
-		return fmt.Errorf(msgWelcomePleaseConfigure, config.SettingsURL(usrCfg.GetString("apibaseurl")), BinaryName)
-	}
-	if usrCfg.GetString("workspace") == "" || usrCfg.GetString("apibaseurl") == "" {
-		return fmt.Errorf(msgRerunConfigure, BinaryName)
-	}
-	return nil
+	return setup, setup.populateDownloadArgs(flags)
 }
 
 func (d *downloadCmdSetup) populateDownloadArgs(flags *pflag.FlagSet) error {
