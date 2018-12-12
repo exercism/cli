@@ -134,6 +134,7 @@ func TestSubmitFilesAndDir(t *testing.T) {
 		tmpDir,
 		filepath.Join(tmpDir, "file-2.txt"),
 	}
+
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
 	if assert.Error(t, err) {
 		assert.Regexp(t, "submitting a directory", err.Error())
