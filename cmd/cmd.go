@@ -104,13 +104,13 @@ type downloadContext struct {
 }
 
 // newDownloadContext creates a downloadContext and issues an HTTP request to populate the payload.
-func newDownloadContext(usrCfg *viper.Viper, downloadParams map[string]string) (*downloadContext, error) {
+func newDownloadContext(usrCfg *viper.Viper, params map[string]string) (*downloadContext, error) {
 	ctx := &downloadContext{
 		usrCfg: usrCfg,
-		uuid:   downloadParams["uuid"],
-		slug:   downloadParams["slug"],
-		track:  downloadParams["track"],
-		team:   downloadParams["team"],
+		uuid:   params["uuid"],
+		slug:   params["slug"],
+		track:  params["track"],
+		team:   params["team"],
 	}
 
 	if err := validateDownloadArgs(ctx, ctx.slug, ctx.uuid); err != nil {
