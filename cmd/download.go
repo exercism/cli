@@ -102,8 +102,8 @@ func (d *downloadCmdSetup) populateDownloadArgs(flags *pflag.FlagSet) error {
 		return err
 	}
 
-	if uuid != "" && slug != "" || uuid == slug {
-		return errors.New("need an --exercise name or a solution --uuid")
+	if err := validateDownloadArgs(d, uuid, slug); err != nil {
+		return err
 	}
 
 	track, err := flags.GetString("track")
@@ -124,6 +124,10 @@ func (d *downloadCmdSetup) populateDownloadArgs(flags *pflag.FlagSet) error {
 	}
 
 	return nil
+}
+
+func (d *downloadCmdSetup) downloadArgsError() error {
+	return errors.New("missing flags: need an --exercise name or a solution --uuid")
 }
 
 func setupDownloadFlags(flags *pflag.FlagSet) {
