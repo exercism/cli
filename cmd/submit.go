@@ -86,7 +86,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	if err := ctx.submitRequest(metadata, documents); err != nil {
+	if err := ctx.submitDocuments(metadata, documents); err != nil {
 		return err
 	}
 
@@ -100,7 +100,7 @@ func newSubmitContext(usrCfg *viper.Viper, flags *pflag.FlagSet, args []string) 
 	return ctx, ctx.sanitizeArgs()
 }
 
-// sanitizeArgs validates args and replaces with evaluated symlink paths.
+// sanitizeArgs validates args and swaps with evaluated symlink paths.
 func (s *submitContext) sanitizeArgs() error {
 	for i, arg := range s.args {
 		var err error
@@ -224,7 +224,6 @@ func (s *submitContext) metadata(exercise workspace.Exercise) (*workspace.Exerci
 	return metadata, nil
 }
 
-// documents creates a document for each internal arg upon validation, returning the collection.
 func (s *submitContext) documents(exercise workspace.Exercise) ([]workspace.Document, error) {
 	docs := make([]workspace.Document, 0, len(s.args))
 	for _, file := range s.args {
@@ -271,8 +270,8 @@ func (s *submitContext) documents(exercise workspace.Exercise) ([]workspace.Docu
 	return docs, nil
 }
 
-// submitRequest submits an HTTP request for each document.
-func (s *submitContext) submitRequest(metadata *workspace.ExerciseMetadata, docs []workspace.Document) error {
+// submitDocuments submits the documents to the API via HTTP.
+func (s *submitContext) submitDocuments(metadata *workspace.ExerciseMetadata, docs []workspace.Document) error {
 	if metadata.ID == "" {
 		return errors.New("id is empty")
 	}
