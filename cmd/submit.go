@@ -141,6 +141,20 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
+	if exercise.Slug != metadata.Exercise {
+		// TODO: error msg should suggest running future doctor command
+		msg := `
+
+	The exercise directory does not match exercise slug in metadata:
+
+		expected '%[1]s' but got '%[2]s'
+
+	Please rename the directory '%[1]s' to '%[2]s' and try again.
+
+		`
+		return fmt.Errorf(msg, exercise.Slug, metadata.Exercise)
+	}
+
 	if !metadata.IsRequester {
 		// TODO: add test
 		msg := `
