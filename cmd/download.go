@@ -48,7 +48,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	ctx, err := newDownloadContext(cfg.UserViperConfig, downloadParams.params)
+	ctx, err := newDownloadContext(cfg.UserViperConfig, downloadParams)
 	if err != nil {
 		return err
 	}
@@ -72,49 +72,46 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	return nil
 }
 
-type downloadParams struct {
-	params map[string]string
+// downloadParams is a value object for the params required to create a downloadContext.
+type downloadParams struct{}
+
+func newDownloadParams(flags *pflag.FlagSet) (map[string]string, error) {
+	d := &downloadParams{}
+	params, err := d.get(flags)
+	return params, err
 }
 
-// newDownloadParams creates downloadParams from flags.
-func newDownloadParams(flags *pflag.FlagSet) (*downloadParams, error) {
-	downloadParams := &downloadParams{}
-	return downloadParams, downloadParams.populate(flags)
-}
-
-func (d *downloadParams) populate(flags *pflag.FlagSet) error {
+func (d *downloadParams) get(flags *pflag.FlagSet) (map[string]string, error) {
 	uuid, err := flags.GetString("uuid")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	slug, err := flags.GetString("exercise")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if err = validateDownloadParams(d, uuid, slug); err != nil {
-		return err
+		return nil, err
 	}
 
 	track, err := flags.GetString("track")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	team, err := flags.GetString("team")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	d.params = map[string]string{
+	return map[string]string{
 		"uuid":  uuid,
 		"slug":  slug,
 		"track": track,
 		"team":  team,
-	}
-
-	return nil
+	}, nil
 }
 
 func (d *downloadParams) downloadParamsError() error {
