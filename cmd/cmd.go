@@ -342,7 +342,7 @@ func (d *downloadContext) sanitizeLegacyFilepath(file, slug string) string {
 }
 
 func (d *downloadContext) downloadParamsError() error {
-	return errors.New("need a 'slug' or a 'uuid'")
+	return errors.New("tried to download but missing a 'slug' or a 'uuid'")
 }
 
 type downloadPayload struct {

@@ -115,7 +115,7 @@ func (d *downloadParams) get(flags *pflag.FlagSet) (map[string]string, error) {
 }
 
 func (d *downloadParams) downloadParamsError() error {
-	return errors.New("missing flags: need an --exercise name or a solution --uuid")
+	return errors.New("need an --exercise name or a solution --uuid")
 }
 
 func setupDownloadFlags(flags *pflag.FlagSet) {
