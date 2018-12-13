@@ -93,7 +93,7 @@ type downloadContext struct {
 // to populate the payload.
 func newDownloadContext(usrCfg *viper.Viper, params *downloadParams) (*downloadContext, error) {
 	if err := params.validate(); err != nil {
-		return nil, errors.New("tried to download but missing a 'slug' or a 'uuid'")
+		return nil, err
 	}
 
 	ctx := &downloadContext{
@@ -333,10 +333,8 @@ type downloadParams struct {
 }
 
 func newDownloadParamsFromExercise(exercise workspace.Exercise) (*downloadParams, error) {
-	if exercise.Slug == "" {
-		return nil, errors.New("exercise slug is empty")
-	}
-	return &downloadParams{slug: exercise.Slug, track: exercise.Track}, nil
+	d := &downloadParams{slug: exercise.Slug, track: exercise.Track}
+	return d, d.validate()
 }
 
 func newDownloadParamsFromFlags(flags *pflag.FlagSet) (*downloadParams, error) {
