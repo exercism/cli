@@ -84,65 +84,26 @@ func validateUserConfig(cfg *viper.Viper) error {
 // downloadContext represents the required context around obtaining a Solution
 // payload from the API and working with the its contents.
 type downloadContext struct {
-	usrCfg *viper.Viper
 	*downloadParams
 	payload *downloadPayload
 }
 
 // newDownloadContext creates a downloadContext, making an HTTP request
 // to populate the payload.
-func newDownloadContext(usrCfg *viper.Viper, params *downloadParams) (*downloadContext, error) {
+func newDownloadContext(params *downloadParams) (*downloadContext, error) {
 	if err := params.validate(); err != nil {
 		return nil, err
 	}
 
-	ctx := &downloadContext{
-		usrCfg:         usrCfg,
+	payload, err := newDownloadPayload(params)
+	if err != nil {
+		return nil, err
+	}
+
+	return &downloadContext{
 		downloadParams: params,
-	}
-	return ctx, ctx.requestPayload()
-}
-
-// requestPayload makes an HTTP request to populate the context payload.
-// This is the required entry point for working with downloadContext.
-func (d *downloadContext) requestPayload() error {
-	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
-	if err != nil {
-		return err
-	}
-
-	req, err := client.NewRequest("GET", d.requestURL(), nil)
-	if err != nil {
-		return err
-	}
-
-	if err = d.buildQuery(req.URL); err != nil {
-		return err
-	}
-	res, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	if err := json.NewDecoder(res.Body).Decode(&d.payload); err != nil {
-		return fmt.Errorf("unable to parse API response - %s", err)
-	}
-
-	if res.StatusCode == http.StatusUnauthorized {
-		siteURL := config.InferSiteURL(d.usrCfg.GetString("apibaseurl"))
-		return fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
-	}
-	if res.StatusCode != http.StatusOK {
-		switch d.payload.Error.Type {
-		case "track_ambiguous":
-			return fmt.Errorf("%s: %s", d.payload.Error.Message, strings.Join(d.payload.Error.PossibleTrackIDs, ", "))
-		default:
-			return errors.New(d.payload.Error.Message)
-		}
-	}
-
-	return nil
+		payload:        payload,
+	}, nil
 }
 
 // writeSolutionFiles attempts to write each solution file in the payload.
@@ -269,34 +230,6 @@ func (d *downloadContext) metadata() (workspace.ExerciseMetadata, error) {
 	}, nil
 }
 
-func (d *downloadContext) requestURL() string {
-	id := "latest"
-	if d.uuid != "" {
-		id = d.uuid
-	}
-	return fmt.Sprintf("%s/solutions/%s", d.usrCfg.GetString("apibaseurl"), id)
-}
-
-func (d *downloadContext) buildQuery(url *netURL.URL) error {
-	if url == nil {
-		return errors.New("url is empty")
-	}
-
-	query := url.Query()
-	if d.uuid == "" {
-		query.Add("exercise_id", d.slug)
-		if d.track != "" {
-			query.Add("track_id", d.track)
-		}
-		if d.team != "" {
-			query.Add("team_id", d.team)
-		}
-	}
-	url.RawQuery = query.Encode()
-
-	return nil
-}
-
 // sanitizeLegacyFilepath is a workaround for a path bug due to an early design
 // decision (later reversed) to allow numeric suffixes for exercise directories,
 // allowing people to have multiple parallel versions of an exercise.
@@ -316,20 +249,21 @@ func (d *downloadContext) sanitizeLegacyFilepath(file, slug string) string {
 
 // downloadParams is required to create a downloadContext.
 type downloadParams struct {
-	uuid  string
-	slug  string
-	track string
-	team  string
+	usrCfg *viper.Viper
+	uuid   string
+	slug   string
+	track  string
+	team   string
 }
 
-func newDownloadParamsFromExercise(exercise workspace.Exercise) (*downloadParams, error) {
-	d := &downloadParams{slug: exercise.Slug, track: exercise.Track}
+func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (*downloadParams, error) {
+	d := &downloadParams{usrCfg: usrCfg, slug: exercise.Slug, track: exercise.Track}
 	return d, d.validate()
 }
 
-func newDownloadParamsFromFlags(flags *pflag.FlagSet) (*downloadParams, error) {
+func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
 	var err error
-	d := &downloadParams{}
+	d := &downloadParams{usrCfg: usrCfg}
 
 	d.uuid, err = flags.GetString("uuid")
 	if err != nil {
@@ -394,6 +328,80 @@ type downloadPayload struct {
 		Message          string   `json:"message"`
 		PossibleTrackIDs []string `json:"possible_track_ids"`
 	} `json:"error,omitempty"`
+}
+
+// newDownloadPayload gets a payload by making an HTTP request to the API.
+func newDownloadPayload(params *downloadParams) (*downloadPayload, error) {
+	if err := params.validate(); err != nil {
+		return nil, err
+	}
+	d := &downloadPayload{}
+
+	client, err := api.NewClient(params.usrCfg.GetString("token"), params.usrCfg.GetString("apibaseurl"))
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := client.NewRequest("GET", d.requestURL(params), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = d.buildQuery(params, req.URL); err != nil {
+		return nil, err
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if err := json.NewDecoder(res.Body).Decode(&d); err != nil {
+		return nil, fmt.Errorf("unable to parse API response - %s", err)
+	}
+
+	if res.StatusCode == http.StatusUnauthorized {
+		siteURL := config.InferSiteURL(params.usrCfg.GetString("apibaseurl"))
+		return nil, fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
+	}
+	if res.StatusCode != http.StatusOK {
+		switch d.Error.Type {
+		case "track_ambiguous":
+			return nil, fmt.Errorf("%s: %s", d.Error.Message, strings.Join(d.Error.PossibleTrackIDs, ", "))
+		default:
+			return nil, errors.New(d.Error.Message)
+		}
+	}
+
+	return d, nil
+}
+
+func (d *downloadPayload) requestURL(params *downloadParams) string {
+	id := "latest"
+	if params.uuid != "" {
+		id = params.uuid
+	}
+	return fmt.Sprintf("%s/solutions/%s", params.usrCfg.GetString("apibaseurl"), id)
+}
+
+func (d *downloadPayload) buildQuery(params *downloadParams, url *netURL.URL) error {
+	if url == nil {
+		return errors.New("url is empty")
+	}
+
+	query := url.Query()
+	if params.uuid == "" {
+		query.Add("exercise_id", params.slug)
+		if params.track != "" {
+			query.Add("track_id", params.track)
+		}
+		if params.team != "" {
+			query.Add("team_id", params.team)
+		}
+	}
+	url.RawQuery = query.Encode()
+
+	return nil
 }
 
 func (d *downloadPayload) validate() error {
