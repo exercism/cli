@@ -72,13 +72,13 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	return nil
 }
 
-// downloadParams is a value object for the params required to create a downloadContext.
+// downloadParams represents the params for creating a downloadContext.
 type downloadParams struct{}
 
+// newDownloadParams returns a map of downloadParams populated from flags.
 func newDownloadParams(flags *pflag.FlagSet) (map[string]string, error) {
 	d := &downloadParams{}
-	params, err := d.get(flags)
-	return params, err
+	return d.get(flags)
 }
 
 func (d *downloadParams) get(flags *pflag.FlagSet) (map[string]string, error) {
@@ -86,7 +86,6 @@ func (d *downloadParams) get(flags *pflag.FlagSet) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	slug, err := flags.GetString("exercise")
 	if err != nil {
 		return nil, err
@@ -100,12 +99,10 @@ func (d *downloadParams) get(flags *pflag.FlagSet) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	team, err := flags.GetString("team")
 	if err != nil {
 		return nil, err
 	}
-
 	return map[string]string{
 		"uuid":  uuid,
 		"slug":  slug,
