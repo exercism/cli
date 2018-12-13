@@ -9,7 +9,6 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"testing"
 
@@ -151,11 +150,8 @@ func TestDownload(t *testing.T) {
 			assert.Equal(t, "bogus-exercise", metadata.Exercise)
 			assert.Equal(t, tc.requester, metadata.IsRequester)
 
-			assert.Regexp(t, "Downloaded to", Err)
-			// Avoid Windows CI failure
-			if runtime.GOOS != "windows" {
-				assert.Regexp(t, dir, Out)
-			}
+			assert.Contains(t, fmt.Sprint(Err), "Downloaded")
+			assert.Contains(t, fmt.Sprint(Out), dir)
 		}
 	}
 }
