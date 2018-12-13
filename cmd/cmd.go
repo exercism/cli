@@ -89,7 +89,8 @@ type downloadContext struct {
 	payload *downloadPayload
 }
 
-// newDownloadContext creates a downloadContext, issuing an HTTP request getting the payload.
+// newDownloadContext creates a downloadContext, making an HTTP request
+// to populate the payload.
 func newDownloadContext(usrCfg *viper.Viper, params *downloadParams) (*downloadContext, error) {
 	if err := params.validate(); err != nil {
 		return nil, errors.New("tried to download but missing a 'slug' or a 'uuid'")
@@ -323,7 +324,7 @@ func (d *downloadContext) sanitizeLegacyFilepath(file, slug string) string {
 	return filepath.FromSlash(file)
 }
 
-// downloadParams represents params for creating a downloadContext.
+// downloadParams is required to create a downloadContext.
 type downloadParams struct {
 	uuid  string
 	slug  string
