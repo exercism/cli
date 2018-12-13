@@ -353,7 +353,7 @@ func newDownloadPayload(params *downloadParams) (*downloadPayload, error) {
 	return d, nil
 }
 
-func (d *downloadPayload) requestURL(params *downloadParams) string {
+func (d downloadPayload) requestURL(params *downloadParams) string {
 	id := "latest"
 	if params.uuid != "" {
 		id = params.uuid
@@ -361,7 +361,7 @@ func (d *downloadPayload) requestURL(params *downloadParams) string {
 	return fmt.Sprintf("%s/solutions/%s", params.usrCfg.GetString("apibaseurl"), id)
 }
 
-func (d *downloadPayload) buildQuery(params *downloadParams, url *netURL.URL) error {
+func (d downloadPayload) buildQuery(params *downloadParams, url *netURL.URL) error {
 	if url == nil {
 		return errors.New("url is empty")
 	}
@@ -381,8 +381,8 @@ func (d *downloadPayload) buildQuery(params *downloadParams, url *netURL.URL) er
 	return nil
 }
 
-func (d *downloadPayload) validate() error {
-	if d == nil {
+func (d downloadPayload) validate() error {
+	if d.Solution.ID == "" {
 		return errors.New("download payload is empty")
 	}
 	if d.Error.Message != "" {
