@@ -47,7 +47,12 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	ctx, err := newDownloadContext(downloadParams)
+	payload, err := newDownloadPayload(downloadParams)
+	if err != nil {
+		return err
+	}
+
+	ctx, err := newDownloadContext(cfg.UserViperConfig, payload)
 	if err != nil {
 		return err
 	}

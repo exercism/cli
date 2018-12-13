@@ -81,28 +81,20 @@ func validateUserConfig(cfg *viper.Viper) error {
 	return nil
 }
 
-// downloadContext represents the required context around obtaining a Solution
-// payload from the API and working with the its contents.
+// downloadContext is a context for working with a downloadPayload.
 type downloadContext struct {
-	*downloadParams
+	usrCfg  *viper.Viper
 	payload *downloadPayload
 }
 
-// newDownloadContext creates a downloadContext, making an HTTP request
-// to populate the payload.
-func newDownloadContext(params *downloadParams) (*downloadContext, error) {
-	if err := params.validate(); err != nil {
-		return nil, err
-	}
-
-	payload, err := newDownloadPayload(params)
-	if err != nil {
+func newDownloadContext(usrCfg *viper.Viper, payload *downloadPayload) (*downloadContext, error) {
+	if err := payload.validate(); err != nil {
 		return nil, err
 	}
 
 	return &downloadContext{
-		downloadParams: params,
-		payload:        payload,
+		usrCfg:  usrCfg,
+		payload: payload,
 	}, nil
 }
 
@@ -247,7 +239,7 @@ func (d *downloadContext) sanitizeLegacyFilepath(file, slug string) string {
 	return filepath.FromSlash(file)
 }
 
-// downloadParams is required to create a downloadContext.
+// downloadParams is required to create a downloadPayload.
 type downloadParams struct {
 	usrCfg *viper.Viper
 	uuid   string
