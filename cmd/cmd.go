@@ -102,10 +102,6 @@ func newDownloadContext(usrCfg *viper.Viper, payload *downloadPayload) (*downloa
 // An HTTP request is made for each file and failed responses are swallowed.
 // All successful file responses are written except where empty.
 func (d *downloadContext) writeSolutionFiles(exercise workspace.Exercise) error {
-	if err := d.payload.validate(); err != nil {
-		return err
-	}
-
 	for _, filename := range d.payload.Solution.Files {
 		res, err := d.requestFile(filename)
 		if err != nil {
@@ -138,9 +134,6 @@ func (d *downloadContext) writeSolutionFiles(exercise workspace.Exercise) error 
 }
 
 func (d *downloadContext) requestFile(filename string) (*http.Response, error) {
-	if err := d.payload.validate(); err != nil {
-		return nil, err
-	}
 	if filename == "" {
 		return nil, errors.New("filename is empty")
 	}
@@ -187,10 +180,6 @@ func (d *downloadContext) writeMetadata(exercise workspace.Exercise) error {
 }
 
 func (d *downloadContext) exercise() (workspace.Exercise, error) {
-	if err := d.payload.validate(); err != nil {
-		return workspace.Exercise{}, err
-	}
-
 	root := d.usrCfg.GetString("workspace")
 	if d.payload.Solution.Team.Slug != "" {
 		root = filepath.Join(root, "teams", d.payload.Solution.Team.Slug)
@@ -206,10 +195,6 @@ func (d *downloadContext) exercise() (workspace.Exercise, error) {
 }
 
 func (d *downloadContext) metadata() (workspace.ExerciseMetadata, error) {
-	if err := d.payload.validate(); err != nil {
-		return workspace.ExerciseMetadata{}, err
-	}
-
 	return workspace.ExerciseMetadata{
 		AutoApprove: d.payload.Solution.Exercise.AutoApprove,
 		Track:       d.payload.Solution.Exercise.Track.ID,
