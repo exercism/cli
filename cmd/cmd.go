@@ -15,6 +15,7 @@ import (
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/workspace"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -95,22 +96,16 @@ func validateDownloadParams(err downloadParamsError, slug, uuid string) error {
 // downloadContext represents the required context around obtaining a Solution
 // payload from the API and working with the its contents.
 type downloadContext struct {
-	usrCfg  *viper.Viper
-	uuid    string
-	slug    string
-	track   string
-	team    string
+	usrCfg *viper.Viper
+	*downloadParams
 	payload *downloadPayload
 }
 
 // newDownloadContext creates a downloadContext, issuing an HTTP request getting the payload.
-func newDownloadContext(usrCfg *viper.Viper, params map[string]string) (*downloadContext, error) {
+func newDownloadContext(usrCfg *viper.Viper, params *downloadParams) (*downloadContext, error) {
 	ctx := &downloadContext{
-		usrCfg: usrCfg,
-		uuid:   params["uuid"],
-		slug:   params["slug"],
-		track:  params["track"],
-		team:   params["team"],
+		usrCfg:         usrCfg,
+		downloadParams: params,
 	}
 
 	if err := validateDownloadParams(ctx, ctx.slug, ctx.uuid); err != nil {
@@ -343,6 +338,53 @@ func (d *downloadContext) sanitizeLegacyFilepath(file, slug string) string {
 
 func (d *downloadContext) downloadParamsError() error {
 	return errors.New("tried to download but missing a 'slug' or a 'uuid'")
+}
+
+// downloadParams represents params for creating a downloadContext.
+type downloadParams struct {
+	uuid  string
+	slug  string
+	track string
+	team  string
+}
+
+func newDownloadParamsFromExercise(exercise workspace.Exercise) (*downloadParams, error) {
+	if exercise.Slug == "" {
+		return nil, errors.New("missing required 'slug'")
+	}
+	return &downloadParams{slug: exercise.Slug, track: exercise.Track}, nil
+}
+
+func newDownloadParamsFromFlags(flags *pflag.FlagSet) (*downloadParams, error) {
+	var err error
+	d := &downloadParams{}
+
+	d.uuid, err = flags.GetString("uuid")
+	if err != nil {
+		return nil, err
+	}
+	d.slug, err = flags.GetString("exercise")
+	if err != nil {
+		return nil, err
+	}
+
+	if err = validateDownloadParams(d, d.uuid, d.slug); err != nil {
+		return nil, err
+	}
+
+	d.track, err = flags.GetString("track")
+	if err != nil {
+		return nil, err
+	}
+	d.team, err = flags.GetString("team")
+	if err != nil {
+		return nil, err
+	}
+	return d, err
+}
+
+func (d *downloadParams) downloadParamsError() error {
+	return errors.New("need an --exercise name or a solution --uuid")
 }
 
 type downloadPayload struct {

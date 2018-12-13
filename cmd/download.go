@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/exercism/cli/config"
@@ -43,7 +42,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	downloadParams, err := newDownloadParams(flags)
+	downloadParams, err := newDownloadParamsFromFlags(flags)
 	if err != nil {
 		return err
 	}
@@ -70,49 +69,6 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	fmt.Fprintf(Out, "%s\n", exercise.MetadataDir())
 
 	return nil
-}
-
-// downloadParams represents the params for creating a downloadContext.
-type downloadParams struct{}
-
-// newDownloadParams returns a map of downloadParams populated from flags.
-func newDownloadParams(flags *pflag.FlagSet) (map[string]string, error) {
-	d := &downloadParams{}
-	return d.get(flags)
-}
-
-func (d *downloadParams) get(flags *pflag.FlagSet) (map[string]string, error) {
-	uuid, err := flags.GetString("uuid")
-	if err != nil {
-		return nil, err
-	}
-	slug, err := flags.GetString("exercise")
-	if err != nil {
-		return nil, err
-	}
-
-	if err = validateDownloadParams(d, uuid, slug); err != nil {
-		return nil, err
-	}
-
-	track, err := flags.GetString("track")
-	if err != nil {
-		return nil, err
-	}
-	team, err := flags.GetString("team")
-	if err != nil {
-		return nil, err
-	}
-	return map[string]string{
-		"uuid":  uuid,
-		"slug":  slug,
-		"track": track,
-		"team":  team,
-	}, nil
-}
-
-func (d *downloadParams) downloadParamsError() error {
-	return errors.New("need an --exercise name or a solution --uuid")
 }
 
 func setupDownloadFlags(flags *pflag.FlagSet) {
