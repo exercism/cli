@@ -239,7 +239,7 @@ func newDownloadPayload(params *downloadParams) (*downloadPayload, error) {
 	}
 	d := &downloadPayload{downloadParams: params}
 
-	client, err := api.NewClient(params.usrCfg.GetString("token"), params.usrCfg.GetString("apibaseurl"))
+	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return nil, err
 	}
@@ -260,7 +260,7 @@ func newDownloadPayload(params *downloadParams) (*downloadPayload, error) {
 	}
 
 	if res.StatusCode == http.StatusUnauthorized {
-		siteURL := config.InferSiteURL(params.usrCfg.GetString("apibaseurl"))
+		siteURL := config.InferSiteURL(d.usrCfg.GetString("apibaseurl"))
 		return nil, fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
 	}
 	if res.StatusCode != http.StatusOK {
