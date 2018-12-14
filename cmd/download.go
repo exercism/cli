@@ -52,26 +52,21 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	ctx, err := newDownloadContext(cfg.UserViperConfig, payload)
+	writer, err := newDownloadWriter(cfg.UserViperConfig, payload)
 	if err != nil {
 		return err
 	}
 
-	exercise, err := ctx.exercise()
-	if err != nil {
+	if err = writer.writeSolutionFiles(); err != nil {
 		return err
 	}
 
-	if err = ctx.writeSolutionFiles(exercise); err != nil {
-		return err
-	}
-
-	if err := ctx.writeMetadata(exercise); err != nil {
+	if err := writer.writeMetadata(); err != nil {
 		return err
 	}
 
 	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", exercise.MetadataDir())
+	fmt.Fprintf(Out, "%s\n", payload.exercise(cfg.UserViperConfig).MetadataDir())
 
 	return nil
 }

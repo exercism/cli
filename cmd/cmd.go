@@ -81,29 +81,42 @@ func validateUserConfig(cfg *viper.Viper) error {
 	return nil
 }
 
-// downloadContext is a context for working with a downloadPayload.
-type downloadContext struct {
+// downloadWriter writes metadata and Solution files from a downloadPayload to disk.
+type downloadWriter struct {
 	usrCfg *viper.Viper
 	*downloadPayload
 }
 
-func newDownloadContext(usrCfg *viper.Viper, payload *downloadPayload) (*downloadContext, error) {
+func newDownloadWriter(usrCfg *viper.Viper, payload *downloadPayload) (*downloadWriter, error) {
 	if err := payload.validate(); err != nil {
 		return nil, err
 	}
 
-	return &downloadContext{
+	return &downloadWriter{
 		usrCfg:          usrCfg,
 		downloadPayload: payload,
 	}, nil
 }
 
-// writeSolutionFiles attempts to write each solution file in the downloadPayload.
+// writeMetadata writes metadata from the downloadPayload's exercise.
+func (d downloadWriter) writeMetadata() error {
+	exercise := d.exercise(d.usrCfg)
+	metadata := d.metadata()
+
+	if err := metadata.Write(exercise.MetadataDir()); err != nil {
+		return err
+	}
+	return nil
+}
+
+// writeSolutionFiles attempts to write each Solution file in the downloadPayload.
 // An HTTP request is made for each file and failed responses are swallowed.
 // All successful file responses are written except where empty.
-func (d downloadContext) writeSolutionFiles(exercise workspace.Exercise) error {
+func (d downloadWriter) writeSolutionFiles() error {
+	exercise := d.exercise(d.usrCfg)
+
 	for _, filename := range d.Solution.Files {
-		res, err := d.requestFile(filename)
+		res, err := d.requestFile(d.usrCfg, filename)
 		if err != nil {
 			return err
 		}
@@ -133,84 +146,10 @@ func (d downloadContext) writeSolutionFiles(exercise workspace.Exercise) error {
 	return nil
 }
 
-func (d downloadContext) requestFile(filename string) (*http.Response, error) {
-	if filename == "" {
-		return nil, errors.New("filename is empty")
-	}
-
-	unparsedURL := fmt.Sprintf("%s%s", d.Solution.FileDownloadBaseURL, filename)
-	parsedURL, err := netURL.ParseRequestURI(unparsedURL)
-	if err != nil {
-		return nil, err
-	}
-
-	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
-	req, err := client.NewRequest("GET", parsedURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	if res.StatusCode != http.StatusOK {
-		// TODO: deal with it
-		return nil, nil
-	}
-	// Don't bother with empty files.
-	if res.Header.Get("Content-Length") == "0" {
-		return nil, nil
-	}
-
-	return res, nil
-}
-
-func (d downloadContext) writeMetadata(exercise workspace.Exercise) error {
-	metadata, err := d.metadata()
-	if err != nil {
-		return err
-	}
-
-	if err := metadata.Write(exercise.MetadataDir()); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (d downloadContext) exercise() (workspace.Exercise, error) {
-	root := d.usrCfg.GetString("workspace")
-	if d.Solution.Team.Slug != "" {
-		root = filepath.Join(root, "teams", d.Solution.Team.Slug)
-	}
-	if !d.Solution.User.IsRequester {
-		root = filepath.Join(root, "users", d.Solution.User.Handle)
-	}
-	return workspace.Exercise{
-		Root:  root,
-		Track: d.Solution.Exercise.Track.ID,
-		Slug:  d.Solution.Exercise.ID,
-	}, nil
-}
-
-func (d downloadContext) metadata() (workspace.ExerciseMetadata, error) {
-	return workspace.ExerciseMetadata{
-		AutoApprove: d.Solution.Exercise.AutoApprove,
-		Track:       d.Solution.Exercise.Track.ID,
-		Team:        d.Solution.Team.Slug,
-		Exercise:    d.Solution.Exercise.ID,
-		ID:          d.Solution.ID,
-		URL:         d.Solution.URL,
-		Handle:      d.Solution.User.Handle,
-		IsRequester: d.Solution.User.IsRequester,
-	}, nil
-}
-
 // sanitizeLegacyFilepath is a workaround for a path bug due to an early design
 // decision (later reversed) to allow numeric suffixes for exercise directories,
 // allowing people to have multiple parallel versions of an exercise.
-func (d downloadContext) sanitizeLegacyFilepath(file, slug string) string {
+func (d downloadWriter) sanitizeLegacyFilepath(file, slug string) string {
 	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, slug)
 	rgxNumericSuffix := regexp.MustCompile(pattern)
 	if rgxNumericSuffix.MatchString(file) {
@@ -307,7 +246,7 @@ type downloadPayload struct {
 	} `json:"error,omitempty"`
 }
 
-// newDownloadPayload gets a payload by making an HTTP request to the API.
+// newDownloadPayload creates a payload by making an HTTP request to the API.
 func newDownloadPayload(params *downloadParams) (*downloadPayload, error) {
 	if err := params.validate(); err != nil {
 		return nil, err
@@ -379,6 +318,70 @@ func (d downloadPayload) buildQuery(params *downloadParams, url *netURL.URL) err
 	url.RawQuery = query.Encode()
 
 	return nil
+}
+
+// requestFile requests a Solution file from the API, returning an HTTP response.
+// Non 200 responses and zero length file responses are swallowed, returning nil.
+func (d downloadPayload) requestFile(usrCfg *viper.Viper, filename string) (*http.Response, error) {
+	if filename == "" {
+		return nil, errors.New("filename is empty")
+	}
+
+	unparsedURL := fmt.Sprintf("%s%s", d.Solution.FileDownloadBaseURL, filename)
+	parsedURL, err := netURL.ParseRequestURI(unparsedURL)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
+	req, err := client.NewRequest("GET", parsedURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		// TODO: deal with it
+		return nil, nil
+	}
+	// Don't bother with empty files.
+	if res.Header.Get("Content-Length") == "0" {
+		return nil, nil
+	}
+
+	return res, nil
+}
+
+func (d downloadPayload) exercise(usrCfg *viper.Viper) workspace.Exercise {
+	root := usrCfg.GetString("workspace")
+	if d.Solution.Team.Slug != "" {
+		root = filepath.Join(root, "teams", d.Solution.Team.Slug)
+	}
+	if !d.Solution.User.IsRequester {
+		root = filepath.Join(root, "users", d.Solution.User.Handle)
+	}
+	return workspace.Exercise{
+		Root:  root,
+		Track: d.Solution.Exercise.Track.ID,
+		Slug:  d.Solution.Exercise.ID,
+	}
+}
+
+func (d downloadPayload) metadata() workspace.ExerciseMetadata {
+	return workspace.ExerciseMetadata{
+		AutoApprove: d.Solution.Exercise.AutoApprove,
+		Track:       d.Solution.Exercise.Track.ID,
+		Team:        d.Solution.Team.Slug,
+		Exercise:    d.Solution.Exercise.ID,
+		ID:          d.Solution.ID,
+		URL:         d.Solution.URL,
+		Handle:      d.Solution.User.Handle,
+		IsRequester: d.Solution.User.IsRequester,
+	}
 }
 
 func (d downloadPayload) validate() error {
