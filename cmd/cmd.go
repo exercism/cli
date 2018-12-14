@@ -304,6 +304,7 @@ func (d downloadPayload) buildQuery(params *downloadParams, url *netURL.URL) {
 // requestFile requests a Solution file from the API, returning an HTTP response.
 // Non 200 responses and zero length file responses are swallowed, returning nil.
 func (d downloadPayload) requestFile(usrCfg *viper.Viper, filename string) (*http.Response, error) {
+	// NOTE: verbose validation because currently errors are swallowed
 	if err := validateUserConfig(usrCfg); err != nil {
 		return nil, err
 	}
