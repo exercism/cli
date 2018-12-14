@@ -83,8 +83,8 @@ func validateUserConfig(cfg *viper.Viper) error {
 
 // downloadContext is a context for working with a downloadPayload.
 type downloadContext struct {
-	usrCfg  *viper.Viper
-	payload *downloadPayload
+	usrCfg *viper.Viper
+	*downloadPayload
 }
 
 func newDownloadContext(usrCfg *viper.Viper, payload *downloadPayload) (*downloadContext, error) {
@@ -93,16 +93,16 @@ func newDownloadContext(usrCfg *viper.Viper, payload *downloadPayload) (*downloa
 	}
 
 	return &downloadContext{
-		usrCfg:  usrCfg,
-		payload: payload,
+		usrCfg:          usrCfg,
+		downloadPayload: payload,
 	}, nil
 }
 
-// writeSolutionFiles attempts to write each solution file in the payload.
+// writeSolutionFiles attempts to write each solution file in the downloadPayload.
 // An HTTP request is made for each file and failed responses are swallowed.
 // All successful file responses are written except where empty.
 func (d downloadContext) writeSolutionFiles(exercise workspace.Exercise) error {
-	for _, filename := range d.payload.Solution.Files {
+	for _, filename := range d.Solution.Files {
 		res, err := d.requestFile(filename)
 		if err != nil {
 			return err
@@ -138,7 +138,7 @@ func (d downloadContext) requestFile(filename string) (*http.Response, error) {
 		return nil, errors.New("filename is empty")
 	}
 
-	unparsedURL := fmt.Sprintf("%s%s", d.payload.Solution.FileDownloadBaseURL, filename)
+	unparsedURL := fmt.Sprintf("%s%s", d.Solution.FileDownloadBaseURL, filename)
 	parsedURL, err := netURL.ParseRequestURI(unparsedURL)
 	if err != nil {
 		return nil, err
@@ -181,29 +181,29 @@ func (d downloadContext) writeMetadata(exercise workspace.Exercise) error {
 
 func (d downloadContext) exercise() (workspace.Exercise, error) {
 	root := d.usrCfg.GetString("workspace")
-	if d.payload.Solution.Team.Slug != "" {
-		root = filepath.Join(root, "teams", d.payload.Solution.Team.Slug)
+	if d.Solution.Team.Slug != "" {
+		root = filepath.Join(root, "teams", d.Solution.Team.Slug)
 	}
-	if !d.payload.Solution.User.IsRequester {
-		root = filepath.Join(root, "users", d.payload.Solution.User.Handle)
+	if !d.Solution.User.IsRequester {
+		root = filepath.Join(root, "users", d.Solution.User.Handle)
 	}
 	return workspace.Exercise{
 		Root:  root,
-		Track: d.payload.Solution.Exercise.Track.ID,
-		Slug:  d.payload.Solution.Exercise.ID,
+		Track: d.Solution.Exercise.Track.ID,
+		Slug:  d.Solution.Exercise.ID,
 	}, nil
 }
 
 func (d downloadContext) metadata() (workspace.ExerciseMetadata, error) {
 	return workspace.ExerciseMetadata{
-		AutoApprove: d.payload.Solution.Exercise.AutoApprove,
-		Track:       d.payload.Solution.Exercise.Track.ID,
-		Team:        d.payload.Solution.Team.Slug,
-		Exercise:    d.payload.Solution.Exercise.ID,
-		ID:          d.payload.Solution.ID,
-		URL:         d.payload.Solution.URL,
-		Handle:      d.payload.Solution.User.Handle,
-		IsRequester: d.payload.Solution.User.IsRequester,
+		AutoApprove: d.Solution.Exercise.AutoApprove,
+		Track:       d.Solution.Exercise.Track.ID,
+		Team:        d.Solution.Team.Slug,
+		Exercise:    d.Solution.Exercise.ID,
+		ID:          d.Solution.ID,
+		URL:         d.Solution.URL,
+		Handle:      d.Solution.User.Handle,
+		IsRequester: d.Solution.User.IsRequester,
 	}, nil
 }
 
