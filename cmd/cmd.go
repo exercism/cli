@@ -156,40 +156,40 @@ type downloadParams struct {
 	team   string
 }
 
-func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (*downloadParams, error) {
-	d := &downloadParams{usrCfg: usrCfg, slug: exercise.Slug, track: exercise.Track}
+func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (downloadParams, error) {
+	d := downloadParams{usrCfg: usrCfg, slug: exercise.Slug, track: exercise.Track}
 	return d, d.validate()
 }
 
-func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
+func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (downloadParams, error) {
 	var err error
-	d := &downloadParams{usrCfg: usrCfg}
+	d := downloadParams{usrCfg: usrCfg}
 
 	d.uuid, err = flags.GetString("uuid")
 	if err != nil {
-		return nil, err
+		return downloadParams{}, err
 	}
 	d.slug, err = flags.GetString("exercise")
 	if err != nil {
-		return nil, err
+		return downloadParams{}, err
 	}
 
 	if err = d.validate(); err != nil {
-		return nil, errors.New("need an --exercise name or a solution --uuid")
+		return downloadParams{}, errors.New("need an --exercise name or a solution --uuid")
 	}
 
 	d.track, err = flags.GetString("track")
 	if err != nil {
-		return nil, err
+		return downloadParams{}, err
 	}
 	d.team, err = flags.GetString("team")
 	if err != nil {
-		return nil, err
+		return downloadParams{}, err
 	}
 	return d, err
 }
 
-func (d *downloadParams) validate() error {
+func (d downloadParams) validate() error {
 	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
 		return errors.New("need a 'slug' or a 'uuid'")
 	}
@@ -197,7 +197,7 @@ func (d *downloadParams) validate() error {
 }
 
 type downloadPayload struct {
-	*downloadParams
+	downloadParams
 	Solution struct {
 		ID   string `json:"id"`
 		URL  string `json:"url"`
@@ -232,7 +232,7 @@ type downloadPayload struct {
 }
 
 // newDownloadPayload creates a payload by making an HTTP request to the API.
-func newDownloadPayload(params *downloadParams) (*downloadPayload, error) {
+func newDownloadPayload(params downloadParams) (*downloadPayload, error) {
 	if err := params.validate(); err != nil {
 		return nil, err
 	}
