@@ -14,3 +14,4 @@ install:
 script:
   - ./.travis.gofmt.sh
   - go test -cover ./...
+
