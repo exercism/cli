@@ -256,9 +256,7 @@ func newDownloadPayload(params *downloadParams) (*downloadPayload, error) {
 		return nil, err
 	}
 
-	if err = d.buildQuery(params, req.URL); err != nil {
-		return nil, err
-	}
+	d.buildQuery(params, req.URL)
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -293,11 +291,7 @@ func (d downloadPayload) requestURL(params *downloadParams) string {
 	return fmt.Sprintf("%s/solutions/%s", params.usrCfg.GetString("apibaseurl"), id)
 }
 
-func (d downloadPayload) buildQuery(params *downloadParams, url *netURL.URL) error {
-	if url == nil {
-		return errors.New("url is empty")
-	}
-
+func (d downloadPayload) buildQuery(params *downloadParams, url *netURL.URL) {
 	query := url.Query()
 	if params.uuid == "" {
 		query.Add("exercise_id", params.slug)
@@ -309,8 +303,6 @@ func (d downloadPayload) buildQuery(params *downloadParams, url *netURL.URL) err
 		}
 	}
 	url.RawQuery = query.Encode()
-
-	return nil
 }
 
 // requestFile requests a Solution file from the API, returning an HTTP response.
