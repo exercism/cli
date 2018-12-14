@@ -121,13 +121,13 @@ func (d downloadWriter) writeSolutionFiles() error {
 		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
 		// TODO: handle --force flag to overwrite without asking.
 
-		relativePath := d.sanitizeLegacyFilepath(filename, exercise.Slug)
-		dir := filepath.Join(exercise.MetadataDir(), filepath.Dir(relativePath))
-		if err = os.MkdirAll(dir, os.FileMode(0755)); err != nil {
+		sanitizedPath := d.sanitizeLegacyFilepath(filename, exercise.Slug)
+		fileWritePath := filepath.Join(exercise.MetadataDir(), sanitizedPath)
+		if err = os.MkdirAll(filepath.Dir(fileWritePath), os.FileMode(0755)); err != nil {
 			return err
 		}
 
-		f, err := os.Create(filepath.Join(exercise.MetadataDir(), relativePath))
+		f, err := os.Create(fileWritePath)
 		if err != nil {
 			return err
 		}
