@@ -98,15 +98,8 @@ func newDownloadWriter(usrCfg *viper.Viper, payload *downloadPayload) (*download
 	}, nil
 }
 
-// writeMetadata writes metadata from the downloadPayload's exercise.
 func (d downloadWriter) writeMetadata() error {
-	exercise := d.exercise(d.usrCfg)
-	metadata := d.metadata()
-
-	if err := metadata.Write(exercise.MetadataDir()); err != nil {
-		return err
-	}
-	return nil
+	return d.metadata().Write(d.exercise(d.usrCfg).MetadataDir())
 }
 
 // writeSolutionFiles attempts to write each Solution file in the downloadPayload.
