@@ -194,7 +194,7 @@ func (d *downloadParams) validate() error {
 	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
 		return errors.New("need a 'slug' or a 'uuid'")
 	}
-	return nil
+	return validateUserConfig(d.usrCfg)
 }
 
 type downloadPayload struct {
