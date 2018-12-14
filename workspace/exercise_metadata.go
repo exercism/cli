@@ -63,7 +63,7 @@ func (em *ExerciseMetadata) String() string {
 }
 
 // Write stores exercise metadata to a file.
-func (em ExerciseMetadata) Write(dir string) error {
+func (em *ExerciseMetadata) Write(dir string) error {
 	b, err := json.Marshal(em)
 	if err != nil {
 		return err
