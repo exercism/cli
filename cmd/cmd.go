@@ -83,32 +83,26 @@ func validateUserConfig(cfg *viper.Viper) error {
 
 // downloadWriter writes metadata and Solution files from a downloadPayload to disk.
 type downloadWriter struct {
-	usrCfg *viper.Viper
 	*downloadPayload
 }
 
-func newDownloadWriter(usrCfg *viper.Viper, payload *downloadPayload) (*downloadWriter, error) {
+func newDownloadWriter(payload *downloadPayload) (*downloadWriter, error) {
 	if err := payload.validate(); err != nil {
 		return nil, err
 	}
-	return &downloadWriter{
-		usrCfg:          usrCfg,
-		downloadPayload: payload,
-	}, nil
+	return &downloadWriter{payload}, nil
 }
 
 func (d downloadWriter) writeMetadata() error {
-	return d.metadata().Write(d.exercise(d.usrCfg).MetadataDir())
+	return d.metadata().Write(d.exercise().MetadataDir())
 }
 
 // writeSolutionFiles attempts to write each Solution file in the downloadPayload.
 // An HTTP request is made for each file and failed responses are swallowed.
 // All successful file responses are written except where empty.
 func (d downloadWriter) writeSolutionFiles() error {
-	exercise := d.exercise(d.usrCfg)
-
 	for _, filename := range d.Solution.Files {
-		res, err := d.requestFile(d.usrCfg, filename)
+		res, err := d.requestFile(filename)
 		if err != nil {
 			return err
 		}
@@ -120,8 +114,8 @@ func (d downloadWriter) writeSolutionFiles() error {
 		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
 		// TODO: handle --force flag to overwrite without asking.
 
-		sanitizedPath := d.sanitizeLegacyFilepath(filename, exercise.Slug)
-		fileWritePath := filepath.Join(exercise.MetadataDir(), sanitizedPath)
+		sanitizedPath := d.sanitizeLegacyFilepath(filename, d.exercise().Slug)
+		fileWritePath := filepath.Join(d.exercise().MetadataDir(), sanitizedPath)
 		if err = os.MkdirAll(filepath.Dir(fileWritePath), os.FileMode(0755)); err != nil {
 			return err
 		}
@@ -203,6 +197,7 @@ func (d *downloadParams) validate() error {
 }
 
 type downloadPayload struct {
+	*downloadParams
 	Solution struct {
 		ID   string `json:"id"`
 		URL  string `json:"url"`
@@ -241,19 +236,18 @@ func newDownloadPayload(params *downloadParams) (*downloadPayload, error) {
 	if err := params.validate(); err != nil {
 		return nil, err
 	}
-	d := &downloadPayload{}
+	d := &downloadPayload{downloadParams: params}
 
 	client, err := api.NewClient(params.usrCfg.GetString("token"), params.usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := client.NewRequest("GET", d.requestURL(params), nil)
+	req, err := client.NewRequest("GET", d.requestURL(), nil)
 	if err != nil {
 		return nil, err
 	}
-
-	d.buildQuery(params, req.URL)
+	d.buildQuery(req.URL)
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -279,23 +273,23 @@ func newDownloadPayload(params *downloadParams) (*downloadPayload, error) {
 	return d, nil
 }
 
-func (d downloadPayload) requestURL(params *downloadParams) string {
+func (d downloadPayload) requestURL() string {
 	id := "latest"
-	if params.uuid != "" {
-		id = params.uuid
+	if d.uuid != "" {
+		id = d.uuid
 	}
-	return fmt.Sprintf("%s/solutions/%s", params.usrCfg.GetString("apibaseurl"), id)
+	return fmt.Sprintf("%s/solutions/%s", d.usrCfg.GetString("apibaseurl"), id)
 }
 
-func (d downloadPayload) buildQuery(params *downloadParams, url *netURL.URL) {
+func (d downloadPayload) buildQuery(url *netURL.URL) {
 	query := url.Query()
-	if params.uuid == "" {
-		query.Add("exercise_id", params.slug)
-		if params.track != "" {
-			query.Add("track_id", params.track)
+	if d.uuid == "" {
+		query.Add("exercise_id", d.slug)
+		if d.track != "" {
+			query.Add("track_id", d.track)
 		}
-		if params.team != "" {
-			query.Add("team_id", params.team)
+		if d.team != "" {
+			query.Add("team_id", d.team)
 		}
 	}
 	url.RawQuery = query.Encode()
@@ -303,11 +297,7 @@ func (d downloadPayload) buildQuery(params *downloadParams, url *netURL.URL) {
 
 // requestFile requests a Solution file from the API, returning an HTTP response.
 // Non 200 responses and zero length file responses are swallowed, returning nil.
-func (d downloadPayload) requestFile(usrCfg *viper.Viper, filename string) (*http.Response, error) {
-	// NOTE: verbose validation because currently errors are swallowed
-	if err := validateUserConfig(usrCfg); err != nil {
-		return nil, err
-	}
+func (d downloadPayload) requestFile(filename string) (*http.Response, error) {
 	if filename == "" {
 		return nil, errors.New("filename is empty")
 	}
@@ -318,12 +308,11 @@ func (d downloadPayload) requestFile(usrCfg *viper.Viper, filename string) (*htt
 		return nil, err
 	}
 
-	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
+	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
 	req, err := client.NewRequest("GET", parsedURL.String(), nil)
 	if err != nil {
 		return nil, err
 	}
-
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -341,8 +330,8 @@ func (d downloadPayload) requestFile(usrCfg *viper.Viper, filename string) (*htt
 	return res, nil
 }
 
-func (d downloadPayload) exercise(usrCfg *viper.Viper) workspace.Exercise {
-	root := usrCfg.GetString("workspace")
+func (d downloadPayload) exercise() workspace.Exercise {
+	root := d.usrCfg.GetString("workspace")
 	if d.Solution.Team.Slug != "" {
 		root = filepath.Join(root, "teams", d.Solution.Team.Slug)
 	}

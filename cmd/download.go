@@ -52,7 +52,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	writer, err := newDownloadWriter(cfg.UserViperConfig, payload)
+	writer, err := newDownloadWriter(payload)
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", payload.exercise(cfg.UserViperConfig).MetadataDir())
+	fmt.Fprintf(Out, "%s\n", payload.exercise().MetadataDir())
 
 	return nil
 }
