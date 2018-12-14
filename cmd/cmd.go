@@ -91,7 +91,6 @@ func newDownloadWriter(usrCfg *viper.Viper, payload *downloadPayload) (*download
 	if err := payload.validate(); err != nil {
 		return nil, err
 	}
-
 	return &downloadWriter{
 		usrCfg:          usrCfg,
 		downloadPayload: payload,
@@ -148,11 +147,9 @@ func (d downloadWriter) sanitizeLegacyFilepath(file, slug string) string {
 	if rgxNumericSuffix.MatchString(file) {
 		file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
 	}
-
 	// Rewrite paths submitted with an older, buggy client where the Windows
 	// path is being treated as part of the filename.
 	file = strings.Replace(file, "\\", "/", -1)
-
 	return filepath.FromSlash(file)
 }
 
@@ -279,7 +276,6 @@ func newDownloadPayload(params *downloadParams) (*downloadPayload, error) {
 			return nil, errors.New(d.Error.Message)
 		}
 	}
-
 	return d, nil
 }
 
