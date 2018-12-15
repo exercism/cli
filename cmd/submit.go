@@ -156,7 +156,6 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	if !metadata.IsRequester {
-		// TODO: add test
 		msg := `
 
     The solution you are submitting is not connected to your account.
