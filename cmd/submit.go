@@ -50,18 +50,6 @@ var submitCmd = &cobra.Command{
 	},
 }
 
-type submission struct {
-	documents []workspace.Document
-	metadata  *workspace.ExerciseMetadata
-}
-
-// submitContext is a context for submitting solutions to the API.
-type submitContext struct {
-	usrCfg *viper.Viper
-	flags  *pflag.FlagSet
-	submission
-}
-
 func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	if err := validateUserConfig(cfg.UserViperConfig); err != nil {
 		return err
@@ -72,12 +60,19 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	if err := submitDocuments(cfg.UserViperConfig, ctx.metadata, ctx.documents); err != nil {
+	if err := ctx.submit(cfg.UserViperConfig); err != nil {
 		return err
 	}
 
 	ctx.printResult()
 	return nil
+}
+
+// submitContext is a context for submitting solutions to the API.
+type submitContext struct {
+	usrCfg *viper.Viper
+	flags  *pflag.FlagSet
+	submission
 }
 
 // newSubmitContext creates a submitContext.
@@ -281,33 +276,21 @@ func (s *submitContext) _documents(filepaths []string, exercise workspace.Exerci
 	return docs, nil
 }
 
-func (s *submitContext) printResult() {
-	msg := `
-
-    Your solution has been submitted successfully.
-    %s
-`
-	suffix := "View it at:\n\n    "
-	if s.metadata.AutoApprove && s.metadata.Team == "" {
-		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
-	}
-	fmt.Fprintf(Err, msg, suffix)
-	fmt.Fprintf(Out, "    %s\n\n", s.metadata.URL)
+type submission struct {
+	documents []workspace.Document
+	metadata  *workspace.ExerciseMetadata
 }
 
-// submitDocuments submits the documents to the Exercism API.
-func submitDocuments(usrCfg *viper.Viper, metadata *workspace.ExerciseMetadata, docs []workspace.Document) error {
-	if metadata.ID == "" {
-		return errors.New("id is empty")
-	}
-	if len(docs) == 0 {
-		return errors.New("documents is empty")
+// submit submits the documents to the Exercism API.
+func (s submission) submit(usrCfg *viper.Viper) error {
+	if err := s.validate(); err != nil {
+		return err
 	}
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
-	for _, doc := range docs {
+	for _, doc := range s.documents {
 		file, err := os.Open(doc.Filepath())
 		if err != nil {
 			return err
@@ -331,7 +314,7 @@ func submitDocuments(usrCfg *viper.Viper, metadata *workspace.ExerciseMetadata, 
 	if err != nil {
 		return err
 	}
-	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), metadata.ID)
+	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), s.metadata.ID)
 	req, err := client.NewRequest("PATCH", url, body)
 	if err != nil {
 		return err
@@ -357,6 +340,30 @@ func submitDocuments(usrCfg *viper.Viper, metadata *workspace.ExerciseMetadata, 
 	_, err = bb.ReadFrom(resp.Body)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (s submission) printResult() {
+	msg := `
+
+    Your solution has been submitted successfully.
+    %s
+`
+	suffix := "View it at:\n\n    "
+	if s.metadata.AutoApprove && s.metadata.Team == "" {
+		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
+	}
+	fmt.Fprintf(Err, msg, suffix)
+	fmt.Fprintf(Out, "    %s\n\n", s.metadata.URL)
+}
+
+func (s submission) validate() error {
+	if s.metadata.ID == "" {
+		return errors.New("id is empty")
+	}
+	if len(s.documents) == 0 {
+		return errors.New("documents is empty")
 	}
 	return nil
 }
