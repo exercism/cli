@@ -55,7 +55,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	ctx, err := newSubmitContext(cfg.UserViperConfig, flags, args)
+	ctx, err := newSubmitCmdContext(cfg.UserViperConfig, flags, args)
 	if err != nil {
 		return err
 	}
@@ -68,16 +68,16 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	return nil
 }
 
-// submitContext is a context for submitting solutions to the API.
-type submitContext struct {
+// submitCmdContext represents the context for the submit cmd.
+type submitCmdContext struct {
 	usrCfg *viper.Viper
 	flags  *pflag.FlagSet
 	submission
 }
 
-// newSubmitContext creates a submitContext.
-func newSubmitContext(usrCfg *viper.Viper, flags *pflag.FlagSet, args []string) (*submitContext, error) {
-	ctx := &submitContext{usrCfg: usrCfg, flags: flags}
+// newSubmitCmdContext sets up a context to initiate a submission.
+func newSubmitCmdContext(usrCfg *viper.Viper, flags *pflag.FlagSet, args []string) (*submitCmdContext, error) {
+	ctx := &submitCmdContext{usrCfg: usrCfg, flags: flags}
 
 	filepaths, err := ctx.sanitizeArgs(args)
 	if err != nil {
@@ -108,7 +108,7 @@ func newSubmitContext(usrCfg *viper.Viper, flags *pflag.FlagSet, args []string) 
 }
 
 // sanitizeArgs validates args and swaps with evaluated symlink paths.
-func (s *submitContext) sanitizeArgs(args []string) ([]string, error) {
+func (s *submitCmdContext) sanitizeArgs(args []string) ([]string, error) {
 	for i, arg := range args {
 		var err error
 		arg, err = filepath.Abs(arg)
@@ -154,7 +154,7 @@ func (s *submitContext) sanitizeArgs(args []string) ([]string, error) {
 	return args, nil
 }
 
-func (s *submitContext) exercise(filepaths []string) (workspace.Exercise, error) {
+func (s *submitCmdContext) exercise(filepaths []string) (workspace.Exercise, error) {
 	ws, err := workspace.New(s.usrCfg.GetString("workspace"))
 	if err != nil {
 		return workspace.Exercise{}, err
@@ -184,7 +184,7 @@ func (s *submitContext) exercise(filepaths []string) (workspace.Exercise, error)
 	return workspace.NewExerciseFromDir(exerciseDir), nil
 }
 
-func (s *submitContext) migrateLegacyMetadata(exercise workspace.Exercise) error {
+func (s *submitCmdContext) migrateLegacyMetadata(exercise workspace.Exercise) error {
 	migrationStatus, err := exercise.MigrateLegacyMetadataFile()
 	if err != nil {
 		return err
@@ -195,7 +195,7 @@ func (s *submitContext) migrateLegacyMetadata(exercise workspace.Exercise) error
 	return nil
 }
 
-func (s *submitContext) _metadata(exercise workspace.Exercise) (*workspace.ExerciseMetadata, error) {
+func (s *submitCmdContext) _metadata(exercise workspace.Exercise) (*workspace.ExerciseMetadata, error) {
 	metadata, err := workspace.NewExerciseMetadata(exercise.Filepath())
 	if err != nil {
 		return nil, err
@@ -230,7 +230,7 @@ func (s *submitContext) _metadata(exercise workspace.Exercise) (*workspace.Exerc
 	return metadata, nil
 }
 
-func (s *submitContext) _documents(filepaths []string, exercise workspace.Exercise) ([]workspace.Document, error) {
+func (s *submitCmdContext) _documents(filepaths []string, exercise workspace.Exercise) ([]workspace.Document, error) {
 	docs := make([]workspace.Document, 0, len(filepaths))
 	for _, file := range filepaths {
 		// Don't submit empty files
