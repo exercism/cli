@@ -194,10 +194,26 @@ func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*dow
 }
 
 func (d *downloadParams) validate() error {
+	if d == nil {
+		return errors.New("DownloadParams is empty")
+	}
 	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
 		return errors.New("need a 'slug' or a 'uuid'")
 	}
-	return validateUserConfig(d.usrCfg)
+	if d.usrCfg == nil {
+		return errors.New("user config is empty")
+	}
+	requiredCfgs := [...]string{
+		"token",
+		"workspace",
+		"apibaseurl",
+	}
+	for _, cfg := range requiredCfgs {
+		if d.usrCfg.GetString(cfg) == "" {
+			return fmt.Errorf("missing required UserViperConfig '%s'", cfg)
+		}
+	}
+	return nil
 }
 
 // download represents a download from the Exercism API.
