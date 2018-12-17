@@ -51,16 +51,14 @@ var submitCmd = &cobra.Command{
 }
 
 type submission struct {
-	exercise  workspace.Exercise
-	metadata  *workspace.ExerciseMetadata
 	documents []workspace.Document
+	metadata  *workspace.ExerciseMetadata
 }
 
 // submitContext is a context for submitting solutions to the API.
 type submitContext struct {
 	usrCfg *viper.Viper
 	flags  *pflag.FlagSet
-	args   []string
 	submission
 }
 
@@ -74,7 +72,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	if err := ctx.submitDocuments(); err != nil {
+	if err := submitDocuments(cfg.UserViperConfig, ctx.metadata, ctx.documents); err != nil {
 		return err
 	}
 
@@ -84,44 +82,43 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 // newSubmitContext creates a submitContext.
 func newSubmitContext(usrCfg *viper.Viper, flags *pflag.FlagSet, args []string) (*submitContext, error) {
-	ctx := &submitContext{usrCfg: usrCfg, flags: flags, args: args}
+	ctx := &submitContext{usrCfg: usrCfg, flags: flags}
 
-	if err := ctx.sanitizeArgs(); err != nil {
-		return nil, err
-	}
-
-	exercise, err := ctx._exercise()
+	filepaths, err := ctx.sanitizeArgs(args)
 	if err != nil {
 		return nil, err
 	}
-	ctx.exercise = exercise
 
-	if err = ctx.migrateLegacyMetadata(); err != nil {
-		return nil, err
-	}
-
-	metadata, err := ctx._metadata()
+	exercise, err := ctx.exercise(filepaths)
 	if err != nil {
 		return nil, err
 	}
-	ctx.metadata = metadata
 
-	documents, err := ctx._documents()
+	if err = ctx.migrateLegacyMetadata(exercise); err != nil {
+		return nil, err
+	}
+
+	documents, err := ctx._documents(filepaths, exercise)
 	if err != nil {
 		return nil, err
 	}
-	ctx.documents = documents
 
+	metadata, err := ctx._metadata(exercise)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx.submission = submission{documents: documents, metadata: metadata}
 	return ctx, nil
 }
 
 // sanitizeArgs validates args and swaps with evaluated symlink paths.
-func (s *submitContext) sanitizeArgs() error {
-	for i, arg := range s.args {
+func (s *submitContext) sanitizeArgs(args []string) ([]string, error) {
+	for i, arg := range args {
 		var err error
 		arg, err = filepath.Abs(arg)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		info, err := os.Lstat(arg)
@@ -134,9 +131,9 @@ func (s *submitContext) sanitizeArgs() error {
         %s
 
         `
-				return fmt.Errorf(msg, arg)
+				return nil, fmt.Errorf(msg, arg)
 			}
-			return err
+			return nil, err
 		}
 		if info.IsDir() {
 			msg := `
@@ -150,27 +147,27 @@ func (s *submitContext) sanitizeArgs() error {
         %s submit FILENAME
 
             `
-			return fmt.Errorf(msg, arg, BinaryName)
+			return nil, fmt.Errorf(msg, arg, BinaryName)
 		}
 
 		src, err := filepath.EvalSymlinks(arg)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		s.args[i] = src
+		args[i] = src
 	}
-	return nil
+	return args, nil
 }
 
-func (s *submitContext) _exercise() (workspace.Exercise, error) {
+func (s *submitContext) exercise(filepaths []string) (workspace.Exercise, error) {
 	ws, err := workspace.New(s.usrCfg.GetString("workspace"))
 	if err != nil {
 		return workspace.Exercise{}, err
 	}
 
 	var exerciseDir string
-	for _, arg := range s.args {
-		dir, err := ws.ExerciseDir(arg)
+	for _, f := range filepaths {
+		dir, err := ws.ExerciseDir(f)
 		if err != nil {
 			if workspace.IsMissingMetadata(err) {
 				return workspace.Exercise{}, errors.New(msgMissingMetadata)
@@ -192,8 +189,8 @@ func (s *submitContext) _exercise() (workspace.Exercise, error) {
 	return workspace.NewExerciseFromDir(exerciseDir), nil
 }
 
-func (s *submitContext) migrateLegacyMetadata() error {
-	migrationStatus, err := s.exercise.MigrateLegacyMetadataFile()
+func (s *submitContext) migrateLegacyMetadata(exercise workspace.Exercise) error {
+	migrationStatus, err := exercise.MigrateLegacyMetadataFile()
 	if err != nil {
 		return err
 	}
@@ -203,13 +200,13 @@ func (s *submitContext) migrateLegacyMetadata() error {
 	return nil
 }
 
-func (s *submitContext) _metadata() (*workspace.ExerciseMetadata, error) {
-	metadata, err := workspace.NewExerciseMetadata(s.exercise.Filepath())
+func (s *submitContext) _metadata(exercise workspace.Exercise) (*workspace.ExerciseMetadata, error) {
+	metadata, err := workspace.NewExerciseMetadata(exercise.Filepath())
 	if err != nil {
 		return nil, err
 	}
 
-	if metadata.Exercise != s.exercise.Slug {
+	if metadata.Exercise != exercise.Slug {
 		// TODO: error msg should suggest running future doctor command
 		msg := `
 
@@ -220,7 +217,7 @@ func (s *submitContext) _metadata() (*workspace.ExerciseMetadata, error) {
 	Please rename the directory '%[1]s' to '%[2]s' and try again.
 
 		`
-		return nil, fmt.Errorf(msg, s.exercise.Slug, metadata.Exercise)
+		return nil, fmt.Errorf(msg, exercise.Slug, metadata.Exercise)
 	}
 
 	if !metadata.IsRequester {
@@ -238,9 +235,9 @@ func (s *submitContext) _metadata() (*workspace.ExerciseMetadata, error) {
 	return metadata, nil
 }
 
-func (s *submitContext) _documents() ([]workspace.Document, error) {
-	docs := make([]workspace.Document, 0, len(s.args))
-	for _, file := range s.args {
+func (s *submitContext) _documents(filepaths []string, exercise workspace.Exercise) ([]workspace.Document, error) {
+	docs := make([]workspace.Document, 0, len(filepaths))
+	for _, file := range filepaths {
 		// Don't submit empty files
 		info, err := os.Stat(file)
 		if err != nil {
@@ -267,7 +264,7 @@ func (s *submitContext) _documents() ([]workspace.Document, error) {
 			fmt.Fprintf(Err, msg, file)
 			continue
 		}
-		doc, err := workspace.NewDocument(s.exercise.Filepath(), file)
+		doc, err := workspace.NewDocument(exercise.Filepath(), file)
 		if err != nil {
 			return nil, err
 		}
@@ -284,19 +281,33 @@ func (s *submitContext) _documents() ([]workspace.Document, error) {
 	return docs, nil
 }
 
-// submitDocuments submits the documents to the API via HTTP.
-func (s *submitContext) submitDocuments() error {
-	if s.metadata.ID == "" {
+func (s *submitContext) printResult() {
+	msg := `
+
+    Your solution has been submitted successfully.
+    %s
+`
+	suffix := "View it at:\n\n    "
+	if s.metadata.AutoApprove && s.metadata.Team == "" {
+		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
+	}
+	fmt.Fprintf(Err, msg, suffix)
+	fmt.Fprintf(Out, "    %s\n\n", s.metadata.URL)
+}
+
+// submitDocuments submits the documents to the Exercism API.
+func submitDocuments(usrCfg *viper.Viper, metadata *workspace.ExerciseMetadata, docs []workspace.Document) error {
+	if metadata.ID == "" {
 		return errors.New("id is empty")
 	}
-	if len(s.documents) == 0 {
+	if len(docs) == 0 {
 		return errors.New("documents is empty")
 	}
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
-	for _, doc := range s.documents {
+	for _, doc := range docs {
 		file, err := os.Open(doc.Filepath())
 		if err != nil {
 			return err
@@ -316,11 +327,11 @@ func (s *submitContext) submitDocuments() error {
 		return err
 	}
 
-	client, err := api.NewClient(s.usrCfg.GetString("token"), s.usrCfg.GetString("apibaseurl"))
+	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return err
 	}
-	url := fmt.Sprintf("%s/solutions/%s", s.usrCfg.GetString("apibaseurl"), s.metadata.ID)
+	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), metadata.ID)
 	req, err := client.NewRequest("PATCH", url, body)
 	if err != nil {
 		return err
@@ -348,20 +359,6 @@ func (s *submitContext) submitDocuments() error {
 		return err
 	}
 	return nil
-}
-
-func (s *submitContext) printResult() {
-	msg := `
-
-    Your solution has been submitted successfully.
-    %s
-`
-	suffix := "View it at:\n\n    "
-	if s.metadata.AutoApprove && s.metadata.Team == "" {
-		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
-	}
-	fmt.Fprintf(Err, msg, suffix)
-	fmt.Fprintf(Out, "    %s\n\n", s.metadata.URL)
 }
 
 func init() {
