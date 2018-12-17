@@ -47,12 +47,12 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	payload, err := newDownloadPayload(downloadParams)
+	download, err := newDownload(downloadParams)
 	if err != nil {
 		return err
 	}
 
-	writer, err := newDownloadWriter(payload)
+	writer, err := newDownloadWriter(download)
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", payload.exercise().MetadataDir())
+	fmt.Fprintf(Out, "%s\n", download.exercise().MetadataDir())
 
 	return nil
 }

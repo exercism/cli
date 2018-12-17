@@ -81,16 +81,16 @@ func validateUserConfig(cfg *viper.Viper) error {
 	return nil
 }
 
-// downloadWriter writes metadata and Solution files from a downloadPayload to disk.
+// downloadWriter writes metadata and Solution files from a download to disk.
 type downloadWriter struct {
-	*downloadPayload
+	*download
 }
 
-func newDownloadWriter(payload *downloadPayload) (*downloadWriter, error) {
-	if err := payload.validate(); err != nil {
+func newDownloadWriter(download *download) (*downloadWriter, error) {
+	if err := download.validate(); err != nil {
 		return nil, err
 	}
-	return &downloadWriter{payload}, nil
+	return &downloadWriter{download}, nil
 }
 
 func (d downloadWriter) writeMetadata() error {
@@ -98,7 +98,7 @@ func (d downloadWriter) writeMetadata() error {
 	return metadata.Write(d.exercise().MetadataDir())
 }
 
-// writeSolutionFiles attempts to write each Solution file in the downloadPayload.
+// writeSolutionFiles attempts to write each Solution file in the download.
 // An HTTP request is made for each file and failed responses are swallowed.
 // All successful file responses are written except where empty.
 func (d downloadWriter) writeSolutionFiles() error {
@@ -148,7 +148,7 @@ func (d downloadWriter) sanitizeLegacyFilepath(file, slug string) string {
 	return filepath.FromSlash(file)
 }
 
-// downloadParams is required to create a downloadPayload.
+// downloadParams is required to create a download.
 type downloadParams struct {
 	usrCfg *viper.Viper
 	uuid   string
@@ -200,47 +200,18 @@ func (d *downloadParams) validate() error {
 	return validateUserConfig(d.usrCfg)
 }
 
-type downloadPayload struct {
+// download represents a download from the Exercism API.
+type download struct {
 	*downloadParams
-	Solution struct {
-		ID   string `json:"id"`
-		URL  string `json:"url"`
-		Team struct {
-			Name string `json:"name"`
-			Slug string `json:"slug"`
-		} `json:"team"`
-		User struct {
-			Handle      string `json:"handle"`
-			IsRequester bool   `json:"is_requester"`
-		} `json:"user"`
-		Exercise struct {
-			ID              string `json:"id"`
-			InstructionsURL string `json:"instructions_url"`
-			AutoApprove     bool   `json:"auto_approve"`
-			Track           struct {
-				ID       string `json:"id"`
-				Language string `json:"language"`
-			} `json:"track"`
-		} `json:"exercise"`
-		FileDownloadBaseURL string   `json:"file_download_base_url"`
-		Files               []string `json:"files"`
-		Iteration           struct {
-			SubmittedAt *string `json:"submitted_at"`
-		}
-	} `json:"solution"`
-	Error struct {
-		Type             string   `json:"type"`
-		Message          string   `json:"message"`
-		PossibleTrackIDs []string `json:"possible_track_ids"`
-	} `json:"error,omitempty"`
+	*downloadPayload
 }
 
-// newDownloadPayload creates a payload by making an HTTP request to the API.
-func newDownloadPayload(params *downloadParams) (*downloadPayload, error) {
+// newDownload creates a download, getting a downloadPayload from the Exercism API.
+func newDownload(params *downloadParams) (*download, error) {
 	if err := params.validate(); err != nil {
 		return nil, err
 	}
-	d := &downloadPayload{downloadParams: params}
+	d := &download{downloadParams: params}
 
 	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
 	if err != nil {
@@ -258,7 +229,7 @@ func newDownloadPayload(params *downloadParams) (*downloadPayload, error) {
 	}
 	defer res.Body.Close()
 
-	if err := json.NewDecoder(res.Body).Decode(&d); err != nil {
+	if err := json.NewDecoder(res.Body).Decode(&d.downloadPayload); err != nil {
 		return nil, fmt.Errorf("unable to parse API response - %s", err)
 	}
 
@@ -277,7 +248,7 @@ func newDownloadPayload(params *downloadParams) (*downloadPayload, error) {
 	return d, nil
 }
 
-func (d *downloadPayload) requestURL() string {
+func (d *download) requestURL() string {
 	id := "latest"
 	if d.uuid != "" {
 		id = d.uuid
@@ -285,7 +256,7 @@ func (d *downloadPayload) requestURL() string {
 	return fmt.Sprintf("%s/solutions/%s", d.usrCfg.GetString("apibaseurl"), id)
 }
 
-func (d *downloadPayload) buildQuery(url *netURL.URL) {
+func (d *download) buildQuery(url *netURL.URL) {
 	query := url.Query()
 	if d.uuid == "" {
 		query.Add("exercise_id", d.slug)
@@ -301,7 +272,7 @@ func (d *downloadPayload) buildQuery(url *netURL.URL) {
 
 // requestFile requests a Solution file from the API, returning an HTTP response.
 // Non 200 responses and zero length file responses are swallowed, returning nil.
-func (d *downloadPayload) requestFile(filename string) (*http.Response, error) {
+func (d *download) requestFile(filename string) (*http.Response, error) {
 	if filename == "" {
 		return nil, errors.New("filename is empty")
 	}
@@ -334,7 +305,7 @@ func (d *downloadPayload) requestFile(filename string) (*http.Response, error) {
 	return res, nil
 }
 
-func (d *downloadPayload) exercise() workspace.Exercise {
+func (d *download) exercise() workspace.Exercise {
 	root := d.usrCfg.GetString("workspace")
 	if d.Solution.Team.Slug != "" {
 		root = filepath.Join(root, "teams", d.Solution.Team.Slug)
@@ -349,7 +320,7 @@ func (d *downloadPayload) exercise() workspace.Exercise {
 	}
 }
 
-func (d *downloadPayload) metadata() workspace.ExerciseMetadata {
+func (d *download) metadata() workspace.ExerciseMetadata {
 	return workspace.ExerciseMetadata{
 		AutoApprove: d.Solution.Exercise.AutoApprove,
 		Track:       d.Solution.Exercise.Track.ID,
@@ -362,12 +333,47 @@ func (d *downloadPayload) metadata() workspace.ExerciseMetadata {
 	}
 }
 
-func (d *downloadPayload) validate() error {
+func (d *download) validate() error {
 	if d == nil || d.Solution.ID == "" {
-		return errors.New("download payload is empty")
+		return errors.New("download is empty")
 	}
 	if d.Error.Message != "" {
 		return errors.New(d.Error.Message)
 	}
 	return nil
+}
+
+// downloadPayload is an Exercism API response.
+type downloadPayload struct {
+	Solution struct {
+		ID   string `json:"id"`
+		URL  string `json:"url"`
+		Team struct {
+			Name string `json:"name"`
+			Slug string `json:"slug"`
+		} `json:"team"`
+		User struct {
+			Handle      string `json:"handle"`
+			IsRequester bool   `json:"is_requester"`
+		} `json:"user"`
+		Exercise struct {
+			ID              string `json:"id"`
+			InstructionsURL string `json:"instructions_url"`
+			AutoApprove     bool   `json:"auto_approve"`
+			Track           struct {
+				ID       string `json:"id"`
+				Language string `json:"language"`
+			} `json:"track"`
+		} `json:"exercise"`
+		FileDownloadBaseURL string   `json:"file_download_base_url"`
+		Files               []string `json:"files"`
+		Iteration           struct {
+			SubmittedAt *string `json:"submitted_at"`
+		}
+	} `json:"solution"`
+	Error struct {
+		Type             string   `json:"type"`
+		Message          string   `json:"message"`
+		PossibleTrackIDs []string `json:"possible_track_ids"`
+	} `json:"error,omitempty"`
 }
