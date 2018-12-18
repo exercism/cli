@@ -296,7 +296,7 @@ type submission struct {
 }
 
 // submit submits the documents to the Exercism API.
-func (s submission) submit(usrCfg *viper.Viper) error {
+func (s *submission) submit(usrCfg *viper.Viper) error {
 	if err := s.validate(); err != nil {
 		return err
 	}
@@ -358,7 +358,10 @@ func (s submission) submit(usrCfg *viper.Viper) error {
 	return nil
 }
 
-func (s submission) validate() error {
+func (s *submission) validate() error {
+	if s == nil {
+		return errors.New("submission is empty")
+	}
 	if s.metadata.ID == "" {
 		return errors.New("id is empty")
 	}
