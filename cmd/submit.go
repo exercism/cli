@@ -276,6 +276,20 @@ func (s *submitCmdContext) _documents(filepaths []string, exercise workspace.Exe
 	return docs, nil
 }
 
+func (s *submitCmdContext) printResult() {
+	msg := `
+
+    Your solution has been submitted successfully.
+    %s
+`
+	suffix := "View it at:\n\n    "
+	if s.metadata.AutoApprove && s.metadata.Team == "" {
+		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
+	}
+	fmt.Fprintf(Err, msg, suffix)
+	fmt.Fprintf(Out, "    %s\n\n", s.metadata.URL)
+}
+
 type submission struct {
 	documents []workspace.Document
 	metadata  *workspace.ExerciseMetadata
@@ -342,20 +356,6 @@ func (s submission) submit(usrCfg *viper.Viper) error {
 		return err
 	}
 	return nil
-}
-
-func (s submission) printResult() {
-	msg := `
-
-    Your solution has been submitted successfully.
-    %s
-`
-	suffix := "View it at:\n\n    "
-	if s.metadata.AutoApprove && s.metadata.Team == "" {
-		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
-	}
-	fmt.Fprintf(Err, msg, suffix)
-	fmt.Fprintf(Out, "    %s\n\n", s.metadata.URL)
 }
 
 func (s submission) validate() error {
