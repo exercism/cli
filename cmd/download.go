@@ -59,22 +59,22 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	return nil
 }
 
-// downloadCmdContext represents the context for the downloadCmd
+// downloadCmdContext is the context for downloadCmd.
 type downloadCmdContext struct {
 	usrCfg *viper.Viper
 	flags  *pflag.FlagSet
 	*downloadWriter
 }
 
-// newDownloadCmdContext creates new downloadCmdContext, instantiating its fields,
+// newDownloadCmdContext creates new downloadCmdContext,
 // providing a download ready for work.
 func newDownloadCmdContext(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadCmdContext, error) {
-	downloadParams, err := newDownloadParamsFromFlags(usrCfg, flags)
+	params, err := newDownloadParamsFromFlags(usrCfg, flags)
 	if err != nil {
 		return nil, err
 	}
 
-	download, err := newDownload(downloadParams)
+	download, err := newDownload(params)
 	if err != nil {
 		return nil, err
 	}
