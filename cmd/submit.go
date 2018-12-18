@@ -290,6 +290,7 @@ func (s *submitCmdContext) printResult() {
 	fmt.Fprintf(Out, "    %s\n\n", s.metadata.URL)
 }
 
+// submission is a submission to the Excercism API.
 type submission struct {
 	documents []workspace.Document
 	metadata  *workspace.ExerciseMetadata
