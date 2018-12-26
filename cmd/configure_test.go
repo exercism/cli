@@ -38,12 +38,10 @@ func TestBareConfigure(t *testing.T) {
 }
 
 func TestConfigureShow(t *testing.T) {
-	oldErr := Err
-	defer func() {
-		Err = oldErr
-	}()
-
-	Err = &bytes.Buffer{}
+	co := newCapturedOutput()
+	co.newErr = &bytes.Buffer{}
+	co.override()
+	defer co.reset()
 
 	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
 	setupConfigureFlags(flags)
@@ -82,6 +80,10 @@ func TestConfigureShow(t *testing.T) {
 }
 
 func TestConfigureToken(t *testing.T) {
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
+
 	testCases := []struct {
 		desc       string
 		configured string
@@ -142,12 +144,6 @@ func TestConfigureToken(t *testing.T) {
 	ts := httptest.NewServer(endpoint)
 	defer ts.Close()
 
-	oldOut := Out
-	Out = ioutil.Discard
-	defer func() {
-		Out = oldOut
-	}()
-
 	for _, tc := range testCases {
 		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
 		setupConfigureFlags(flags)
@@ -173,6 +169,10 @@ func TestConfigureToken(t *testing.T) {
 }
 
 func TestConfigureAPIBaseURL(t *testing.T) {
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
+
 	endpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/ping" {
 			w.WriteHeader(http.StatusNotFound)
@@ -225,12 +225,6 @@ func TestConfigureAPIBaseURL(t *testing.T) {
 		},
 	}
 
-	oldOut := Out
-	Out = ioutil.Discard
-	defer func() {
-		Out = oldOut
-	}()
-
 	for _, tc := range testCases {
 		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
 		setupConfigureFlags(flags)
@@ -256,11 +250,9 @@ func TestConfigureAPIBaseURL(t *testing.T) {
 }
 
 func TestConfigureWorkspace(t *testing.T) {
-	oldErr := Err
-	Err = ioutil.Discard
-	defer func() {
-		Err = oldErr
-	}()
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
 
 	testCases := []struct {
 		desc       string
@@ -342,14 +334,9 @@ func TestConfigureWorkspace(t *testing.T) {
 }
 
 func TestConfigureDefaultWorkspaceWithoutClobbering(t *testing.T) {
-	oldOut := Out
-	oldErr := Err
-	Out = ioutil.Discard
-	Err = ioutil.Discard
-	defer func() {
-		Out = oldOut
-		Err = oldErr
-	}()
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
 
 	// Stub server to always be 200 OK
 	endpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
@@ -387,14 +374,9 @@ func TestConfigureDefaultWorkspaceWithoutClobbering(t *testing.T) {
 }
 
 func TestConfigureExplicitWorkspaceWithoutClobberingNonDirectory(t *testing.T) {
-	oldOut := Out
-	oldErr := Err
-	Out = ioutil.Discard
-	Err = ioutil.Discard
-	defer func() {
-		Out = oldOut
-		Err = oldErr
-	}()
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
 
 	tmpDir, err := ioutil.TempDir("", "no-clobber")
 	defer os.RemoveAll(tmpDir)
