@@ -51,12 +51,8 @@ var submitCmd = &cobra.Command{
 func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	usrCfg := cfg.UserViperConfig
 
-	if usrCfg.GetString("token") == "" {
-		return fmt.Errorf(msgWelcomePleaseConfigure, config.SettingsURL(usrCfg.GetString("apibaseurl")), BinaryName)
-	}
-
-	if usrCfg.GetString("workspace") == "" {
-		return fmt.Errorf(msgRerunConfigure, BinaryName)
+	if err := validateUserConfig(usrCfg); err != nil {
+		return err
 	}
 
 	for i, arg := range args {

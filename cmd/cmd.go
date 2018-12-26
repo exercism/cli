@@ -1,5 +1,12 @@
 package cmd
 
+import (
+	"fmt"
+
+	"github.com/exercism/cli/config"
+	"github.com/spf13/viper"
+)
+
 const msgWelcomePleaseConfigure = `
 
     Welcome to Exercism!
@@ -33,3 +40,18 @@ const msgMissingMetadata = `
     Please see https://exercism.io/cli-v1-to-v2 for instructions on how to fix it.
 
 `
+
+// validateUserConfig validates the presense of required user config values
+func validateUserConfig(cfg *viper.Viper) error {
+	if cfg.GetString("token") == "" {
+		return fmt.Errorf(
+			msgWelcomePleaseConfigure,
+			config.SettingsURL(cfg.GetString("apibaseurl")),
+			BinaryName,
+		)
+	}
+	if cfg.GetString("workspace") == "" || cfg.GetString("apibaseurl") == "" {
+		return fmt.Errorf(msgRerunConfigure, BinaryName)
+	}
+	return nil
+}
