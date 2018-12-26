@@ -20,8 +20,6 @@ var (
 	Out io.Writer
 	// Err is used to write errors.
 	Err io.Writer
-	// In is used to provide mocked test input (i.e. for prompts).
-	In io.Reader
 )
 
 const msgWelcomePleaseConfigure = `

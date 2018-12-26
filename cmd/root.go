@@ -43,7 +43,6 @@ func init() {
 	config.SetDefaultDirName(BinaryName)
 	Out = os.Stdout
 	Err = os.Stderr
-	In = os.Stdin
 	api.UserAgent = fmt.Sprintf("github.com/exercism/cli v%s (%s/%s)", Version, runtime.GOOS, runtime.GOARCH)
 	RootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().IntP("timeout", "", 0, "override the default HTTP timeout (seconds)")
