@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -504,6 +505,8 @@ func fakeSubmitServer(t *testing.T, submittedFiles map[string]string) *httptest.
 			}
 			submittedFiles[fileHeader.Filename] = string(body)
 		}
+
+		fmt.Fprint(w, "{}")
 	})
 	return httptest.NewServer(handler)
 }
@@ -551,6 +554,46 @@ func TestSubmitRelativePath(t *testing.T) {
 
 	assert.Equal(t, 1, len(submittedFiles))
 	assert.Equal(t, "This is a file.", submittedFiles["file.txt"])
+}
+
+func TestSubmitServerErr(t *testing.T) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, `{"error": {"type": "error", "message": "test error"}}`)
+	})
+
+	ts := httptest.NewServer(handler)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "submit-err-tmp-dir")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
+
+	cfg := config.Config{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+		DefaultBaseURL:  "http://example.com",
+	}
+
+	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
+	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
+	writeFakeMetadata(t, dir, "bogus-track", "bogus-exercise")
+
+	err = ioutil.WriteFile(filepath.Join(dir, "file-1.txt"), []byte("This is file 1"), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	files := []string{
+		filepath.Join(dir, "file-1.txt"),
+	}
+
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
+
+	assert.Regexp(t, "test error", err.Error())
 }
 
 func TestSubmissionNotConnectedToRequesterAccount(t *testing.T) {
