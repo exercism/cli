@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"path/filepath"
 
@@ -249,6 +251,15 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode == http.StatusBadRequest {
+		var jsonErrBody apiErrorMessage
+		if err := json.NewDecoder(resp.Body).Decode(&jsonErrBody); err != nil {
+			return fmt.Errorf("failed to parse error response - %s", err)
+		}
+
+		return fmt.Errorf(jsonErrBody.Error.Message)
+	}
+
 	bb := &bytes.Buffer{}
 	_, err = bb.ReadFrom(resp.Body)
 	if err != nil {
@@ -271,4 +282,11 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 func init() {
 	RootCmd.AddCommand(submitCmd)
+}
+
+type apiErrorMessage struct {
+	Error struct {
+		Type    string `json:"type"`
+		Message string `json:"message"`
+	} `json:"error,omitempty"`
 }
