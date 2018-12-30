@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"io/ioutil"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,9 +21,9 @@ func (fc *fakeCLI) Upgrade() error {
 }
 
 func TestUpgrade(t *testing.T) {
-	oldOut := Out
-	Out = ioutil.Discard
-	defer func() { Out = oldOut }()
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
 
 	testCases := []struct {
 		desc     string

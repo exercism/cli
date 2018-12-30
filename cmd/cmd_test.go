@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"io"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -89,4 +90,31 @@ func (test *CommandTest) Teardown(t *testing.T) {
 	if err := os.RemoveAll(test.TmpDir); err != nil {
 		t.Fatal(err)
 	}
+}
+
+// capturedOutput lets us more easily redirect streams in the tests.
+type capturedOutput struct {
+	oldOut, oldErr, newOut, newErr io.Writer
+}
+
+// newCapturedOutput creates a new value to override the streams.
+func newCapturedOutput() capturedOutput {
+	return capturedOutput{
+		oldOut: Out,
+		oldErr: Err,
+		newOut: ioutil.Discard,
+		newErr: ioutil.Discard,
+	}
+}
+
+// override sets the package variables to the fake streams.
+func (co capturedOutput) override() {
+	Out = co.newOut
+	Err = co.newErr
+}
+
+// reset puts back the original streams for the commands to write to.
+func (co capturedOutput) reset() {
+	Out = co.oldOut
+	Err = co.oldErr
 }

@@ -142,14 +142,10 @@ func TestSubmitFilesAndDir(t *testing.T) {
 }
 
 func TestSubmitFiles(t *testing.T) {
-	oldOut := Out
-	oldErr := Err
-	Out = ioutil.Discard
-	Err = ioutil.Discard
-	defer func() {
-		Out = oldOut
-		Err = oldErr
-	}()
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
+
 	// The fake endpoint will populate this when it receives the call from the command.
 	submittedFiles := map[string]string{}
 	ts := fakeSubmitServer(t, submittedFiles)
@@ -201,11 +197,10 @@ func TestSubmitFiles(t *testing.T) {
 }
 
 func TestLegacyMetadataMigration(t *testing.T) {
-	oldErr := Err
-	defer func() {
-		Err = oldErr
-	}()
-	Err = &bytes.Buffer{}
+	co := newCapturedOutput()
+	co.newErr = &bytes.Buffer{}
+	co.override()
+	defer co.reset()
 
 	submittedFiles := map[string]string{}
 	ts := fakeSubmitServer(t, submittedFiles)
@@ -265,14 +260,9 @@ func TestLegacyMetadataMigration(t *testing.T) {
 }
 
 func TestSubmitWithEmptyFile(t *testing.T) {
-	oldOut := Out
-	oldErr := Err
-	Out = ioutil.Discard
-	Err = ioutil.Discard
-	defer func() {
-		Out = oldOut
-		Err = oldErr
-	}()
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
 
 	// The fake endpoint will populate this when it receives the call from the command.
 	submittedFiles := map[string]string{}
@@ -311,14 +301,9 @@ func TestSubmitWithEmptyFile(t *testing.T) {
 }
 
 func TestSubmitWithEnormousFile(t *testing.T) {
-	oldOut := Out
-	oldErr := Err
-	Out = ioutil.Discard
-	Err = ioutil.Discard
-	defer func() {
-		Out = oldOut
-		Err = oldErr
-	}()
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
 
 	// The fake endpoint will populate this when it receives the call from the command.
 	submittedFiles := map[string]string{}
@@ -358,14 +343,10 @@ func TestSubmitWithEnormousFile(t *testing.T) {
 }
 
 func TestSubmitFilesForTeamExercise(t *testing.T) {
-	oldOut := Out
-	oldErr := Err
-	Out = ioutil.Discard
-	Err = ioutil.Discard
-	defer func() {
-		Out = oldOut
-		Err = oldErr
-	}()
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
+
 	// The fake endpoint will populate this when it receives the call from the command.
 	submittedFiles := map[string]string{}
 	ts := fakeSubmitServer(t, submittedFiles)
@@ -409,14 +390,9 @@ func TestSubmitFilesForTeamExercise(t *testing.T) {
 }
 
 func TestSubmitOnlyEmptyFile(t *testing.T) {
-	oldOut := Out
-	oldErr := Err
-	Out = ioutil.Discard
-	Err = ioutil.Discard
-	defer func() {
-		Out = oldOut
-		Err = oldErr
-	}()
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
 
 	tmpDir, err := ioutil.TempDir("", "just-an-empty-file")
 	defer os.RemoveAll(tmpDir)
@@ -512,14 +488,10 @@ func fakeSubmitServer(t *testing.T, submittedFiles map[string]string) *httptest.
 }
 
 func TestSubmitRelativePath(t *testing.T) {
-	oldOut := Out
-	oldErr := Err
-	Out = ioutil.Discard
-	Err = ioutil.Discard
-	defer func() {
-		Out = oldOut
-		Err = oldErr
-	}()
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
+
 	// The fake endpoint will populate this when it receives the call from the command.
 	submittedFiles := map[string]string{}
 	ts := fakeSubmitServer(t, submittedFiles)
