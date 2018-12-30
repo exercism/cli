@@ -164,7 +164,7 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 		workspace = config.DefaultWorkspaceDir(configuration)
 
 		// If it already exists don't clobber it with the default.
-		if _, err := os.Lstat(workspace); !os.IsNotExist(err) {
+		if _, err := os.Lstat(workspace); os.IsExist(err) {
 			msg := `
     The default Exercism workspace is
 
