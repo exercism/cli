@@ -55,16 +55,37 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	ctx, err := newSubmitCmdContext(cfg.UserViperConfig, flags, args)
+	ctx := &submitCmdContext{usrCfg: cfg.UserViperConfig, flags: flags}
+
+	filepaths, err := ctx.sanitizeArgs(args)
 	if err != nil {
 		return err
 	}
 
-	if err := ctx.submit(cfg.UserViperConfig); err != nil {
+	exercise, err := ctx.exercise(filepaths)
+	if err != nil {
 		return err
 	}
 
-	ctx.printResult()
+	if err = ctx.migrateLegacyMetadata(exercise); err != nil {
+		return err
+	}
+
+	documents, err := ctx.documents(filepaths, exercise)
+	if err != nil {
+		return err
+	}
+
+	metadata, err := ctx.metadata(exercise)
+	if err != nil {
+		return err
+	}
+
+	if err := ctx.submit(metadata, documents); err != nil {
+		return err
+	}
+
+	ctx.printResult(metadata)
 	return nil
 }
 
@@ -72,39 +93,6 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 type submitCmdContext struct {
 	usrCfg *viper.Viper
 	flags  *pflag.FlagSet
-	submission
-}
-
-// newSubmitCmdContext sets up a context to initiate a submission.
-func newSubmitCmdContext(usrCfg *viper.Viper, flags *pflag.FlagSet, args []string) (*submitCmdContext, error) {
-	ctx := &submitCmdContext{usrCfg: usrCfg, flags: flags}
-
-	filepaths, err := ctx.sanitizeArgs(args)
-	if err != nil {
-		return nil, err
-	}
-
-	exercise, err := ctx.exercise(filepaths)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = ctx.migrateLegacyMetadata(exercise); err != nil {
-		return nil, err
-	}
-
-	documents, err := ctx._documents(filepaths, exercise)
-	if err != nil {
-		return nil, err
-	}
-
-	metadata, err := ctx._metadata(exercise)
-	if err != nil {
-		return nil, err
-	}
-
-	ctx.submission = submission{documents: documents, metadata: metadata}
-	return ctx, nil
 }
 
 // sanitizeArgs validates args and swaps with evaluated symlink paths.
@@ -195,7 +183,7 @@ func (s *submitCmdContext) migrateLegacyMetadata(exercise workspace.Exercise) er
 	return nil
 }
 
-func (s *submitCmdContext) _metadata(exercise workspace.Exercise) (*workspace.ExerciseMetadata, error) {
+func (s *submitCmdContext) metadata(exercise workspace.Exercise) (*workspace.ExerciseMetadata, error) {
 	metadata, err := workspace.NewExerciseMetadata(exercise.Filepath())
 	if err != nil {
 		return nil, err
@@ -230,7 +218,7 @@ func (s *submitCmdContext) _metadata(exercise workspace.Exercise) (*workspace.Ex
 	return metadata, nil
 }
 
-func (s *submitCmdContext) _documents(filepaths []string, exercise workspace.Exercise) ([]workspace.Document, error) {
+func (s *submitCmdContext) documents(filepaths []string, exercise workspace.Exercise) ([]workspace.Document, error) {
 	docs := make([]workspace.Document, 0, len(filepaths))
 	for _, file := range filepaths {
 		// Don't submit empty files
@@ -276,36 +264,12 @@ func (s *submitCmdContext) _documents(filepaths []string, exercise workspace.Exe
 	return docs, nil
 }
 
-func (s *submitCmdContext) printResult() {
-	msg := `
-
-    Your solution has been submitted successfully.
-    %s
-`
-	suffix := "View it at:\n\n    "
-	if s.metadata.AutoApprove && s.metadata.Team == "" {
-		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
-	}
-	fmt.Fprintf(Err, msg, suffix)
-	fmt.Fprintf(Out, "    %s\n\n", s.metadata.URL)
-}
-
-// submission is a submission to the Excercism API.
-type submission struct {
-	documents []workspace.Document
-	metadata  *workspace.ExerciseMetadata
-}
-
 // submit submits the documents to the Exercism API.
-func (s *submission) submit(usrCfg *viper.Viper) error {
-	if err := s.validate(); err != nil {
-		return err
-	}
-
+func (s *submitCmdContext) submit(metadata *workspace.ExerciseMetadata, docs []workspace.Document) error {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
-	for _, doc := range s.documents {
+	for _, doc := range docs {
 		file, err := os.Open(doc.Filepath())
 		if err != nil {
 			return err
@@ -325,11 +289,11 @@ func (s *submission) submit(usrCfg *viper.Viper) error {
 		return err
 	}
 
-	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
+	client, err := api.NewClient(s.usrCfg.GetString("token"), s.usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return err
 	}
-	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), s.metadata.ID)
+	url := fmt.Sprintf("%s/solutions/%s", s.usrCfg.GetString("apibaseurl"), metadata.ID)
 	req, err := client.NewRequest("PATCH", url, body)
 	if err != nil {
 		return err
@@ -359,17 +323,18 @@ func (s *submission) submit(usrCfg *viper.Viper) error {
 	return nil
 }
 
-func (s *submission) validate() error {
-	if s == nil {
-		return errors.New("submission is empty")
+func (s *submitCmdContext) printResult(metadata *workspace.ExerciseMetadata) {
+	msg := `
+
+    Your solution has been submitted successfully.
+    %s
+`
+	suffix := "View it at:\n\n    "
+	if metadata.AutoApprove && metadata.Team == "" {
+		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
 	}
-	if s.metadata.ID == "" {
-		return errors.New("id is empty")
-	}
-	if len(s.documents) == 0 {
-		return errors.New("documents is empty")
-	}
-	return nil
+	fmt.Fprintf(Err, msg, suffix)
+	fmt.Fprintf(Out, "    %s\n\n", metadata.URL)
 }
 
 func init() {
