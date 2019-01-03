@@ -45,5 +45,10 @@ complete -f -c exercism -n "__fish_seen_subcommand_from workspace" -s h -l help 
 
 # Options
 complete -f -c exercism -s h -l help -d "show help"
-complete -f -c exercism -l timeout -a "(seq 0 1000 10000)" -d "override default HTTP timeout"
+complete -f -c exercism -l timeout -a "10" -d "10 seconds"
+complete -f -c exercism -l timeout -a "30" -d "30 seconds"
+complete -f -c exercism -l timeout -a "60" -d "1 minute"
+complete -f -c exercism -l timeout -a "300" -d "5 minutes"
+complete -f -c exercism -l timeout -a "600" -d "10 minutes"
+complete -f -c exercism -l timeout -a "" -d "override default HTTP timeout"
 complete -f -c exercism -s v -l verbose -d "turn on verbose logging"
