@@ -222,6 +222,22 @@ type download struct {
 	*downloadPayload
 }
 
+func newDownloadFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (*download, error) {
+	downloadParams, err := newDownloadParamsFromExercise(usrCfg, exercise)
+	if err != nil {
+		return nil, err
+	}
+	return newDownload(downloadParams)
+}
+
+func newDownloadFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*download, error) {
+	downloadParams, err := newDownloadParamsFromFlags(usrCfg, flags)
+	if err != nil {
+		return nil, err
+	}
+	return newDownload(downloadParams)
+}
+
 // newDownload creates a download, getting a downloadPayload from the Exercism API.
 func newDownload(params *downloadParams) (*download, error) {
 	if err := params.validate(); err != nil {

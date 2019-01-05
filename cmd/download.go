@@ -69,12 +69,7 @@ type downloadCmdContext struct {
 // newDownloadCmdContext creates new downloadCmdContext,
 // providing a download ready for work.
 func newDownloadCmdContext(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadCmdContext, error) {
-	params, err := newDownloadParamsFromFlags(usrCfg, flags)
-	if err != nil {
-		return nil, err
-	}
-
-	download, err := newDownload(params)
+	download, err := newDownloadFromFlags(usrCfg, flags)
 	if err != nil {
 		return nil, err
 	}
