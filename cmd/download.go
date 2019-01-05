@@ -42,48 +42,22 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	ctx, err := newDownloadCmdContext(cfg.UserViperConfig, flags)
+	download, err := newDownloadFromFlags(cfg.UserViperConfig, flags)
 	if err != nil {
 		return err
 	}
 
-	if err = ctx.writeSolutionFiles(); err != nil {
+	if err = download.writeSolutionFiles(); err != nil {
 		return err
 	}
 
-	if err := ctx.writeMetadata(); err != nil {
+	if err := download.writeMetadata(); err != nil {
 		return err
 	}
 
-	ctx.printResult()
-	return nil
-}
-
-// downloadCmdContext is the context for downloadCmd.
-type downloadCmdContext struct {
-	usrCfg *viper.Viper
-	flags  *pflag.FlagSet
-	*download
-}
-
-// newDownloadCmdContext creates new downloadCmdContext,
-// providing a download ready for work.
-func newDownloadCmdContext(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadCmdContext, error) {
-	download, err := newDownloadFromFlags(usrCfg, flags)
-	if err != nil {
-		return nil, err
-	}
-
-	return &downloadCmdContext{
-		usrCfg:   usrCfg,
-		flags:    flags,
-		download: download,
-	}, nil
-}
-
-func (d *downloadCmdContext) printResult() {
 	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", d.exercise().MetadataDir())
+	fmt.Fprintf(Out, "%s\n", download.exercise().MetadataDir())
+	return nil
 }
 
 func setupDownloadFlags(flags *pflag.FlagSet) {
