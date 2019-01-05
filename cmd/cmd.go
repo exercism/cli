@@ -81,134 +81,6 @@ func validateUserConfig(cfg *viper.Viper) error {
 	return nil
 }
 
-// downloadWriter writes metadata and Solution files from a download to disk.
-type downloadWriter struct {
-	*download
-}
-
-func (d downloadWriter) writeMetadata() error {
-	metadata := d.metadata()
-	return metadata.Write(d.exercise().MetadataDir())
-}
-
-// writeSolutionFiles attempts to write each Solution file in the download.
-// An HTTP request is made for each file and failed responses are swallowed.
-// All successful file responses are written except where empty.
-func (d downloadWriter) writeSolutionFiles() error {
-	for _, filename := range d.Solution.Files {
-		res, err := d.requestFile(filename)
-		if err != nil {
-			return err
-		}
-		if res == nil {
-			continue
-		}
-		defer res.Body.Close()
-
-		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
-		// TODO: handle --force flag to overwrite without asking.
-
-		sanitizedPath := d.sanitizeLegacyFilepath(filename, d.exercise().Slug)
-		fileWritePath := filepath.Join(d.exercise().MetadataDir(), sanitizedPath)
-		if err = os.MkdirAll(filepath.Dir(fileWritePath), os.FileMode(0755)); err != nil {
-			return err
-		}
-
-		f, err := os.Create(fileWritePath)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		if _, err := io.Copy(f, res.Body); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// sanitizeLegacyFilepath is a workaround for a path bug due to an early design
-// decision (later reversed) to allow numeric suffixes for exercise directories,
-// allowing people to have multiple parallel versions of an exercise.
-func (d downloadWriter) sanitizeLegacyFilepath(file, slug string) string {
-	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, slug)
-	rgxNumericSuffix := regexp.MustCompile(pattern)
-	if rgxNumericSuffix.MatchString(file) {
-		file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
-	}
-	// Rewrite paths submitted with an older, buggy client where the Windows
-	// path is being treated as part of the filename.
-	file = strings.Replace(file, "\\", "/", -1)
-	return filepath.FromSlash(file)
-}
-
-// downloadParams is required to create a download.
-type downloadParams struct {
-	usrCfg *viper.Viper
-	uuid   string
-	slug   string
-	track  string
-	team   string
-}
-
-func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (*downloadParams, error) {
-	d := &downloadParams{usrCfg: usrCfg, slug: exercise.Slug, track: exercise.Track}
-	return d, d.validate()
-}
-
-func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
-	if flags == nil {
-		return nil, errors.New("flags is empty")
-	}
-	var err error
-	d := &downloadParams{usrCfg: usrCfg}
-
-	d.uuid, err = flags.GetString("uuid")
-	if err != nil {
-		return nil, err
-	}
-	d.slug, err = flags.GetString("exercise")
-	if err != nil {
-		return nil, err
-	}
-
-	if err = d.validate(); err != nil {
-		return nil, errors.New("need an --exercise name or a solution --uuid")
-	}
-
-	d.track, err = flags.GetString("track")
-	if err != nil {
-		return nil, err
-	}
-	d.team, err = flags.GetString("team")
-	if err != nil {
-		return nil, err
-	}
-	return d, err
-}
-
-func (d *downloadParams) validate() error {
-	if d == nil {
-		return errors.New("DownloadParams is empty")
-	}
-	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
-		return errors.New("need a 'slug' or a 'uuid'")
-	}
-	if d.usrCfg == nil {
-		return errors.New("user config is empty")
-	}
-	requiredCfgs := [...]string{
-		"token",
-		"workspace",
-		"apibaseurl",
-	}
-	for _, cfg := range requiredCfgs {
-		if d.usrCfg.GetString(cfg) == "" {
-			return fmt.Errorf("missing required UserViperConfig '%s'", cfg)
-		}
-	}
-	return nil
-}
-
 // download represents a download from the Exercism API.
 type download struct {
 	*downloadParams
@@ -366,6 +238,134 @@ func (d *download) validate() error {
 	}
 	if d.Error.Message != "" {
 		return errors.New(d.Error.Message)
+	}
+	return nil
+}
+
+// downloadWriter writes metadata and Solution files from a download to disk.
+type downloadWriter struct {
+	*download
+}
+
+func (d downloadWriter) writeMetadata() error {
+	metadata := d.metadata()
+	return metadata.Write(d.exercise().MetadataDir())
+}
+
+// writeSolutionFiles attempts to write each Solution file in the download.
+// An HTTP request is made for each file and failed responses are swallowed.
+// All successful file responses are written except where empty.
+func (d downloadWriter) writeSolutionFiles() error {
+	for _, filename := range d.Solution.Files {
+		res, err := d.requestFile(filename)
+		if err != nil {
+			return err
+		}
+		if res == nil {
+			continue
+		}
+		defer res.Body.Close()
+
+		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
+		// TODO: handle --force flag to overwrite without asking.
+
+		sanitizedPath := d.sanitizeLegacyFilepath(filename, d.exercise().Slug)
+		fileWritePath := filepath.Join(d.exercise().MetadataDir(), sanitizedPath)
+		if err = os.MkdirAll(filepath.Dir(fileWritePath), os.FileMode(0755)); err != nil {
+			return err
+		}
+
+		f, err := os.Create(fileWritePath)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		if _, err := io.Copy(f, res.Body); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// sanitizeLegacyFilepath is a workaround for a path bug due to an early design
+// decision (later reversed) to allow numeric suffixes for exercise directories,
+// allowing people to have multiple parallel versions of an exercise.
+func (d downloadWriter) sanitizeLegacyFilepath(file, slug string) string {
+	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, slug)
+	rgxNumericSuffix := regexp.MustCompile(pattern)
+	if rgxNumericSuffix.MatchString(file) {
+		file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
+	}
+	// Rewrite paths submitted with an older, buggy client where the Windows
+	// path is being treated as part of the filename.
+	file = strings.Replace(file, "\\", "/", -1)
+	return filepath.FromSlash(file)
+}
+
+// downloadParams is required to create a download.
+type downloadParams struct {
+	usrCfg *viper.Viper
+	uuid   string
+	slug   string
+	track  string
+	team   string
+}
+
+func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (*downloadParams, error) {
+	d := &downloadParams{usrCfg: usrCfg, slug: exercise.Slug, track: exercise.Track}
+	return d, d.validate()
+}
+
+func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
+	if flags == nil {
+		return nil, errors.New("flags is empty")
+	}
+	var err error
+	d := &downloadParams{usrCfg: usrCfg}
+
+	d.uuid, err = flags.GetString("uuid")
+	if err != nil {
+		return nil, err
+	}
+	d.slug, err = flags.GetString("exercise")
+	if err != nil {
+		return nil, err
+	}
+
+	if err = d.validate(); err != nil {
+		return nil, errors.New("need an --exercise name or a solution --uuid")
+	}
+
+	d.track, err = flags.GetString("track")
+	if err != nil {
+		return nil, err
+	}
+	d.team, err = flags.GetString("team")
+	if err != nil {
+		return nil, err
+	}
+	return d, err
+}
+
+func (d *downloadParams) validate() error {
+	if d == nil {
+		return errors.New("DownloadParams is empty")
+	}
+	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
+		return errors.New("need a 'slug' or a 'uuid'")
+	}
+	if d.usrCfg == nil {
+		return errors.New("user config is empty")
+	}
+	requiredCfgs := [...]string{
+		"token",
+		"workspace",
+		"apibaseurl",
+	}
+	for _, cfg := range requiredCfgs {
+		if d.usrCfg.GetString(cfg) == "" {
+			return fmt.Errorf("missing required UserViperConfig '%s'", cfg)
+		}
 	}
 	return nil
 }
