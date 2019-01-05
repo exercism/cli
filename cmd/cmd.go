@@ -86,13 +86,6 @@ type downloadWriter struct {
 	*download
 }
 
-func newDownloadWriter(download *download) (*downloadWriter, error) {
-	if err := download.validate(); err != nil {
-		return nil, err
-	}
-	return &downloadWriter{download}, nil
-}
-
 func (d downloadWriter) writeMetadata() error {
 	metadata := d.metadata()
 	return metadata.Write(d.exercise().MetadataDir())
@@ -220,6 +213,7 @@ func (d *downloadParams) validate() error {
 type download struct {
 	*downloadParams
 	*downloadPayload
+	*downloadWriter
 }
 
 func newDownloadFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (*download, error) {
@@ -244,6 +238,7 @@ func newDownload(params *downloadParams) (*download, error) {
 		return nil, err
 	}
 	d := &download{downloadParams: params}
+	d.downloadWriter = &downloadWriter{download: d}
 
 	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
 	if err != nil {
