@@ -70,7 +70,7 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	exercise, err := ctx.exercise(submitPaths)
+	exercise, err := ctx.exercise(submitPaths[0])
 	if err != nil {
 		return err
 	}
@@ -146,14 +146,15 @@ func (s *submitCmdContext) evaluatedSymlinks(submitPaths []string) ([]string, er
 	return evalSymlinkSubmitPaths, nil
 }
 
-// exercise returns an Exercise using the directory of the submitted paths.
-func (s *submitCmdContext) exercise(submitPaths []string) (workspace.Exercise, error) {
+// exercise creates an exercise using one of the submitted filepaths.
+// This assumes prior verification that submit paths belong to the same exercise.
+func (s *submitCmdContext) exercise(aSubmitPath string) (workspace.Exercise, error) {
 	ws, err := workspace.New(s.usrCfg.GetString("workspace"))
 	if err != nil {
 		return workspace.Exercise{}, err
 	}
 
-	dir, err := ws.ExerciseDir(submitPaths[0])
+	dir, err := ws.ExerciseDir(aSubmitPath)
 	if err != nil {
 		return workspace.Exercise{}, err
 	}
