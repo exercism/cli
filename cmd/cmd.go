@@ -81,6 +81,21 @@ func validateUserConfig(cfg *viper.Viper) error {
 	return nil
 }
 
+// sanitizeLegacyNumericSuffixFilepath is a workaround for a path bug due to an early design
+// decision (later reversed) to allow numeric suffixes for exercise directories,
+// allowing people to have multiple parallel versions of an exercise.
+func sanitizeLegacyNumericSuffixFilepath(file, slug string) string {
+	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, slug)
+	rgxNumericSuffix := regexp.MustCompile(pattern)
+	if rgxNumericSuffix.MatchString(file) {
+		file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
+	}
+	// Rewrite paths submitted with an older, buggy client where the Windows
+	// path is being treated as part of the filename.
+	file = strings.Replace(file, "\\", "/", -1)
+	return filepath.FromSlash(file)
+}
+
 // download is a download from the Exercism API.
 type download struct {
 	*downloadParams
@@ -233,21 +248,6 @@ func (d *download) metadata() workspace.ExerciseMetadata {
 	}
 }
 
-// sanitizeLegacyFilepath is a workaround for a path bug due to an early design
-// decision (later reversed) to allow numeric suffixes for exercise directories,
-// allowing people to have multiple parallel versions of an exercise.
-func (d *download) sanitizeLegacyFilepath(file, slug string) string {
-	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, slug)
-	rgxNumericSuffix := regexp.MustCompile(pattern)
-	if rgxNumericSuffix.MatchString(file) {
-		file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
-	}
-	// Rewrite paths submitted with an older, buggy client where the Windows
-	// path is being treated as part of the filename.
-	file = strings.Replace(file, "\\", "/", -1)
-	return filepath.FromSlash(file)
-}
-
 // validate validates the presence of an ID and checks for any error responses.
 func (d *download) validate() error {
 	if d.Solution.ID == "" {
@@ -287,7 +287,7 @@ func (d downloadWriter) writeSolutionFiles() error {
 		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
 		// TODO: handle --force flag to overwrite without asking.
 
-		sanitizedPath := d.sanitizeLegacyFilepath(filename, d.exercise().Slug)
+		sanitizedPath := sanitizeLegacyNumericSuffixFilepath(filename, d.exercise().Slug)
 		fileWritePath := filepath.Join(d.exercise().MetadataDir(), sanitizedPath)
 		if err = os.MkdirAll(filepath.Dir(fileWritePath), os.FileMode(0755)); err != nil {
 			return err
