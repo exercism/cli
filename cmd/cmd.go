@@ -304,11 +304,12 @@ func (d downloadWriter) writeSolutionFiles() error {
 
 // downloadParams is required to create a download.
 type downloadParams struct {
-	usrCfg *viper.Viper
-	uuid   string
-	slug   string
-	track  string
-	team   string
+	usrCfg    *viper.Viper
+	uuid      string
+	slug      string
+	track     string
+	team      string
+	fromFlags bool
 }
 
 func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (*downloadParams, error) {
@@ -321,7 +322,7 @@ func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*dow
 		return nil, errors.New("flags is empty")
 	}
 	var err error
-	d := &downloadParams{usrCfg: usrCfg}
+	d := &downloadParams{usrCfg: usrCfg, fromFlags: true}
 
 	d.uuid, err = flags.GetString("uuid")
 	if err != nil {
@@ -333,7 +334,7 @@ func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*dow
 	}
 
 	if err = d.validate(); err != nil {
-		return nil, errors.New("need an --exercise name or a solution --uuid")
+		return nil, err
 	}
 
 	d.track, err = flags.GetString("track")
@@ -352,6 +353,9 @@ func (d *downloadParams) validate() error {
 		return errors.New("DownloadParams is empty")
 	}
 	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
+		if d.fromFlags {
+			return errors.New("need an --exercise name or a solution --uuid")
+		}
 		return errors.New("need a 'slug' or a 'uuid'")
 	}
 	if d.usrCfg == nil {
