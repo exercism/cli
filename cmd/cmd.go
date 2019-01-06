@@ -349,27 +349,14 @@ func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*dow
 }
 
 func (d *downloadParams) validate() error {
-	if d == nil {
-		return errors.New("DownloadParams is empty")
-	}
 	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
 		if d.fromFlags {
 			return errors.New("need an --exercise name or a solution --uuid")
 		}
 		return errors.New("need a 'slug' or a 'uuid'")
 	}
-	if d.usrCfg == nil {
-		return errors.New("user config is empty")
-	}
-	requiredCfgs := [...]string{
-		"token",
-		"workspace",
-		"apibaseurl",
-	}
-	for _, cfg := range requiredCfgs {
-		if d.usrCfg.GetString(cfg) == "" {
-			return fmt.Errorf("missing required UserViperConfig '%s'", cfg)
-		}
+	if err := validateUserConfig(d.usrCfg); err != nil {
+		return err
 	}
 	return nil
 }
