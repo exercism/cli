@@ -127,7 +127,7 @@ func newSubmitCmdContext(usrCfg *viper.Viper, flags *pflag.FlagSet) *submitCmdCo
 	}
 }
 
-// evaluatedSymlinks returns a slice of submit paths where each path's symlink has been evaluated.
+// evaluatedSymlinks returns the submit paths with evaluated symlinks.
 func (s *submitCmdContext) evaluatedSymlinks(submitPaths []string) ([]string, error) {
 	evalSymlinkSubmitPaths := make([]string, 0, len(submitPaths))
 	for _, path := range submitPaths {
@@ -172,8 +172,8 @@ func (s *submitCmdContext) migrateLegacyMetadata(exercise workspace.Exercise) er
 	return nil
 }
 
-// documents returns a slice of documents to be submitted.
-// empty files are skipped and a warning is printed.
+// documents builds the documents that get submitted.
+// Empty files are skipped, printing a warning.
 func (s *submitCmdContext) documents(submitPaths []string, exercise workspace.Exercise) ([]workspace.Document, error) {
 	docs := make([]workspace.Document, 0, len(submitPaths))
 	for _, file := range submitPaths {
