@@ -146,7 +146,7 @@ func newDownload(params *downloadParams) (*download, error) {
 			return nil, errors.New(d.Error.Message)
 		}
 	}
-	return d, nil
+	return d, d.validate()
 }
 
 func (d *download) requestURL() string {
