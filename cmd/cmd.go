@@ -232,6 +232,21 @@ func (d *download) metadata() workspace.ExerciseMetadata {
 	}
 }
 
+// sanitizeLegacyFilepath is a workaround for a path bug due to an early design
+// decision (later reversed) to allow numeric suffixes for exercise directories,
+// allowing people to have multiple parallel versions of an exercise.
+func (d *download) sanitizeLegacyFilepath(file, slug string) string {
+	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, slug)
+	rgxNumericSuffix := regexp.MustCompile(pattern)
+	if rgxNumericSuffix.MatchString(file) {
+		file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
+	}
+	// Rewrite paths submitted with an older, buggy client where the Windows
+	// path is being treated as part of the filename.
+	file = strings.Replace(file, "\\", "/", -1)
+	return filepath.FromSlash(file)
+}
+
 func (d *download) validate() error {
 	if d == nil || d.Solution.ID == "" {
 		return errors.New("download is empty")
@@ -285,21 +300,6 @@ func (d downloadWriter) writeSolutionFiles() error {
 		}
 	}
 	return nil
-}
-
-// sanitizeLegacyFilepath is a workaround for a path bug due to an early design
-// decision (later reversed) to allow numeric suffixes for exercise directories,
-// allowing people to have multiple parallel versions of an exercise.
-func (d downloadWriter) sanitizeLegacyFilepath(file, slug string) string {
-	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, slug)
-	rgxNumericSuffix := regexp.MustCompile(pattern)
-	if rgxNumericSuffix.MatchString(file) {
-		file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
-	}
-	// Rewrite paths submitted with an older, buggy client where the Windows
-	// path is being treated as part of the filename.
-	file = strings.Replace(file, "\\", "/", -1)
-	return filepath.FromSlash(file)
 }
 
 // downloadParams is required to create a download.
