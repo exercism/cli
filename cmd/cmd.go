@@ -81,13 +81,14 @@ func validateUserConfig(cfg *viper.Viper) error {
 	return nil
 }
 
-// download represents a download from the Exercism API.
+// download is a download from the Exercism API.
 type download struct {
 	*downloadParams
 	*downloadPayload
 	*downloadWriter
 }
 
+// newDownloadParamsFromExercise is a convenience wrapper for creating a new download.
 func newDownloadFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (*download, error) {
 	downloadParams, err := newDownloadParamsFromExercise(usrCfg, exercise)
 	if err != nil {
@@ -96,6 +97,7 @@ func newDownloadFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (
 	return newDownload(downloadParams)
 }
 
+// newDownloadParamsFromFlags is a convenience wrapper for creating a new download.
 func newDownloadFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*download, error) {
 	downloadParams, err := newDownloadParamsFromFlags(usrCfg, flags)
 	if err != nil {
@@ -104,7 +106,7 @@ func newDownloadFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*download,
 	return newDownload(downloadParams)
 }
 
-// newDownload creates a download, getting a downloadPayload from the Exercism API.
+// newDownload initiates a download by requesting a downloadPayload from the Exercism API.
 func newDownload(params *downloadParams) (*download, error) {
 	if err := params.validate(); err != nil {
 		return nil, err
@@ -170,7 +172,7 @@ func (d *download) buildQuery(url *netURL.URL) {
 }
 
 // requestFile requests a Solution file from the API, returning an HTTP response.
-// Non 200 responses and zero length file responses are swallowed, returning nil.
+// Non-200 responses and 0 Content-Length responses are swallowed, returning nil.
 func (d *download) requestFile(filename string) (*http.Response, error) {
 	if filename == "" {
 		return nil, errors.New("filename is empty")
@@ -204,6 +206,8 @@ func (d *download) requestFile(filename string) (*http.Response, error) {
 	return res, nil
 }
 
+// exercise creates an exercise, setting its root based on the solution
+// being owned by a team or another user.
 func (d *download) exercise() workspace.Exercise {
 	root := d.usrCfg.GetString("workspace")
 	if d.Solution.Team.Slug != "" {
@@ -247,9 +251,10 @@ func (d *download) sanitizeLegacyFilepath(file, slug string) string {
 	return filepath.FromSlash(file)
 }
 
+// validate validates the presence of an ID and checks for any error responses.
 func (d *download) validate() error {
-	if d == nil || d.Solution.ID == "" {
-		return errors.New("download is empty")
+	if d.Solution.ID == "" {
+		return errors.New("download missing an ID")
 	}
 	if d.Error.Message != "" {
 		return errors.New(d.Error.Message)
@@ -257,19 +262,20 @@ func (d *download) validate() error {
 	return nil
 }
 
-// downloadWriter writes metadata and Solution files from a download to disk.
+// downloadWriter writes download contents to the workspace.
 type downloadWriter struct {
 	*download
 }
 
+// writeMetadata writes the exercise metadata.
 func (d downloadWriter) writeMetadata() error {
 	metadata := d.metadata()
 	return metadata.Write(d.exercise().MetadataDir())
 }
 
-// writeSolutionFiles attempts to write each Solution file in the download.
-// An HTTP request is made for each file and failed responses are swallowed.
-// All successful file responses are written except where empty.
+// writeSolutionFiles attempts to write each exercise file that is part of the downloaded Solution.
+// An HTTP request is made using each filename and failed responses are swallowed.
+// All successful file responses are written except when 0 Content-Length.
 func (d downloadWriter) writeSolutionFiles() error {
 	for _, filename := range d.Solution.Files {
 		res, err := d.requestFile(filename)
@@ -348,6 +354,7 @@ func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*dow
 	return d, err
 }
 
+// validate validates the presence of required downloadParams.
 func (d *downloadParams) validate() error {
 	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
 		if d.fromFlags {
