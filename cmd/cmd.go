@@ -325,9 +325,8 @@ func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise workspace.Exerc
 }
 
 func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
-	var err error
 	d := &downloadParams{usrCfg: usrCfg, fromFlags: true}
-
+	var err error
 	d.uuid, err = flags.GetString("uuid")
 	if err != nil {
 		return nil, err
@@ -336,11 +335,6 @@ func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*dow
 	if err != nil {
 		return nil, err
 	}
-
-	if err = d.validate(); err != nil {
-		return nil, err
-	}
-
 	d.track, err = flags.GetString("track")
 	if err != nil {
 		return nil, err
@@ -349,7 +343,7 @@ func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*dow
 	if err != nil {
 		return nil, err
 	}
-	return d, err
+	return d, d.validate()
 }
 
 // validate validates the presence of required downloadParams.
