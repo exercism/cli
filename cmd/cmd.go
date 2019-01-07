@@ -123,6 +123,9 @@ func newDownloadFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*download,
 
 // newDownload initiates a download by requesting a downloadPayload from the Exercism API.
 func newDownload(params *downloadParams) (*download, error) {
+	if err := params.validate(); err != nil {
+		return nil, err
+	}
 	d := &download{downloadParams: params}
 	d.downloadWriter = &downloadWriter{download: d}
 
