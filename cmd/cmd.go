@@ -321,9 +321,6 @@ func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise workspace.Exerc
 }
 
 func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
-	if flags == nil {
-		return nil, errors.New("flags is empty")
-	}
 	var err error
 	d := &downloadParams{usrCfg: usrCfg, fromFlags: true}
 
