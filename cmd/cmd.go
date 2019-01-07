@@ -103,7 +103,7 @@ type download struct {
 	*downloadWriter
 }
 
-// newDownloadParamsFromExercise is a convenience wrapper for creating a new download.
+// newDownloadFromExercise is a convenience wrapper for creating a new download.
 func newDownloadFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (*download, error) {
 	downloadParams, err := newDownloadParamsFromExercise(usrCfg, exercise)
 	if err != nil {
@@ -112,7 +112,7 @@ func newDownloadFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (
 	return newDownload(downloadParams)
 }
 
-// newDownloadParamsFromFlags is a convenience wrapper for creating a new download.
+// newDownloadFromFlags is a convenience wrapper for creating a new download.
 func newDownloadFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*download, error) {
 	downloadParams, err := newDownloadParamsFromFlags(usrCfg, flags)
 	if err != nil {
