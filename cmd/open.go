@@ -43,10 +43,10 @@ Pass the path to the directory that contains the solution you want to see on the
 
 func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	var url string
+	usrCfg := cfg.UserViperConfig
+	track, _ := flags.GetString("track")
 
 	if remote, _ := flags.GetBool("remote"); remote {
-		usrCfg := cfg.UserViperConfig
-
 		apiUrl := fmt.Sprintf("%s/solutions/latest", usrCfg.GetString("apibaseurl"))
 
 		client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
@@ -61,7 +61,7 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 		q := req.URL.Query()
 		q.Add("exercise_id", args[0])
-		if track, _ := flags.GetString("track"); track != "" {
+		if track != "" {
 			q.Add("track_id", track)
 		}
 		req.URL.RawQuery = q.Encode()
@@ -88,11 +88,46 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 		url = payload.Solution.URL
 	} else {
-		metadata, err := workspace.NewExerciseMetadata(args[0])
+		ws, err := workspace.New(usrCfg.GetString("workspace"))
 		if err != nil {
 			return err
 		}
-		url = metadata.URL
+		exercises, err := ws.Exercises()
+		if err != nil {
+			return err
+		}
+
+		matchingExercises := make([]workspace.Exercise, 0, len(exercises))
+		for _, exercise := range exercises {
+			if track != "" {
+				if exercise.Track == track && exercise.Slug == args[0] {
+					matchingExercises = append(matchingExercises, exercise)
+				}
+			} else if exercise.Slug == args[0] {
+				matchingExercises = append(matchingExercises, exercise)
+			}
+		}
+
+		switch len(matchingExercises) {
+		case 0:
+			return fmt.Errorf("No matching exercise found")
+		case 1:
+			metaDir := matchingExercises[0].MetadataDir()
+			meta, err := workspace.NewExerciseMetadata(metaDir)
+
+			if err != nil {
+				return err
+			}
+
+			url = meta.URL
+			break
+		default:
+			tracks := make([]string, 0, len(matchingExercises))
+			for _, exercise := range matchingExercises {
+				tracks = append(tracks, exercise.Track)
+			}
+			return fmt.Errorf("Please specify a track ID: %s", strings.Join(tracks, ", "))
+		}
 	}
 	browser.Open(url)
 	return nil
