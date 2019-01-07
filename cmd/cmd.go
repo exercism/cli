@@ -189,10 +189,6 @@ func (d *download) buildQuery(url *netURL.URL) {
 // requestFile requests a Solution file from the API, returning an HTTP response.
 // Non-200 responses and 0 Content-Length responses are swallowed, returning nil.
 func (d *download) requestFile(filename string) (*http.Response, error) {
-	if filename == "" {
-		return nil, errors.New("filename is empty")
-	}
-
 	unparsedURL := fmt.Sprintf("%s%s", d.Solution.FileDownloadBaseURL, filename)
 	parsedURL, err := netURL.ParseRequestURI(unparsedURL)
 	if err != nil {
