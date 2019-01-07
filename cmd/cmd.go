@@ -266,7 +266,7 @@ type downloadWriter struct {
 // writeMetadata writes the exercise metadata.
 func (d downloadWriter) writeMetadata() error {
 	metadata := d.metadata()
-	return metadata.Write(d.exercise().MetadataDir())
+	return metadata.Write(d.destination())
 }
 
 // writeSolutionFiles attempts to write each exercise file that is part of the downloaded Solution.
@@ -287,7 +287,7 @@ func (d downloadWriter) writeSolutionFiles() error {
 		// TODO: handle --force flag to overwrite without asking.
 
 		sanitizedPath := sanitizeLegacyNumericSuffixFilepath(filename, d.exercise().Slug)
-		fileWritePath := filepath.Join(d.exercise().MetadataDir(), sanitizedPath)
+		fileWritePath := filepath.Join(d.destination(), sanitizedPath)
 		if err = os.MkdirAll(filepath.Dir(fileWritePath), os.FileMode(0755)); err != nil {
 			return err
 		}
@@ -302,6 +302,11 @@ func (d downloadWriter) writeSolutionFiles() error {
 		}
 	}
 	return nil
+}
+
+// destination is the download destination path.
+func (d downloadWriter) destination() string {
+	return d.exercise().MetadataDir()
 }
 
 // downloadParams is required to create a download.
