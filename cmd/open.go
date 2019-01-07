@@ -25,7 +25,6 @@ var openCmd = &cobra.Command{
 
 Pass the path to the directory that contains the solution you want to see on the website.
 	`,
-	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.NewConfig()
 
@@ -44,7 +43,12 @@ Pass the path to the directory that contains the solution you want to see on the
 func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	var url string
 	usrCfg := cfg.UserViperConfig
-	track, _ := flags.GetString("track")
+	trackID, _ := flags.GetString("track")
+	exerciseID, _ := flags.GetString("exercise")
+
+	if exerciseID == "" {
+		return fmt.Errorf("Must provide an `--exercise`")
+	}
 
 	if remote, _ := flags.GetBool("remote"); remote {
 		apiUrl := fmt.Sprintf("%s/solutions/latest", usrCfg.GetString("apibaseurl"))
@@ -60,9 +64,9 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		}
 
 		q := req.URL.Query()
-		q.Add("exercise_id", args[0])
-		if track != "" {
-			q.Add("track_id", track)
+		q.Add("exercise_id", exerciseID)
+		if trackID != "" {
+			q.Add("track_id", trackID)
 		}
 		req.URL.RawQuery = q.Encode()
 
@@ -99,11 +103,11 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 		matchingExercises := make([]workspace.Exercise, 0, len(exercises))
 		for _, exercise := range exercises {
-			if track != "" {
-				if exercise.Track == track && exercise.Slug == args[0] {
+			if trackID != "" {
+				if exercise.Track == trackID && exercise.Slug == exerciseID {
 					matchingExercises = append(matchingExercises, exercise)
 				}
-			} else if exercise.Slug == args[0] {
+			} else if exercise.Slug == exerciseID {
 				matchingExercises = append(matchingExercises, exercise)
 			}
 		}
@@ -148,6 +152,7 @@ type openPayload struct {
 func setupOpenFlags(flags *pflag.FlagSet) {
 	flags.BoolP("remote", "r", false, "checks for remote solutions")
 	flags.StringP("track", "t", "", "the track id")
+	flags.StringP("exercise", "e", "", "the exercise slug")
 }
 
 func init() {
