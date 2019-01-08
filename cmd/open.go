@@ -45,6 +45,7 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	usrCfg := cfg.UserViperConfig
 	trackID, _ := flags.GetString("track")
 	exerciseID, _ := flags.GetString("exercise")
+	teamID, _ := flags.GetString("team")
 
 	if exerciseID == "" {
 		return fmt.Errorf("Must provide an `--exercise`")
@@ -67,6 +68,9 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		q.Add("exercise_id", exerciseID)
 		if trackID != "" {
 			q.Add("track_id", trackID)
+		}
+		if teamID != "" {
+			q.Add("team_id", teamID)
 		}
 		req.URL.RawQuery = q.Encode()
 
@@ -101,35 +105,41 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 			return err
 		}
 
-		matchingExercises := make([]workspace.Exercise, 0, len(exercises))
+		matchingExerciseMeta := make([]*workspace.ExerciseMetadata, 0, len(exercises))
 		for _, exercise := range exercises {
-			if trackID != "" {
-				if exercise.Track == trackID && exercise.Slug == exerciseID {
-					matchingExercises = append(matchingExercises, exercise)
-				}
-			} else if exercise.Slug == exerciseID {
-				matchingExercises = append(matchingExercises, exercise)
-			}
-		}
-
-		switch len(matchingExercises) {
-		case 0:
-			return fmt.Errorf("No matching exercise found")
-		case 1:
-			metaDir := matchingExercises[0].MetadataDir()
+			metaDir := exercise.MetadataDir()
 			meta, err := workspace.NewExerciseMetadata(metaDir)
-
 			if err != nil {
 				return err
 			}
 
-			url = meta.URL
+			if meta.Exercise != exerciseID {
+				continue
+			}
+
+			if trackID != "" && meta.Track != trackID {
+				continue
+			}
+
+			if meta.Team != teamID {
+				continue
+			}
+
+			matchingExerciseMeta = append(matchingExerciseMeta, meta)
+		}
+
+		switch len(matchingExerciseMeta) {
+		case 0:
+			return fmt.Errorf("No matching exercise found")
+		case 1:
+			url = matchingExerciseMeta[0].URL
 			break
 		default:
-			tracks := make([]string, 0, len(matchingExercises))
-			for _, exercise := range matchingExercises {
+			tracks := make([]string, 0, len(matchingExerciseMeta))
+			for _, exercise := range matchingExerciseMeta {
 				tracks = append(tracks, exercise.Track)
 			}
+
 			return fmt.Errorf("Please specify a track ID: %s", strings.Join(tracks, ", "))
 		}
 	}
@@ -153,6 +163,7 @@ func setupOpenFlags(flags *pflag.FlagSet) {
 	flags.BoolP("remote", "r", false, "checks for remote solutions")
 	flags.StringP("track", "t", "", "the track id")
 	flags.StringP("exercise", "e", "", "the exercise slug")
+	flags.StringP("team", "T", "", "the team slug")
 }
 
 func init() {
