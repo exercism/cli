@@ -273,6 +273,9 @@ func (d downloadWriter) writeMetadata() error {
 // An HTTP request is made using each filename and failed responses are swallowed.
 // All successful file responses are written except when 0 Content-Length.
 func (d downloadWriter) writeSolutionFiles() error {
+	if d.fromExercise {
+		return errors.New("existing exercise files should not be overwritten")
+	}
 	for _, filename := range d.Solution.Files {
 		res, err := d.requestFile(filename)
 		if err != nil {
@@ -311,16 +314,23 @@ func (d downloadWriter) destination() string {
 
 // downloadParams is required to create a download.
 type downloadParams struct {
-	usrCfg    *viper.Viper
-	uuid      string
-	slug      string
-	track     string
-	team      string
-	fromFlags bool
+	usrCfg *viper.Viper
+	uuid   string
+	slug   string
+	track  string
+	team   string
+
+	fromExercise bool
+	fromFlags    bool
 }
 
 func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (*downloadParams, error) {
-	d := &downloadParams{usrCfg: usrCfg, slug: exercise.Slug, track: exercise.Track}
+	d := &downloadParams{
+		usrCfg:       usrCfg,
+		slug:         exercise.Slug,
+		track:        exercise.Track,
+		fromExercise: true,
+	}
 	return d, d.validate()
 }
 
