@@ -611,6 +611,45 @@ func TestSubmitServerErr(t *testing.T) {
 	assert.Regexp(t, "test error", err.Error())
 }
 
+func TestHandle404Response(t *testing.T) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(404)
+	})
+
+	ts := httptest.NewServer(handler)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "submit-nonsuccess")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
+
+	cfg := config.Config{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+		DefaultBaseURL:  "http://example.com",
+	}
+
+	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
+	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
+	writeFakeMetadata(t, dir, "bogus-track", "bogus-exercise")
+
+	err = ioutil.WriteFile(filepath.Join(dir, "file-1.txt"), []byte("This is file 1"), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	files := []string{
+		filepath.Join(dir, "file-1.txt"),
+	}
+
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
+	if assert.Error(t, err) {
+		assert.Contains(t, err.Error(), "unsuccessful")
+	}
+}
 func TestSubmissionNotConnectedToRequesterAccount(t *testing.T) {
 	submittedFiles := map[string]string{}
 	ts := fakeSubmitServer(t, submittedFiles)

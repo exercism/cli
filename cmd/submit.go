@@ -272,6 +272,10 @@ func (s *submitCmdContext) submit(metadata *workspace.ExerciseMetadata, docs []w
 		return decodedAPIError(resp)
 	}
 
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return fmt.Errorf("submission unsuccessful (%s)", resp.Status)
+	}
+
 	bb := &bytes.Buffer{}
 	_, err = bb.ReadFrom(resp.Body)
 	if err != nil {
