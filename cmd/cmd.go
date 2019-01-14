@@ -98,7 +98,7 @@ func sanitizeLegacyNumericSuffixFilepath(file, slug string) string {
 
 // download is a download from the Exercism API.
 type download struct {
-	*downloadParams
+	params *downloadParams
 	*downloadPayload
 	*downloadWriter
 }
@@ -126,10 +126,10 @@ func newDownload(params *downloadParams) (*download, error) {
 	if err := params.validate(); err != nil {
 		return nil, err
 	}
-	d := &download{downloadParams: params}
+	d := &download{params: params}
 	d.downloadWriter = &downloadWriter{download: d}
 
-	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
+	client, err := api.NewClient(d.params.token, d.params.apibaseurl)
 	if err != nil {
 		return nil, err
 	}
@@ -150,8 +150,7 @@ func newDownload(params *downloadParams) (*download, error) {
 	}
 
 	if res.StatusCode == http.StatusUnauthorized {
-		siteURL := config.InferSiteURL(d.usrCfg.GetString("apibaseurl"))
-		return nil, fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
+		return nil, fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", config.InferSiteURL(d.params.apibaseurl))
 	}
 	if res.StatusCode != http.StatusOK {
 		switch d.Error.Type {
@@ -166,21 +165,21 @@ func newDownload(params *downloadParams) (*download, error) {
 
 func (d *download) requestURL() string {
 	id := "latest"
-	if d.uuid != "" {
-		id = d.uuid
+	if d.params.uuid != "" {
+		id = d.params.uuid
 	}
-	return fmt.Sprintf("%s/solutions/%s", d.usrCfg.GetString("apibaseurl"), id)
+	return fmt.Sprintf("%s/solutions/%s", d.params.apibaseurl, id)
 }
 
 func (d *download) buildQuery(url *netURL.URL) {
 	query := url.Query()
-	if d.uuid == "" {
-		query.Add("exercise_id", d.slug)
-		if d.track != "" {
-			query.Add("track_id", d.track)
+	if d.params.uuid == "" {
+		query.Add("exercise_id", d.params.slug)
+		if d.params.track != "" {
+			query.Add("track_id", d.params.track)
 		}
-		if d.team != "" {
-			query.Add("team_id", d.team)
+		if d.params.team != "" {
+			query.Add("team_id", d.params.team)
 		}
 	}
 	url.RawQuery = query.Encode()
@@ -195,7 +194,7 @@ func (d *download) requestFile(filename string) (*http.Response, error) {
 		return nil, err
 	}
 
-	client, err := api.NewClient(d.usrCfg.GetString("token"), d.usrCfg.GetString("apibaseurl"))
+	client, err := api.NewClient(d.params.token, d.params.apibaseurl)
 	req, err := client.NewRequest("GET", parsedURL.String(), nil)
 	if err != nil {
 		return nil, err
@@ -220,7 +219,7 @@ func (d *download) requestFile(filename string) (*http.Response, error) {
 // exercise creates an exercise, setting its root based on the solution
 // being owned by a team or another user.
 func (d *download) exercise() workspace.Exercise {
-	root := d.usrCfg.GetString("workspace")
+	root := d.params.workspace
 	if d.Solution.Team.Slug != "" {
 		root = filepath.Join(root, "teams", d.Solution.Team.Slug)
 	}
@@ -273,7 +272,7 @@ func (d downloadWriter) writeMetadata() error {
 // An HTTP request is made using each filename and failed responses are swallowed.
 // All successful file responses are written except when 0 Content-Length.
 func (d downloadWriter) writeSolutionFiles() error {
-	if d.fromExercise {
+	if d.params.fromExercise {
 		return errors.New("existing exercise files should not be overwritten")
 	}
 	for _, filename := range d.Solution.Files {
@@ -320,6 +319,9 @@ type downloadParams struct {
 	track  string
 	team   string
 
+	// config
+	token, apibaseurl, workspace string
+
 	fromExercise bool
 	fromFlags    bool
 }
@@ -331,11 +333,13 @@ func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise workspace.Exerc
 		track:        exercise.Track,
 		fromExercise: true,
 	}
+	d.setFromConfig()
 	return d, d.validate()
 }
 
 func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
 	d := &downloadParams{usrCfg: usrCfg, fromFlags: true}
+	d.setFromConfig()
 	var err error
 	d.uuid, err = flags.GetString("uuid")
 	if err != nil {
@@ -354,6 +358,13 @@ func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*dow
 		return nil, err
 	}
 	return d, d.validate()
+}
+
+// setFromConfig sets the fields derived from usrCfg.
+func (d *downloadParams) setFromConfig() {
+	d.token = d.usrCfg.GetString("token")
+	d.apibaseurl = d.usrCfg.GetString("apibaseurl")
+	d.workspace = d.usrCfg.GetString("workspace")
 }
 
 // validate validates the presence of required downloadParams.
