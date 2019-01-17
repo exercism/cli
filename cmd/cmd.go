@@ -313,11 +313,10 @@ func (d downloadWriter) destination() string {
 
 // downloadParams is required to create a download.
 type downloadParams struct {
-	usrCfg *viper.Viper
-	uuid   string
-	slug   string
-	track  string
-	team   string
+	uuid  string
+	slug  string
+	track string
+	team  string
 
 	// config
 	token, apibaseurl, workspace string
@@ -327,19 +326,14 @@ type downloadParams struct {
 }
 
 func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (*downloadParams, error) {
-	d := &downloadParams{
-		usrCfg:       usrCfg,
-		slug:         exercise.Slug,
-		track:        exercise.Track,
-		fromExercise: true,
-	}
-	d.setFromConfig()
+	d := &downloadParams{slug: exercise.Slug, track: exercise.Track, fromExercise: true}
+	d.setFromConfig(usrCfg)
 	return d, d.validate()
 }
 
 func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
-	d := &downloadParams{usrCfg: usrCfg, fromFlags: true}
-	d.setFromConfig()
+	d := &downloadParams{fromFlags: true}
+	d.setFromConfig(usrCfg)
 	var err error
 	d.uuid, err = flags.GetString("uuid")
 	if err != nil {
@@ -361,10 +355,10 @@ func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*dow
 }
 
 // setFromConfig sets the fields derived from usrCfg.
-func (d *downloadParams) setFromConfig() {
-	d.token = d.usrCfg.GetString("token")
-	d.apibaseurl = d.usrCfg.GetString("apibaseurl")
-	d.workspace = d.usrCfg.GetString("workspace")
+func (d *downloadParams) setFromConfig(usrCfg *viper.Viper) {
+	d.token = usrCfg.GetString("token")
+	d.apibaseurl = usrCfg.GetString("apibaseurl")
+	d.workspace = usrCfg.GetString("workspace")
 }
 
 func (d *downloadParams) validate() error {
