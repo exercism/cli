@@ -14,7 +14,7 @@ import (
 
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/workspace"
+	ws "github.com/exercism/cli/workspace"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -104,7 +104,7 @@ type download struct {
 }
 
 // newDownloadFromExercise is a convenience wrapper for creating a new download.
-func newDownloadFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (*download, error) {
+func newDownloadFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*download, error) {
 	downloadParams, err := newDownloadParamsFromExercise(usrCfg, exercise)
 	if err != nil {
 		return nil, err
@@ -216,8 +216,8 @@ func (d *download) requestFile(filename string) (*http.Response, error) {
 	return res, nil
 }
 
-func (d *download) metadata() workspace.ExerciseMetadata {
-	return workspace.ExerciseMetadata{
+func (d *download) metadata() ws.ExerciseMetadata {
+	return ws.ExerciseMetadata{
 		AutoApprove: d.Solution.Exercise.AutoApprove,
 		Track:       d.Solution.Exercise.Track.ID,
 		Team:        d.Solution.Team.Slug,
@@ -229,8 +229,8 @@ func (d *download) metadata() workspace.ExerciseMetadata {
 	}
 }
 
-func (d *download) exercise() workspace.Exercise {
-	return workspace.Exercise{
+func (d *download) exercise() ws.Exercise {
+	return ws.Exercise{
 		Root:  d.solutionRoot(),
 		Track: d.Solution.Exercise.Track.ID,
 		Slug:  d.Solution.Exercise.ID,
@@ -340,7 +340,7 @@ type downloadParams struct {
 	fromFlags    bool
 }
 
-func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise workspace.Exercise) (*downloadParams, error) {
+func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*downloadParams, error) {
 	d := &downloadParams{slug: exercise.Slug, track: exercise.Track, fromExercise: true}
 	d.setFromConfig(usrCfg)
 	return d, d.validate()
