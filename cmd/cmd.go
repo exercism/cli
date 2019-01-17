@@ -216,23 +216,6 @@ func (d *download) requestFile(filename string) (*http.Response, error) {
 	return res, nil
 }
 
-// exercise creates an exercise, setting its root based on the solution
-// being owned by a team or another user.
-func (d *download) exercise() workspace.Exercise {
-	root := d.params.workspace
-	if d.Solution.Team.Slug != "" {
-		root = filepath.Join(root, "teams", d.Solution.Team.Slug)
-	}
-	if !d.Solution.User.IsRequester {
-		root = filepath.Join(root, "users", d.Solution.User.Handle)
-	}
-	return workspace.Exercise{
-		Root:  root,
-		Track: d.Solution.Exercise.Track.ID,
-		Slug:  d.Solution.Exercise.ID,
-	}
-}
-
 func (d *download) metadata() workspace.ExerciseMetadata {
 	return workspace.ExerciseMetadata{
 		AutoApprove: d.Solution.Exercise.AutoApprove,
@@ -244,6 +227,36 @@ func (d *download) metadata() workspace.ExerciseMetadata {
 		Handle:      d.Solution.User.Handle,
 		IsRequester: d.Solution.User.IsRequester,
 	}
+}
+
+func (d *download) exercise() workspace.Exercise {
+	return workspace.Exercise{
+		Root:  d.solutionRoot(),
+		Track: d.Solution.Exercise.Track.ID,
+		Slug:  d.Solution.Exercise.ID,
+	}
+}
+
+// solutionRoot sets the root path based on the solution
+// being part of a team and/or owned by another user.
+func (d *download) solutionRoot() string {
+	root := d.params.workspace
+
+	if d.isTeamSolution() {
+		root = filepath.Join(root, "teams", d.Solution.Team.Slug)
+	}
+	if d.solutionBelongsToOtherUser() {
+		root = filepath.Join(root, "users", d.Solution.User.Handle)
+	}
+	return root
+}
+
+func (d *download) isTeamSolution() bool {
+	return d.Solution.Team.Slug != ""
+}
+
+func (d *download) solutionBelongsToOtherUser() bool {
+	return !d.Solution.User.IsRequester
 }
 
 // validate validates the presence of an ID and checks for any error responses.
