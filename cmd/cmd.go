@@ -353,24 +353,32 @@ func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*
 func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
 	d := &downloadParams{fromFlags: true}
 	d.setFromConfig(usrCfg)
-	var err error
-	d.uuid, err = flags.GetString("uuid")
-	if err != nil {
-		return nil, err
-	}
-	d.slug, err = flags.GetString("exercise")
-	if err != nil {
-		return nil, err
-	}
-	d.track, err = flags.GetString("track")
-	if err != nil {
-		return nil, err
-	}
-	d.team, err = flags.GetString("team")
-	if err != nil {
+	if err := d.setFromFlags(flags); err != nil {
 		return nil, err
 	}
 	return d, d.validate()
+}
+
+// setFromFlags sets the fields derived from flags.
+func (d *downloadParams) setFromFlags(flags *pflag.FlagSet) error {
+	var err error
+	d.uuid, err = flags.GetString("uuid")
+	if err != nil {
+		return err
+	}
+	d.slug, err = flags.GetString("exercise")
+	if err != nil {
+		return err
+	}
+	d.track, err = flags.GetString("track")
+	if err != nil {
+		return err
+	}
+	d.team, err = flags.GetString("team")
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // setFromConfig sets the fields derived from the user config.
