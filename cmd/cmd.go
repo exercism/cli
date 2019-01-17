@@ -367,16 +367,45 @@ func (d *downloadParams) setFromConfig() {
 	d.workspace = d.usrCfg.GetString("workspace")
 }
 
-// validate validates the presence of required downloadParams.
 func (d *downloadParams) validate() error {
+	validator := downloadParamsValidator{downloadParams: d}
+
+	if err := validator.needsSlugXorUUID(); err != nil {
+		return err
+	}
+	if err := validator.needsUserConfigValues(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// downloadParamsValidator contains validation rules for downloadParams.
+type downloadParamsValidator struct {
+	*downloadParams
+}
+
+// needsSlugXorUUID checks the presence of either a slug or a uuid (but not both).
+func (d downloadParamsValidator) needsSlugXorUUID() error {
 	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
 		if d.fromFlags {
 			return errors.New("need an --exercise name or a solution --uuid")
 		}
 		return errors.New("need a 'slug' or a 'uuid'")
 	}
-	if err := validateUserConfig(d.usrCfg); err != nil {
-		return err
+	return nil
+}
+
+// needsUserConfigValues checks the presence of required values from the user config.
+func (d downloadParamsValidator) needsUserConfigValues() error {
+	errMsg := "missing required user config: '%s'"
+	if d.token == "" {
+		return fmt.Errorf(errMsg, "token")
+	}
+	if d.apibaseurl == "" {
+		return fmt.Errorf(errMsg, "apibaseurl")
+	}
+	if d.workspace == "" {
+		return fmt.Errorf(errMsg, "workspace")
 	}
 	return nil
 }
