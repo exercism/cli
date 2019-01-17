@@ -173,7 +173,7 @@ func (d *download) requestURL() string {
 
 func (d *download) buildQuery(url *netURL.URL) {
 	query := url.Query()
-	if d.params.uuid == "" {
+	if d.params.slug != "" {
 		query.Add("exercise_id", d.params.slug)
 		if d.params.track != "" {
 			query.Add("track_id", d.params.track)
@@ -376,6 +376,9 @@ func (d *downloadParams) validate() error {
 	if err := validator.needsUserConfigValues(); err != nil {
 		return err
 	}
+	if err := validator.needsSlugWhenGivenTrackOrTeam(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -406,6 +409,17 @@ func (d downloadParamsValidator) needsUserConfigValues() error {
 	}
 	if d.workspace == "" {
 		return fmt.Errorf(errMsg, "workspace")
+	}
+	return nil
+}
+
+// needsSlugWhenGivenTrackOrTeam ensures that track/team arguments are also given with a slug.
+// (track/team meaningless when given a uuid).
+func (d downloadParamsValidator) needsSlugWhenGivenTrackOrTeam() error {
+	if d.fromFlags {
+		if (d.team != "" || d.track != "") && d.slug == "" {
+			return errors.New("--team or --track requires --exercise (not --uuid)")
+		}
 	}
 	return nil
 }
