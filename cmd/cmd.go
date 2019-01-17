@@ -139,6 +139,7 @@ func newDownload(params *downloadParams) (*download, error) {
 		return nil, err
 	}
 	d.buildQuery(req.URL)
+
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -150,7 +151,10 @@ func newDownload(params *downloadParams) (*download, error) {
 	}
 
 	if res.StatusCode == http.StatusUnauthorized {
-		return nil, fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", config.InferSiteURL(d.params.apibaseurl))
+		return nil, fmt.Errorf(
+			"unauthorized request. Please run the configure command. You can find your API token at %s/my/settings",
+			config.InferSiteURL(d.params.apibaseurl),
+		)
 	}
 	if res.StatusCode != http.StatusOK {
 		switch d.Error.Type {
@@ -188,8 +192,8 @@ func (d *download) buildQuery(url *netURL.URL) {
 // requestFile requests a Solution file from the API, returning an HTTP response.
 // Non-200 responses and 0 Content-Length responses are swallowed, returning nil.
 func (d *download) requestFile(filename string) (*http.Response, error) {
-	unparsedURL := fmt.Sprintf("%s%s", d.Solution.FileDownloadBaseURL, filename)
-	parsedURL, err := netURL.ParseRequestURI(unparsedURL)
+	parsedURL, err := netURL.ParseRequestURI(
+		fmt.Sprintf("%s%s", d.Solution.FileDownloadBaseURL, filename))
 	if err != nil {
 		return nil, err
 	}
@@ -237,7 +241,7 @@ func (d *download) exercise() ws.Exercise {
 	}
 }
 
-// solutionRoot sets the root path based on the solution
+// solutionRoot builds the root path based on the solution
 // being part of a team and/or owned by another user.
 func (d *download) solutionRoot() string {
 	root := d.params.workspace
@@ -259,7 +263,7 @@ func (d *download) solutionBelongsToOtherUser() bool {
 	return !d.Solution.User.IsRequester
 }
 
-// validate validates the presence of an ID and checks for any error responses.
+// validate validates the presence of an ID and checks for an error message.
 func (d *download) validate() error {
 	if d.Solution.ID == "" {
 		return errors.New("download missing an ID")
@@ -369,7 +373,7 @@ func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*dow
 	return d, d.validate()
 }
 
-// setFromConfig sets the fields derived from usrCfg.
+// setFromConfig sets the fields derived from the user config.
 func (d *downloadParams) setFromConfig(usrCfg *viper.Viper) {
 	d.token = usrCfg.GetString("token")
 	d.apibaseurl = usrCfg.GetString("apibaseurl")
