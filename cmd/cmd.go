@@ -313,13 +313,15 @@ func (d downloadWriter) destination() string {
 
 // downloadParams is required to create a download.
 type downloadParams struct {
-	uuid  string
-	slug  string
+	// either/or
+	slug, uuid string
+
+	// user config
+	token, apibaseurl, workspace string
+
+	// optional
 	track string
 	team  string
-
-	// config
-	token, apibaseurl, workspace string
 
 	fromExercise bool
 	fromFlags    bool
