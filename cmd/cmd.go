@@ -81,10 +81,10 @@ func validateUserConfig(cfg *viper.Viper) error {
 	return nil
 }
 
-// sanitizeLegacyNumericSuffixFilepath is a workaround for a path bug due to an early design
+// sanitizeLegacyFilepath is a workaround for a path bug due to an early design
 // decision (later reversed) to allow numeric suffixes for exercise directories,
 // allowing people to have multiple parallel versions of an exercise.
-func sanitizeLegacyNumericSuffixFilepath(file, slug string) string {
+func sanitizeLegacyFilepath(file, slug string) string {
 	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, slug)
 	rgxNumericSuffix := regexp.MustCompile(pattern)
 	if rgxNumericSuffix.MatchString(file) {
@@ -192,9 +192,9 @@ func (d *download) buildQuery(url *netURL.URL) {
 	url.RawQuery = query.Encode()
 }
 
-// requestFile requests a Solution file from the API, returning an HTTP response.
+// requestSolutionFile requests a Solution file from the API, returning an HTTP response.
 // Non-200 responses and 0 Content-Length responses are swallowed, returning nil.
-func (d *download) requestFile(filename string) (*http.Response, error) {
+func (d *download) requestSolutionFile(filename string) (*http.Response, error) {
 	parsedURL, err := netURL.ParseRequestURI(
 		fmt.Sprintf("%s%s", d.Solution.FileDownloadBaseURL, filename))
 	if err != nil {
@@ -296,7 +296,7 @@ func (d downloadWriter) writeSolutionFiles() error {
 		return errors.New("download via exercise not allowed to write solution files")
 	}
 	for _, filename := range d.Solution.Files {
-		res, err := d.requestFile(filename)
+		res, err := d.requestSolutionFile(filename)
 		if err != nil {
 			return err
 		}
@@ -308,13 +308,13 @@ func (d downloadWriter) writeSolutionFiles() error {
 		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
 		// TODO: handle --force flag to overwrite without asking.
 
-		sanitizedPath := sanitizeLegacyNumericSuffixFilepath(filename, d.exercise().Slug)
-		fileWritePath := filepath.Join(d.destination(), sanitizedPath)
-		if err = os.MkdirAll(filepath.Dir(fileWritePath), os.FileMode(0755)); err != nil {
+		destination := filepath.Join(
+			d.destination(),
+			sanitizeLegacyFilepath(filename, d.exercise().Slug))
+		if err = os.MkdirAll(filepath.Dir(destination), os.FileMode(0755)); err != nil {
 			return err
 		}
-
-		f, err := os.Create(fileWritePath)
+		f, err := os.Create(destination)
 		if err != nil {
 			return err
 		}
