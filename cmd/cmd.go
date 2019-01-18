@@ -293,7 +293,7 @@ func (d downloadWriter) writeMetadata() error {
 // All successful file responses are written except when 0 Content-Length.
 func (d downloadWriter) writeSolutionFiles() error {
 	if d.params.fromExercise {
-		return errors.New("existing exercise files should not be overwritten")
+		return errors.New("download via exercise not allowed to write solution files")
 	}
 	for _, filename := range d.Solution.Files {
 		res, err := d.requestFile(filename)
