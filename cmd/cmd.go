@@ -103,18 +103,21 @@ type download struct {
 	*downloadWriter
 }
 
-// newDownloadFromExercise is a convenience wrapper for creating a new download.
-func newDownloadFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*download, error) {
-	downloadParams, err := newDownloadParamsFromExercise(usrCfg, exercise)
+// newDownloadFromFlags initiates a download from flags.
+// This is the primary interaction for downloading from the Exercism API.
+func newDownloadFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*download, error) {
+	downloadParams, err := newDownloadParamsFromFlags(usrCfg, flags)
 	if err != nil {
 		return nil, err
 	}
 	return newDownload(downloadParams)
 }
 
-// newDownloadFromFlags is a convenience wrapper for creating a new download.
-func newDownloadFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*download, error) {
-	downloadParams, err := newDownloadParamsFromFlags(usrCfg, flags)
+// newDownloadFromExercise initiates a download from an exercise.
+// This is used to get metadata and isn't the primary interaction for downloading.
+// Only allows writing metadata, not exercise files.
+func newDownloadFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*download, error) {
+	downloadParams, err := newDownloadParamsFromExercise(usrCfg, exercise)
 	if err != nil {
 		return nil, err
 	}
