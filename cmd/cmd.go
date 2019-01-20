@@ -100,7 +100,7 @@ func sanitizeLegacyFilepath(file, slug string) string {
 type download struct {
 	params *downloadParams
 	*downloadPayload
-	*downloadWriter
+	downloadWriter
 }
 
 // newDownloadFromFlags initiates a download from flags.
@@ -130,7 +130,7 @@ func newDownload(params *downloadParams) (*download, error) {
 		return nil, err
 	}
 	d := &download{params: params}
-	d.downloadWriter = &downloadWriter{download: d}
+	d.downloadWriter = fileDownloadWriter{download: d}
 
 	client, err := api.NewClient(d.params.token, d.params.apibaseurl)
 	if err != nil {
@@ -277,13 +277,20 @@ func (d *download) validate() error {
 	return nil
 }
 
-// downloadWriter writes download contents to the workspace.
-type downloadWriter struct {
+// downloadWriter writes download contents.
+type downloadWriter interface {
+	writeMetadata() error
+	writeSolutionFiles() error
+	destination() string
+}
+
+// fileDownloadWriter writes download contents to the file system.
+type fileDownloadWriter struct {
 	*download
 }
 
 // writeMetadata writes the exercise metadata.
-func (d downloadWriter) writeMetadata() error {
+func (d fileDownloadWriter) writeMetadata() error {
 	metadata := d.metadata()
 	return metadata.Write(d.destination())
 }
@@ -291,7 +298,7 @@ func (d downloadWriter) writeMetadata() error {
 // writeSolutionFiles attempts to write each exercise file that is part of the downloaded Solution.
 // An HTTP request is made using each filename and failed responses are swallowed.
 // All successful file responses are written except when 0 Content-Length.
-func (d downloadWriter) writeSolutionFiles() error {
+func (d fileDownloadWriter) writeSolutionFiles() error {
 	if d.params.fromExercise {
 		return errors.New("download via exercise not allowed to write solution files")
 	}
@@ -327,7 +334,7 @@ func (d downloadWriter) writeSolutionFiles() error {
 }
 
 // destination is the download destination path.
-func (d downloadWriter) destination() string {
+func (d fileDownloadWriter) destination() string {
 	return d.exercise().MetadataDir()
 }
 
