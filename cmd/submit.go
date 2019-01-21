@@ -290,6 +290,9 @@ type submitValidator struct {
 
 // filesExistAndNotADir checks that each file exists and is not a directory.
 func (s submitValidator) filesExistAndNotADir(submitPaths []string) error {
+	if len(submitPaths) == 0 {
+		return fmt.Errorf("usage: %s submit FILE1 [FILE2 ...]", BinaryName)
+	}
 	for _, path := range submitPaths {
 		path, err := filepath.Abs(path)
 		if err != nil {
