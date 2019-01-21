@@ -28,6 +28,7 @@ var submitCmd = &cobra.Command{
 
     Call the command with the list of files you want to submit.
 `,
+	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.NewConfig()
 
