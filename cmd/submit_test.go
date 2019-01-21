@@ -47,30 +47,6 @@ func TestSubmitWithoutWorkspace(t *testing.T) {
 	}
 }
 
-func TestSubmitWithoutArgs(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "submit-no-args")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
-
-	v := viper.New()
-	v.Set("token", "abc123")
-	v.Set("workspace", tmpDir)
-	v.Set("apibaseurl", "http://api.example.com")
-
-	cfg := config.Config{
-		Persister:       config.InMemoryPersister{},
-		UserViperConfig: v,
-		DefaultBaseURL:  "http://example.com",
-	}
-
-	var noCLIArguments []string
-
-	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), noCLIArguments)
-	if assert.Error(t, err) {
-		assert.Contains(t, err.Error(), "usage")
-	}
-}
-
 func TestSubmitNonExistentFile(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "submit-no-such-file")
 	defer os.RemoveAll(tmpDir)
