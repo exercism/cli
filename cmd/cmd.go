@@ -81,6 +81,10 @@ func validateUserConfig(cfg *viper.Viper) error {
 	return nil
 }
 
+type solutionRequester interface {
+	requestSolutionFile(string) (*http.Response, error)
+}
+
 // download is a download from the Exercism API.
 type download struct {
 	params *downloadParams
@@ -294,10 +298,12 @@ type downloadWriter interface {
 // fileDownloadWriter writes download contents to the file system.
 type fileDownloadWriter struct {
 	*download
+	requester solutionRequester
 }
 
 func (d *fileDownloadWriter) init(dl *download) error {
 	d.download = dl
+	d.requester = dl
 	return dl.validate()
 }
 
