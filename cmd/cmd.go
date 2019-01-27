@@ -373,7 +373,7 @@ type downloadParams struct {
 	track, team string
 
 	// duck-type for downloadParams created from varying types
-	downloadableFrom
+	downloadableFrom downloadableFrom
 }
 
 func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*downloadParams, error) {
@@ -440,7 +440,7 @@ func (d *downloadParams) validate() error {
 }
 
 func (d downloadParams) ensureWritable() error {
-	if !d.writeExerciseFilesPermitted() {
+	if !d.downloadableFrom.writeExerciseFilesPermitted() {
 		return errors.New("writing exercise files not permitted")
 	}
 	return nil
@@ -454,7 +454,7 @@ type downloadParamsValidator struct {
 // needsSlugXorUUID checks the presence of either a slug or a uuid (but not both).
 func (d downloadParamsValidator) needsSlugXorUUID() error {
 	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
-		return d.missingSlugOrUUIDError()
+		return d.downloadableFrom.missingSlugOrUUIDError()
 	}
 	return nil
 }
@@ -478,7 +478,7 @@ func (d downloadParamsValidator) needsUserConfigValues() error {
 // (track/team meaningless when given a uuid).
 func (d downloadParamsValidator) needsSlugWhenGivenTrackOrTeam() error {
 	if (d.team != "" || d.track != "") && d.slug == "" {
-		return d.givenTrackOrTeamMissingSlugError()
+		return d.downloadableFrom.givenTrackOrTeamMissingSlugError()
 	}
 	return nil
 }
