@@ -311,11 +311,8 @@ func (d fileDownloadWriter) writeMetadata() error {
 // An HTTP request is made using each filename and failed responses are swallowed.
 // All successful file responses are written except when 0 Content-Length.
 func (d fileDownloadWriter) writeSolutionFiles() error {
-	if !d.params.writeExerciseFilesPermitted() {
-		return fmt.Errorf(
-			"writing exercise files not permitted when downloading from %s",
-			d.params.downloadParamsFrom,
-		)
+	if err := d.params.ensureWritable(); err != nil {
+		return err
 	}
 	for _, filename := range d.Solution.Files {
 		res, err := d.requestSolutionFile(filename)
@@ -430,6 +427,13 @@ func (d *downloadParams) validate() error {
 	return nil
 }
 
+func (d downloadParams) ensureWritable() error {
+	if !d.writeExerciseFilesPermitted() {
+		return errors.New("writing exercise files not permitted")
+	}
+	return nil
+}
+
 // downloadParamsValidator contains validation rules for downloadParams.
 type downloadParamsValidator struct {
 	*downloadParams
@@ -471,7 +475,6 @@ type downloadParamsFrom interface {
 	writeExerciseFilesPermitted() bool
 	missingSlugOrUUIDError() error
 	givenTrackOrTeamMissingSlugError() error
-	String() string
 }
 
 type downloadParamsFromFlags struct{}
@@ -486,8 +489,6 @@ func (d downloadParamsFromFlags) givenTrackOrTeamMissingSlugError() error {
 	return errors.New("--track or --team requires --exercise (not --uuid)")
 }
 
-func (d downloadParamsFromFlags) String() string { return "flags" }
-
 type downloadParamsFromExercise struct{}
 
 func (d downloadParamsFromExercise) writeExerciseFilesPermitted() bool { return false }
@@ -499,8 +500,6 @@ func (d downloadParamsFromExercise) missingSlugOrUUIDError() error {
 func (d downloadParamsFromExercise) givenTrackOrTeamMissingSlugError() error {
 	return errors.New("programmer error - should never happen")
 }
-
-func (d downloadParamsFromExercise) String() string { return "exercise" }
 
 // sanitizeLegacyFilepath is a workaround for a path bug due to an early design
 // decision (later reversed) to allow numeric suffixes for exercise directories,
