@@ -487,7 +487,7 @@ func (d downloadParamsValidator) needsSlugWhenGivenTrackOrTeam() error {
 	return nil
 }
 
-// downloadableFrom is the interface to faciliate polymorphism when creating downloadParams from different types.
+// downloadableFrom is the interface to facilitate polymorphism when creating downloadParams from different types.
 type downloadableFrom interface {
 	writeExerciseFilesPermitted() bool
 	missingSlugOrUUIDError() error
