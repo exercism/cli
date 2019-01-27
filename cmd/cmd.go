@@ -311,7 +311,7 @@ func (d fileDownloadWriter) writeMetadata() error {
 // An HTTP request is made using each filename and failed responses are swallowed.
 // All successful file responses are written except when 0 Content-Length.
 func (d fileDownloadWriter) writeSolutionFiles() error {
-	if d.params.fromExercise {
+	if d.params.from() == fromExercise {
 		return errors.New("download via exercise not allowed to write solution files")
 	}
 	for _, filename := range d.Solution.Files {
@@ -361,17 +361,21 @@ type downloadParams struct {
 	// optional
 	track, team string
 
-	fromExercise, fromFlags bool
+	downloadParamsFrom
 }
 
 func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*downloadParams, error) {
-	d := &downloadParams{slug: exercise.Slug, track: exercise.Track, fromExercise: true}
+	d := &downloadParams{
+		slug:               exercise.Slug,
+		track:              exercise.Track,
+		downloadParamsFrom: downloadParamsFromExercise{},
+	}
 	d.setFieldsFromConfig(usrCfg)
 	return d, d.validate()
 }
 
 func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
-	d := &downloadParams{fromFlags: true}
+	d := &downloadParams{downloadParamsFrom: downloadParamsFromFlags{}}
 	d.setFieldsFromConfig(usrCfg)
 	if err := d.setFieldsFromFlags(flags); err != nil {
 		return nil, err
@@ -431,10 +435,7 @@ type downloadParamsValidator struct {
 // needsSlugXorUUID checks the presence of either a slug or a uuid (but not both).
 func (d downloadParamsValidator) needsSlugXorUUID() error {
 	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
-		if d.fromFlags {
-			return errors.New("need an --exercise name or a solution --uuid")
-		}
-		return errors.New("need a 'slug' or a 'uuid'")
+		return d.missingSlugOrUUIDError()
 	}
 	return nil
 }
@@ -457,12 +458,47 @@ func (d downloadParamsValidator) needsUserConfigValues() error {
 // needsSlugWhenGivenTrackOrTeam ensures that track/team arguments are also given with a slug.
 // (track/team meaningless when given a uuid).
 func (d downloadParamsValidator) needsSlugWhenGivenTrackOrTeam() error {
-	if d.fromFlags {
-		if (d.team != "" || d.track != "") && d.slug == "" {
-			return errors.New("--team or --track requires --exercise (not --uuid)")
-		}
+	if (d.team != "" || d.track != "") && d.slug == "" {
+		return d.givenTrackOrTeamMissingSlugError()
 	}
 	return nil
+}
+
+type fromType int
+
+const (
+	fromFlags fromType = iota
+	fromExercise
+)
+
+type downloadParamsFrom interface {
+	from() fromType
+	missingSlugOrUUIDError() error
+	givenTrackOrTeamMissingSlugError() error
+}
+
+type downloadParamsFromFlags struct{}
+
+func (d downloadParamsFromFlags) from() fromType { return fromFlags }
+
+func (d downloadParamsFromFlags) missingSlugOrUUIDError() error {
+	return errors.New("need an --exercise name or a solution --uuid")
+}
+
+func (d downloadParamsFromFlags) givenTrackOrTeamMissingSlugError() error {
+	return errors.New("--track or --team requires --exercise (not --uuid)")
+}
+
+type downloadParamsFromExercise struct{}
+
+func (d downloadParamsFromExercise) from() fromType { return fromExercise }
+
+func (d downloadParamsFromExercise) missingSlugOrUUIDError() error {
+	return errors.New("need a 'slug' or a 'uuid'")
+}
+
+func (d downloadParamsFromExercise) givenTrackOrTeamMissingSlugError() error {
+	return errors.New("programmer error - should never happen")
 }
 
 // sanitizeLegacyFilepath is a workaround for a path bug due to an early design
