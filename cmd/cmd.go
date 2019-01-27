@@ -81,21 +81,6 @@ func validateUserConfig(cfg *viper.Viper) error {
 	return nil
 }
 
-// sanitizeLegacyFilepath is a workaround for a path bug due to an early design
-// decision (later reversed) to allow numeric suffixes for exercise directories,
-// allowing people to have multiple parallel versions of an exercise.
-func sanitizeLegacyFilepath(file, slug string) string {
-	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, slug)
-	rgxNumericSuffix := regexp.MustCompile(pattern)
-	if rgxNumericSuffix.MatchString(file) {
-		file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
-	}
-	// Rewrite paths submitted with an older, buggy client where the Windows
-	// path is being treated as part of the filename.
-	file = strings.Replace(file, "\\", "/", -1)
-	return filepath.FromSlash(file)
-}
-
 // download is a download from the Exercism API.
 type download struct {
 	params *downloadParams
@@ -140,6 +125,48 @@ func newDownload(params *downloadParams, writer downloadWriter) (*download, erro
 	return d, d.validate()
 }
 
+// requestSolutionFile requests a Solution file from the API, returning an HTTP response.
+// Non-200 responses and 0 Content-Length responses are swallowed, returning nil.
+func (d download) requestSolutionFile(filename string) (*http.Response, error) {
+	parsedURL, err := netURL.ParseRequestURI(
+		fmt.Sprintf("%s%s", d.Solution.FileDownloadBaseURL, filename))
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := api.NewClient(d.params.token, d.params.apibaseurl)
+	req, err := client.NewRequest("GET", parsedURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		// TODO: deal with it
+		return nil, nil
+	}
+	// Don't bother with empty files.
+	if res.Header.Get("Content-Length") == "0" {
+		return nil, nil
+	}
+
+	return res, nil
+}
+
+func (d *download) setWriter(writer downloadWriter) error {
+	if writer == nil {
+		errors.New("writer is empty")
+	}
+	if err := writer.init(d); err != nil {
+		return err
+	}
+	d.downloadWriter = writer
+	return nil
+}
+
 // setPayload sets the downloadPayload by getting a payload from the Exercism API.
 func (d *download) setPayload() error {
 	client, err := api.NewClient(d.params.token, d.params.apibaseurl)
@@ -180,17 +207,6 @@ func (d *download) setPayload() error {
 	return nil
 }
 
-func (d *download) setWriter(writer downloadWriter) error {
-	if writer == nil {
-		errors.New("writer is empty")
-	}
-	if err := writer.init(d); err != nil {
-		return err
-	}
-	d.downloadWriter = writer
-	return nil
-}
-
 func (d download) requestURL() string {
 	id := "latest"
 	if d.params.uuid != "" {
@@ -211,37 +227,6 @@ func (d download) buildQuery(url *netURL.URL) {
 		}
 	}
 	url.RawQuery = query.Encode()
-}
-
-// requestSolutionFile requests a Solution file from the API, returning an HTTP response.
-// Non-200 responses and 0 Content-Length responses are swallowed, returning nil.
-func (d download) requestSolutionFile(filename string) (*http.Response, error) {
-	parsedURL, err := netURL.ParseRequestURI(
-		fmt.Sprintf("%s%s", d.Solution.FileDownloadBaseURL, filename))
-	if err != nil {
-		return nil, err
-	}
-
-	client, err := api.NewClient(d.params.token, d.params.apibaseurl)
-	req, err := client.NewRequest("GET", parsedURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	if res.StatusCode != http.StatusOK {
-		// TODO: deal with it
-		return nil, nil
-	}
-	// Don't bother with empty files.
-	if res.Header.Get("Content-Length") == "0" {
-		return nil, nil
-	}
-
-	return res, nil
 }
 
 func (d download) metadata() ws.ExerciseMetadata {
@@ -480,6 +465,21 @@ func (d downloadParamsValidator) needsSlugWhenGivenTrackOrTeam() error {
 		}
 	}
 	return nil
+}
+
+// sanitizeLegacyFilepath is a workaround for a path bug due to an early design
+// decision (later reversed) to allow numeric suffixes for exercise directories,
+// allowing people to have multiple parallel versions of an exercise.
+func sanitizeLegacyFilepath(file, slug string) string {
+	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, slug)
+	rgxNumericSuffix := regexp.MustCompile(pattern)
+	if rgxNumericSuffix.MatchString(file) {
+		file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
+	}
+	// Rewrite paths submitted with an older, buggy client where the Windows
+	// path is being treated as part of the filename.
+	file = strings.Replace(file, "\\", "/", -1)
+	return filepath.FromSlash(file)
 }
 
 // downloadPayload is an Exercism API response.
