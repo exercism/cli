@@ -297,7 +297,7 @@ type downloadWriter interface {
 
 // fileDownloadWriter writes download contents to the file system.
 type fileDownloadWriter struct {
-	*download
+	download *download
 	requester solutionRequester
 }
 
@@ -309,7 +309,7 @@ func (d *fileDownloadWriter) init(dl *download) error {
 
 // writeMetadata writes the exercise metadata.
 func (d fileDownloadWriter) writeMetadata() error {
-	metadata := d.metadata()
+	metadata := d.download.metadata()
 	return metadata.Write(d.destination())
 }
 
@@ -317,10 +317,10 @@ func (d fileDownloadWriter) writeMetadata() error {
 // An HTTP request is made using each filename and failed responses are swallowed.
 // All successful file responses are written except when 0 Content-Length.
 func (d fileDownloadWriter) writeSolutionFiles() error {
-	if err := d.params.ensureWritable(); err != nil {
+	if err := d.download.params.ensureWritable(); err != nil {
 		return err
 	}
-	for _, filename := range d.Solution.Files {
+	for _, filename := range d.download.Solution.Files {
 		d.writeSolutionFile(filename)
 	}
 	return nil
@@ -341,7 +341,7 @@ func (d fileDownloadWriter) writeSolutionFile(filename string) error {
 
 	destination := filepath.Join(
 		d.destination(),
-		sanitizeLegacyFilepath(filename, d.exercise().Slug))
+		sanitizeLegacyFilepath(filename, d.download.exercise().Slug))
 	if err = os.MkdirAll(filepath.Dir(destination), os.FileMode(0755)); err != nil {
 		return err
 	}
@@ -358,7 +358,7 @@ func (d fileDownloadWriter) writeSolutionFile(filename string) error {
 
 // destination is the download destination path.
 func (d fileDownloadWriter) destination() string {
-	return d.exercise().MetadataDir()
+	return d.download.exercise().MetadataDir()
 }
 
 // downloadParams is required to create a download.
