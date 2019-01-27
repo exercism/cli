@@ -321,32 +321,37 @@ func (d fileDownloadWriter) writeSolutionFiles() error {
 		return err
 	}
 	for _, filename := range d.Solution.Files {
-		res, err := d.requestSolutionFile(filename)
-		if err != nil {
-			return err
-		}
-		if res == nil {
-			continue
-		}
-		defer res.Body.Close()
+		d.writeSolutionFile(filename)
+	}
+	return nil
+}
 
-		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
-		// TODO: handle --force flag to overwrite without asking.
+func (d fileDownloadWriter) writeSolutionFile(filename string) error {
+	res, err := d.requester.requestSolutionFile(filename)
+	if err != nil {
+		return err
+	}
+	if res == nil {
+		return nil
+	}
+	defer res.Body.Close()
 
-		destination := filepath.Join(
-			d.destination(),
-			sanitizeLegacyFilepath(filename, d.exercise().Slug))
-		if err = os.MkdirAll(filepath.Dir(destination), os.FileMode(0755)); err != nil {
-			return err
-		}
-		f, err := os.Create(destination)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		if _, err := io.Copy(f, res.Body); err != nil {
-			return err
-		}
+	// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
+	// TODO: handle --force flag to overwrite without asking.
+
+	destination := filepath.Join(
+		d.destination(),
+		sanitizeLegacyFilepath(filename, d.exercise().Slug))
+	if err = os.MkdirAll(filepath.Dir(destination), os.FileMode(0755)); err != nil {
+		return err
+	}
+	f, err := os.Create(destination)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	if _, err := io.Copy(f, res.Body); err != nil {
+		return err
 	}
 	return nil
 }
