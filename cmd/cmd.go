@@ -129,31 +129,42 @@ func newDownload(params *downloadParams, writer downloadWriter) (*download, erro
 	if err := params.validate(); err != nil {
 		return nil, err
 	}
-	d := &download{params: params}
 
+	d := &download{params: params}
+	if err := d.setPayload(); err != nil {
+		return nil, err
+	}
+	if err := d.setWriter(writer); err != nil {
+		return nil, err
+	}
+	return d, d.validate()
+}
+
+// setPayload sets the downloadPayload by getting a payload from the Exercism API.
+func (d *download) setPayload() error {
 	client, err := api.NewClient(d.params.token, d.params.apibaseurl)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	req, err := client.NewRequest("GET", d.requestURL(), nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	d.buildQuery(req.URL)
 
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer res.Body.Close()
 
 	if err := json.NewDecoder(res.Body).Decode(&d.downloadPayload); err != nil {
-		return nil, fmt.Errorf("unable to parse API response - %s", err)
+		return fmt.Errorf("unable to parse API response - %s", err)
 	}
 
 	if res.StatusCode == http.StatusUnauthorized {
-		return nil, fmt.Errorf(
+		return fmt.Errorf(
 			"unauthorized request. Please run the configure command. You can find your API token at %s/my/settings",
 			config.InferSiteURL(d.params.apibaseurl),
 		)
@@ -161,16 +172,12 @@ func newDownload(params *downloadParams, writer downloadWriter) (*download, erro
 	if res.StatusCode != http.StatusOK {
 		switch d.Error.Type {
 		case "track_ambiguous":
-			return nil, fmt.Errorf("%s: %s", d.Error.Message, strings.Join(d.Error.PossibleTrackIDs, ", "))
+			return fmt.Errorf("%s: %s", d.Error.Message, strings.Join(d.Error.PossibleTrackIDs, ", "))
 		default:
-			return nil, errors.New(d.Error.Message)
+			return errors.New(d.Error.Message)
 		}
 	}
-
-	if err := d.setWriter(writer); err != nil {
-		return nil, err
-	}
-	return d, d.validate()
+	return nil
 }
 
 func (d *download) setWriter(writer downloadWriter) error {
