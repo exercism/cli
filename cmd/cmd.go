@@ -311,8 +311,8 @@ func (d fileDownloadWriter) writeMetadata() error {
 // An HTTP request is made using each filename and failed responses are swallowed.
 // All successful file responses are written except when 0 Content-Length.
 func (d fileDownloadWriter) writeSolutionFiles() error {
-	if d.params.from() == fromExercise {
-		return errors.New("download via exercise not allowed to write solution files")
+	if !d.params.writeExerciseFilesPermitted() {
+		return errors.New("exercise files not writable")
 	}
 	for _, filename := range d.Solution.Files {
 		res, err := d.requestSolutionFile(filename)
@@ -464,22 +464,15 @@ func (d downloadParamsValidator) needsSlugWhenGivenTrackOrTeam() error {
 	return nil
 }
 
-type fromType int
-
-const (
-	fromFlags fromType = iota
-	fromExercise
-)
-
 type downloadParamsFrom interface {
-	from() fromType
+	writeExerciseFilesPermitted() bool
 	missingSlugOrUUIDError() error
 	givenTrackOrTeamMissingSlugError() error
 }
 
 type downloadParamsFromFlags struct{}
 
-func (d downloadParamsFromFlags) from() fromType { return fromFlags }
+func (d downloadParamsFromFlags) writeExerciseFilesPermitted() bool { return true }
 
 func (d downloadParamsFromFlags) missingSlugOrUUIDError() error {
 	return errors.New("need an --exercise name or a solution --uuid")
@@ -491,7 +484,7 @@ func (d downloadParamsFromFlags) givenTrackOrTeamMissingSlugError() error {
 
 type downloadParamsFromExercise struct{}
 
-func (d downloadParamsFromExercise) from() fromType { return fromExercise }
+func (d downloadParamsFromExercise) writeExerciseFilesPermitted() bool { return false }
 
 func (d downloadParamsFromExercise) missingSlugOrUUIDError() error {
 	return errors.New("need a 'slug' or a 'uuid'")
