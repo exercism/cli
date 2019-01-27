@@ -88,7 +88,7 @@ type solutionRequester interface {
 // download is a download from the Exercism API.
 type download struct {
 	params *downloadParams
-	*downloadPayload
+	payload *downloadPayload
 	downloadWriter
 }
 
@@ -133,7 +133,7 @@ func newDownload(params *downloadParams, writer downloadWriter) (*download, erro
 // Non-200 responses and 0 Content-Length responses are swallowed, returning nil.
 func (d download) requestSolutionFile(filename string) (*http.Response, error) {
 	parsedURL, err := netURL.ParseRequestURI(
-		fmt.Sprintf("%s%s", d.Solution.FileDownloadBaseURL, filename))
+		fmt.Sprintf("%s%s", d.payload.Solution.FileDownloadBaseURL, filename))
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +190,7 @@ func (d *download) setPayload() error {
 	}
 	defer res.Body.Close()
 
-	if err := json.NewDecoder(res.Body).Decode(&d.downloadPayload); err != nil {
+	if err := json.NewDecoder(res.Body).Decode(&d.payload); err != nil {
 		return fmt.Errorf("unable to parse API response - %s", err)
 	}
 
@@ -201,11 +201,15 @@ func (d *download) setPayload() error {
 		)
 	}
 	if res.StatusCode != http.StatusOK {
-		switch d.Error.Type {
+		switch d.payload.Error.Type {
 		case "track_ambiguous":
-			return fmt.Errorf("%s: %s", d.Error.Message, strings.Join(d.Error.PossibleTrackIDs, ", "))
+			return fmt.Errorf(
+				"%s: %s",
+				d.payload.Error.Message,
+				strings.Join(d.payload.Error.PossibleTrackIDs, ", "),
+			)
 		default:
-			return errors.New(d.Error.Message)
+			return errors.New(d.payload.Error.Message)
 		}
 	}
 	return nil
@@ -235,22 +239,22 @@ func (d download) buildQuery(url *netURL.URL) {
 
 func (d download) metadata() ws.ExerciseMetadata {
 	return ws.ExerciseMetadata{
-		AutoApprove: d.Solution.Exercise.AutoApprove,
-		Track:       d.Solution.Exercise.Track.ID,
-		Team:        d.Solution.Team.Slug,
-		Exercise:    d.Solution.Exercise.ID,
-		ID:          d.Solution.ID,
-		URL:         d.Solution.URL,
-		Handle:      d.Solution.User.Handle,
-		IsRequester: d.Solution.User.IsRequester,
+		AutoApprove: d.payload.Solution.Exercise.AutoApprove,
+		Track:       d.payload.Solution.Exercise.Track.ID,
+		Team:        d.payload.Solution.Team.Slug,
+		Exercise:    d.payload.Solution.Exercise.ID,
+		ID:          d.payload.Solution.ID,
+		URL:         d.payload.Solution.URL,
+		Handle:      d.payload.Solution.User.Handle,
+		IsRequester: d.payload.Solution.User.IsRequester,
 	}
 }
 
 func (d download) exercise() ws.Exercise {
 	return ws.Exercise{
 		Root:  d.solutionRoot(),
-		Track: d.Solution.Exercise.Track.ID,
-		Slug:  d.Solution.Exercise.ID,
+		Track: d.payload.Solution.Exercise.Track.ID,
+		Slug:  d.payload.Solution.Exercise.ID,
 	}
 }
 
@@ -260,29 +264,29 @@ func (d download) solutionRoot() string {
 	root := d.params.workspace
 
 	if d.isTeamSolution() {
-		root = filepath.Join(root, "teams", d.Solution.Team.Slug)
+		root = filepath.Join(root, "teams", d.payload.Solution.Team.Slug)
 	}
 	if d.solutionBelongsToOtherUser() {
-		root = filepath.Join(root, "users", d.Solution.User.Handle)
+		root = filepath.Join(root, "users", d.payload.Solution.User.Handle)
 	}
 	return root
 }
 
 func (d download) isTeamSolution() bool {
-	return d.Solution.Team.Slug != ""
+	return d.payload.Solution.Team.Slug != ""
 }
 
 func (d download) solutionBelongsToOtherUser() bool {
-	return !d.Solution.User.IsRequester
+	return !d.payload.Solution.User.IsRequester
 }
 
 // validate validates the presence of an ID and checks for an error message.
 func (d download) validate() error {
-	if d.Solution.ID == "" {
+	if d.payload.Solution.ID == "" {
 		return errors.New("download missing an ID")
 	}
-	if d.Error.Message != "" {
-		return errors.New(d.Error.Message)
+	if d.payload.Error.Message != "" {
+		return errors.New(d.payload.Error.Message)
 	}
 	return nil
 }
@@ -320,7 +324,7 @@ func (d fileDownloadWriter) writeSolutionFiles() error {
 	if err := d.download.params.ensureWritable(); err != nil {
 		return err
 	}
-	for _, filename := range d.download.Solution.Files {
+	for _, filename := range d.download.payload.Solution.Files {
 		d.writeSolutionFile(filename)
 	}
 	return nil
