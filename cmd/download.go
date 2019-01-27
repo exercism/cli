@@ -47,16 +47,16 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	if err = download.writeSolutionFiles(); err != nil {
+	if err = download.writer.writeSolutionFiles(); err != nil {
 		return err
 	}
 
-	if err := download.writeMetadata(); err != nil {
+	if err := download.writer.writeMetadata(); err != nil {
 		return err
 	}
 
 	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", download.destination())
+	fmt.Fprintf(Out, "%s\n", download.writer.destination())
 	return nil
 }
 

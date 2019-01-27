@@ -87,9 +87,9 @@ type solutionRequester interface {
 
 // download is a download from the Exercism API.
 type download struct {
-	params *downloadParams
+	params  *downloadParams
 	payload *downloadPayload
-	downloadWriter
+	writer  downloadWriter
 }
 
 // newDownloadFromFlags initiates a download from flags.
@@ -167,7 +167,7 @@ func (d *download) setWriter(writer downloadWriter) error {
 	if err := writer.init(d); err != nil {
 		return err
 	}
-	d.downloadWriter = writer
+	d.writer = writer
 	return nil
 }
 
@@ -301,7 +301,7 @@ type downloadWriter interface {
 
 // fileDownloadWriter writes download contents to the file system.
 type fileDownloadWriter struct {
-	download *download
+	download  *download
 	requester solutionRequester
 }
 
@@ -382,8 +382,8 @@ type downloadParams struct {
 
 func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*downloadParams, error) {
 	d := &downloadParams{
-		slug:              exercise.Slug,
-		track:             exercise.Track,
+		slug:             exercise.Slug,
+		track:            exercise.Track,
 		downloadableFrom: downloadableFromExercise{},
 	}
 	d.setFieldsFromConfig(usrCfg)
