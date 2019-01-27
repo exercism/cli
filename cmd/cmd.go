@@ -361,6 +361,7 @@ type downloadParams struct {
 	// optional
 	track, team string
 
+	// duck-type for downloadParams created from varying types
 	downloadParamsFrom
 }
 
@@ -471,6 +472,7 @@ func (d downloadParamsValidator) needsSlugWhenGivenTrackOrTeam() error {
 	return nil
 }
 
+// downloadParamsFrom is the interface to faciliate polymorphism when creating downloadParams from different types.
 type downloadParamsFrom interface {
 	writeExerciseFilesPermitted() bool
 	missingSlugOrUUIDError() error
