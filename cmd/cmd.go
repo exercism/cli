@@ -359,11 +359,9 @@ type downloadParams struct {
 	token, apibaseurl, workspace string
 
 	// optional
-	track string
-	team  string
+	track, team string
 
-	fromExercise bool
-	fromFlags    bool
+	fromExercise, fromFlags bool
 }
 
 func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*downloadParams, error) {
