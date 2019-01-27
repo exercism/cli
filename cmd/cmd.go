@@ -110,7 +110,7 @@ func newDownloadFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*download,
 	if err != nil {
 		return nil, err
 	}
-	return newDownload(downloadParams)
+	return newDownload(downloadParams, &fileDownloadWriter{})
 }
 
 // newDownloadFromExercise initiates a download from an exercise.
@@ -121,16 +121,15 @@ func newDownloadFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*downlo
 	if err != nil {
 		return nil, err
 	}
-	return newDownload(downloadParams)
+	return newDownload(downloadParams, &fileDownloadWriter{})
 }
 
 // newDownload initiates a download by requesting a downloadPayload from the Exercism API.
-func newDownload(params *downloadParams) (*download, error) {
+func newDownload(params *downloadParams, writer downloadWriter) (*download, error) {
 	if err := params.validate(); err != nil {
 		return nil, err
 	}
 	d := &download{params: params}
-	d.downloadWriter = fileDownloadWriter{download: d}
 
 	client, err := api.NewClient(d.params.token, d.params.apibaseurl)
 	if err != nil {
@@ -167,7 +166,22 @@ func newDownload(params *downloadParams) (*download, error) {
 			return nil, errors.New(d.Error.Message)
 		}
 	}
+
+	if err := d.setWriter(writer); err != nil {
+		return nil, err
+	}
 	return d, d.validate()
+}
+
+func (d *download) setWriter(writer downloadWriter) error {
+	if writer == nil {
+		errors.New("writer is empty")
+	}
+	if err := writer.init(d); err != nil {
+		return err
+	}
+	d.downloadWriter = writer
+	return nil
 }
 
 func (d *download) requestURL() string {
@@ -279,6 +293,7 @@ func (d *download) validate() error {
 
 // downloadWriter writes download contents.
 type downloadWriter interface {
+	init(*download) error
 	writeMetadata() error
 	writeSolutionFiles() error
 	destination() string
@@ -287,6 +302,11 @@ type downloadWriter interface {
 // fileDownloadWriter writes download contents to the file system.
 type fileDownloadWriter struct {
 	*download
+}
+
+func (d *fileDownloadWriter) init(dl *download) error {
+	d.download = dl
+	return dl.validate()
 }
 
 // writeMetadata writes the exercise metadata.
