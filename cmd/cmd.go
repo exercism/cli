@@ -368,21 +368,21 @@ type downloadParams struct {
 
 func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*downloadParams, error) {
 	d := &downloadParams{slug: exercise.Slug, track: exercise.Track, fromExercise: true}
-	d.setFromConfig(usrCfg)
+	d.setFieldsFromConfig(usrCfg)
 	return d, d.validate()
 }
 
 func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
 	d := &downloadParams{fromFlags: true}
-	d.setFromConfig(usrCfg)
-	if err := d.setFromFlags(flags); err != nil {
+	d.setFieldsFromConfig(usrCfg)
+	if err := d.setFieldsFromFlags(flags); err != nil {
 		return nil, err
 	}
 	return d, d.validate()
 }
 
-// setFromFlags sets the fields derived from flags.
-func (d *downloadParams) setFromFlags(flags *pflag.FlagSet) error {
+// setFieldsFromFlags sets the fields derived from flags.
+func (d *downloadParams) setFieldsFromFlags(flags *pflag.FlagSet) error {
 	var err error
 	d.uuid, err = flags.GetString("uuid")
 	if err != nil {
@@ -403,8 +403,8 @@ func (d *downloadParams) setFromFlags(flags *pflag.FlagSet) error {
 	return nil
 }
 
-// setFromConfig sets the fields derived from the user config.
-func (d *downloadParams) setFromConfig(usrCfg *viper.Viper) {
+// setFieldsFromConfig sets the fields derived from the user config.
+func (d *downloadParams) setFieldsFromConfig(usrCfg *viper.Viper) {
 	d.token = usrCfg.GetString("token")
 	d.apibaseurl = usrCfg.GetString("apibaseurl")
 	d.workspace = usrCfg.GetString("workspace")
