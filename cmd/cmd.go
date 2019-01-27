@@ -312,7 +312,10 @@ func (d fileDownloadWriter) writeMetadata() error {
 // All successful file responses are written except when 0 Content-Length.
 func (d fileDownloadWriter) writeSolutionFiles() error {
 	if !d.params.writeExerciseFilesPermitted() {
-		return errors.New("exercise files not writable")
+		return fmt.Errorf(
+			"writing exercise files not permitted when downloading from %s",
+			d.params.downloadParamsFrom,
+		)
 	}
 	for _, filename := range d.Solution.Files {
 		res, err := d.requestSolutionFile(filename)
@@ -468,6 +471,7 @@ type downloadParamsFrom interface {
 	writeExerciseFilesPermitted() bool
 	missingSlugOrUUIDError() error
 	givenTrackOrTeamMissingSlugError() error
+	String() string
 }
 
 type downloadParamsFromFlags struct{}
@@ -482,6 +486,8 @@ func (d downloadParamsFromFlags) givenTrackOrTeamMissingSlugError() error {
 	return errors.New("--track or --team requires --exercise (not --uuid)")
 }
 
+func (d downloadParamsFromFlags) String() string { return "flags" }
+
 type downloadParamsFromExercise struct{}
 
 func (d downloadParamsFromExercise) writeExerciseFilesPermitted() bool { return false }
@@ -493,6 +499,8 @@ func (d downloadParamsFromExercise) missingSlugOrUUIDError() error {
 func (d downloadParamsFromExercise) givenTrackOrTeamMissingSlugError() error {
 	return errors.New("programmer error - should never happen")
 }
+
+func (d downloadParamsFromExercise) String() string { return "exercise" }
 
 // sanitizeLegacyFilepath is a workaround for a path bug due to an early design
 // decision (later reversed) to allow numeric suffixes for exercise directories,
