@@ -373,21 +373,21 @@ type downloadParams struct {
 	track, team string
 
 	// duck-type for downloadParams created from varying types
-	downloadParamsFrom
+	downloadableFrom
 }
 
 func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*downloadParams, error) {
 	d := &downloadParams{
-		slug:               exercise.Slug,
-		track:              exercise.Track,
-		downloadParamsFrom: downloadParamsFromExercise{},
+		slug:              exercise.Slug,
+		track:             exercise.Track,
+		downloadableFrom: downloadableFromExercise{},
 	}
 	d.setFieldsFromConfig(usrCfg)
 	return d, d.validate()
 }
 
 func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
-	d := &downloadParams{downloadParamsFrom: downloadParamsFromFlags{}}
+	d := &downloadParams{downloadableFrom: downloadableFromFlags{}}
 	d.setFieldsFromConfig(usrCfg)
 	if err := d.setFieldsFromFlags(flags); err != nil {
 		return nil, err
@@ -483,34 +483,34 @@ func (d downloadParamsValidator) needsSlugWhenGivenTrackOrTeam() error {
 	return nil
 }
 
-// downloadParamsFrom is the interface to faciliate polymorphism when creating downloadParams from different types.
-type downloadParamsFrom interface {
+// downloadableFrom is the interface to faciliate polymorphism when creating downloadParams from different types.
+type downloadableFrom interface {
 	writeExerciseFilesPermitted() bool
 	missingSlugOrUUIDError() error
 	givenTrackOrTeamMissingSlugError() error
 }
 
-type downloadParamsFromFlags struct{}
+type downloadableFromFlags struct{}
 
-func (d downloadParamsFromFlags) writeExerciseFilesPermitted() bool { return true }
+func (d downloadableFromFlags) writeExerciseFilesPermitted() bool { return true }
 
-func (d downloadParamsFromFlags) missingSlugOrUUIDError() error {
+func (d downloadableFromFlags) missingSlugOrUUIDError() error {
 	return errors.New("need an --exercise name or a solution --uuid")
 }
 
-func (d downloadParamsFromFlags) givenTrackOrTeamMissingSlugError() error {
+func (d downloadableFromFlags) givenTrackOrTeamMissingSlugError() error {
 	return errors.New("--track or --team requires --exercise (not --uuid)")
 }
 
-type downloadParamsFromExercise struct{}
+type downloadableFromExercise struct{}
 
-func (d downloadParamsFromExercise) writeExerciseFilesPermitted() bool { return false }
+func (d downloadableFromExercise) writeExerciseFilesPermitted() bool { return false }
 
-func (d downloadParamsFromExercise) missingSlugOrUUIDError() error {
+func (d downloadableFromExercise) missingSlugOrUUIDError() error {
 	return errors.New("need a 'slug' or a 'uuid'")
 }
 
-func (d downloadParamsFromExercise) givenTrackOrTeamMissingSlugError() error {
+func (d downloadableFromExercise) givenTrackOrTeamMissingSlugError() error {
 	return errors.New("programmer error - should never happen")
 }
 
