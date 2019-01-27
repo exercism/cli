@@ -191,7 +191,7 @@ func (d *download) setWriter(writer downloadWriter) error {
 	return nil
 }
 
-func (d *download) requestURL() string {
+func (d download) requestURL() string {
 	id := "latest"
 	if d.params.uuid != "" {
 		id = d.params.uuid
@@ -199,7 +199,7 @@ func (d *download) requestURL() string {
 	return fmt.Sprintf("%s/solutions/%s", d.params.apibaseurl, id)
 }
 
-func (d *download) buildQuery(url *netURL.URL) {
+func (d download) buildQuery(url *netURL.URL) {
 	query := url.Query()
 	if d.params.slug != "" {
 		query.Add("exercise_id", d.params.slug)
@@ -215,7 +215,7 @@ func (d *download) buildQuery(url *netURL.URL) {
 
 // requestSolutionFile requests a Solution file from the API, returning an HTTP response.
 // Non-200 responses and 0 Content-Length responses are swallowed, returning nil.
-func (d *download) requestSolutionFile(filename string) (*http.Response, error) {
+func (d download) requestSolutionFile(filename string) (*http.Response, error) {
 	parsedURL, err := netURL.ParseRequestURI(
 		fmt.Sprintf("%s%s", d.Solution.FileDownloadBaseURL, filename))
 	if err != nil {
@@ -244,7 +244,7 @@ func (d *download) requestSolutionFile(filename string) (*http.Response, error) 
 	return res, nil
 }
 
-func (d *download) metadata() ws.ExerciseMetadata {
+func (d download) metadata() ws.ExerciseMetadata {
 	return ws.ExerciseMetadata{
 		AutoApprove: d.Solution.Exercise.AutoApprove,
 		Track:       d.Solution.Exercise.Track.ID,
@@ -257,7 +257,7 @@ func (d *download) metadata() ws.ExerciseMetadata {
 	}
 }
 
-func (d *download) exercise() ws.Exercise {
+func (d download) exercise() ws.Exercise {
 	return ws.Exercise{
 		Root:  d.solutionRoot(),
 		Track: d.Solution.Exercise.Track.ID,
@@ -267,7 +267,7 @@ func (d *download) exercise() ws.Exercise {
 
 // solutionRoot builds the root path based on the solution
 // being part of a team and/or owned by another user.
-func (d *download) solutionRoot() string {
+func (d download) solutionRoot() string {
 	root := d.params.workspace
 
 	if d.isTeamSolution() {
@@ -279,16 +279,16 @@ func (d *download) solutionRoot() string {
 	return root
 }
 
-func (d *download) isTeamSolution() bool {
+func (d download) isTeamSolution() bool {
 	return d.Solution.Team.Slug != ""
 }
 
-func (d *download) solutionBelongsToOtherUser() bool {
+func (d download) solutionBelongsToOtherUser() bool {
 	return !d.Solution.User.IsRequester
 }
 
 // validate validates the presence of an ID and checks for an error message.
-func (d *download) validate() error {
+func (d download) validate() error {
 	if d.Solution.ID == "" {
 		return errors.New("download missing an ID")
 	}
