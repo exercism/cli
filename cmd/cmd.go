@@ -459,7 +459,7 @@ type downloadParamsValidator struct {
 // needsSlugXorUUID checks the presence of either a slug or a uuid (but not both).
 func (d downloadParamsValidator) needsSlugXorUUID() error {
 	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
-		return d.downloadableFrom.missingSlugOrUUIDError()
+		return d.downloadableFrom.errMissingSlugOrUUID()
 	}
 	return nil
 }
@@ -483,7 +483,7 @@ func (d downloadParamsValidator) needsUserConfigValues() error {
 // (track/team meaningless when given a uuid).
 func (d downloadParamsValidator) needsSlugWhenGivenTrackOrTeam() error {
 	if (d.team != "" || d.track != "") && d.slug == "" {
-		return d.downloadableFrom.givenTrackOrTeamMissingSlugError()
+		return d.downloadableFrom.errGivenTrackOrTeamMissingSlug()
 	}
 	return nil
 }
@@ -491,19 +491,19 @@ func (d downloadParamsValidator) needsSlugWhenGivenTrackOrTeam() error {
 // downloadableFrom is the interface to facilitate polymorphism when creating downloadParams from different types.
 type downloadableFrom interface {
 	writeExerciseFilesPermitted() bool
-	missingSlugOrUUIDError() error
-	givenTrackOrTeamMissingSlugError() error
+	errMissingSlugOrUUID() error
+	errGivenTrackOrTeamMissingSlug() error
 }
 
 type downloadableFromFlags struct{}
 
 func (d downloadableFromFlags) writeExerciseFilesPermitted() bool { return true }
 
-func (d downloadableFromFlags) missingSlugOrUUIDError() error {
+func (d downloadableFromFlags) errMissingSlugOrUUID() error {
 	return errors.New("need an --exercise name or a solution --uuid")
 }
 
-func (d downloadableFromFlags) givenTrackOrTeamMissingSlugError() error {
+func (d downloadableFromFlags) errGivenTrackOrTeamMissingSlug() error {
 	return errors.New("--track or --team requires --exercise (not --uuid)")
 }
 
@@ -511,11 +511,11 @@ type downloadableFromExercise struct{}
 
 func (d downloadableFromExercise) writeExerciseFilesPermitted() bool { return false }
 
-func (d downloadableFromExercise) missingSlugOrUUIDError() error {
+func (d downloadableFromExercise) errMissingSlugOrUUID() error {
 	return errors.New("need a 'slug' or a 'uuid'")
 }
 
-func (d downloadableFromExercise) givenTrackOrTeamMissingSlugError() error {
+func (d downloadableFromExercise) errGivenTrackOrTeamMissingSlug() error {
 	return errors.New("programmer error - should never happen")
 }
 
