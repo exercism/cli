@@ -321,7 +321,7 @@ func (w fileDownloadWriter) writeMetadata() error {
 // An HTTP request is made using each filename and failed responses are swallowed.
 // All successful file responses are written except when 0 Content-Length.
 func (w fileDownloadWriter) writeSolutionFiles() error {
-	if err := w.download.params.ensureWritable(); err != nil {
+	if err := w.download.params.ensureExerciseFilesWritable(); err != nil {
 		return err
 	}
 	for _, filename := range w.download.payload.Solution.Files {
@@ -443,9 +443,10 @@ func (d *downloadParams) validate() error {
 	return nil
 }
 
-func (d downloadParams) ensureWritable() error {
+// ensureExerciseFilesWritable checks permission for writing exercise files.
+func (d downloadParams) ensureExerciseFilesWritable() error {
 	if !d.downloadableFrom.writeExerciseFilesPermitted() {
-		return errors.New("writing exercise files not permitted")
+		return errors.New("writing exercise files not permitted when downloading from this type")
 	}
 	return nil
 }
