@@ -217,6 +217,8 @@ func (d *download) setPayload() error {
 	return nil
 }
 
+// payloadURL is the URL used to request a downloadPayload.
+// The latest solution is used unless given a UUID.
 func (d download) payloadURL() string {
 	id := "latest"
 	if d.params.uuid != "" {
