@@ -305,33 +305,33 @@ type fileDownloadWriter struct {
 	requester solutionRequester
 }
 
-func (d *fileDownloadWriter) init(dl *download) error {
-	d.download = dl
-	d.requester = dl
+func (w *fileDownloadWriter) init(dl *download) error {
+	w.download = dl
+	w.requester = dl
 	return dl.validate()
 }
 
 // writeMetadata writes the exercise metadata.
-func (d fileDownloadWriter) writeMetadata() error {
-	metadata := d.download.metadata()
-	return metadata.Write(d.destination())
+func (w fileDownloadWriter) writeMetadata() error {
+	metadata := w.download.metadata()
+	return metadata.Write(w.destination())
 }
 
 // writeSolutionFiles attempts to write each exercise file that is part of the downloaded Solution.
 // An HTTP request is made using each filename and failed responses are swallowed.
 // All successful file responses are written except when 0 Content-Length.
-func (d fileDownloadWriter) writeSolutionFiles() error {
-	if err := d.download.params.ensureWritable(); err != nil {
+func (w fileDownloadWriter) writeSolutionFiles() error {
+	if err := w.download.params.ensureWritable(); err != nil {
 		return err
 	}
-	for _, filename := range d.download.payload.Solution.Files {
-		d.writeSolutionFile(filename)
+	for _, filename := range w.download.payload.Solution.Files {
+		w.writeSolutionFile(filename)
 	}
 	return nil
 }
 
-func (d fileDownloadWriter) writeSolutionFile(filename string) error {
-	res, err := d.requester.requestSolutionFile(filename)
+func (w fileDownloadWriter) writeSolutionFile(filename string) error {
+	res, err := w.requester.requestSolutionFile(filename)
 	if err != nil {
 		return err
 	}
@@ -344,8 +344,8 @@ func (d fileDownloadWriter) writeSolutionFile(filename string) error {
 	// TODO: handle --force flag to overwrite without asking.
 
 	destination := filepath.Join(
-		d.destination(),
-		sanitizeLegacyFilepath(filename, d.download.exercise().Slug))
+		w.destination(),
+		sanitizeLegacyFilepath(filename, w.download.exercise().Slug))
 	if err = os.MkdirAll(filepath.Dir(destination), os.FileMode(0755)); err != nil {
 		return err
 	}
@@ -361,8 +361,8 @@ func (d fileDownloadWriter) writeSolutionFile(filename string) error {
 }
 
 // destination is the download destination path.
-func (d fileDownloadWriter) destination() string {
-	return d.download.exercise().MetadataDir()
+func (w fileDownloadWriter) destination() string {
+	return w.download.exercise().MetadataDir()
 }
 
 // downloadParams is required to create a download.
