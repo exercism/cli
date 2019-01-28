@@ -387,7 +387,7 @@ type downloadParams struct {
 	track, team string
 
 	// duck-type for downloadParams created from varying types
-	downloadableFrom downloadableFrom
+	downloadableFrom
 }
 
 // newDownloadParamsFromExercise creates a new downloadParams given an exercise.
@@ -464,44 +464,22 @@ func (d downloadParams) ensureExerciseFilesWritable() error {
 	return nil
 }
 
-// downloadParamsValidator contains validation rules for downloadParams.
-type downloadParamsValidator struct {
-	*downloadParams
+// writeExerciseFilesPermitted is a template pattern default.
+func (d downloadParams) writeExerciseFilesPermitted() bool { return false }
+
+// errMissingSlugOrUUID is a template pattern default.
+func (d downloadParams) errMissingSlugOrUUID() error {
+	return errors.New("need a 'slug' or a 'uuid'")
 }
 
-// needsSlugXorUUID checks the presence of either a slug or a uuid (but not both).
-func (d downloadParamsValidator) needsSlugXorUUID() error {
-	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
-		return d.downloadableFrom.errMissingSlugOrUUID()
-	}
-	return nil
+// errGivenTrackOrTeamMissingSlug is a template pattern default.
+func (d downloadParams) errGivenTrackOrTeamMissingSlug() error {
+	return errors.New("track or team requires slug (not uuid)")
 }
 
-// needsUserConfigValues checks the presence of required values from the user config.
-func (d downloadParamsValidator) needsUserConfigValues() error {
-	errMsg := "missing required user config: '%s'"
-	if d.token == "" {
-		return fmt.Errorf(errMsg, "token")
-	}
-	if d.apibaseurl == "" {
-		return fmt.Errorf(errMsg, "apibaseurl")
-	}
-	if d.workspace == "" {
-		return fmt.Errorf(errMsg, "workspace")
-	}
-	return nil
-}
-
-// needsSlugWhenGivenTrackOrTeam ensures that track/team arguments are also given with a slug.
-// (track/team meaningless when given a uuid).
-func (d downloadParamsValidator) needsSlugWhenGivenTrackOrTeam() error {
-	if (d.team != "" || d.track != "") && d.slug == "" {
-		return d.downloadableFrom.errGivenTrackOrTeamMissingSlug()
-	}
-	return nil
-}
-
-// downloadableFrom is the interface to facilitate polymorphism when creating downloadParams from different types.
+// downloadableFrom is the interface to use the template pattern when creating downloadParams from different types.
+// Clients can embed downloadParams to delegate to the default implementation.
+// This allows fine-grained specializations without having to define the entire interface.
 type downloadableFrom interface {
 	writeExerciseFilesPermitted() bool
 	errMissingSlugOrUUID() error
@@ -522,7 +500,8 @@ func (d downloadableFromFlags) errGivenTrackOrTeamMissingSlug() error {
 }
 
 // downloadableFromExercise represents downloadParams created from an exercise.
-type downloadableFromExercise struct{}
+// This delegates to the template default.
+type downloadableFromExercise struct{ *downloadParams }
 
 // downloadParamsValidator contains validation rules for downloadParams.
 type downloadParamsValidator struct {
