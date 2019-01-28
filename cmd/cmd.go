@@ -442,7 +442,7 @@ func (d *downloadParams) setFieldsFromConfig(usrCfg *viper.Viper) {
 
 // validate validates creation of downloadParams.
 func (d *downloadParams) validate() error {
-	validator := downloadParamsValidator{downloadParams: d}
+	validator := downloadParamsValidator{params: d}
 
 	if err := validator.needsSlugXorUUID(); err != nil {
 		return err
@@ -524,14 +524,41 @@ func (d downloadableFromFlags) errGivenTrackOrTeamMissingSlug() error {
 // downloadableFromExercise represents downloadParams created from an exercise.
 type downloadableFromExercise struct{}
 
-func (d downloadableFromExercise) writeExerciseFilesPermitted() bool { return false }
-
-func (d downloadableFromExercise) errMissingSlugOrUUID() error {
-	return errors.New("need a 'slug' or a 'uuid'")
+// downloadParamsValidator contains validation rules for downloadParams.
+type downloadParamsValidator struct {
+	params *downloadParams
 }
 
-func (d downloadableFromExercise) errGivenTrackOrTeamMissingSlug() error {
-	return errors.New("programmer error - should never happen")
+// needsSlugXorUUID checks the presence of either a slug or a uuid (but not both).
+func (d downloadParamsValidator) needsSlugXorUUID() error {
+	if d.params.slug != "" && d.params.uuid != "" || d.params.uuid == d.params.slug {
+		return d.params.downloadableFrom.errMissingSlugOrUUID()
+	}
+	return nil
+}
+
+// needsUserConfigValues checks the presence of required values from the user config.
+func (d downloadParamsValidator) needsUserConfigValues() error {
+	errMsg := "missing required user config: '%s'"
+	if d.params.token == "" {
+		return fmt.Errorf(errMsg, "token")
+	}
+	if d.params.apibaseurl == "" {
+		return fmt.Errorf(errMsg, "apibaseurl")
+	}
+	if d.params.workspace == "" {
+		return fmt.Errorf(errMsg, "workspace")
+	}
+	return nil
+}
+
+// needsSlugWhenGivenTrackOrTeam ensures that track/team arguments are also given with a slug.
+// (track/team meaningless when given a uuid).
+func (d downloadParamsValidator) needsSlugWhenGivenTrackOrTeam() error {
+	if (d.params.team != "" || d.params.track != "") && d.params.slug == "" {
+		return d.params.downloadableFrom.errGivenTrackOrTeamMissingSlug()
+	}
+	return nil
 }
 
 // sanitizeLegacyFilepath is a workaround for a path bug due to an early design
