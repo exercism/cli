@@ -81,6 +81,7 @@ func validateUserConfig(cfg *viper.Viper) error {
 	return nil
 }
 
+// solutionRequester is the interface for requesting a solution file from the Exercism API.
 type solutionRequester interface {
 	requestSolutionFile(string) (*http.Response, error)
 }
@@ -113,7 +114,7 @@ func newDownloadFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*downlo
 	return newDownload(downloadParams, &fileDownloadWriter{})
 }
 
-// newDownload initiates a download by requesting a downloadPayload from the Exercism API.
+// newDownload creates a write ready download by requesting a downloadPayload from the Exercism API.
 func newDownload(params *downloadParams, writer downloadWriter) (*download, error) {
 	if err := params.validate(); err != nil {
 		return nil, err
@@ -160,6 +161,7 @@ func (d download) requestSolutionFile(filename string) (*http.Response, error) {
 	return res, nil
 }
 
+// setWriter initializes the downloadWriter and sets the field.
 func (d *download) setWriter(writer downloadWriter) error {
 	if writer == nil {
 		errors.New("writer is empty")
@@ -171,7 +173,7 @@ func (d *download) setWriter(writer downloadWriter) error {
 	return nil
 }
 
-// setPayload sets the downloadPayload by getting a payload from the Exercism API.
+// setPayload sets the payload by requesting a downloadPayload from the Exercism API.
 func (d *download) setPayload() error {
 	client, err := api.NewClient(d.params.token, d.params.apibaseurl)
 	if err != nil {
@@ -272,15 +274,18 @@ func (d download) solutionRoot() string {
 	return root
 }
 
+// isTeamSolution indicates if the solution is part of a team.
 func (d download) isTeamSolution() bool {
 	return d.payload.Solution.Team.Slug != ""
 }
 
+// solutionBelongsToOtherUser indicates if the solution belongs to another user
+// (as opposed to being owned by the requesting user).
 func (d download) solutionBelongsToOtherUser() bool {
 	return !d.payload.Solution.User.IsRequester
 }
 
-// validate validates the presence of an ID and checks for an error message.
+// validate verifies creation of a valid download.
 func (d download) validate() error {
 	if d.payload.Solution.ID == "" {
 		return errors.New("download missing an ID")
@@ -305,6 +310,7 @@ type fileDownloadWriter struct {
 	requester solutionRequester
 }
 
+// init inititates the writer by setting its download dependent fields.
 func (w *fileDownloadWriter) init(dl *download) error {
 	w.download = dl
 	w.requester = dl
@@ -365,7 +371,8 @@ func (w fileDownloadWriter) destination() string {
 	return w.download.exercise().MetadataDir()
 }
 
-// downloadParams is required to create a download.
+// downloadParams is parameter object for creating a download.
+// A download may be constructed from multiple data sources; downloadParams encapsulates this construction.
 type downloadParams struct {
 	// either/or
 	slug, uuid string
@@ -380,6 +387,7 @@ type downloadParams struct {
 	downloadableFrom downloadableFrom
 }
 
+// newDownloadParamsFromExercise creates a new downloadParams given an exercise.
 func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*downloadParams, error) {
 	d := &downloadParams{
 		slug:             exercise.Slug,
@@ -390,6 +398,7 @@ func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*
 	return d, d.validate()
 }
 
+// newDownloadParamsFromFlags creates a new downloadParams given flags.
 func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
 	d := &downloadParams{downloadableFrom: downloadableFromFlags{}}
 	d.setFieldsFromConfig(usrCfg)
@@ -428,6 +437,7 @@ func (d *downloadParams) setFieldsFromConfig(usrCfg *viper.Viper) {
 	d.workspace = usrCfg.GetString("workspace")
 }
 
+// validate validates creation of downloadParams.
 func (d *downloadParams) validate() error {
 	validator := downloadParamsValidator{downloadParams: d}
 
@@ -495,6 +505,7 @@ type downloadableFrom interface {
 	errGivenTrackOrTeamMissingSlug() error
 }
 
+// downloadableFromFlags represents downloadParams created from flags.
 type downloadableFromFlags struct{}
 
 func (d downloadableFromFlags) writeExerciseFilesPermitted() bool { return true }
@@ -507,6 +518,7 @@ func (d downloadableFromFlags) errGivenTrackOrTeamMissingSlug() error {
 	return errors.New("--track or --team requires --exercise (not --uuid)")
 }
 
+// downloadableFromExercise represents downloadParams created from an exercise.
 type downloadableFromExercise struct{}
 
 func (d downloadableFromExercise) writeExerciseFilesPermitted() bool { return false }
