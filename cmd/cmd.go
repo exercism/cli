@@ -180,11 +180,11 @@ func (d *download) setPayload() error {
 		return err
 	}
 
-	req, err := client.NewRequest("GET", d.requestURL(), nil)
+	req, err := client.NewRequest("GET", d.payloadURL(), nil)
 	if err != nil {
 		return err
 	}
-	d.buildQuery(req.URL)
+	d.buildPayloadQueryParams(req.URL)
 
 	res, err := client.Do(req)
 	if err != nil {
@@ -217,7 +217,7 @@ func (d *download) setPayload() error {
 	return nil
 }
 
-func (d download) requestURL() string {
+func (d download) payloadURL() string {
 	id := "latest"
 	if d.params.uuid != "" {
 		id = d.params.uuid
@@ -225,7 +225,8 @@ func (d download) requestURL() string {
 	return fmt.Sprintf("%s/solutions/%s", d.params.apibaseurl, id)
 }
 
-func (d download) buildQuery(url *netURL.URL) {
+// buildPayloadQueryParams adds optional query parameters to the URL.
+func (d download) buildPayloadQueryParams(url *netURL.URL) {
 	query := url.Query()
 	if d.params.slug != "" {
 		query.Add("exercise_id", d.params.slug)
