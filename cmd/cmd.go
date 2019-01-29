@@ -397,47 +397,38 @@ func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*
 		track:            exercise.Track,
 		downloadableFrom: downloadableFromExercise{},
 	}
-	d.setFieldsFromConfig(usrCfg)
-	return d, d.validate()
+	return d.build(usrCfg)
 }
 
 // newDownloadParamsFromFlags creates a new downloadParams given flags.
 func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
 	d := &downloadParams{downloadableFrom: downloadableFromFlags{}}
-	d.setFieldsFromConfig(usrCfg)
-	if err := d.setFieldsFromFlags(flags); err != nil {
-		return nil, err
-	}
-	return d, d.validate()
-}
-
-// setFieldsFromFlags sets the fields derived from flags.
-func (d *downloadParams) setFieldsFromFlags(flags *pflag.FlagSet) error {
 	var err error
 	d.uuid, err = flags.GetString("uuid")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	d.slug, err = flags.GetString("exercise")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	d.track, err = flags.GetString("track")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	d.team, err = flags.GetString("team")
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return d.build(usrCfg)
 }
 
-// setFieldsFromConfig sets the fields derived from the user config.
-func (d *downloadParams) setFieldsFromConfig(usrCfg *viper.Viper) {
+// build contains the common creation logic for creating downloadParams.
+func (d *downloadParams) build(usrCfg *viper.Viper) (*downloadParams, error) {
 	d.token = usrCfg.GetString("token")
 	d.apibaseurl = usrCfg.GetString("apibaseurl")
 	d.workspace = usrCfg.GetString("workspace")
+	return d, d.validate()
 }
 
 // validate validates creation of downloadParams.
