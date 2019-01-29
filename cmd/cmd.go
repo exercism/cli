@@ -257,15 +257,15 @@ func (d download) metadata() ws.ExerciseMetadata {
 
 func (d download) exercise() ws.Exercise {
 	return ws.Exercise{
-		Root:  d.solutionRoot(),
+		Root:  d.solutionRootFilepath(),
 		Track: d.payload.Solution.Exercise.Track.ID,
 		Slug:  d.payload.Solution.Exercise.ID,
 	}
 }
 
-// solutionRoot builds the root path based on the solution
+// solutionRootFilepath builds the root path based on the solution
 // being part of a team and/or owned by another user.
-func (d download) solutionRoot() string {
+func (d download) solutionRootFilepath() string {
 	root := d.params.workspace
 
 	if d.isTeamSolution() {
