@@ -95,8 +95,8 @@ type download struct {
 
 // newDownloadFromFlags initiates a download from flags.
 // This is the primary interaction for downloading from the Exercism API.
-func newDownloadFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*download, error) {
-	downloadParams, err := newDownloadParamsFromFlags(usrCfg, flags)
+func newDownloadFromFlags(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
+	downloadParams, err := newDownloadParamsFromFlags(flags, usrCfg)
 	if err != nil {
 		return nil, err
 	}
@@ -106,8 +106,8 @@ func newDownloadFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*download,
 // newDownloadFromExercise initiates a download from an exercise.
 // This is used to get metadata and isn't the primary interaction for downloading.
 // Only allows writing metadata, not exercise files.
-func newDownloadFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*download, error) {
-	downloadParams, err := newDownloadParamsFromExercise(usrCfg, exercise)
+func newDownloadFromExercise(exercise ws.Exercise, usrCfg *viper.Viper) (*download, error) {
+	downloadParams, err := newDownloadParamsFromExercise(exercise, usrCfg)
 	if err != nil {
 		return nil, err
 	}
@@ -391,7 +391,7 @@ type downloadParams struct {
 }
 
 // newDownloadParamsFromExercise creates a new downloadParams given an exercise.
-func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*downloadParams, error) {
+func newDownloadParamsFromExercise(exercise ws.Exercise, usrCfg *viper.Viper) (*downloadParams, error) {
 	d := &downloadParams{
 		slug:             exercise.Slug,
 		track:            exercise.Track,
@@ -401,7 +401,7 @@ func newDownloadParamsFromExercise(usrCfg *viper.Viper, exercise ws.Exercise) (*
 }
 
 // newDownloadParamsFromFlags creates a new downloadParams given flags.
-func newDownloadParamsFromFlags(usrCfg *viper.Viper, flags *pflag.FlagSet) (*downloadParams, error) {
+func newDownloadParamsFromFlags(flags *pflag.FlagSet, usrCfg *viper.Viper) (*downloadParams, error) {
 	d := &downloadParams{downloadableFrom: downloadableFromFlags{}}
 	var err error
 	d.uuid, err = flags.GetString("uuid")

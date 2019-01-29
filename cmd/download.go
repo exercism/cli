@@ -42,7 +42,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	download, err := newDownloadFromFlags(cfg.UserViperConfig, flags)
+	download, err := newDownloadFromFlags(flags, cfg.UserViperConfig)
 	if err != nil {
 		return err
 	}
