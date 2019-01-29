@@ -432,8 +432,8 @@ func (d *downloadParams) build(usrCfg *viper.Viper) (*downloadParams, error) {
 }
 
 // validate validates creation of downloadParams.
-func (d *downloadParams) validate() error {
-	validator := downloadParamsValidator{params: d}
+func (d downloadParams) validate() error {
+	validator := downloadParamsValidator{params: &d}
 
 	if err := validator.needsSlugXorUUID(); err != nil {
 		return err
