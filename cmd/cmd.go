@@ -124,9 +124,7 @@ func newDownload(params *downloadParams, writer downloadWriter) (*download, erro
 	if err := d.setPayload(); err != nil {
 		return nil, err
 	}
-	if err := d.setWriter(writer); err != nil {
-		return nil, err
-	}
+	d.setWriter(writer)
 	return d, d.validate()
 }
 
@@ -162,15 +160,9 @@ func (d download) requestSolutionFile(filename string) (*http.Response, error) {
 }
 
 // setWriter initializes the downloadWriter and sets the field.
-func (d *download) setWriter(writer downloadWriter) error {
-	if writer == nil {
-		errors.New("writer is empty")
-	}
-	if err := writer.init(d); err != nil {
-		return err
-	}
+func (d *download) setWriter(writer downloadWriter) {
+	writer.init(d)
 	d.writer = writer
-	return nil
 }
 
 // setPayload sets the payload by requesting a downloadPayload from the Exercism API.
@@ -301,7 +293,7 @@ func (d download) validate() error {
 
 // downloadWriter writes download contents.
 type downloadWriter interface {
-	init(*download) error
+	init(*download)
 	writeMetadata() error
 	writeSolutionFiles() error
 	destination() string
@@ -314,10 +306,9 @@ type fileDownloadWriter struct {
 }
 
 // init inititates the writer by setting its download dependent fields.
-func (w *fileDownloadWriter) init(dl *download) error {
+func (w *fileDownloadWriter) init(dl *download) {
 	w.download = dl
 	w.requester = dl
-	return dl.validate()
 }
 
 // writeMetadata writes the exercise metadata.
