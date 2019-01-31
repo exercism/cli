@@ -66,7 +66,7 @@ const msgMissingMetadata = `
 
 `
 
-// validateUserConfig validates the presense of required user config values
+// validateUserConfig validates the presence of required user config values
 func validateUserConfig(cfg *viper.Viper) error {
 	if cfg.GetString("token") == "" {
 		return fmt.Errorf(
@@ -305,7 +305,7 @@ type fileDownloadWriter struct {
 	requester solutionRequester
 }
 
-// init inititates the writer by setting its download dependent fields.
+// init initiates the writer by setting its download dependent fields.
 func (w *fileDownloadWriter) init(dl *download) {
 	w.download = dl
 	w.requester = dl
