@@ -122,11 +122,16 @@ func newDownload(params *downloadParams, writer downloadWriter) (*download, erro
 	}
 
 	d := &download{params: params}
+
 	d.payload, err = d.requestPayload()
 	if err != nil {
 		return nil, err
+
 	}
-	d.setWriter(writer)
+
+	writer.init(d)
+	d.writer = writer
+
 	return d, d.validate()
 }
 
@@ -159,12 +164,6 @@ func (d download) requestSolutionFile(filename string) (*http.Response, error) {
 	}
 
 	return res, nil
-}
-
-// setWriter initializes the downloadWriter and sets the field.
-func (d *download) setWriter(writer downloadWriter) {
-	writer.init(d)
-	d.writer = writer
 }
 
 // requestPayload returns a downloadPayload from the Exercism API.
