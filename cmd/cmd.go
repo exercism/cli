@@ -280,6 +280,14 @@ func (d download) solutionBelongsToOtherUser() bool {
 	return !d.payload.Solution.User.IsRequester
 }
 
+// ensureExerciseFilesWritable checks permission for writing exercise files.
+func (d download) ensureExerciseFilesWritable() error {
+	if !d.params.downloadableFrom.writeExerciseFilesPermitted() {
+		return errors.New("writing exercise files not permitted when downloading from this type")
+	}
+	return nil
+}
+
 // validate verifies creation of a valid download.
 func (d download) validate() error {
 	if d.payload.Solution.ID == "" {
@@ -321,7 +329,7 @@ func (w fileDownloadWriter) writeMetadata() error {
 // An HTTP request is made using each filename and failed responses are swallowed.
 // All successful file responses are written except when 0 Content-Length.
 func (w fileDownloadWriter) writeSolutionFiles() error {
-	if err := w.download.params.ensureExerciseFilesWritable(); err != nil {
+	if err := w.download.ensureExerciseFilesWritable(); err != nil {
 		return err
 	}
 	for _, filename := range w.download.payload.Solution.Files {
@@ -331,7 +339,7 @@ func (w fileDownloadWriter) writeSolutionFiles() error {
 }
 
 func (w fileDownloadWriter) writeSolutionFile(filename string) error {
-	if err := w.download.params.ensureExerciseFilesWritable(); err != nil {
+	if err := w.download.ensureExerciseFilesWritable(); err != nil {
 		return err
 	}
 	res, err := w.requester.requestSolutionFile(filename)
@@ -437,14 +445,6 @@ func (d downloadParams) validate() error {
 	}
 	if err := validator.needsSlugWhenGivenTrackOrTeam(); err != nil {
 		return err
-	}
-	return nil
-}
-
-// ensureExerciseFilesWritable checks permission for writing exercise files.
-func (d downloadParams) ensureExerciseFilesWritable() error {
-	if !d.downloadableFrom.writeExerciseFilesPermitted() {
-		return errors.New("writing exercise files not permitted when downloading from this type")
 	}
 	return nil
 }
