@@ -331,6 +331,9 @@ func (w fileDownloadWriter) writeSolutionFiles() error {
 }
 
 func (w fileDownloadWriter) writeSolutionFile(filename string) error {
+	if err := w.download.params.ensureExerciseFilesWritable(); err != nil {
+		return err
+	}
 	res, err := w.requester.requestSolutionFile(filename)
 	if err != nil {
 		return err
