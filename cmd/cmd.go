@@ -122,11 +122,9 @@ func newDownload(params *downloadParams, writer downloadWriter) (*download, erro
 	}
 
 	d := &download{params: params}
-
 	d.payload, err = d.requestPayload()
 	if err != nil {
 		return nil, err
-
 	}
 
 	writer.init(d)
