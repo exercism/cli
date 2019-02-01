@@ -388,7 +388,7 @@ type downloadParams struct {
 	// optional
 	track, team string
 
-	// duck-type for downloadParams created from varying types
+	// polymorphic reference for downloads initiated via different types
 	downloadableFrom
 }
 
@@ -449,22 +449,18 @@ func (d downloadParams) validate() error {
 	return nil
 }
 
-// writeExerciseFilesPermitted is a template pattern default.
 func (d downloadParams) writeExerciseFilesPermitted() bool { return false }
 
-// errMissingSlugOrUUID is a template pattern default.
 func (d downloadParams) errMissingSlugOrUUID() error {
 	return errors.New("need a 'slug' or a 'uuid'")
 }
 
-// errGivenTrackOrTeamMissingSlug is a template pattern default.
 func (d downloadParams) errGivenTrackOrTeamMissingSlug() error {
 	return errors.New("track or team requires slug (not uuid)")
 }
 
-// downloadableFrom is the interface to use the template pattern when creating downloadParams from different types.
+// downloadableFrom is an interface for variant behavior for downloads initiated from different types.
 // Clients can embed downloadParams to delegate to the default implementation.
-// This allows fine-grained specializations without having to define the entire interface.
 type downloadableFrom interface {
 	writeExerciseFilesPermitted() bool
 	errMissingSlugOrUUID() error
