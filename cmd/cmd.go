@@ -116,12 +116,14 @@ func newDownloadFromExercise(exercise ws.Exercise, usrCfg *viper.Viper) (*downlo
 
 // newDownload creates a write ready download by requesting a downloadPayload from the Exercism API.
 func newDownload(params *downloadParams, writer downloadWriter) (*download, error) {
-	if err := params.validate(); err != nil {
+	var err error
+	if err = params.validate(); err != nil {
 		return nil, err
 	}
 
 	d := &download{params: params}
-	if err := d.setPayload(); err != nil {
+	d.payload, err = d.requestPayload()
+	if err != nil {
 		return nil, err
 	}
 	d.setWriter(writer)
@@ -165,31 +167,32 @@ func (d *download) setWriter(writer downloadWriter) {
 	d.writer = writer
 }
 
-// setPayload sets the payload by requesting a downloadPayload from the Exercism API.
-func (d *download) setPayload() error {
+// requestPayload returns a downloadPayload from the Exercism API.
+func (d download) requestPayload() (*downloadPayload, error) {
 	client, err := api.NewClient(d.params.token, d.params.apibaseurl)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	req, err := client.NewRequest("GET", d.payloadURL(), nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	d.buildPayloadQueryParams(req.URL)
 
 	res, err := client.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer res.Body.Close()
 
-	if err := json.NewDecoder(res.Body).Decode(&d.payload); err != nil {
-		return fmt.Errorf("unable to parse API response - %s", err)
+	var payload *downloadPayload
+	if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
+		return nil, fmt.Errorf("unable to parse API response - %s", err)
 	}
 
 	if res.StatusCode == http.StatusUnauthorized {
-		return fmt.Errorf(
+		return nil, fmt.Errorf(
 			"unauthorized request. Please run the configure command. You can find your API token at %s/my/settings",
 			config.InferSiteURL(d.params.apibaseurl),
 		)
@@ -197,16 +200,16 @@ func (d *download) setPayload() error {
 	if res.StatusCode != http.StatusOK {
 		switch d.payload.Error.Type {
 		case "track_ambiguous":
-			return fmt.Errorf(
+			return nil, fmt.Errorf(
 				"%s: %s",
 				d.payload.Error.Message,
 				strings.Join(d.payload.Error.PossibleTrackIDs, ", "),
 			)
 		default:
-			return errors.New(d.payload.Error.Message)
+			return nil, errors.New(d.payload.Error.Message)
 		}
 	}
-	return nil
+	return payload, nil
 }
 
 // payloadURL is the URL used to request a downloadPayload.
