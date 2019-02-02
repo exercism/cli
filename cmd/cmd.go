@@ -103,9 +103,8 @@ func newDownloadFromFlags(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download,
 	return newDownload(downloadParams, &fileDownloadWriter{})
 }
 
-// newDownloadFromExercise initiates a download from an exercise.
+// newDownloadFromExercise initiates a download from an existing exercise directory.
 // This is used to get metadata and isn't the primary interaction for downloading.
-// Only allows writing metadata, not solution files.
 func newDownloadFromExercise(exercise ws.Exercise, usrCfg *viper.Viper) (*download, error) {
 	downloadParams, err := newDownloadParamsFromExercise(exercise, usrCfg)
 	if err != nil {
@@ -392,7 +391,7 @@ type downloadParams struct {
 	downloadableFrom
 }
 
-// newDownloadParamsFromExercise creates a new downloadParams given an exercise.
+// newDownloadParamsFromExercise creates a new downloadParams from an exercise.
 func newDownloadParamsFromExercise(exercise ws.Exercise, usrCfg *viper.Viper) (*downloadParams, error) {
 	d := &downloadParams{
 		slug:             exercise.Slug,
@@ -480,7 +479,7 @@ func (d downloadableFromFlags) errGivenTrackOrTeamMissingSlug() error {
 	return errors.New("--track or --team requires --exercise (not --uuid)")
 }
 
-// downloadableFromExercise represents downloadParams created from an exercise.
+// downloadableFromExercise represents downloadParams created from an existing exercise directory.
 // This delegates to the template default.
 type downloadableFromExercise struct{ *downloadParams }
 
