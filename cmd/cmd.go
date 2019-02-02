@@ -332,7 +332,9 @@ func (w fileDownloadWriter) writeSolutionFiles() error {
 		return err
 	}
 	for _, filename := range w.download.payload.Solution.Files {
-		w.writeSolutionFile(filename)
+		if err := w.writeSolutionFile(filename); err != nil {
+			return err
+		}
 	}
 	return nil
 }
