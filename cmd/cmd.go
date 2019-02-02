@@ -328,9 +328,6 @@ func (w fileDownloadWriter) writeMetadata() error {
 // An HTTP request is made using each filename and failed responses are swallowed.
 // All successful file responses are written except when 0 Content-Length.
 func (w fileDownloadWriter) writeSolutionFiles() error {
-	if err := w.download.ensureSolutionWritable(); err != nil {
-		return err
-	}
 	for _, filename := range w.download.payload.Solution.Files {
 		if err := w.writeSolutionFile(filename); err != nil {
 			return err
