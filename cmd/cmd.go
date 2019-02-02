@@ -282,7 +282,7 @@ func (d download) solutionBelongsToOtherUser() bool {
 // ensureSolutionWritable checks permission for writing solution files.
 func (d download) ensureSolutionWritable() error {
 	if !d.params.downloadableFrom.writeSolutionPermitted() {
-		return errors.New("writing solution files not permitted when downloading from this type")
+		return errors.New("writing solution files not permitted in this context")
 	}
 	return nil
 }
