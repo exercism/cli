@@ -105,7 +105,7 @@ func newDownloadFromFlags(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download,
 
 // newDownloadFromExercise initiates a download from an exercise.
 // This is used to get metadata and isn't the primary interaction for downloading.
-// Only allows writing metadata, not exercise files.
+// Only allows writing metadata, not solution files.
 func newDownloadFromExercise(exercise ws.Exercise, usrCfg *viper.Viper) (*download, error) {
 	downloadParams, err := newDownloadParamsFromExercise(exercise, usrCfg)
 	if err != nil {
@@ -280,10 +280,10 @@ func (d download) solutionBelongsToOtherUser() bool {
 	return !d.payload.Solution.User.IsRequester
 }
 
-// ensureExerciseFilesWritable checks permission for writing exercise files.
-func (d download) ensureExerciseFilesWritable() error {
-	if !d.params.downloadableFrom.writeExerciseFilesPermitted() {
-		return errors.New("writing exercise files not permitted when downloading from this type")
+// ensureSolutionWritable checks permission for writing solution files.
+func (d download) ensureSolutionWritable() error {
+	if !d.params.downloadableFrom.writeSolutionPermitted() {
+		return errors.New("writing solution files not permitted when downloading from this type")
 	}
 	return nil
 }
@@ -325,11 +325,11 @@ func (w fileDownloadWriter) writeMetadata() error {
 	return metadata.Write(w.destination())
 }
 
-// writeSolutionFiles attempts to write each exercise file that is part of the downloaded Solution.
+// writeSolutionFiles attempts to write each file that is part of the downloaded solution.
 // An HTTP request is made using each filename and failed responses are swallowed.
 // All successful file responses are written except when 0 Content-Length.
 func (w fileDownloadWriter) writeSolutionFiles() error {
-	if err := w.download.ensureExerciseFilesWritable(); err != nil {
+	if err := w.download.ensureSolutionWritable(); err != nil {
 		return err
 	}
 	for _, filename := range w.download.payload.Solution.Files {
@@ -339,7 +339,7 @@ func (w fileDownloadWriter) writeSolutionFiles() error {
 }
 
 func (w fileDownloadWriter) writeSolutionFile(filename string) error {
-	if err := w.download.ensureExerciseFilesWritable(); err != nil {
+	if err := w.download.ensureSolutionWritable(); err != nil {
 		return err
 	}
 	res, err := w.requester.requestSolutionFile(filename)
@@ -449,7 +449,7 @@ func (d downloadParams) validate() error {
 	return nil
 }
 
-func (d downloadParams) writeExerciseFilesPermitted() bool { return false }
+func (d downloadParams) writeSolutionPermitted() bool { return false }
 
 func (d downloadParams) errMissingSlugOrUUID() error {
 	return errors.New("need a 'slug' or a 'uuid'")
@@ -462,7 +462,7 @@ func (d downloadParams) errGivenTrackOrTeamMissingSlug() error {
 // downloadableFrom is an interface for variant behavior for downloads initiated from different types.
 // Clients can embed downloadParams to delegate to the default implementation.
 type downloadableFrom interface {
-	writeExerciseFilesPermitted() bool
+	writeSolutionPermitted() bool
 	errMissingSlugOrUUID() error
 	errGivenTrackOrTeamMissingSlug() error
 }
@@ -470,7 +470,7 @@ type downloadableFrom interface {
 // downloadableFromFlags represents downloadParams created from flags.
 type downloadableFromFlags struct{}
 
-func (d downloadableFromFlags) writeExerciseFilesPermitted() bool { return true }
+func (d downloadableFromFlags) writeSolutionPermitted() bool { return true }
 
 func (d downloadableFromFlags) errMissingSlugOrUUID() error {
 	return errors.New("need an --exercise name or a solution --uuid")
