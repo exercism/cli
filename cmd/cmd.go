@@ -428,6 +428,10 @@ func (d *downloadParams) newDownloadParams(usrCfg *viper.Viper) (*downloadParams
 	d.token = usrCfg.GetString("token")
 	d.apibaseurl = usrCfg.GetString("apibaseurl")
 	d.workspace = usrCfg.GetString("workspace")
+
+	if d.downloadableFrom == nil {
+		d.downloadableFrom = d
+	}
 	return d, d.validate()
 }
 
