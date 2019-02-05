@@ -491,7 +491,7 @@ type downloadParamsValidator struct {
 	params *downloadParams
 }
 
-// needsSlugXorUUID checks the presence of either a slug or a uuid (but not both).
+// needsSlugXorUUID checks the presence of slug XOR uuid.
 func (d downloadParamsValidator) needsSlugXorUUID() error {
 	if d.params.slug != "" && d.params.uuid != "" || d.params.uuid == d.params.slug {
 		return d.params.downloadableFrom.errMissingSlugOrUUID()
