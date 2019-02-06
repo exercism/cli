@@ -270,9 +270,9 @@ func (d download) solutionBelongsToOtherUser() bool {
 	return !d.payload.Solution.User.IsRequester
 }
 
-// ensureSolutionWritable checks permission for writing solution files.
-func (d download) ensureSolutionWritable() error {
-	if !d.params.downloadableFrom.writeSolutionPermitted() {
+// ensureSolutionFilesWritable checks permission for writing solution files.
+func (d download) ensureSolutionFilesWritable() error {
+	if !d.params.downloadableFrom.writeSolutionFilesPermitted() {
 		return errors.New("writing solution files not permitted in this context")
 	}
 	return nil
@@ -326,7 +326,7 @@ func (w fileDownloadWriter) writeSolutionFiles() error {
 }
 
 func (w fileDownloadWriter) writeSolutionFile(filename string) error {
-	if err := w.download.ensureSolutionWritable(); err != nil {
+	if err := w.download.ensureSolutionFilesWritable(); err != nil {
 		return err
 	}
 	res, err := w.requester.requestSolutionFile(filename)
@@ -427,7 +427,6 @@ func (d *downloadParams) newDownloadParams(usrCfg *viper.Viper) (*downloadParams
 // validate validates creation of downloadParams.
 func (d downloadParams) validate() error {
 	validator := downloadParamsValidator{params: &d}
-
 	if err := validator.needsSlugXorUUID(); err != nil {
 		return err
 	}
@@ -440,12 +439,15 @@ func (d downloadParams) validate() error {
 	return nil
 }
 
-func (d downloadParams) writeSolutionPermitted() bool { return false }
+// writeSolutionFilesPermitted is the default permission.
+func (d downloadParams) writeSolutionFilesPermitted() bool { return false }
 
+// errMissingSlugOrUUID is the default error.
 func (d downloadParams) errMissingSlugOrUUID() error {
 	return errors.New("need a 'slug' or a 'uuid'")
 }
 
+// errGivenTrackOrTeamMissingSlug is the default error.
 func (d downloadParams) errGivenTrackOrTeamMissingSlug() error {
 	return errors.New("track or team requires slug (not uuid)")
 }
@@ -453,7 +455,8 @@ func (d downloadParams) errGivenTrackOrTeamMissingSlug() error {
 // downloadableFrom is an interface for variant behavior for downloads initiated from different types.
 // Clients can embed downloadParams to delegate to the default implementation.
 type downloadableFrom interface {
-	writeSolutionPermitted() bool
+	// indicates permission to write solution files from the payload.
+	writeSolutionFilesPermitted() bool
 	errMissingSlugOrUUID() error
 	errGivenTrackOrTeamMissingSlug() error
 }
@@ -461,7 +464,7 @@ type downloadableFrom interface {
 // downloadableFromFlags represents downloadParams created from flags.
 type downloadableFromFlags struct{}
 
-func (d downloadableFromFlags) writeSolutionPermitted() bool { return true }
+func (d downloadableFromFlags) writeSolutionFilesPermitted() bool { return true }
 
 func (d downloadableFromFlags) errMissingSlugOrUUID() error {
 	return errors.New("need an --exercise name or a solution --uuid")
@@ -472,7 +475,7 @@ func (d downloadableFromFlags) errGivenTrackOrTeamMissingSlug() error {
 }
 
 // downloadableFromExercise represents downloadParams created from an existing exercise directory.
-// This delegates to the template default.
+// This delegates to the default implementation.
 type downloadableFromExercise struct{ *downloadParams }
 
 // downloadParamsValidator contains validation rules for downloadParams.
