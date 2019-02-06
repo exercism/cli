@@ -46,7 +46,6 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	if err != nil {
 		return err
 	}
-
 	writer := newFileDownloadWriter(download)
 	if err := writer.writeSolutionFiles(); err != nil {
 		return err
@@ -55,9 +54,13 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", writer.destination())
+	printDownloadResult(writer.destination())
 	return nil
+}
+
+func printDownloadResult(destination string) {
+	fmt.Fprintf(Err, "\nDownloaded to\n")
+	fmt.Fprintf(Out, "%s\n", destination)
 }
 
 func setupDownloadFlags(flags *pflag.FlagSet) {
