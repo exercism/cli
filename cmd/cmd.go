@@ -115,10 +115,6 @@ func newDownloadFromExercise(exercise ws.Exercise, usrCfg *viper.Viper) (*downlo
 // newDownload creates a write ready download by requesting a downloadPayload from the Exercism API.
 func newDownload(params *downloadParams) (*download, error) {
 	var err error
-	if err = params.validate(); err != nil {
-		return nil, err
-	}
-
 	d := &download{params: params}
 	d.payload, err = d.requestPayload()
 	if err != nil {
