@@ -90,7 +90,6 @@ type solutionRequester interface {
 type download struct {
 	params  *downloadParams
 	payload *downloadPayload
-	writer  downloadWriter
 }
 
 // newDownloadFromFlags initiates a download from flags.
@@ -100,7 +99,7 @@ func newDownloadFromFlags(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download,
 	if err != nil {
 		return nil, err
 	}
-	return newDownload(downloadParams, &fileDownloadWriter{})
+	return newDownload(downloadParams)
 }
 
 // newDownloadFromExercise initiates a download from an existing exercise directory.
@@ -110,11 +109,11 @@ func newDownloadFromExercise(exercise ws.Exercise, usrCfg *viper.Viper) (*downlo
 	if err != nil {
 		return nil, err
 	}
-	return newDownload(downloadParams, &fileDownloadWriter{})
+	return newDownload(downloadParams)
 }
 
 // newDownload creates a write ready download by requesting a downloadPayload from the Exercism API.
-func newDownload(params *downloadParams, writer downloadWriter) (*download, error) {
+func newDownload(params *downloadParams) (*download, error) {
 	var err error
 	if err = params.validate(); err != nil {
 		return nil, err
@@ -125,10 +124,6 @@ func newDownload(params *downloadParams, writer downloadWriter) (*download, erro
 	if err != nil {
 		return nil, err
 	}
-
-	writer.init(d)
-	d.writer = writer
-
 	return d, d.validate()
 }
 
@@ -300,7 +295,6 @@ func (d download) validate() error {
 
 // downloadWriter writes download contents.
 type downloadWriter interface {
-	init(*download)
 	writeMetadata() error
 	writeSolutionFiles() error
 	destination() string
@@ -312,10 +306,9 @@ type fileDownloadWriter struct {
 	requester solutionRequester
 }
 
-// init initiates the writer by setting its download dependent fields.
-func (w *fileDownloadWriter) init(dl *download) {
-	w.download = dl
-	w.requester = dl
+// newFileDownloadWriter creates a fileDownloadWriter.
+func newFileDownloadWriter(dl *download) *fileDownloadWriter {
+	return &fileDownloadWriter{download: dl, requester: dl}
 }
 
 // writeMetadata writes the exercise metadata.
