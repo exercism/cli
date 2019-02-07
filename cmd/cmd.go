@@ -81,11 +81,6 @@ func validateUserConfig(cfg *viper.Viper) error {
 	return nil
 }
 
-// solutionRequester is the interface for requesting a solution file from the Exercism API.
-type solutionRequester interface {
-	requestSolutionFile(string) (*http.Response, error)
-}
-
 // download is a download from the Exercism API.
 type download struct {
 	params  *downloadParams
@@ -291,13 +286,12 @@ func (d download) validate() error {
 
 // downloadWriter writes download contents to the file system.
 type downloadWriter struct {
-	download  *download
-	requester solutionRequester
+	download *download
 }
 
 // newDownloadWriter creates a downloadWriter.
 func newDownloadWriter(dl *download) *downloadWriter {
-	return &downloadWriter{download: dl, requester: dl}
+	return &downloadWriter{download: dl}
 }
 
 // writeMetadata writes the exercise metadata.
@@ -322,7 +316,7 @@ func (w downloadWriter) writeSolutionFile(filename string) error {
 	if err := w.download.ensureSolutionFilesWritable(); err != nil {
 		return err
 	}
-	res, err := w.requester.requestSolutionFile(filename)
+	res, err := w.download.requestSolutionFile(filename)
 	if err != nil {
 		return err
 	}
