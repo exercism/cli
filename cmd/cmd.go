@@ -289,26 +289,19 @@ func (d download) validate() error {
 	return nil
 }
 
-// downloadWriter writes download contents.
-type downloadWriter interface {
-	writeMetadata() error
-	writeSolutionFiles() error
-	destination() string
-}
-
-// fileDownloadWriter writes download contents to the file system.
-type fileDownloadWriter struct {
+// downloadWriter writes download contents to the file system.
+type downloadWriter struct {
 	download  *download
 	requester solutionRequester
 }
 
-// newFileDownloadWriter creates a fileDownloadWriter.
-func newFileDownloadWriter(dl *download) *fileDownloadWriter {
-	return &fileDownloadWriter{download: dl, requester: dl}
+// newDownloadWriter creates a downloadWriter.
+func newDownloadWriter(dl *download) *downloadWriter {
+	return &downloadWriter{download: dl, requester: dl}
 }
 
 // writeMetadata writes the exercise metadata.
-func (w fileDownloadWriter) writeMetadata() error {
+func (w downloadWriter) writeMetadata() error {
 	metadata := w.download.metadata()
 	return metadata.Write(w.destination())
 }
@@ -316,7 +309,7 @@ func (w fileDownloadWriter) writeMetadata() error {
 // writeSolutionFiles attempts to write each file that is part of the downloaded solution.
 // An HTTP request is made using each filename and failed responses are swallowed.
 // All successful file responses are written except when 0 Content-Length.
-func (w fileDownloadWriter) writeSolutionFiles() error {
+func (w downloadWriter) writeSolutionFiles() error {
 	for _, filename := range w.download.payload.Solution.Files {
 		if err := w.writeSolutionFile(filename); err != nil {
 			return err
@@ -325,7 +318,7 @@ func (w fileDownloadWriter) writeSolutionFiles() error {
 	return nil
 }
 
-func (w fileDownloadWriter) writeSolutionFile(filename string) error {
+func (w downloadWriter) writeSolutionFile(filename string) error {
 	if err := w.download.ensureSolutionFilesWritable(); err != nil {
 		return err
 	}
@@ -359,7 +352,7 @@ func (w fileDownloadWriter) writeSolutionFile(filename string) error {
 }
 
 // destination is the download destination path.
-func (w fileDownloadWriter) destination() string {
+func (w downloadWriter) destination() string {
 	return w.download.exercise().MetadataDir()
 }
 

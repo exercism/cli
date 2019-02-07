@@ -46,7 +46,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	if err != nil {
 		return err
 	}
-	writer := newFileDownloadWriter(download)
+	writer := newDownloadWriter(download)
 	if err := writer.writeSolutionFiles(); err != nil {
 		return err
 	}
