@@ -107,14 +107,50 @@ func newDownloadFromExercise(exercise ws.Exercise, usrCfg *viper.Viper) (*downlo
 	return newDownload(downloadParams)
 }
 
-// newDownload creates a write ready download by requesting a downloadPayload from the Exercism API.
+// newDownload creates a download by requesting a downloadPayload from the Exercism API.
 func newDownload(params *downloadParams) (*download, error) {
-	var err error
 	d := &download{params: params}
-	d.payload, err = d.requestPayload()
+
+	client, err := api.NewClient(d.params.token, d.params.apibaseurl)
 	if err != nil {
 		return nil, err
 	}
+
+	req, err := client.NewRequest("GET", d.payloadURL(), nil)
+	if err != nil {
+		return nil, err
+	}
+	d.buildPayloadQueryParams(req.URL)
+
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if err := json.NewDecoder(res.Body).Decode(&d.payload); err != nil {
+		return nil, fmt.Errorf("unable to parse API response - %s", err)
+	}
+
+	if res.StatusCode == http.StatusUnauthorized {
+		return nil, fmt.Errorf(
+			"unauthorized request. Please run the configure command. You can find your API token at %s/my/settings",
+			config.InferSiteURL(d.params.apibaseurl),
+		)
+	}
+	if res.StatusCode != http.StatusOK {
+		switch d.payload.Error.Type {
+		case "track_ambiguous":
+			return nil, fmt.Errorf(
+				"%s: %s",
+				d.payload.Error.Message,
+				strings.Join(d.payload.Error.PossibleTrackIDs, ", "),
+			)
+		default:
+			return nil, errors.New(d.payload.Error.Message)
+		}
+	}
+
 	return d, d.validate()
 }
 
@@ -147,51 +183,6 @@ func (d download) requestSolutionFile(filename string) (*http.Response, error) {
 	}
 
 	return res, nil
-}
-
-// requestPayload returns a downloadPayload from the Exercism API.
-func (d download) requestPayload() (*downloadPayload, error) {
-	client, err := api.NewClient(d.params.token, d.params.apibaseurl)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := client.NewRequest("GET", d.payloadURL(), nil)
-	if err != nil {
-		return nil, err
-	}
-	d.buildPayloadQueryParams(req.URL)
-
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	var payload *downloadPayload
-	if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
-		return nil, fmt.Errorf("unable to parse API response - %s", err)
-	}
-
-	if res.StatusCode == http.StatusUnauthorized {
-		return nil, fmt.Errorf(
-			"unauthorized request. Please run the configure command. You can find your API token at %s/my/settings",
-			config.InferSiteURL(d.params.apibaseurl),
-		)
-	}
-	if res.StatusCode != http.StatusOK {
-		switch d.payload.Error.Type {
-		case "track_ambiguous":
-			return nil, fmt.Errorf(
-				"%s: %s",
-				d.payload.Error.Message,
-				strings.Join(d.payload.Error.PossibleTrackIDs, ", "),
-			)
-		default:
-			return nil, errors.New(d.payload.Error.Message)
-		}
-	}
-	return payload, nil
 }
 
 // payloadURL is the URL used to request a downloadPayload.
