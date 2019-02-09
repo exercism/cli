@@ -154,37 +154,6 @@ func newDownload(params *downloadParams) (*download, error) {
 	return d, d.validate()
 }
 
-// requestSolutionFile requests a Solution file from the API, returning an HTTP response.
-// Non-200 responses and 0 Content-Length responses are swallowed, returning nil.
-func (d download) requestSolutionFile(filename string) (*http.Response, error) {
-	parsedURL, err := netURL.ParseRequestURI(
-		fmt.Sprintf("%s%s", d.payload.Solution.FileDownloadBaseURL, filename))
-	if err != nil {
-		return nil, err
-	}
-
-	client, err := api.NewClient(d.params.token, d.params.apibaseurl)
-	req, err := client.NewRequest("GET", parsedURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	if res.StatusCode != http.StatusOK {
-		// TODO: deal with it
-		return nil, nil
-	}
-	// Don't bother with empty files.
-	if res.Header.Get("Content-Length") == "0" {
-		return nil, nil
-	}
-
-	return res, nil
-}
-
 // payloadURL is the URL used to request a downloadPayload.
 // The latest solution is used unless given a UUID.
 func (d download) payloadURL() string {
@@ -275,14 +244,54 @@ func (d download) validate() error {
 	return nil
 }
 
+// solutionFileRequester requests solution files from a download.
+type solutionFileRequester struct {
+	download *download
+}
+
+// request requests a Solution file from the API, returning an HTTP response.
+// Non-200 responses and 0 Content-Length responses are swallowed, returning nil.
+func (s solutionFileRequester) request(filename string) (*http.Response, error) {
+	parsedURL, err := netURL.ParseRequestURI(
+		fmt.Sprintf("%s%s", s.download.payload.Solution.FileDownloadBaseURL, filename))
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := api.NewClient(s.download.params.token, s.download.params.apibaseurl)
+	req, err := client.NewRequest("GET", parsedURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		// TODO: deal with it
+		return nil, nil
+	}
+	// Don't bother with empty files.
+	if res.Header.Get("Content-Length") == "0" {
+		return nil, nil
+	}
+
+	return res, nil
+}
+
 // downloadWriter writes download contents to the file system.
 type downloadWriter struct {
-	download *download
+	download      *download
+	fileRequester solutionFileRequester
 }
 
 // newDownloadWriter creates a downloadWriter.
 func newDownloadWriter(dl *download) *downloadWriter {
-	return &downloadWriter{download: dl}
+	return &downloadWriter{
+		download:      dl,
+		fileRequester: solutionFileRequester{download: dl},
+	}
 }
 
 // writeMetadata writes the exercise metadata.
@@ -307,7 +316,7 @@ func (w downloadWriter) writeSolutionFile(filename string) error {
 	if err := w.download.ensureSolutionFilesWritable(); err != nil {
 		return err
 	}
-	res, err := w.download.requestSolutionFile(filename)
+	res, err := w.fileRequester.request(filename)
 	if err != nil {
 		return err
 	}
