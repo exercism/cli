@@ -422,12 +422,12 @@ func (d downloadParams) writeSolutionFilesPermitted() bool { return false }
 
 // errMissingSlugOrUUID is the default error.
 func (d downloadParams) errMissingSlugOrUUID() error {
-	return errors.New("need a 'slug' or a 'uuid'")
+	return errors.New("programmer error")
 }
 
 // errGivenTrackOrTeamMissingSlug is the default error.
 func (d downloadParams) errGivenTrackOrTeamMissingSlug() error {
-	return errors.New("track or team requires slug (not uuid)")
+	return errors.New("programmer error")
 }
 
 // downloadableFrom is an interface for variant behavior for downloads initiated from different types.
