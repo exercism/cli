@@ -1,3 +1,5 @@
+#compdef exercism
+
 _exercism() {
     local curcontext="$curcontext" state line
     typeset -A opt_args
@@ -33,4 +35,4 @@ _exercism() {
     esac
 }
 
-compdef '_exercism' exercism
+_exercism "$@"

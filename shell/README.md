@@ -17,15 +17,17 @@ adding the following snippet:
 
 ### Zsh
 
+Load up the completion by placing the `exercism_completion.zsh` somewhere on
+your `$fpath` as `_exercism`. For example:
+
     mkdir -p ~/.config/exercism
-    mv ../shell/exercism_completion.zsh ~/.config/exercism/exercism_completion.zsh
+    mv ../shell/exercism_completion.zsh ~/.config/exercism/_exercism
 
-Load up the completion in your `.zshrc`, `.zsh_profile` or `.profile` by adding
-the following snippet
+and then add the directory to your `$fpath` in your `.zshrc`, `.zsh_profile` or
+`.profile` before running `compinit`:
 
-    if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
-      source ~/.config/exercism/exercism_completion.zsh
-    fi
+    export fpath=(~/.config/exercism $fpath)
+    autoload -U compinit && compinit
 
 
 #### Oh my Zsh
