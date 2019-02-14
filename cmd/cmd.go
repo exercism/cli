@@ -373,7 +373,7 @@ func newDownloadParamsFromExercise(exercise ws.Exercise, usrCfg *viper.Viper) (*
 		track:            exercise.Track,
 		downloadableFrom: downloadableFromExercise{},
 	}
-	return d.newDownloadParams(usrCfg)
+	return d.build(usrCfg)
 }
 
 // newDownloadParamsFromFlags creates a new downloadParams given flags.
@@ -396,11 +396,11 @@ func newDownloadParamsFromFlags(flags *pflag.FlagSet, usrCfg *viper.Viper) (*dow
 	if err != nil {
 		return nil, err
 	}
-	return d.newDownloadParams(usrCfg)
+	return d.build(usrCfg)
 }
 
-// newDownloadParams contains the common creation logic for creating downloadParams.
-func (d *downloadParams) newDownloadParams(usrCfg *viper.Viper) (*downloadParams, error) {
+// build contains the common creation logic for creating downloadParams.
+func (d *downloadParams) build(usrCfg *viper.Viper) (*downloadParams, error) {
 	d.token = usrCfg.GetString("token")
 	d.apibaseurl = usrCfg.GetString("apibaseurl")
 	d.workspace = usrCfg.GetString("workspace")
