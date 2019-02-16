@@ -83,8 +83,8 @@ func validateUserConfig(cfg *viper.Viper) error {
 
 // download is a download from the Exercism API.
 type download struct {
-	params  *downloadParams
-	payload *downloadPayload
+	params *downloadParams
+	*downloadPayload
 }
 
 // newDownloadFromFlags initiates a download from flags.
@@ -128,7 +128,7 @@ func newDownload(params *downloadParams) (*download, error) {
 	}
 	defer res.Body.Close()
 
-	if err := json.NewDecoder(res.Body).Decode(&d.payload); err != nil {
+	if err := json.NewDecoder(res.Body).Decode(&d.downloadPayload); err != nil {
 		return nil, fmt.Errorf("unable to parse API response - %s", err)
 	}
 
@@ -139,15 +139,15 @@ func newDownload(params *downloadParams) (*download, error) {
 		)
 	}
 	if res.StatusCode != http.StatusOK {
-		switch d.payload.Error.Type {
+		switch d.Error.Type {
 		case "track_ambiguous":
 			return nil, fmt.Errorf(
 				"%s: %s",
-				d.payload.Error.Message,
-				strings.Join(d.payload.Error.PossibleTrackIDs, ", "),
+				d.Error.Message,
+				strings.Join(d.Error.PossibleTrackIDs, ", "),
 			)
 		default:
-			return nil, errors.New(d.payload.Error.Message)
+			return nil, errors.New(d.Error.Message)
 		}
 	}
 
@@ -181,22 +181,22 @@ func (d download) buildPayloadQueryParams(url *netURL.URL) {
 
 func (d download) metadata() ws.ExerciseMetadata {
 	return ws.ExerciseMetadata{
-		AutoApprove: d.payload.Solution.Exercise.AutoApprove,
-		Track:       d.payload.Solution.Exercise.Track.ID,
-		Team:        d.payload.Solution.Team.Slug,
-		Exercise:    d.payload.Solution.Exercise.ID,
-		ID:          d.payload.Solution.ID,
-		URL:         d.payload.Solution.URL,
-		Handle:      d.payload.Solution.User.Handle,
-		IsRequester: d.payload.Solution.User.IsRequester,
+		AutoApprove: d.Solution.Exercise.AutoApprove,
+		Track:       d.Solution.Exercise.Track.ID,
+		Team:        d.Solution.Team.Slug,
+		Exercise:    d.Solution.Exercise.ID,
+		ID:          d.Solution.ID,
+		URL:         d.Solution.URL,
+		Handle:      d.Solution.User.Handle,
+		IsRequester: d.Solution.User.IsRequester,
 	}
 }
 
 func (d download) exercise() ws.Exercise {
 	return ws.Exercise{
 		Root:  d.solutionRootFilepath(),
-		Track: d.payload.Solution.Exercise.Track.ID,
-		Slug:  d.payload.Solution.Exercise.ID,
+		Track: d.Solution.Exercise.Track.ID,
+		Slug:  d.Solution.Exercise.ID,
 	}
 }
 
@@ -206,23 +206,23 @@ func (d download) solutionRootFilepath() string {
 	root := d.params.workspace
 
 	if d.isTeamSolution() {
-		root = filepath.Join(root, "teams", d.payload.Solution.Team.Slug)
+		root = filepath.Join(root, "teams", d.Solution.Team.Slug)
 	}
 	if d.solutionBelongsToOtherUser() {
-		root = filepath.Join(root, "users", d.payload.Solution.User.Handle)
+		root = filepath.Join(root, "users", d.Solution.User.Handle)
 	}
 	return root
 }
 
 // isTeamSolution indicates if the solution is part of a team.
 func (d download) isTeamSolution() bool {
-	return d.payload.Solution.Team.Slug != ""
+	return d.Solution.Team.Slug != ""
 }
 
 // solutionBelongsToOtherUser indicates if the solution belongs to another user
 // (as opposed to being owned by the requesting user).
 func (d download) solutionBelongsToOtherUser() bool {
-	return !d.payload.Solution.User.IsRequester
+	return !d.Solution.User.IsRequester
 }
 
 // ensureSolutionFilesWritable checks permission for writing solution files.
@@ -235,11 +235,11 @@ func (d download) ensureSolutionFilesWritable() error {
 
 // validate verifies creation of a valid download.
 func (d download) validate() error {
-	if d.payload.Solution.ID == "" {
+	if d.Solution.ID == "" {
 		return errors.New("download missing an ID")
 	}
-	if d.payload.Error.Message != "" {
-		return errors.New(d.payload.Error.Message)
+	if d.Error.Message != "" {
+		return errors.New(d.Error.Message)
 	}
 	return nil
 }
@@ -253,7 +253,7 @@ type solutionFileRequester struct {
 // Non-200 responses and 0 Content-Length responses are swallowed, returning nil.
 func (s solutionFileRequester) request(filename string) (*http.Response, error) {
 	parsedURL, err := netURL.ParseRequestURI(
-		fmt.Sprintf("%s%s", s.download.payload.Solution.FileDownloadBaseURL, filename))
+		fmt.Sprintf("%s%s", s.download.Solution.FileDownloadBaseURL, filename))
 	if err != nil {
 		return nil, err
 	}
@@ -304,7 +304,7 @@ func (w downloadWriter) writeMetadata() error {
 // An HTTP request is made using each filename and failed responses are swallowed.
 // All successful file responses are written except when 0 Content-Length.
 func (w downloadWriter) writeSolutionFiles() error {
-	for _, filename := range w.download.payload.Solution.Files {
+	for _, filename := range w.download.Solution.Files {
 		if err := w.writeSolutionFile(filename); err != nil {
 			return err
 		}
