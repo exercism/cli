@@ -439,7 +439,7 @@ func (d downloadParams) errGivenTrackOrTeamMissingSlug() error {
 	return errors.New("programmer error")
 }
 
-// downloadableFrom is an interface for variant behavior for downloads initiated from different types.
+// downloadableFrom is a polymorphic interface for downloads initiated from different types.
 // Clients can embed downloadParams to delegate to the default implementation.
 type downloadableFrom interface {
 	// indicates permission to write solution files from the payload.
