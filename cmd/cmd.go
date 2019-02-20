@@ -81,6 +81,24 @@ func validateUserConfig(cfg *viper.Viper) error {
 	return nil
 }
 
+// decodedAPIError decodes and returns the error message from the API response.
+// If the message is blank, it returns a fallback message with the status code.
+func decodedAPIError(resp *http.Response) error {
+	var apiError struct {
+		Error struct {
+			Type    string `json:"type"`
+			Message string `json:"message"`
+		} `json:"error,omitempty"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&apiError); err != nil {
+		return fmt.Errorf("failed to parse API error response: %s", err)
+	}
+	if apiError.Error.Message != "" {
+		return fmt.Errorf(apiError.Error.Message)
+	}
+	return fmt.Errorf("unexpected API response: %d", resp.StatusCode)
+}
+
 // download is a download from the Exercism API.
 type download struct {
 	params *downloadParams
@@ -250,7 +268,7 @@ type solutionFileRequester struct {
 }
 
 // request requests a Solution file from the API, returning an HTTP response.
-// Non-200 responses and 0 Content-Length responses are swallowed, returning nil.
+// 0 Content-Length responses are swallowed, returning nil.
 func (s solutionFileRequester) request(filename string) (*http.Response, error) {
 	parsedURL, err := netURL.ParseRequestURI(
 		fmt.Sprintf("%s%s", s.download.Solution.FileDownloadBaseURL, filename))
@@ -269,8 +287,7 @@ func (s solutionFileRequester) request(filename string) (*http.Response, error) 
 	}
 
 	if res.StatusCode != http.StatusOK {
-		// TODO: deal with it
-		return nil, nil
+		return nil, decodedAPIError(res)
 	}
 	// Don't bother with empty files.
 	if res.Header.Get("Content-Length") == "0" {
@@ -300,9 +317,6 @@ func (w downloadWriter) writeMetadata() error {
 	return metadata.Write(w.destination())
 }
 
-// writeSolutionFiles attempts to write each file that is part of the downloaded solution.
-// An HTTP request is made using each filename and failed responses are swallowed.
-// All successful file responses are written except when 0 Content-Length.
 func (w downloadWriter) writeSolutionFiles() error {
 	for _, filename := range w.download.Solution.Files {
 		if err := w.writeSolutionFile(filename); err != nil {
@@ -312,6 +326,7 @@ func (w downloadWriter) writeSolutionFiles() error {
 	return nil
 }
 
+// writeSolutionFile attempts to write the file from the downloaded solution.
 func (w downloadWriter) writeSolutionFile(filename string) error {
 	if err := w.download.ensureSolutionFilesWritable(); err != nil {
 		return err
