@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -254,12 +253,7 @@ func (s *submitCmdContext) submit(metadata *workspace.ExerciseMetadata, docs []w
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusBadRequest {
-		var jsonErrBody apiErrorMessage
-		if err := json.NewDecoder(resp.Body).Decode(&jsonErrBody); err != nil {
-			return fmt.Errorf("failed to parse error response - %s", err)
-		}
-
-		return fmt.Errorf(jsonErrBody.Error.Message)
+		return decodedAPIError(resp)
 	}
 
 	bb := &bytes.Buffer{}
@@ -429,11 +423,4 @@ func (s submitValidator) isRequestor(metadata *workspace.ExerciseMetadata) error
 
 func init() {
 	RootCmd.AddCommand(submitCmd)
-}
-
-type apiErrorMessage struct {
-	Error struct {
-		Type    string `json:"type"`
-		Message string `json:"message"`
-	} `json:"error,omitempty"`
 }

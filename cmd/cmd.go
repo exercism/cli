@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"io"
 
@@ -69,4 +71,22 @@ func validateUserConfig(cfg *viper.Viper) error {
 		return fmt.Errorf(msgRerunConfigure, BinaryName)
 	}
 	return nil
+}
+
+// decodedAPIError decodes and returns the error message from the API response.
+// If the message is blank, it returns a fallback message with the status code.
+func decodedAPIError(resp *http.Response) error {
+	var apiError struct {
+		Error struct {
+			Type    string `json:"type"`
+			Message string `json:"message"`
+		} `json:"error,omitempty"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&apiError); err != nil {
+		return fmt.Errorf("failed to parse API error response: %s", err)
+	}
+	if apiError.Error.Message != "" {
+		return fmt.Errorf(apiError.Error.Message)
+	}
+	return fmt.Errorf("unexpected API response: %d", resp.StatusCode)
 }
