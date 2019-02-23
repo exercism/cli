@@ -317,45 +317,36 @@ func (w downloadWriter) writeMetadata() error {
 	return metadata.Write(w.destination())
 }
 
+// writeSolutionFiles attempts to write each file from the downloaded solution.
 func (w downloadWriter) writeSolutionFiles() error {
 	for _, filename := range w.download.Solution.Files {
-		if err := w.writeSolutionFile(filename); err != nil {
+		if err := w.download.ensureSolutionFilesWritable(); err != nil {
 			return err
 		}
-	}
-	return nil
-}
+		res, err := w.fileRequester.request(filename)
+		if err != nil {
+			return err
+		}
+		if res == nil {
+			// Ignore empty responses
+			continue
+		}
+		defer res.Body.Close()
 
-// writeSolutionFile attempts to write the file from the downloaded solution.
-func (w downloadWriter) writeSolutionFile(filename string) error {
-	if err := w.download.ensureSolutionFilesWritable(); err != nil {
-		return err
-	}
-	res, err := w.fileRequester.request(filename)
-	if err != nil {
-		return err
-	}
-	if res == nil {
-		return nil
-	}
-	defer res.Body.Close()
-
-	// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
-	// TODO: handle --force flag to overwrite without asking.
-
-	destination := filepath.Join(
-		w.destination(),
-		sanitizeLegacyFilepath(filename, w.download.exercise().Slug))
-	if err = os.MkdirAll(filepath.Dir(destination), os.FileMode(0755)); err != nil {
-		return err
-	}
-	f, err := os.Create(destination)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	if _, err := io.Copy(f, res.Body); err != nil {
-		return err
+		destination := filepath.Join(
+			w.destination(),
+			sanitizeLegacyFilepath(filename, w.download.exercise().Slug))
+		if err = os.MkdirAll(filepath.Dir(destination), os.FileMode(0755)); err != nil {
+			return err
+		}
+		f, err := os.Create(destination)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		if _, err := io.Copy(f, res.Body); err != nil {
+			return err
+		}
 	}
 	return nil
 }
