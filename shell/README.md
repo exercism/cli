@@ -20,13 +20,13 @@ adding the following snippet:
 Load up the completion by placing the `exercism_completion.zsh` somewhere on
 your `$fpath` as `_exercism`. For example:
 
-    mkdir -p ~/.config/exercism
-    mv ../shell/exercism_completion.zsh ~/.config/exercism/_exercism
+    mkdir -p ~/.zsh/functions
+    mv ../shell/exercism_completion.zsh ~/.zsh/functions/_exercism
 
 and then add the directory to your `$fpath` in your `.zshrc`, `.zsh_profile` or
 `.profile` before running `compinit`:
 
-    export fpath=(~/.config/exercism $fpath)
+    export fpath=(~/.zsh/functions $fpath)
     autoload -U compinit && compinit
 
 
@@ -39,4 +39,3 @@ If you are using the popular [oh-my-zsh](https://github.com/robbyrussell/oh-my-z
 Completions must go in the user defined `$fish_complete_path`. By default, this is `~/.config/fish/completions`
 
     mv ../shell/exercism.fish ~/.config/fish/exercism.fish
-
