@@ -7,10 +7,6 @@ go:
   - "1.11.x"
   - tip
 
-install:
-  - go get -u github.com/golang/dep/...
-  - dep ensure
-
 script:
   - ./.travis.gofmt.sh
   - go test -cover ./...
