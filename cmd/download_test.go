@@ -144,7 +144,7 @@ func TestDownload(t *testing.T) {
 		assert.NoError(t, err)
 
 		assert.Equal(t, "bogus-track", metadata.Track)
-		assert.Equal(t, "bogus-exercise", metadata.Exercise)
+		assert.Equal(t, "bogus-exercise", metadata.ExerciseSlug)
 		assert.Equal(t, tc.requester, metadata.IsRequester)
 	}
 }

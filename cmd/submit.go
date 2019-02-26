@@ -389,7 +389,7 @@ func (s submitValidator) submissionNotEmpty(docs []workspace.Document) error {
 
 // metadataMatchesExercise checks that the metadata refers to the exercise being submitted.
 func (s submitValidator) metadataMatchesExercise(metadata *workspace.ExerciseMetadata, exercise workspace.Exercise) error {
-	if metadata.Exercise != exercise.Slug {
+	if metadata.ExerciseSlug != exercise.Slug {
 		// TODO: error msg should suggest running future doctor command
 		msg := `
 
@@ -400,7 +400,7 @@ func (s submitValidator) metadataMatchesExercise(metadata *workspace.ExerciseMet
     Please rename the directory '%[1]s' to '%[2]s' and try again.
 
         `
-		return fmt.Errorf(msg, exercise.Slug, metadata.Exercise)
+		return fmt.Errorf(msg, exercise.Slug, metadata.ExerciseSlug)
 	}
 	return nil
 }
@@ -416,7 +416,7 @@ func (s submitValidator) isRequestor(metadata *workspace.ExerciseMetadata) error
         %s download --exercise=%s --track=%s
 
         `
-		return fmt.Errorf(msg, BinaryName, metadata.Exercise, metadata.Track)
+		return fmt.Errorf(msg, BinaryName, metadata.ExerciseSlug, metadata.Track)
 	}
 	return nil
 }

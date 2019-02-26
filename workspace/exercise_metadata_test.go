@@ -15,13 +15,13 @@ func TestExerciseMetadata(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	em1 := &ExerciseMetadata{
-		Track:       "a-track",
-		Exercise:    "bogus-exercise",
-		ID:          "abc",
-		URL:         "http://example.com",
-		Handle:      "alice",
-		IsRequester: true,
-		Dir:         dir,
+		Track:        "a-track",
+		ExerciseSlug: "bogus-exercise",
+		ID:           "abc",
+		URL:          "http://example.com",
+		Handle:       "alice",
+		IsRequester:  true,
+		Dir:          dir,
 	}
 	err = em1.Write(dir)
 	assert.NoError(t, err)
@@ -49,29 +49,29 @@ func TestSuffix(t *testing.T) {
 	}{
 		{
 			metadata: ExerciseMetadata{
-				Exercise: "bat",
-				Dir:      "",
+				ExerciseSlug: "bat",
+				Dir:          "",
 			},
 			suffix: "",
 		},
 		{
 			metadata: ExerciseMetadata{
-				Exercise: "bat",
-				Dir:      "/path/to/bat",
+				ExerciseSlug: "bat",
+				Dir:          "/path/to/bat",
 			},
 			suffix: "",
 		},
 		{
 			metadata: ExerciseMetadata{
-				Exercise: "bat",
-				Dir:      "/path/to/bat-2",
+				ExerciseSlug: "bat",
+				Dir:          "/path/to/bat-2",
 			},
 			suffix: "2",
 		},
 		{
 			metadata: ExerciseMetadata{
-				Exercise: "bat",
-				Dir:      "/path/to/bat-200",
+				ExerciseSlug: "bat",
+				Dir:          "/path/to/bat-200",
 			},
 			suffix: "200",
 		},
@@ -92,48 +92,48 @@ func TestExerciseMetadataString(t *testing.T) {
 	}{
 		{
 			metadata: ExerciseMetadata{
-				Track:    "elixir",
-				Exercise: "secret-handshake",
-				Handle:   "",
-				Dir:      "",
+				Track:        "elixir",
+				ExerciseSlug: "secret-handshake",
+				Handle:       "",
+				Dir:          "",
 			},
 			desc: "elixir/secret-handshake",
 		},
 		{
 			metadata: ExerciseMetadata{
-				Track:       "cpp",
-				Exercise:    "clock",
-				Handle:      "alice",
-				IsRequester: true,
+				Track:        "cpp",
+				ExerciseSlug: "clock",
+				Handle:       "alice",
+				IsRequester:  true,
 			},
 			desc: "cpp/clock",
 		},
 		{
 			metadata: ExerciseMetadata{
-				Track:       "cpp",
-				Exercise:    "clock",
-				Handle:      "alice",
-				IsRequester: true,
-				Dir:         "/path/to/clock-2",
+				Track:        "cpp",
+				ExerciseSlug: "clock",
+				Handle:       "alice",
+				IsRequester:  true,
+				Dir:          "/path/to/clock-2",
 			},
 			desc: "cpp/clock (2)",
 		},
 		{
 			metadata: ExerciseMetadata{
-				Track:       "fsharp",
-				Exercise:    "hello-world",
-				Handle:      "bob",
-				IsRequester: false,
+				Track:        "fsharp",
+				ExerciseSlug: "hello-world",
+				Handle:       "bob",
+				IsRequester:  false,
 			},
 			desc: "fsharp/hello-world by @bob",
 		},
 		{
 			metadata: ExerciseMetadata{
-				Track:       "haskell",
-				Exercise:    "allergies",
-				Handle:      "charlie",
-				IsRequester: false,
-				Dir:         "/path/to/allergies-2",
+				Track:        "haskell",
+				ExerciseSlug: "allergies",
+				Handle:       "charlie",
+				IsRequester:  false,
+				Dir:          "/path/to/allergies-2",
 			},
 			desc: "haskell/allergies (2) by @charlie",
 		},
