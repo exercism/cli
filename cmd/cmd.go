@@ -56,7 +56,7 @@ const msgMissingMetadata = `
 
 `
 
-// validateUserConfig validates the presense of required user config values
+// validateUserConfig validates the presence of required user config values
 func validateUserConfig(cfg *viper.Viper) error {
 	if cfg.GetString("token") == "" {
 		return fmt.Errorf(
