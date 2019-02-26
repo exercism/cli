@@ -129,16 +129,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		}
 	}
 
-	metadata := workspace.ExerciseMetadata{
-		AutoApprove:  payload.Solution.Exercise.AutoApprove,
-		Track:        payload.Solution.Exercise.Track.ID,
-		Team:         payload.Solution.Team.Slug,
-		ExerciseSlug: payload.Solution.Exercise.ID,
-		ID:           payload.Solution.ID,
-		URL:          payload.Solution.URL,
-		Handle:       payload.Solution.User.Handle,
-		IsRequester:  payload.Solution.User.IsRequester,
-	}
+	metadata := payload.metadata()
 
 	root := usrCfg.GetString("workspace")
 	if metadata.Team != "" {
@@ -261,6 +252,19 @@ type downloadPayload struct {
 		Message          string   `json:"message"`
 		PossibleTrackIDs []string `json:"possible_track_ids"`
 	} `json:"error,omitempty"`
+}
+
+func (dp downloadPayload) metadata() workspace.ExerciseMetadata {
+	return workspace.ExerciseMetadata{
+		AutoApprove:  dp.Solution.Exercise.AutoApprove,
+		Track:        dp.Solution.Exercise.Track.ID,
+		Team:         dp.Solution.Team.Slug,
+		ExerciseSlug: dp.Solution.Exercise.ID,
+		ID:           dp.Solution.ID,
+		URL:          dp.Solution.URL,
+		Handle:       dp.Solution.User.Handle,
+		IsRequester:  dp.Solution.User.IsRequester,
+	}
 }
 
 func setupDownloadFlags(flags *pflag.FlagSet) {
