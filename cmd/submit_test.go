@@ -218,11 +218,11 @@ func TestLegacyMetadataMigration(t *testing.T) {
 	os.MkdirAll(dir, os.FileMode(0755))
 
 	metadata := &workspace.ExerciseMetadata{
-		ID:          "bogus-solution-uuid",
-		Track:       "bogus-track",
-		Exercise:    "bogus-exercise",
-		URL:         "http://example.com/bogus-url",
-		IsRequester: true,
+		ID:           "bogus-solution-uuid",
+		Track:        "bogus-track",
+		ExerciseSlug: "bogus-exercise",
+		URL:          "http://example.com/bogus-url",
+		IsRequester:  true,
 	}
 	b, err := json.Marshal(metadata)
 	assert.NoError(t, err)
@@ -585,11 +585,11 @@ func TestSubmissionNotConnectedToRequesterAccount(t *testing.T) {
 	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
 
 	metadata := &workspace.ExerciseMetadata{
-		ID:          "bogus-solution-uuid",
-		Track:       "bogus-track",
-		Exercise:    "bogus-exercise",
-		URL:         "http://example.com/bogus-url",
-		IsRequester: false,
+		ID:           "bogus-solution-uuid",
+		Track:        "bogus-track",
+		ExerciseSlug: "bogus-exercise",
+		URL:          "http://example.com/bogus-url",
+		IsRequester:  false,
 	}
 	err = metadata.Write(dir)
 	assert.NoError(t, err)
@@ -651,11 +651,11 @@ func TestExerciseDirnameMatchesMetadataSlug(t *testing.T) {
 
 func writeFakeMetadata(t *testing.T, dir, trackID, exerciseSlug string) {
 	metadata := &workspace.ExerciseMetadata{
-		ID:          "bogus-solution-uuid",
-		Track:       trackID,
-		Exercise:    exerciseSlug,
-		URL:         "http://example.com/bogus-url",
-		IsRequester: true,
+		ID:           "bogus-solution-uuid",
+		Track:        trackID,
+		ExerciseSlug: exerciseSlug,
+		URL:          "http://example.com/bogus-url",
+		IsRequester:  true,
 	}
 	err := metadata.Write(dir)
 	assert.NoError(t, err)

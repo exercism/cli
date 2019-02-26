@@ -130,14 +130,14 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	metadata := workspace.ExerciseMetadata{
-		AutoApprove: payload.Solution.Exercise.AutoApprove,
-		Track:       payload.Solution.Exercise.Track.ID,
-		Team:        payload.Solution.Team.Slug,
-		Exercise:    payload.Solution.Exercise.ID,
-		ID:          payload.Solution.ID,
-		URL:         payload.Solution.URL,
-		Handle:      payload.Solution.User.Handle,
-		IsRequester: payload.Solution.User.IsRequester,
+		AutoApprove:  payload.Solution.Exercise.AutoApprove,
+		Track:        payload.Solution.Exercise.Track.ID,
+		Team:         payload.Solution.Team.Slug,
+		ExerciseSlug: payload.Solution.Exercise.ID,
+		ID:           payload.Solution.ID,
+		URL:          payload.Solution.URL,
+		Handle:       payload.Solution.User.Handle,
+		IsRequester:  payload.Solution.User.IsRequester,
 	}
 
 	root := usrCfg.GetString("workspace")
@@ -151,7 +151,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	exercise := workspace.Exercise{
 		Root:  root,
 		Track: metadata.Track,
-		Slug:  metadata.Exercise,
+		Slug:  metadata.ExerciseSlug,
 	}
 
 	dir := exercise.MetadataDir()
@@ -201,7 +201,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		// Work around a path bug due to an early design decision (later reversed) to
 		// allow numeric suffixes for exercise directories, allowing people to have
 		// multiple parallel versions of an exercise.
-		pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, metadata.Exercise)
+		pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, metadata.ExerciseSlug)
 		rgxNumericSuffix := regexp.MustCompile(pattern)
 		if rgxNumericSuffix.MatchString(file) {
 			file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
