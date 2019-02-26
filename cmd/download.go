@@ -130,22 +130,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	metadata := payload.metadata()
-
-	root := usrCfg.GetString("workspace")
-	if metadata.Team != "" {
-		root = filepath.Join(root, "teams", metadata.Team)
-	}
-	if !metadata.IsRequester {
-		root = filepath.Join(root, "users", metadata.Handle)
-	}
-
-	exercise := workspace.Exercise{
-		Root:  root,
-		Track: metadata.Track,
-		Slug:  metadata.ExerciseSlug,
-	}
-
-	dir := exercise.MetadataDir()
+	dir := metadata.Exercise(usrCfg.GetString("workspace")).MetadataDir()
 
 	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
 		return err

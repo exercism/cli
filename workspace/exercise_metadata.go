@@ -87,3 +87,23 @@ func (em *ExerciseMetadata) PathToParent() string {
 	}
 	return filepath.Join(dir, em.Track)
 }
+
+// Exercise is an implementation of a problem on disk.
+func (em *ExerciseMetadata) Exercise(workspace string) Exercise {
+	return Exercise{
+		Root:  em.root(workspace),
+		Track: em.Track,
+		Slug:  em.ExerciseSlug,
+	}
+}
+
+// root represents the root of the exercise.
+func (em *ExerciseMetadata) root(workspace string) string {
+	if em.Team != "" {
+		return filepath.Join(workspace, "teams", em.Team)
+	}
+	if !em.IsRequester {
+		return filepath.Join(workspace, "users", em.Handle)
+	}
+	return workspace
+}
