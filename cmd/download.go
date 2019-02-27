@@ -54,18 +54,6 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	uuid, err := flags.GetString("uuid")
-	if err != nil {
-		return err
-	}
-	slug, err := flags.GetString("exercise")
-	if err != nil {
-		return err
-	}
-	if uuid != "" && slug != "" || uuid == slug {
-		return errors.New("need an --exercise name or a solution --uuid")
-	}
-
 	track, err := flags.GetString("track")
 	if err != nil {
 		return err
@@ -76,11 +64,11 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	param := "latest"
-	if uuid != "" {
-		param = uuid
+	identifier, err := downloadIdentifier(flags)
+	if err != nil {
+		return err
 	}
-	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), param)
+	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), identifier)
 
 	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
 	if err != nil {
@@ -92,6 +80,14 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
+	uuid, err := flags.GetString("uuid")
+	if err != nil {
+		return err
+	}
+	slug, err := flags.GetString("exercise")
+	if err != nil {
+		return err
+	}
 	if uuid == "" {
 		q := req.URL.Query()
 		q.Add("exercise_id", slug)
@@ -250,6 +246,27 @@ func (dp downloadPayload) metadata() workspace.ExerciseMetadata {
 		Handle:       dp.Solution.User.Handle,
 		IsRequester:  dp.Solution.User.IsRequester,
 	}
+}
+
+// downloadIdentifier is the variable for the URI to initiate an exercise download.
+func downloadIdentifier(flags *pflag.FlagSet) (string, error) {
+	uuid, err := flags.GetString("uuid")
+	if err != nil {
+		return "", err
+	}
+	slug, err := flags.GetString("exercise")
+	if err != nil {
+		return "", err
+	}
+	if uuid != "" && slug != "" || uuid == slug {
+		return "", errors.New("need an --exercise name or a solution --uuid")
+	}
+
+	identifier := "latest"
+	if uuid != "" {
+		identifier = uuid
+	}
+	return identifier, nil
 }
 
 func setupDownloadFlags(flags *pflag.FlagSet) {
