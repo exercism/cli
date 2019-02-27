@@ -54,28 +54,8 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	identifier, err := downloadIdentifier(flags)
-	if err != nil {
-		return err
-	}
-	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), identifier)
-
-	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
-	if err != nil {
-		return err
-	}
-
-	req, err := client.NewRequest("GET", url, nil)
-	if err != nil {
-		return err
-	}
-
-	req, err = addQueryToDownloadRequest(flags, req)
-	if err != nil {
-		return err
-	}
-
-	res, err := client.Do(req)
+	dlClient := newDownloadClient(flags, usrCfg)
+	res, err := dlClient.Do()
 	if err != nil {
 		return err
 	}
@@ -112,6 +92,10 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
+	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
+	if err != nil {
+		return err
+	}
 	for _, file := range payload.Solution.Files {
 		unparsedURL := fmt.Sprintf("%s%s", payload.Solution.FileDownloadBaseURL, file)
 		parsedURL, err := netURL.ParseRequestURI(unparsedURL)
@@ -221,60 +205,6 @@ func (dp downloadPayload) metadata() workspace.ExerciseMetadata {
 		Handle:       dp.Solution.User.Handle,
 		IsRequester:  dp.Solution.User.IsRequester,
 	}
-}
-
-// downloadIdentifier is the variable for the URI to initiate an exercise download.
-func downloadIdentifier(flags *pflag.FlagSet) (string, error) {
-	uuid, err := flags.GetString("uuid")
-	if err != nil {
-		return "", err
-	}
-	slug, err := flags.GetString("exercise")
-	if err != nil {
-		return "", err
-	}
-	if uuid != "" && slug != "" || uuid == slug {
-		return "", errors.New("need an --exercise name or a solution --uuid")
-	}
-
-	identifier := "latest"
-	if uuid != "" {
-		identifier = uuid
-	}
-	return identifier, nil
-}
-
-func addQueryToDownloadRequest(flags *pflag.FlagSet, req *http.Request) (*http.Request, error) {
-	uuid, err := flags.GetString("uuid")
-	if err != nil {
-		return req, err
-	}
-	slug, err := flags.GetString("exercise")
-	if err != nil {
-		return req, err
-	}
-	track, err := flags.GetString("track")
-	if err != nil {
-		return req, err
-	}
-
-	team, err := flags.GetString("team")
-	if err != nil {
-		return req, err
-	}
-
-	if uuid == "" {
-		q := req.URL.Query()
-		q.Add("exercise_id", slug)
-		if track != "" {
-			q.Add("track_id", track)
-		}
-		if team != "" {
-			q.Add("team_id", team)
-		}
-		req.URL.RawQuery = q.Encode()
-	}
-	return req, nil
 }
 
 func setupDownloadFlags(flags *pflag.FlagSet) {
