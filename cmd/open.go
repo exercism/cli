@@ -48,7 +48,14 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	teamID, _ := flags.GetString("team")
 
 	if exerciseID == "" {
-		return fmt.Errorf("Must provide an `--exercise`")
+		// if no --exercise is given, use original functionality
+		metadata, err := workspace.NewExerciseMetadata(args[0])
+		if err != nil {
+			return err
+		}
+		browser.Open(metadata.URL)
+		return nil
+		//return fmt.Errorf("Must provide an `--exercise`")
 	}
 
 	if remote, _ := flags.GetBool("remote"); remote {
