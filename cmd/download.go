@@ -54,66 +54,29 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	identifier, err := downloadIdentifier(flags)
-	if err != nil {
-		return err
-	}
-	url := fmt.Sprintf("%s/solutions/%s", usrCfg.GetString("apibaseurl"), identifier)
-
-	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
+	download, err := newDownload(flags, usrCfg)
 	if err != nil {
 		return err
 	}
 
-	req, err := client.NewRequest("GET", url, nil)
-	if err != nil {
-		return err
-	}
-
-	req, err = addQueryToDownloadRequest(flags, req)
-	if err != nil {
-		return err
-	}
-
-	res, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-
-	var payload downloadPayload
-	defer res.Body.Close()
-	if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
-		return fmt.Errorf("unable to parse API response - %s", err)
-	}
-
-	if res.StatusCode == http.StatusUnauthorized {
-		siteURL := config.InferSiteURL(usrCfg.GetString("apibaseurl"))
-		return fmt.Errorf("unauthorized request. Please run the configure command. You can find your API token at %s/my/settings", siteURL)
-	}
-
-	if res.StatusCode != http.StatusOK {
-		switch payload.Error.Type {
-		case "track_ambiguous":
-			return fmt.Errorf("%s: %s", payload.Error.Message, strings.Join(payload.Error.PossibleTrackIDs, ", "))
-		default:
-			return errors.New(payload.Error.Message)
-		}
-	}
-
-	metadata := payload.metadata()
+	metadata := download.payload.metadata()
 	dir := metadata.Exercise(usrCfg.GetString("workspace")).MetadataDir()
 
 	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
 		return err
 	}
 
-	err = metadata.Write(dir)
+	if err := metadata.Write(dir); err != nil {
+		return err
+	}
+
+	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return err
 	}
 
-	for _, file := range payload.Solution.Files {
-		unparsedURL := fmt.Sprintf("%s%s", payload.Solution.FileDownloadBaseURL, file)
+	for _, file := range download.payload.Solution.Files {
+		unparsedURL := fmt.Sprintf("%s%s", download.payload.Solution.FileDownloadBaseURL, file)
 		parsedURL, err := netURL.ParseRequestURI(unparsedURL)
 
 		if err != nil {
@@ -176,6 +139,150 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	return nil
 }
 
+type download struct {
+	// either/or
+	slug, uuid string
+
+	// user config
+	token, apibaseurl, workspace string
+
+	// optional
+	track, team string
+
+	payload *downloadPayload
+}
+
+func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
+	var err error
+	d := &download{}
+	d.uuid, err = flags.GetString("uuid")
+	if err != nil {
+		return nil, err
+	}
+	d.slug, err = flags.GetString("exercise")
+	if err != nil {
+		return nil, err
+	}
+	d.track, err = flags.GetString("track")
+	if err != nil {
+		return nil, err
+	}
+	d.team, err = flags.GetString("team")
+	if err != nil {
+		return nil, err
+	}
+
+	d.token = usrCfg.GetString("token")
+	d.apibaseurl = usrCfg.GetString("apibaseurl")
+	d.workspace = usrCfg.GetString("workspace")
+
+	if err = d.needsSlugXorUUID(); err != nil {
+		return nil, err
+	}
+	if err = d.needsUserConfigValues(); err != nil {
+		return nil, err
+	}
+	if err = d.needsSlugWhenGivenTrackOrTeam(); err != nil {
+		return nil, err
+	}
+
+	client, err := api.NewClient(d.token, d.apibaseurl)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := client.NewRequest("GET", d.url(), nil)
+	if err != nil {
+		return nil, err
+	}
+	d.buildQueryParams(req.URL)
+
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if err := json.NewDecoder(res.Body).Decode(&d.payload); err != nil {
+		return nil, fmt.Errorf("unable to parse API response - %s", err)
+	}
+
+	if res.StatusCode == http.StatusUnauthorized {
+		return nil, fmt.Errorf(
+			"unauthorized request. Please run the configure command. You can find your API token at %s/my/settings",
+			config.InferSiteURL(d.apibaseurl),
+		)
+	}
+	if res.StatusCode != http.StatusOK {
+		switch d.payload.Error.Type {
+		case "track_ambiguous":
+			return nil, fmt.Errorf(
+				"%s: %s",
+				d.payload.Error.Message,
+				strings.Join(d.payload.Error.PossibleTrackIDs, ", "),
+			)
+		default:
+			return nil, errors.New(d.payload.Error.Message)
+		}
+	}
+
+	return d, nil
+}
+
+func (d download) url() string {
+	id := "latest"
+	if d.uuid != "" {
+		id = d.uuid
+	}
+	return fmt.Sprintf("%s/solutions/%s", d.apibaseurl, id)
+}
+
+func (d download) buildQueryParams(url *netURL.URL) {
+	query := url.Query()
+	if d.slug != "" {
+		query.Add("exercise_id", d.slug)
+		if d.track != "" {
+			query.Add("track_id", d.track)
+		}
+		if d.team != "" {
+			query.Add("team_id", d.team)
+		}
+	}
+	url.RawQuery = query.Encode()
+}
+
+// needsSlugXorUUID checks the presence of slug XOR uuid.
+func (d download) needsSlugXorUUID() error {
+	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
+		return errors.New("need an --exercise name or a solution --uuid")
+	}
+	return nil
+}
+
+// needsUserConfigValues checks the presence of required values from the user config.
+func (d download) needsUserConfigValues() error {
+	errMsg := "missing required user config: '%s'"
+	if d.token == "" {
+		return fmt.Errorf(errMsg, "token")
+	}
+	if d.apibaseurl == "" {
+		return fmt.Errorf(errMsg, "apibaseurl")
+	}
+	if d.workspace == "" {
+		return fmt.Errorf(errMsg, "workspace")
+	}
+	return nil
+}
+
+// needsSlugWhenGivenTrackOrTeam ensures that track/team arguments are also given with a slug.
+// (track/team meaningless when given a uuid).
+func (d download) needsSlugWhenGivenTrackOrTeam() error {
+	if (d.team != "" || d.track != "") && d.slug == "" {
+		return errors.New("--track or --team requires --exercise (not --uuid)")
+	}
+	return nil
+}
+
 type downloadPayload struct {
 	Solution struct {
 		ID   string `json:"id"`
@@ -221,60 +328,6 @@ func (dp downloadPayload) metadata() workspace.ExerciseMetadata {
 		Handle:       dp.Solution.User.Handle,
 		IsRequester:  dp.Solution.User.IsRequester,
 	}
-}
-
-// downloadIdentifier is the variable for the URI to initiate an exercise download.
-func downloadIdentifier(flags *pflag.FlagSet) (string, error) {
-	uuid, err := flags.GetString("uuid")
-	if err != nil {
-		return "", err
-	}
-	slug, err := flags.GetString("exercise")
-	if err != nil {
-		return "", err
-	}
-	if uuid != "" && slug != "" || uuid == slug {
-		return "", errors.New("need an --exercise name or a solution --uuid")
-	}
-
-	identifier := "latest"
-	if uuid != "" {
-		identifier = uuid
-	}
-	return identifier, nil
-}
-
-func addQueryToDownloadRequest(flags *pflag.FlagSet, req *http.Request) (*http.Request, error) {
-	uuid, err := flags.GetString("uuid")
-	if err != nil {
-		return req, err
-	}
-	slug, err := flags.GetString("exercise")
-	if err != nil {
-		return req, err
-	}
-	track, err := flags.GetString("track")
-	if err != nil {
-		return req, err
-	}
-
-	team, err := flags.GetString("team")
-	if err != nil {
-		return req, err
-	}
-
-	if uuid == "" {
-		q := req.URL.Query()
-		q.Add("exercise_id", slug)
-		if track != "" {
-			q.Add("track_id", track)
-		}
-		if team != "" {
-			q.Add("team_id", team)
-		}
-		req.URL.RawQuery = q.Encode()
-	}
-	return req, nil
 }
 
 func setupDownloadFlags(flags *pflag.FlagSet) {
