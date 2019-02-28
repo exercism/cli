@@ -120,7 +120,7 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 				return err
 			}
 
-			if meta.Exercise != exerciseID {
+			if meta.ExerciseSlug != exerciseID {
 				continue
 			}
 
