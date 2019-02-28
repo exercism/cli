@@ -12,26 +12,15 @@ Exercism would be impossible without people like you being willing to spend time
 
 You'll need Go version 1.11 or higher. Follow the directions on http://golang.org/doc/install
 
-You will also need to be familiar with the Go `modules` dependency management system. Refer to the [modules wiki page](https://github.com/golang/go/wiki/Modules) to learn more.
-
 ## Development
 
-A typical development workflow looks like this:
+This project uses Go's [`modules` dependency management](https://github.com/golang/go/wiki/Modules) system.
 
-1. [fork this repo on the GitHub webpage][fork]
-1. `cd /path/to/the/development/directory`
-1. `git clone https://github.com/<your-github-username>/cli.git`
-1. `cd cli`
-1. `git remote add upstream https://github.com/exercism/cli.git`
-1. Optionally: `git config user.name <your-github-username>` and `git config user.email <your-github-email>` 
-1. `git checkout -b <development-branch-name>`
-1. `git push -u origin <development-branch-name>` (setup where you push to, check it works)
+To contribute [fork this repo on the GitHub webpage][fork] and clone your fork.
+Make your desired changes and submit a pull request.
+Please provide tests for the changes where possible.
 
-Then make your desired changes and submit a pull request. Please provide tests for the changes where possible.
-
-Please note that if your development directory is located inside the `GOPATH`, you would need to set the `GO111MODULE=on` environment variable, in order to be able to use the `modules` system. 
-
-If you wish to learn how to contribute to the Go projects without the `modules`, check out the blog post [Contributing to Open Source Repositories in Go][contrib-blog] on the Splice blog.
+Please note that if your development directory is located inside the `GOPATH`, you need to set the `GO111MODULE=on` environment variable.
 
 ## Running the Tests
 
@@ -66,4 +55,3 @@ In order to cross-compile for all platforms, run `bin/build-all`. The binaries
 will be built into the `release` directory.
 
 [fork]: https://github.com/exercism/cli/fork
-[contrib-blog]: https://splice.com/blog/contributing-open-source-git-repositories-go/
