@@ -226,7 +226,7 @@ func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
 		}
 	}
 
-	return d, d.validate()
+	return d, nil
 }
 
 func (d download) url() string {
@@ -249,16 +249,6 @@ func (d download) buildQueryParams(url *netURL.URL) {
 		}
 	}
 	url.RawQuery = query.Encode()
-}
-
-func (d download) validate() error {
-	if d.payload.Solution.ID == "" {
-		return errors.New("download missing ID")
-	}
-	if d.payload.Error.Message != "" {
-		return errors.New(d.payload.Error.Message)
-	}
-	return nil
 }
 
 // needsSlugXorUUID checks the presence of slug XOR uuid.
