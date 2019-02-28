@@ -10,33 +10,28 @@ Exercism would be impossible without people like you being willing to spend time
 
 ## Dependencies
 
-You'll need Go version 1.10 or higher. Follow the directions on http://golang.org/doc/install
+You'll need Go version 1.11 or higher. Follow the directions on http://golang.org/doc/install
 
-You will also need `dep`, the Go dependency management tool. Follow the directions on https://golang.github.io/dep/docs/installation.html
+You will also need to be familiar with the Go `modules` dependency management system. Refer to the [modules wiki page](https://github.com/golang/go/wiki/Modules) to learn more.
 
 ## Development
 
-If you've never contributed to a Go project before this is going to feel a little bit foreign.
-
-The TL;DR is: **don't clone your fork**, and it matters where on your filesystem the project gets cloned to.
-
-If you don't care how and why and just want something that works, follow these steps:
+A typical development workflow looks like this:
 
 1. [fork this repo on the GitHub webpage][fork]
-1. `go get github.com/exercism/cli/exercism`
-1. `cd $GOPATH/src/github.com/exercism/cli` (or `cd %GOPATH%\src\github.com\exercism\cli` on Windows)
-1. `git remote rename origin upstream`
-1. `git remote add origin git@github.com:<your-github-username>/cli.git`
-1. `git checkout -b development`
-1. `git push -u origin development` (setup where you push to, check it works)
-1. `go get -u github.com/golang/dep/cmd/dep`
-   * depending on your setup, you may need to install `dep` by following the instructions in the [`dep` repo](https://github.com/golang/dep)
-1. `dep ensure`
-1. `git update-index --assume-unchanged Gopkg.lock` (prevent your dep changes being committed)
+1. `cd /path/to/the/development/directory`
+1. `git clone https://github.com/<your-github-username>/cli.git`
+1. `cd cli`
+1. `git remote add upstream https://github.com/exercism/cli.git`
+1. Optionally: `git config user.name <your-github-username>` and `git config user.email <your-github-email>` 
+1. `git checkout -b <development-branch-name>`
+1. `git push -u origin <development-branch-name>` (setup where you push to, check it works)
 
-Then make changes as usual and submit a pull request. Please provide tests for the changes where possible.
+Then make your desired changes and submit a pull request. Please provide tests for the changes where possible.
 
-If you care about the details, check out the blog post [Contributing to Open Source Repositories in Go][contrib-blog] on the Splice blog.
+Please note that if your development directory is located inside the `GOPATH`, you would need to set the `GO111MODULE=on` environment variable, in order to be able to use the `modules` system. 
+
+If you wish to learn how to contribute to the Go projects without the `modules`, check out the blog post [Contributing to Open Source Repositories in Go][contrib-blog] on the Splice blog.
 
 ## Running the Tests
 
@@ -56,12 +51,12 @@ damaging your real Exercism submissions, or test different tokens, etc.
 
 On Unices:
 
-- `cd $GOPATH/src/github.com/exercism/cli/exercism && go build -o testercism main.go`
+- `cd /path/to/the/development/directory/cli && go build -o testercism main.go`
 - `./testercism -h`
 
 On Windows:
 
-- `cd /d %GOPATH%\src\github.com\exercism\cli`
+- `cd /d \path\to\the\development\directory\cli`
 - `go build -o testercism.exe exercism\main.go`
 - `testercism.exe —h`
 
