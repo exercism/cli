@@ -274,7 +274,7 @@ func (w downloadWriter) writeSolutionFiles() error {
 
 		destination := filepath.Join(
 			w.destination(),
-			sanitizeLegacyFilepath(filename, w.download.exercise().Slug))
+			w.sanitizeLegacyFilepath(filename, w.download.exercise().Slug))
 		if err = os.MkdirAll(filepath.Dir(destination), os.FileMode(0755)); err != nil {
 			return err
 		}
@@ -298,7 +298,7 @@ func (w downloadWriter) destination() string {
 // sanitizeLegacyFilepath is a workaround for a path bug due to an early design
 // decision (later reversed) to allow numeric suffixes for exercise directories,
 // allowing people to have multiple parallel versions of an exercise.
-func sanitizeLegacyFilepath(file, slug string) string {
+func (d downloadWriter) sanitizeLegacyFilepath(file, slug string) string {
 	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, slug)
 	rgxNumericSuffix := regexp.MustCompile(pattern)
 	if rgxNumericSuffix.MatchString(file) {
