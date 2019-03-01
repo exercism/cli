@@ -204,26 +204,7 @@ func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
 	defer res.Body.Close()
 
 	if err := json.NewDecoder(res.Body).Decode(&d.payload); err != nil {
-		return nil, fmt.Errorf("unable to parse API response - %s", err)
-	}
-
-	if res.StatusCode == http.StatusUnauthorized {
-		return nil, fmt.Errorf(
-			"unauthorized request. Please run the configure command. You can find your API token at %s/my/settings",
-			config.InferSiteURL(d.apibaseurl),
-		)
-	}
-	if res.StatusCode != http.StatusOK {
-		switch d.payload.Error.Type {
-		case "track_ambiguous":
-			return nil, fmt.Errorf(
-				"%s: %s",
-				d.payload.Error.Message,
-				strings.Join(d.payload.Error.PossibleTrackIDs, ", "),
-			)
-		default:
-			return nil, errors.New(d.payload.Error.Message)
-		}
+		return nil, decodedAPIError(res)
 	}
 
 	return d, nil
