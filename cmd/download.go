@@ -14,7 +14,7 @@ import (
 
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/workspace"
+	ws "github.com/exercism/cli/workspace"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -59,7 +59,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	metadata := download.payload.metadata()
+	metadata := download.metadata()
 	dir := metadata.Exercise(usrCfg.GetString("workspace")).MetadataDir()
 
 	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
@@ -75,8 +75,8 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	for _, file := range download.payload.Solution.Files {
-		unparsedURL := fmt.Sprintf("%s%s", download.payload.Solution.FileDownloadBaseURL, file)
+	for _, file := range download.downloadPayload.Solution.Files {
+		unparsedURL := fmt.Sprintf("%s%s", download.downloadPayload.Solution.FileDownloadBaseURL, file)
 		parsedURL, err := netURL.ParseRequestURI(unparsedURL)
 
 		if err != nil {
@@ -149,7 +149,7 @@ type download struct {
 	// optional
 	track, team string
 
-	payload *downloadPayload
+	*downloadPayload
 }
 
 func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
@@ -203,7 +203,7 @@ func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
 	}
 	defer res.Body.Close()
 
-	if err := json.NewDecoder(res.Body).Decode(&d.payload); err != nil {
+	if err := json.NewDecoder(res.Body).Decode(&d.downloadPayload); err != nil {
 		return nil, decodedAPIError(res)
 	}
 
@@ -264,6 +264,52 @@ func (d download) needsSlugWhenGivenTrackOrTeam() error {
 	return nil
 }
 
+func (d download) metadata() ws.ExerciseMetadata {
+	return ws.ExerciseMetadata{
+		AutoApprove:  d.Solution.Exercise.AutoApprove,
+		Track:        d.Solution.Exercise.Track.ID,
+		Team:         d.Solution.Team.Slug,
+		ExerciseSlug: d.Solution.Exercise.ID,
+		ID:           d.Solution.ID,
+		URL:          d.Solution.URL,
+		Handle:       d.Solution.User.Handle,
+		IsRequester:  d.Solution.User.IsRequester,
+	}
+}
+
+func (d download) exercise() ws.Exercise {
+	return ws.Exercise{
+		Root:  d.solutionRootFilepath(),
+		Track: d.Solution.Exercise.Track.ID,
+		Slug:  d.Solution.Exercise.ID,
+	}
+}
+
+// solutionRootFilepath builds the root path based on the solution
+// being part of a team and/or owned by another user.
+func (d download) solutionRootFilepath() string {
+	root := d.workspace
+
+	if d.isTeamSolution() {
+		root = filepath.Join(root, "teams", d.Solution.Team.Slug)
+	}
+	if d.solutionBelongsToOtherUser() {
+		root = filepath.Join(root, "users", d.Solution.User.Handle)
+	}
+	return root
+}
+
+// isTeamSolution indicates if the solution is part of a team.
+func (d download) isTeamSolution() bool {
+	return d.Solution.Team.Slug != ""
+}
+
+// solutionBelongsToOtherUser indicates if the solution belongs to another user
+// (as opposed to being owned by the requesting user).
+func (d download) solutionBelongsToOtherUser() bool {
+	return !d.Solution.User.IsRequester
+}
+
 type downloadPayload struct {
 	Solution struct {
 		ID   string `json:"id"`
@@ -296,19 +342,6 @@ type downloadPayload struct {
 		Message          string   `json:"message"`
 		PossibleTrackIDs []string `json:"possible_track_ids"`
 	} `json:"error,omitempty"`
-}
-
-func (dp downloadPayload) metadata() workspace.ExerciseMetadata {
-	return workspace.ExerciseMetadata{
-		AutoApprove:  dp.Solution.Exercise.AutoApprove,
-		Track:        dp.Solution.Exercise.Track.ID,
-		Team:         dp.Solution.Team.Slug,
-		ExerciseSlug: dp.Solution.Exercise.ID,
-		ID:           dp.Solution.ID,
-		URL:          dp.Solution.URL,
-		Handle:       dp.Solution.User.Handle,
-		IsRequester:  dp.Solution.User.IsRequester,
-	}
 }
 
 func setupDownloadFlags(flags *pflag.FlagSet) {
