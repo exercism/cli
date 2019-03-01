@@ -66,6 +66,8 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
+	submitPaths = ctx.removeDuplicatePaths(submitPaths)
+
 	if err = ctx.validator.filesBelongToSameExercise(submitPaths); err != nil {
 		return err
 	}
@@ -144,6 +146,20 @@ func (s *submitCmdContext) evaluatedSymlinks(submitPaths []string) ([]string, er
 		evalSymlinkSubmitPaths = append(evalSymlinkSubmitPaths, src)
 	}
 	return evalSymlinkSubmitPaths, nil
+}
+
+func (s *submitCmdContext) removeDuplicatePaths(submitPaths []string) []string {
+	seen := make(map[string]bool)
+	result := make([]string, 0, len(submitPaths))
+
+	for _, val := range submitPaths {
+		if _, ok := seen[val]; !ok {
+			seen[val] = true
+			result = append(result, val)
+		}
+	}
+
+	return result
 }
 
 // exercise creates an exercise using one of the submitted filepaths.

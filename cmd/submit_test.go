@@ -142,6 +142,45 @@ func TestSubmitFilesAndDir(t *testing.T) {
 	}
 }
 
+func TestDuplicateFiles(t *testing.T) {
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
+
+	// The fake endpoint will populate this when it receives the call from the command.
+	submittedFiles := map[string]string{}
+	ts := fakeSubmitServer(t, submittedFiles)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "duplicate-files")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
+	os.MkdirAll(dir, os.FileMode(0755))
+
+	writeFakeMetadata(t, dir, "bogus-track", "bogus-exercise")
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
+
+	cfg := config.Config{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+	}
+
+	file1 := filepath.Join(dir, "file-1.txt")
+	err = ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
+
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file1, file1})
+	assert.NoError(t, err)
+
+	assert.Equal(t, 1, len(submittedFiles))
+	assert.Equal(t, "This is file 1.", submittedFiles["file-1.txt"])
+}
+
 func TestSubmitFiles(t *testing.T) {
 	co := newCapturedOutput()
 	co.override()
