@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"io"
 
@@ -78,14 +79,22 @@ func validateUserConfig(cfg *viper.Viper) error {
 func decodedAPIError(resp *http.Response) error {
 	var apiError struct {
 		Error struct {
-			Type    string `json:"type"`
-			Message string `json:"message"`
+			Type             string   `json:"type"`
+			Message          string   `json:"message"`
+			PossibleTrackIDs []string `json:"possible_track_ids"`
 		} `json:"error,omitempty"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&apiError); err != nil {
 		return fmt.Errorf("failed to parse API error response: %s", err)
 	}
 	if apiError.Error.Message != "" {
+		if apiError.Error.Type == "track_ambiguous" {
+			return fmt.Errorf(
+				"%s: %s",
+				apiError.Error.Message,
+				strings.Join(apiError.Error.PossibleTrackIDs, ", "),
+			)
+		}
 		return fmt.Errorf(apiError.Error.Message)
 	}
 	return fmt.Errorf("unexpected API response: %d", resp.StatusCode)
