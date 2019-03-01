@@ -59,83 +59,16 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	metadata := download.metadata()
-	dir := metadata.Exercise(usrCfg.GetString("workspace")).MetadataDir()
-
-	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
+	writer := newDownloadWriter(download)
+	if err := writer.writeSolutionFiles(); err != nil {
+		return err
+	}
+	if err := writer.writeMetadata(); err != nil {
 		return err
 	}
 
-	if err := metadata.Write(dir); err != nil {
-		return err
-	}
-
-	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
-	if err != nil {
-		return err
-	}
-
-	for _, file := range download.downloadPayload.Solution.Files {
-		unparsedURL := fmt.Sprintf("%s%s", download.downloadPayload.Solution.FileDownloadBaseURL, file)
-		parsedURL, err := netURL.ParseRequestURI(unparsedURL)
-
-		if err != nil {
-			return err
-		}
-
-		url := parsedURL.String()
-
-		req, err := client.NewRequest("GET", url, nil)
-		if err != nil {
-			return err
-		}
-
-		res, err := client.Do(req)
-		if err != nil {
-			return err
-		}
-		defer res.Body.Close()
-
-		if res.StatusCode != http.StatusOK {
-			// TODO: deal with it
-			continue
-		}
-		// Don't bother with empty files.
-		if res.Header.Get("Content-Length") == "0" {
-			continue
-		}
-
-		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
-		// TODO: handle --force flag to overwrite without asking.
-
-		// Work around a path bug due to an early design decision (later reversed) to
-		// allow numeric suffixes for exercise directories, allowing people to have
-		// multiple parallel versions of an exercise.
-		pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, metadata.ExerciseSlug)
-		rgxNumericSuffix := regexp.MustCompile(pattern)
-		if rgxNumericSuffix.MatchString(file) {
-			file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
-		}
-
-		// Rewrite paths submitted with an older, buggy client where the Windows path is being treated as part of the filename.
-		file = strings.Replace(file, "\\", "/", -1)
-
-		relativePath := filepath.FromSlash(file)
-		dir := filepath.Join(metadata.Dir, filepath.Dir(relativePath))
-		os.MkdirAll(dir, os.FileMode(0755))
-
-		f, err := os.Create(filepath.Join(metadata.Dir, relativePath))
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		_, err = io.Copy(f, res.Body)
-		if err != nil {
-			return err
-		}
-	}
 	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", metadata.Dir)
+	fmt.Fprintf(Out, "%s\n", writer.destination())
 	return nil
 }
 
@@ -308,6 +241,103 @@ func (d download) isTeamSolution() bool {
 // (as opposed to being owned by the requesting user).
 func (d download) solutionBelongsToOtherUser() bool {
 	return !d.Solution.User.IsRequester
+}
+
+// requestFile requests a Solution file from the API, returning an HTTP response.
+// 0 Content-Length responses are swallowed, returning nil.
+func (d download) requestFile(filename string) (*http.Response, error) {
+	parsedURL, err := netURL.ParseRequestURI(
+		fmt.Sprintf("%s%s", d.Solution.FileDownloadBaseURL, filename))
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := api.NewClient(d.token, d.apibaseurl)
+	req, err := client.NewRequest("GET", parsedURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, decodedAPIError(res)
+	}
+	// Don't bother with empty files.
+	if res.Header.Get("Content-Length") == "0" {
+		return nil, nil
+	}
+
+	return res, nil
+}
+
+// downloadWriter writes download contents to the file system.
+type downloadWriter struct {
+	download *download
+}
+
+// newDownloadWriter creates a downloadWriter.
+func newDownloadWriter(dl *download) *downloadWriter {
+	return &downloadWriter{download: dl}
+}
+
+// writeMetadata writes the exercise metadata.
+func (w downloadWriter) writeMetadata() error {
+	metadata := w.download.metadata()
+	return metadata.Write(w.destination())
+}
+
+// writeSolutionFiles attempts to write each file from the downloaded solution.
+func (w downloadWriter) writeSolutionFiles() error {
+	for _, filename := range w.download.Solution.Files {
+		res, err := w.download.requestFile(filename)
+		if err != nil {
+			return err
+		}
+		if res == nil {
+			// Ignore empty responses
+			continue
+		}
+		defer res.Body.Close()
+
+		destination := filepath.Join(
+			w.destination(),
+			sanitizeLegacyFilepath(filename, w.download.exercise().Slug))
+		if err = os.MkdirAll(filepath.Dir(destination), os.FileMode(0755)); err != nil {
+			return err
+		}
+		f, err := os.Create(destination)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		if _, err := io.Copy(f, res.Body); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// destination is the download destination path.
+func (w downloadWriter) destination() string {
+	return w.download.exercise().MetadataDir()
+}
+
+// sanitizeLegacyFilepath is a workaround for a path bug due to an early design
+// decision (later reversed) to allow numeric suffixes for exercise directories,
+// allowing people to have multiple parallel versions of an exercise.
+func sanitizeLegacyFilepath(file, slug string) string {
+	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, slug)
+	rgxNumericSuffix := regexp.MustCompile(pattern)
+	if rgxNumericSuffix.MatchString(file) {
+		file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
+	}
+	// Rewrite paths submitted with an older, buggy client where the Windows
+	// path is being treated as part of the filename.
+	file = strings.Replace(file, "\\", "/", -1)
+	return filepath.FromSlash(file)
 }
 
 type downloadPayload struct {
