@@ -197,8 +197,8 @@ func (d download) needsSlugWhenGivenTrackOrTeam() error {
 	return nil
 }
 
-func (d download) metadata() ws.ExerciseMetadata {
-	return ws.ExerciseMetadata{
+func (d download) metadata() *ws.ExerciseMetadata {
+	return &ws.ExerciseMetadata{
 		AutoApprove:  d.Solution.Exercise.AutoApprove,
 		Track:        d.Solution.Exercise.Track.ID,
 		Team:         d.Solution.Team.Slug,
@@ -211,8 +211,7 @@ func (d download) metadata() ws.ExerciseMetadata {
 }
 
 func (d download) exercise() ws.Exercise {
-	metadata := d.metadata()
-	return metadata.Exercise(d.workspace)
+	return d.metadata().Exercise(d.workspace)
 }
 
 // requestFile requests a Solution file from the API, returning an HTTP response.
@@ -257,8 +256,7 @@ func newDownloadWriter(dl *download) *downloadWriter {
 
 // writeMetadata writes the exercise metadata.
 func (w downloadWriter) writeMetadata() error {
-	metadata := w.download.metadata()
-	return metadata.Write(w.destination())
+	return w.download.metadata().Write(w.destination())
 }
 
 // writeSolutionFiles attempts to write each file from the downloaded solution.
