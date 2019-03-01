@@ -211,36 +211,8 @@ func (d download) metadata() ws.ExerciseMetadata {
 }
 
 func (d download) exercise() ws.Exercise {
-	return ws.Exercise{
-		Root:  d.solutionRootFilepath(),
-		Track: d.Solution.Exercise.Track.ID,
-		Slug:  d.Solution.Exercise.ID,
-	}
-}
-
-// solutionRootFilepath builds the root path based on the solution
-// being part of a team and/or owned by another user.
-func (d download) solutionRootFilepath() string {
-	root := d.workspace
-
-	if d.isTeamSolution() {
-		root = filepath.Join(root, "teams", d.Solution.Team.Slug)
-	}
-	if d.solutionBelongsToOtherUser() {
-		root = filepath.Join(root, "users", d.Solution.User.Handle)
-	}
-	return root
-}
-
-// isTeamSolution indicates if the solution is part of a team.
-func (d download) isTeamSolution() bool {
-	return d.Solution.Team.Slug != ""
-}
-
-// solutionBelongsToOtherUser indicates if the solution belongs to another user
-// (as opposed to being owned by the requesting user).
-func (d download) solutionBelongsToOtherUser() bool {
-	return !d.Solution.User.IsRequester
+	metadata := d.metadata()
+	return metadata.Exercise(d.workspace)
 }
 
 // requestFile requests a Solution file from the API, returning an HTTP response.
