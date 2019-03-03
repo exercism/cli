@@ -11,6 +11,36 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestTrackPaths(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "walk")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	a1 := filepath.Join(tmpDir, "track-a", "exercise-one")
+	b1 := filepath.Join(tmpDir, "track-b", "exercise-one")
+	b2 := filepath.Join(tmpDir, "track-b", "exercise-two")
+
+	// It should ignore user and team directory
+	userDir := filepath.Join(tmpDir, "users", "alice", "track-a", "exercise-one")
+	teamDir := filepath.Join(tmpDir, "teams", "alice", "track-a", "exercise-one")
+
+	for _, path := range []string{a1, b1, b2, userDir, teamDir} {
+		err := os.MkdirAll(path, os.FileMode(0755))
+		assert.NoError(t, err)
+	}
+
+	ws, err := New(tmpDir)
+	assert.NoError(t, err)
+
+	paths, err := ws.TrackPaths()
+	assert.NoError(t, err)
+	if assert.Equal(t, 2, len(paths)) {
+		sort.Strings(paths)
+		assert.Equal(t, paths[0], "track-a")
+		assert.Equal(t, paths[1], "track-b")
+	}
+}
+
 func TestWorkspacePotentialExercises(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "walk")
 	defer os.RemoveAll(tmpDir)

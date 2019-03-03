@@ -35,15 +35,9 @@ func New(dir string) (Workspace, error) {
 	return Workspace{Dir: dir}, nil
 }
 
-// PotentialExercises are a first-level guess at the user's exercises.
-// It looks at the workspace structurally, and guesses based on
-// the location of the directory. E.g. any top level directory
-// within the workspace (except 'users') is assumed to be a
-// track, and any directory within there again is assumed to
-// be an exercise.
-func (ws Workspace) PotentialExercises() ([]Exercise, error) {
-	exercises := []Exercise{}
-
+// TrackPaths are the top level directories in a workspace.
+func (ws Workspace) TrackPaths() ([]string, error) {
+	trackPaths := []string{}
 	topInfos, err := ioutil.ReadDir(ws.Dir)
 	if err != nil {
 		return nil, err
@@ -53,11 +47,31 @@ func (ws Workspace) PotentialExercises() ([]Exercise, error) {
 			continue
 		}
 
-		if topInfo.Name() == "users" {
+		if topInfo.Name() == "users" || topInfo.Name() == "teams" {
 			continue
 		}
 
-		subInfos, err := ioutil.ReadDir(filepath.Join(ws.Dir, topInfo.Name()))
+		trackPaths = append(trackPaths, topInfo.Name())
+	}
+
+	return trackPaths, nil
+}
+
+// PotentialExercises are a first-level guess at the user's exercises.
+// It looks at the workspace structurally, and guesses based on
+// the location of the directory. E.g. any top level directory
+// within the workspace (except 'users') is assumed to be a
+// track, and any directory within there again is assumed to
+// be an exercise.
+func (ws Workspace) PotentialExercises() ([]Exercise, error) {
+	exercises := []Exercise{}
+
+	trackPaths, err := ws.TrackPaths()
+	if err != nil {
+		return nil, err
+	}
+	for _, trackPath := range trackPaths {
+		subInfos, err := ioutil.ReadDir(filepath.Join(ws.Dir, trackPath))
 		if err != nil {
 			return nil, err
 		}
@@ -67,7 +81,7 @@ func (ws Workspace) PotentialExercises() ([]Exercise, error) {
 				continue
 			}
 
-			exercises = append(exercises, Exercise{Track: topInfo.Name(), Slug: subInfo.Name(), Root: ws.Dir})
+			exercises = append(exercises, Exercise{Track: trackPath, Slug: subInfo.Name(), Root: ws.Dir})
 		}
 	}
 
