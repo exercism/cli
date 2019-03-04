@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
-	"net/http"
 	"os"
 	"path/filepath"
 
@@ -268,12 +267,8 @@ func (s *submitCmdContext) submit(metadata *workspace.ExerciseMetadata, docs []w
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == http.StatusBadRequest {
-		return decodedAPIError(resp)
-	}
-
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return fmt.Errorf("submission unsuccessful (%s)", resp.Status)
+		return decodedAPIError(resp)
 	}
 
 	bb := &bytes.Buffer{}

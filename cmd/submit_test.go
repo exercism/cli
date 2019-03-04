@@ -611,7 +611,7 @@ func TestSubmitServerErr(t *testing.T) {
 	assert.Regexp(t, "test error", err.Error())
 }
 
-func TestHandle404Response(t *testing.T) {
+func TestHandleErrorResponse(t *testing.T) {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
 	})
@@ -646,10 +646,9 @@ func TestHandle404Response(t *testing.T) {
 	}
 
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
-	if assert.Error(t, err) {
-		assert.Contains(t, err.Error(), "unsuccessful")
-	}
+	assert.Error(t, err)
 }
+
 func TestSubmissionNotConnectedToRequesterAccount(t *testing.T) {
 	submittedFiles := map[string]string{}
 	ts := fakeSubmitServer(t, submittedFiles)
