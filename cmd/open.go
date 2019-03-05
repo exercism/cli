@@ -43,36 +43,59 @@ Pass the path to the directory that contains the solution you want to see on the
 func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	var url string
 	usrCfg := cfg.UserViperConfig
-	trackID, _ := flags.GetString("track")
-	exerciseID, _ := flags.GetString("exercise")
-	teamID, _ := flags.GetString("team")
+	trackID, err := flags.GetString("track")
+	if err != nil {
+		return err
+	}
 
-	if exerciseID == "" {
+	exerciseSlug, err := flags.GetString("exercise")
+	if err != nil {
+		return err
+	}
+
+	teamID, err := flags.GetString("team")
+	if err != nil {
+		return err
+	}
+
+	remote, err := flags.GetBool("remote")
+	if err != nil {
+		return err
+	}
+
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	}
+
+	if exerciseSlug == "" {
+		if path == "" {
+			return fmt.Errorf("must provide an --exercise slug or an exercise path")
+		}
 		// if no --exercise is given, use original functionality
-		metadata, err := workspace.NewExerciseMetadata(args[0])
+		metadata, err := workspace.NewExerciseMetadata(path)
 		if err != nil {
 			return err
 		}
 		browser.Open(metadata.URL)
 		return nil
-		//return fmt.Errorf("Must provide an `--exercise`")
 	}
 
-	if remote, _ := flags.GetBool("remote"); remote {
-		apiUrl := fmt.Sprintf("%s/solutions/latest", usrCfg.GetString("apibaseurl"))
+	if remote {
+		apiURL := fmt.Sprintf("%s/solutions/latest", usrCfg.GetString("apibaseurl"))
 
 		client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
 		if err != nil {
 			return err
 		}
 
-		req, err := client.NewRequest("GET", apiUrl, nil)
+		req, err := client.NewRequest("GET", apiURL, nil)
 		if err != nil {
 			return err
 		}
 
 		q := req.URL.Query()
-		q.Add("exercise_id", exerciseID)
+		q.Add("exercise_id", exerciseSlug)
 		if trackID != "" {
 			q.Add("track_id", trackID)
 		}
@@ -102,54 +125,58 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		}
 
 		url = payload.Solution.URL
-	} else {
-		ws, err := workspace.New(usrCfg.GetString("workspace"))
-		if err != nil {
-			return err
-		}
-		exercises, err := ws.Exercises()
-		if err != nil {
-			return err
-		}
 
-		matchingExerciseMeta := make([]*workspace.ExerciseMetadata, 0, len(exercises))
-		for _, exercise := range exercises {
-			metaDir := exercise.MetadataDir()
-			meta, err := workspace.NewExerciseMetadata(metaDir)
-			if err != nil {
-				return err
-			}
-
-			if meta.ExerciseSlug != exerciseID {
-				continue
-			}
-
-			if trackID != "" && meta.Track != trackID {
-				continue
-			}
-
-			if meta.Team != teamID {
-				continue
-			}
-
-			matchingExerciseMeta = append(matchingExerciseMeta, meta)
-		}
-
-		switch len(matchingExerciseMeta) {
-		case 0:
-			return fmt.Errorf("No matching exercise found")
-		case 1:
-			url = matchingExerciseMeta[0].URL
-			break
-		default:
-			tracks := make([]string, 0, len(matchingExerciseMeta))
-			for _, exercise := range matchingExerciseMeta {
-				tracks = append(tracks, exercise.Track)
-			}
-
-			return fmt.Errorf("Please specify a track ID: %s", strings.Join(tracks, ", "))
-		}
+		browser.Open(url)
+		return nil
 	}
+
+	ws, err := workspace.New(usrCfg.GetString("workspace"))
+	if err != nil {
+		return err
+	}
+	exercises, err := ws.Exercises()
+	if err != nil {
+		return err
+	}
+
+	matchingExerciseMeta := make([]*workspace.ExerciseMetadata, 0, len(exercises))
+	for _, exercise := range exercises {
+		metaDir := exercise.MetadataDir()
+		meta, err := workspace.NewExerciseMetadata(metaDir)
+		if err != nil {
+			return err
+		}
+
+		if meta.ExerciseSlug != exerciseSlug {
+			continue
+		}
+
+		if trackID != "" && meta.Track != trackID {
+			continue
+		}
+
+		if meta.Team != teamID {
+			continue
+		}
+
+		matchingExerciseMeta = append(matchingExerciseMeta, meta)
+	}
+
+	switch len(matchingExerciseMeta) {
+	case 0:
+		return fmt.Errorf("No matching exercise found")
+	case 1:
+		url = matchingExerciseMeta[0].URL
+		break
+	default:
+		tracks := make([]string, 0, len(matchingExerciseMeta))
+		for _, exercise := range matchingExerciseMeta {
+			tracks = append(tracks, exercise.Track)
+		}
+
+		return fmt.Errorf("Please specify a track ID: %s", strings.Join(tracks, ", "))
+	}
+
 	browser.Open(url)
 	return nil
 }
