@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
-	"net/http"
 	"os"
 	"path/filepath"
 
@@ -268,7 +267,7 @@ func (s *submitCmdContext) submit(metadata *workspace.ExerciseMetadata, docs []w
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == http.StatusBadRequest {
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		return decodedAPIError(resp)
 	}
 
