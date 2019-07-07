@@ -6,6 +6,12 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## Next Release
 * **Your contribution here**
+* [#770](https://github.com/exercism/cli/pull/770) Print API error messages in submit command - [@Smarticles101]
+* [#763](https://github.com/exercism/cli/pull/763) Add Fish shell tab completions - [@John-Goff]
+* [#806](https://github.com/exercism/cli/pull/806) Make Zsh shell tab completions work on $fpath - [@QuLogic]
+* [#797](https://github.com/exercism/cli/pull/797) Fix panic when submit command is not given args - [@jdsutherland]
+* [#828](https://github.com/exercism/cli/pull/828) Remove duplicate files before submitting - [@larson004]
+* [#793](https://github.com/exercism/cli/pull/793) Submit handles non 2xx responses - [@jdsutherland]
 
 ## v3.0.11 (2018-11-18)
 * [#752](https://github.com/exercism/cli/pull/752) Improve error message on upgrade command - [@farisj]
@@ -410,7 +416,10 @@ All changes by [@msgehard]
 
 [@AlexWheeler]: https://github.com/AlexWheeler
 [@Dparker1990]: https://github.com/Dparker1990
+[@John-Goff]: https://github.com/John-Goff
 [@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
+[@QuLogic]: https://github.com/QuLogic
+[@Smarticles101]: https://github.com/Smarticles101
 [@Tonkpils]: https://github.com/Tonkpils
 [@TrevorBramble]: https://github.com/TrevorBramble
 [@alebaffa]: https://github.com/alebaffa
@@ -443,6 +452,7 @@ All changes by [@msgehard]
 [@jppunnett]: https://github.com/jppunnett
 [@katrinleinweber]: https://github.com/katrinleinweber
 [@kytrinyx]: https://github.com/kytrinyx
+[@larson004]: https://github.com/larson004
 [@lcowell]: https://github.com/lcowell
 [@manusajith]: https://github.com/manusajith
 [@morphatic]: https://github.com/morphatic
@@ -463,4 +473,3 @@ All changes by [@msgehard]
 [@srt32]: https://github.com/srt32
 [@williandrade]: https://github.com/williandrade
 [@zabawaba99]: https://github.com/zabawaba99
-[@Smarticles101]: https://github.com/Smarticles101
