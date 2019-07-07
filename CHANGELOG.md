@@ -6,6 +6,8 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## Next Release
 * **Your contribution here**
+
+## v3.0.12 (2019-07-07)
 * [#770](https://github.com/exercism/cli/pull/770) Print API error messages in submit command - [@Smarticles101]
 * [#763](https://github.com/exercism/cli/pull/763) Add Fish shell tab completions - [@John-Goff]
 * [#806](https://github.com/exercism/cli/pull/806) Make Zsh shell tab completions work on $fpath - [@QuLogic]
