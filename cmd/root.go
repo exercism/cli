@@ -49,5 +49,5 @@ func init() {
 	api.UserAgent = fmt.Sprintf("github.com/exercism/cli v%s (%s/%s)", Version, runtime.GOOS, runtime.GOARCH)
 	RootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().IntP("timeout", "", 0, "override the default HTTP timeout (seconds)")
-	RootCmd.PersistentFlags().BoolP("unmask-token", "", false, "will unmask the API duruing a request/response dump")
+	RootCmd.PersistentFlags().BoolP("unmask-token", "", false, "will unmask the API during a request/response dump")
 }
