@@ -48,7 +48,9 @@ func DumpRequest(req *http.Request) {
 	temp := req.Header.Get("Authorization")
 
 	if !UnmaskAPIKey {
-		req.Header.Set("Authorization", "Bearer "+utils.Redact(strings.Split(temp, " ")[1]))
+		if token := strings.Split(temp, " ")[1]; token != "" {
+			req.Header.Set("Authorization", "Bearer "+utils.Redact(token))
+		}
 	}
 
 	dump, err := httputil.DumpRequest(req, req.ContentLength > 0)
