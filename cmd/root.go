@@ -24,6 +24,9 @@ Download exercises and submit your solutions.`,
 		if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
 			debug.Verbose = verbose
 		}
+		if unmask, _ := cmd.Flags().GetBool("unmask-token"); unmask {
+			debug.UnmaskAPIKey = unmask
+		}
 		if timeout, _ := cmd.Flags().GetInt("timeout"); timeout > 0 {
 			cli.TimeoutInSeconds = timeout
 			api.TimeoutInSeconds = timeout
@@ -46,4 +49,5 @@ func init() {
 	api.UserAgent = fmt.Sprintf("github.com/exercism/cli v%s (%s/%s)", Version, runtime.GOOS, runtime.GOARCH)
 	RootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().IntP("timeout", "", 0, "override the default HTTP timeout (seconds)")
+	RootCmd.PersistentFlags().BoolP("unmask-token", "", false, "will unmask the API duruing a request/response dump")
 }

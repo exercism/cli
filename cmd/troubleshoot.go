@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"html/template"
 	"runtime"
-	"strings"
 	"sync"
 	"time"
 
 	"github.com/exercism/cli/cli"
 	"github.com/exercism/cli/config"
+	"github.com/exercism/cli/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -192,7 +192,7 @@ func newConfigurationStatus(status *Status) configurationStatus {
 		TokenURL:  config.SettingsURL(v.GetString("apibaseurl")),
 	}
 	if status.Censor && cs.Token != "" {
-		cs.Token = redact(cs.Token)
+		cs.Token = utils.Redact(cs.Token)
 	}
 	return cs
 }
@@ -210,12 +210,6 @@ func (ping *apiPing) Call(wg *sync.WaitGroup) {
 	}
 	res.Body.Close()
 	ping.Status = "connected"
-}
-
-func redact(token string) string {
-	str := token[4 : len(token)-3]
-	redaction := strings.Repeat("*", len(str))
-	return string(token[:4]) + redaction + string(token[len(token)-3:])
 }
 
 const tmplSelfTest = `

@@ -9,12 +9,16 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"strings"
+
+	"github.com/exercism/cli/utils"
 )
 
 var (
 	// Verbose determines if debugging output is displayed to the user
-	Verbose bool
-	output  io.Writer = os.Stderr
+	Verbose      bool
+	output       io.Writer = os.Stderr
+	UnmaskAPIKey bool
 )
 
 // Println conditionally outputs a message to Stderr
@@ -41,6 +45,12 @@ func DumpRequest(req *http.Request) {
 	body := io.TeeReader(req.Body, &bodyCopy)
 	req.Body = ioutil.NopCloser(body)
 
+	temp := req.Header.Get("Authorization")
+
+	if !UnmaskAPIKey {
+		req.Header.Set("Authorization", "Bearer "+utils.Redact(strings.Split(temp, " ")[1]))
+	}
+
 	dump, err := httputil.DumpRequest(req, req.ContentLength > 0)
 	if err != nil {
 		log.Fatal(err)
@@ -51,6 +61,7 @@ func DumpRequest(req *http.Request) {
 	Println("========================= END DumpRequest =========================")
 	Println("")
 
+	req.Header.Set("Authorization", temp)
 	req.Body = ioutil.NopCloser(&bodyCopy)
 }
 
