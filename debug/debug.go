@@ -16,8 +16,9 @@ import (
 
 var (
 	// Verbose determines if debugging output is displayed to the user
-	Verbose      bool
-	output       io.Writer = os.Stderr
+	Verbose bool
+	output  io.Writer = os.Stderr
+	// UnmaskAPIKey determines if the API key should de displayed during a dump
 	UnmaskAPIKey bool
 )
 
