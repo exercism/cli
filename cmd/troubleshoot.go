@@ -10,7 +10,7 @@ import (
 
 	"github.com/exercism/cli/cli"
 	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/utils"
+	"github.com/exercism/cli/debug"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -192,7 +192,7 @@ func newConfigurationStatus(status *Status) configurationStatus {
 		TokenURL:  config.SettingsURL(v.GetString("apibaseurl")),
 	}
 	if status.Censor && cs.Token != "" {
-		cs.Token = utils.Redact(cs.Token)
+		cs.Token = debug.Redact(cs.Token)
 	}
 	return cs
 }

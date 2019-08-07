@@ -10,8 +10,6 @@ import (
 	"net/http/httputil"
 	"os"
 	"strings"
-
-	"github.com/exercism/cli/utils"
 )
 
 var (
@@ -50,7 +48,7 @@ func DumpRequest(req *http.Request) {
 
 	if !UnmaskAPIKey {
 		if token := strings.Split(temp, " ")[1]; token != "" {
-			req.Header.Set("Authorization", "Bearer "+utils.Redact(token))
+			req.Header.Set("Authorization", "Bearer "+Redact(token))
 		}
 	}
 
@@ -89,4 +87,11 @@ func DumpResponse(res *http.Response) {
 	Println("")
 
 	res.Body = ioutil.NopCloser(body)
+}
+
+// Redact masks the given token by replacing part of the string with *
+func Redact(token string) string {
+	str := token[4 : len(token)-3]
+	redaction := strings.Repeat("*", len(str))
+	return string(token[:4]) + redaction + string(token[len(token)-3:])
 }
