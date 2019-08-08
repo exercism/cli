@@ -9,12 +9,15 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"strings"
 )
 
 var (
 	// Verbose determines if debugging output is displayed to the user
 	Verbose bool
 	output  io.Writer = os.Stderr
+	// UnmaskAPIKey determines if the API key should de displayed during a dump
+	UnmaskAPIKey bool
 )
 
 // Println conditionally outputs a message to Stderr
@@ -41,6 +44,14 @@ func DumpRequest(req *http.Request) {
 	body := io.TeeReader(req.Body, &bodyCopy)
 	req.Body = ioutil.NopCloser(body)
 
+	temp := req.Header.Get("Authorization")
+
+	if !UnmaskAPIKey {
+		if token := strings.Split(temp, " ")[1]; token != "" {
+			req.Header.Set("Authorization", "Bearer "+Redact(token))
+		}
+	}
+
 	dump, err := httputil.DumpRequest(req, req.ContentLength > 0)
 	if err != nil {
 		log.Fatal(err)
@@ -51,6 +62,7 @@ func DumpRequest(req *http.Request) {
 	Println("========================= END DumpRequest =========================")
 	Println("")
 
+	req.Header.Set("Authorization", temp)
 	req.Body = ioutil.NopCloser(&bodyCopy)
 }
 
@@ -75,4 +87,11 @@ func DumpResponse(res *http.Response) {
 	Println("")
 
 	res.Body = ioutil.NopCloser(body)
+}
+
+// Redact masks the given token by replacing part of the string with *
+func Redact(token string) string {
+	str := token[4 : len(token)-3]
+	redaction := strings.Repeat("*", len(str))
+	return string(token[:4]) + redaction + string(token[len(token)-3:])
 }
