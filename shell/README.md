@@ -32,11 +32,7 @@ and then add the directory to your `$fpath` in your `.zshrc`, `.zsh_profile` or
 
 #### Oh my Zsh
 
-If you are using the popular [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) framework to manage your zsh plugins, follow these steps:
-
-    mkdir -p ~/.oh-my-zsh/completions
-    mv ../shell/exercism_completion.zsh ~/.oh-my-zsh/completions
-
+If you are using the popular [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) framework to manage your zsh plugins, move the file `exercism_completion.zsh` into `~/.oh-my-zsh/custom`.
 
 ### Fish
 
