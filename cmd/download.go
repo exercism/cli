@@ -188,6 +188,9 @@ func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
 	if err := json.NewDecoder(res.Body).Decode(&d.payload); err != nil {
 		return nil, decodedAPIError(res)
 	}
+	if d.payload.Error.Message != "" {
+		return nil, errors.New(d.payload.Error.Message)
+	}
 
 	return d, nil
 }
