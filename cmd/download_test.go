@@ -272,6 +272,42 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
 	assert.True(t, os.IsNotExist(err), "It should not write the file if empty.")
 }
 
+func TestDownloadError(t *testing.T) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, `{"error": {"type": "error", "message": "test error"}}`)
+	})
+
+	ts := httptest.NewServer(handler)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "submit-err-tmp-dir")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
+
+	cfg := config.Config{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+		DefaultBaseURL:  "http://example.com",
+	}
+
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	setupDownloadFlags(flags)
+	flags.Set("uuid", "value")
+
+	err = runDownload(cfg, flags, []string{})
+
+	fmt.Println(err)
+
+	assert.Regexp(t, "test error", err.Error())
+
+}
+
 const payloadTemplate = `
 {
 	"solution": {
