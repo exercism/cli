@@ -302,9 +302,7 @@ func TestDownloadError(t *testing.T) {
 
 	err = runDownload(cfg, flags, []string{})
 
-	fmt.Println(err)
-
-	assert.Regexp(t, "test error", err.Error())
+	assert.Equal(t, "test error", err.Error())
 
 }
 
