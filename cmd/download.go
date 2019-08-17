@@ -104,7 +104,9 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		// TODO: handle collisions
 		path := sf.relativePath()
 		dir := filepath.Join(metadata.Dir, filepath.Dir(path))
-		os.MkdirAll(dir, os.FileMode(0755))
+		if err = os.MkdirAll(dir, os.FileMode(0755)); err != nil {
+			return err
+		}
 
 		f, err := os.Create(filepath.Join(metadata.Dir, path))
 		if err != nil {

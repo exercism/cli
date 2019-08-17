@@ -124,7 +124,9 @@ func (status *Status) compile() (string, error) {
 	}
 
 	var bb bytes.Buffer
-	t.Execute(&bb, status)
+	if err = t.Execute(&bb, status); err != nil {
+		return "", err
+	}
 	return bb.String(), nil
 }
 
