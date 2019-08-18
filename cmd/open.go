@@ -21,8 +21,7 @@ Pass the path to the directory that contains the solution you want to see on the
 		if err != nil {
 			return err
 		}
-		browser.Open(metadata.URL)
-		return nil
+		return browser.Open(metadata.URL)
 	},
 }
 
