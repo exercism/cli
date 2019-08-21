@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	netURL "net/url"
 	"os"
@@ -187,7 +189,14 @@ func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
 	}
 	defer res.Body.Close()
 
-	if err := json.NewDecoder(res.Body).Decode(&d.payload); err != nil {
+	if res.StatusCode < 200 || res.StatusCode > 299 {
+		return nil, decodedAPIError(res)
+	}
+
+	body, _ := ioutil.ReadAll(res.Body)
+	res.Body = ioutil.NopCloser(bytes.NewReader(body))
+
+	if err := json.Unmarshal(body, &d.payload); err != nil {
 		return nil, decodedAPIError(res)
 	}
 
