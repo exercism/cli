@@ -49,9 +49,5 @@ On Windows:
 - `go build -o testercism.exe exercism\main.go`
 - `testercism.exe —h`
 
-### Building for All Platforms
-
-In order to cross-compile for all platforms, run `bin/build-all`. The binaries
-will be built into the `release` directory.
-
-[fork]: https://github.com/exercism/cli/fork
+### Releasing a new CLI version
+Consult the [release documentation](https://github.com/exercism/cli/master/RELEASE.md).

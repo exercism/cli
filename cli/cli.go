@@ -30,15 +30,18 @@ var (
 
 var (
 	osMap = map[string]string{
-		"darwin":  "mac",
+		"darwin":  "darwin",
+		"freebsd": "freebsd",
 		"linux":   "linux",
+		"openbsd": "openbsd",
 		"windows": "windows",
 	}
 
 	archMap = map[string]string{
-		"amd64": "64bit",
-		"386":   "32bit",
+		"386":   "i386",
+		"amd64": "x86_64",
 		"arm":   "arm",
+		"ppc64": "ppc64",
 	}
 )
 
