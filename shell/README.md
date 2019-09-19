@@ -37,8 +37,8 @@ Zsh](https://github.com/robbyrussell/oh-my-zsh) framework to manage your zsh
 plugins, you need to move the file `exercism_completion.zsh` to a new custom
 plugin:
 
-    mkdir -p ~/.oh-my-zsh/custom/plugins/exercism
-    cp ../shell/exercism_completion.zsh ~/.oh-my-zsh/custom/plugins/exercism/_exercism
+    mkdir -p $ZSH_CUSTOM/plugins/exercism
+    cp ../shell/exercism_completion.zsh $ZSH_CUSTOM/plugins/exercism/_exercism
 
 Then edit the file `~/.zshrc` to include `exercism` in the list of plugins.
 Completions will be activated the next time you open a new shell.
