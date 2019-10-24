@@ -423,6 +423,7 @@ All changes by [@msgehard]
 * Build on Travis
 
 [@AlexWheeler]: https://github.com/AlexWheeler
+[@avegner]: https://github.com/avegner
 [@Dparker1990]: https://github.com/Dparker1990
 [@John-Goff]: https://github.com/John-Goff
 [@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
@@ -446,6 +447,7 @@ All changes by [@msgehard]
 [@dpritchett]: https://github.com/dpritchett
 [@eToThePiIPower]: https://github.com/eToThePiIPower
 [@ebautistabar]: https://github.com/ebautistabar
+[@ekingery]: https://github.com/ekingery
 [@elimisteve]: https://github.com/elimisteve
 [@ests]: https://github.com/ests
 [@farisj]: https://github.com/farisj
@@ -457,6 +459,7 @@ All changes by [@msgehard]
 [@jdsutherland]: https://github.com/jdsutherland
 [@jgsqware]: https://github.com/jgsqware
 [@jish]: https://github.com/jish
+[@Jrank2013]: https://github.com/Jrank2013
 [@jppunnett]: https://github.com/jppunnett
 [@katrinleinweber]: https://github.com/katrinleinweber
 [@kytrinyx]: https://github.com/kytrinyx
