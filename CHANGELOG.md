@@ -7,6 +7,12 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * **Your contribution here**
 
+## v3.0.13 (2019-10-23)
+* [#866](https://github.com/exercism/cli/pull/866) The API token outputted during verbose will now be masked by default - [@Jrank2013]
+* [#873](https://github.com/exercism/cli/pull/873) Make all errors in cmd package checked - [@avegner]
+* [#871](https://github.com/exercism/cli/pull/871) Error message returned if the track is locked - [@Jrank2013]
+* [#886](https://github.com/exercism/cli/pull/886) Added GoReleaser config, updated docs, made archive naming adjustments - [@ekingery]
+
 ## v3.0.12 (2019-07-07)
 * [#770](https://github.com/exercism/cli/pull/770) Print API error messages in submit command - [@Smarticles101]
 * [#763](https://github.com/exercism/cli/pull/763) Add Fish shell tab completions - [@John-Goff]
