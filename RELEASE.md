@@ -46,7 +46,7 @@ goreleaser --rm-dist
 snapcraft login
 
 # Push to snapcraft
-for f in `ls dist/*.snap`; do snapcraft push --release=stable $f; done
+for f in dist/*.snap; do snapcraft push --release=stable "$f"; done
 
 # [TODO] Push to homebrew
 ```
