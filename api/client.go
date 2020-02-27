@@ -4,10 +4,27 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+	"os"
 	"time"
 
 	"github.com/exercism/cli/debug"
 )
+
+func createHTTPClient(timeout int) *http.Client {
+	hc := &http.Client{
+		Timeout: time.Duration(timeout) * time.Second,
+	}
+
+	httpsProxy, exists := os.LookupEnv("HTTPS_PROXY")
+
+	if exists && httpsProxy != "" {
+		httpsURL, _ := url.Parse(httpsProxy)
+		hc.Transport = &http.Transport{Proxy: http.ProxyURL(httpsURL)}
+		return hc
+	}
+	return hc
+}
 
 var (
 	// UserAgent lets the API know where the call is being made from.
@@ -17,7 +34,7 @@ var (
 	// TimeoutInSeconds is the timeout the default HTTP client will use.
 	TimeoutInSeconds = 60
 	// HTTPClient is the client used to make HTTP calls in the cli package.
-	HTTPClient = &http.Client{Timeout: time.Duration(TimeoutInSeconds) * time.Second}
+	HTTPClient = createHTTPClient(TimeoutInSeconds)
 )
 
 // Client is an http client that is configured for Exercism.
