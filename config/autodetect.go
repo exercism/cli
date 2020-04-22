@@ -71,11 +71,12 @@ var languagePatterns = map[string]Patterns{
 	"vimscript":  {Matches: []string{"*.vim"}},
 }
 
-func findSolutions(lang string) ([]string, error) {
+// FindSolutions Infer exercism solution given a track
+func FindSolutions(track string) ([]string, error) {
 	var result []string
-	rules, ok := languagePatterns[lang]
+	rules, ok := languagePatterns[track]
 	if !ok {
-		return nil, fmt.Errorf("Cannot find file patterns for language %s", lang)
+		return nil, fmt.Errorf("Cannot find file patterns for language %s", track)
 	}
 
 	for _, rule := range rules.Matches {

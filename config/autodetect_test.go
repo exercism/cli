@@ -34,7 +34,7 @@ func setupTestDirectiory(t *testing.T) {
 	for _, fn := range files {
 		ioutil.WriteFile(fn, content, os.ModePerm)
 	}
-	solutionFiles, _ := findSolutions("c")
+	solutionFiles, _ := FindSolutions("c")
 	assert.ElementsMatch(t, files, solutionFiles)
 	// go
 	// java
