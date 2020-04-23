@@ -211,17 +211,11 @@ func TestSubmitFilesWithoutArgs(t *testing.T) {
 	err = ioutil.WriteFile(file3, []byte("This is file 3."), os.FileMode(0755))
 	assert.NoError(t, err)
 
-	readme := filepath.Join(dir, "README.md")
-	err = ioutil.WriteFile(readme, []byte("This is the readme."), os.FileMode(0755))
-	assert.NoError(t, err)
-
 	v := viper.New()
 	v.Set("token", "abc123")
 	v.Set("workspace", dir)
 	v.Set("apibaseurl", ts.URL)
 
-	tmp := config.NewConfig()
-	_ = tmp
 	trackGlobs := config.NewConfig().TrackGlobs
 	trackGlobs["bogus-track"] = config.GlobRule{Matches: []string{"*.txt", "subdir/*.txt"}}
 
