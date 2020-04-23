@@ -16,30 +16,28 @@ var cases = []struct {
 	{"c", []string{"main.c", "main.h"}},
 }
 
-func setupTestDirectiory(t *testing.T) {
-	tmpdir, err := ioutil.TempDir("", "test_autodetect")
+func TestAutoDetect(t *testing.T) {
+	exerciseDir, err := ioutil.TempDir("", "test_autodetect")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	defer os.RemoveAll(tmpdir)
-	os.Chdir(tmpdir)
+	defer os.RemoveAll(exerciseDir)
 
-	srcDir := filepath.Join(tmpdir, "src")
+	srcDir := filepath.Join(exerciseDir, "src")
 	os.Mkdir(srcDir, 0755)
 
 	content := []byte("Very valid syntax.")
 	// c
-	files := []string{"src/bob.c", "src/bob_c.c", "src/BobC.c"}
-	for _, fn := range files {
-		ioutil.WriteFile(fn, content, os.ModePerm)
+	files := []string{"bob.c", "bob_c.c", "BobC.c"}
+	for i, fn := range files {
+		fullPath := filepath.Join(srcDir, fn)
+		ioutil.WriteFile(fullPath, content, os.ModePerm)
+		files[i] = fullPath
 	}
-	solutionFiles, _ := FindSolutions("c")
+
+	solutionFiles, _ := FindSolutions(defaultTrackGlobs, "c", exerciseDir)
 	assert.ElementsMatch(t, files, solutionFiles)
 	// go
 	// java
-}
-
-func TestAutoDetect(t *testing.T) {
-	setupTestDirectiory(t)
 }

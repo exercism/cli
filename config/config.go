@@ -25,6 +25,7 @@ type Config struct {
 	Dir             string
 	DefaultBaseURL  string
 	DefaultDirName  string
+	TrackGlobs      map[string]GlobRule
 	UserViperConfig *viper.Viper
 	Persister       Persister
 }
@@ -40,6 +41,7 @@ func NewConfig() Config {
 		Home:           home,
 		DefaultBaseURL: defaultBaseURL,
 		DefaultDirName: DefaultDirName,
+		TrackGlobs:     defaultTrackGlobs,
 		Persister:      FilePersister{Dir: dir},
 	}
 }

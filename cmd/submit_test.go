@@ -46,7 +46,6 @@ func TestSubmitWithoutWorkspace(t *testing.T) {
 		assert.Regexp(t, "re-run the configure", err.Error())
 	}
 }
-
 func TestSubmitNonExistentFile(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "submit-no-such-file")
 	defer os.RemoveAll(tmpDir)
@@ -181,6 +180,67 @@ func TestDuplicateFiles(t *testing.T) {
 	assert.Equal(t, "This is file 1.", submittedFiles["file-1.txt"])
 }
 
+func TestSubmitFilesWithoutArgs(t *testing.T) {
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
+	Err = &bytes.Buffer{}
+
+	// The fake endpoint will populate this when it receives the call from the command.
+	submittedFiles := map[string]string{}
+	ts := fakeSubmitServer(t, submittedFiles)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "submit-files")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
+	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
+	writeFakeMetadata(t, dir, "bogus-track", "bogus-exercise")
+
+	file1 := filepath.Join(dir, "file-1.txt")
+	err = ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	file2 := filepath.Join(dir, "subdir", "file-2.txt")
+	err = ioutil.WriteFile(file2, []byte("This is file 2."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	file3 := filepath.Join(dir, "README.md")
+	err = ioutil.WriteFile(file3, []byte("This is file 3."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	readme := filepath.Join(dir, "README.md")
+	err = ioutil.WriteFile(readme, []byte("This is the readme."), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", dir)
+	v.Set("apibaseurl", ts.URL)
+
+	tmp := config.NewConfig()
+	_ = tmp
+	trackGlobs := config.NewConfig().TrackGlobs
+	trackGlobs["bogus-track"] = config.GlobRule{Matches: []string{"*.txt", "subdir/*.txt"}}
+
+	cfg := config.Config{
+		Persister:       config.InMemoryPersister{},
+		Dir:             dir,
+		UserViperConfig: v,
+		TrackGlobs:      trackGlobs,
+	}
+
+	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
+
+	if assert.NoError(t, err) {
+		assert.Equal(t, 2, len(submittedFiles))
+		assert.Equal(t, "This is file 1.", submittedFiles["file-1.txt"])
+		assert.Equal(t, "This is file 2.", submittedFiles["subdir/file-2.txt"])
+		assert.Regexp(t, "submitted successfully", Err)
+	}
+}
 func TestSubmitFiles(t *testing.T) {
 	co := newCapturedOutput()
 	co.override()

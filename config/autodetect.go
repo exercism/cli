@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-type Patterns struct {
+type GlobRule struct {
 	Matches []string
 	Except  []string
 }
@@ -13,7 +13,7 @@ type Patterns struct {
 // The configuration rules below originaly is a port from
 // Source: @petertseng - https://gist.github.com/petertseng/e3e88bf1c383865ff67f4095413993b2
 //
-var languagePatterns = map[string]Patterns{
+var defaultTrackGlobs = map[string]GlobRule{
 	"ballerina": {Matches: []string{"*.bal"}},
 	"c":         {Matches: []string{"src/*.c", "src/*.h"}},
 	"ceylon":    {Matches: []string{"source/*/*.ceylon"}, Except: []string{"module.ceylon", " Test.ceylon"}},
@@ -72,15 +72,16 @@ var languagePatterns = map[string]Patterns{
 }
 
 // FindSolutions Infer exercism solution given a track
-func FindSolutions(track string) ([]string, error) {
+func FindSolutions(trackGlobs map[string]GlobRule, track string, exerciseDir string) ([]string, error) {
 	var result []string
-	rules, ok := languagePatterns[track]
+	rules, ok := trackGlobs[track]
 	if !ok {
-		return nil, fmt.Errorf("Cannot find file patterns for language %s", track)
+		return nil, fmt.Errorf("Cannot find file patterns for track %s", track)
 	}
 
 	for _, rule := range rules.Matches {
-		paths, err := filepath.Glob(rule)
+		paths, err := filepath.Glob(filepath.Join(exerciseDir, rule))
+		fmt.Println(filepath.Join(exerciseDir, rule))
 		if err != nil {
 			return nil, err
 		}
@@ -91,7 +92,6 @@ func FindSolutions(track string) ([]string, error) {
 			}
 
 			for _, ExceptRule := range rules.Except {
-
 				match, err := filepath.Match(ExceptRule, path)
 				if err != nil {
 					return nil, err

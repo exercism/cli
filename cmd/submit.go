@@ -19,14 +19,13 @@ import (
 
 // submitCmd lets people upload a solution to the website.
 var submitCmd = &cobra.Command{
-	Use:     "submit FILE1 [FILE2 ...]",
+	Use:     "submit [FILE1] [FILE2 ...]",
 	Aliases: []string{"s"},
 	Short:   "Submit your solution to an exercise.",
 	Long: `Submit your solution to an Exercism exercise.
 
     Call the command with the list of files you want to submit.
 `,
-	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.NewConfig()
 
@@ -50,30 +49,44 @@ var submitCmd = &cobra.Command{
 }
 
 func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
+	var err error
 	if err := validateUserConfig(cfg.UserViperConfig); err != nil {
 		return err
 	}
 
 	ctx := newSubmitCmdContext(cfg.UserViperConfig, flags)
 
-	if err := ctx.validator.filesExistAndNotADir(args); err != nil {
-		return err
-	}
+	var submitPaths []string
+	var exercise workspace.Exercise
+	if len(args) == 0 {
+		exercise, err = ctx.exercise(cfg.Dir)
+		if err != nil {
+			return err
+		}
 
-	submitPaths, err := ctx.evaluatedSymlinks(args)
-	if err != nil {
-		return err
-	}
+		submitPaths, err = config.FindSolutions(cfg.TrackGlobs, exercise.Track, cfg.Dir)
+		if err != nil {
+			return err
+		}
+	} else {
+		if err = ctx.validator.filesExistAndNotADir(args); err != nil {
+			return err
+		}
 
-	submitPaths = ctx.removeDuplicatePaths(submitPaths)
+		submitPaths, err = ctx.evaluatedSymlinks(args)
+		if err != nil {
+			return err
+		}
 
-	if err = ctx.validator.filesBelongToSameExercise(submitPaths); err != nil {
-		return err
-	}
+		submitPaths = ctx.removeDuplicatePaths(submitPaths)
+		if err = ctx.validator.filesBelongToSameExercise(submitPaths); err != nil {
+			return err
+		}
 
-	exercise, err := ctx.exercise(submitPaths[0])
-	if err != nil {
-		return err
+		exercise, err = ctx.exercise(submitPaths[0])
+		if err != nil {
+			return err
+		}
 	}
 
 	if err = ctx.migrateLegacyMetadata(exercise); err != nil {
