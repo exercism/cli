@@ -59,12 +59,19 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	var submitPaths []string
 	var exercise workspace.Exercise
 	if len(args) == 0 {
-		exercise, err = ctx.exercise(cfg.Dir)
+		cwd, err := os.Getwd()
 		if err != nil {
 			return err
 		}
 
-		submitPaths, err = config.FindSolutions(cfg.TrackGlobs, exercise.Track, cfg.Dir)
+		exercise, err = ctx.exercise(cwd)
+
+		if err != nil {
+			return err
+		}
+
+		submitPaths, err = config.FindSolutions(cfg.TrackGlobs, exercise.Track, cwd)
+
 		if err != nil {
 			return err
 		}

@@ -199,6 +199,9 @@ func TestSubmitFilesWithoutArgs(t *testing.T) {
 	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
 	writeFakeMetadata(t, dir, "bogus-track", "bogus-exercise")
 
+	err = os.Chdir(dir)
+	assert.NoError(t, err)
+
 	file1 := filepath.Join(dir, "file-1.txt")
 	err = ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
 	assert.NoError(t, err)
@@ -235,6 +238,7 @@ func TestSubmitFilesWithoutArgs(t *testing.T) {
 		assert.Regexp(t, "submitted successfully", Err)
 	}
 }
+
 func TestSubmitFiles(t *testing.T) {
 	co := newCapturedOutput()
 	co.override()

@@ -15,6 +15,7 @@ type GlobRule struct {
 //
 var defaultTrackGlobs = map[string]GlobRule{
 	"ballerina": {Matches: []string{"*.bal"}},
+	"bash":      {Matches: []string{"*.sh"}, Except: []string{"*_test.sh"}},
 	"c":         {Matches: []string{"src/*.c", "src/*.h"}},
 	"ceylon":    {Matches: []string{"source/*/*.ceylon"}, Except: []string{"module.ceylon", " Test.ceylon"}},
 	"cfml":      {Matches: []string{"*.cfc"}, Except: []string{"Test.cfc", "TestRunner.cfc"}},
@@ -74,25 +75,25 @@ var defaultTrackGlobs = map[string]GlobRule{
 // FindSolutions Infer exercism solution given a track
 func FindSolutions(trackGlobs map[string]GlobRule, track string, exerciseDir string) ([]string, error) {
 	var result []string
-	rules, ok := trackGlobs[track]
+	exerciseRule, ok := trackGlobs[track]
 	if !ok {
 		return nil, fmt.Errorf("Cannot find file patterns for track %s", track)
 	}
 
-	for _, rule := range rules.Matches {
-		paths, err := filepath.Glob(filepath.Join(exerciseDir, rule))
-		fmt.Println(filepath.Join(exerciseDir, rule))
+	for _, rule := range exerciseRule.Matches {
+		paths, err := filepath.Glob(rule)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, path := range paths {
-			if len(rules.Except) == 0 {
-				result = append(result, path)
-			}
+		if len(exerciseRule.Except) == 0 {
+			result = append(result, paths...)
+			continue
+		}
 
-			for _, ExceptRule := range rules.Except {
-				match, err := filepath.Match(ExceptRule, path)
+		for _, path := range paths {
+			for _, exceptRule := range exerciseRule.Except {
+				match, err := filepath.Match(exceptRule, path)
 				if err != nil {
 					return nil, err
 				}
@@ -103,6 +104,10 @@ func FindSolutions(trackGlobs map[string]GlobRule, track string, exerciseDir str
 			}
 
 		}
+	}
+
+	for i, path := range result {
+		result[i] = filepath.Join(exerciseDir, path)
 	}
 
 	return result, nil
