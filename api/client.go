@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"time"
 
@@ -17,7 +18,12 @@ var (
 	// TimeoutInSeconds is the timeout the default HTTP client will use.
 	TimeoutInSeconds = 60
 	// HTTPClient is the client used to make HTTP calls in the cli package.
-	HTTPClient = &http.Client{Timeout: time.Duration(TimeoutInSeconds) * time.Second}
+	HTTPClient = &http.Client{
+		Timeout: time.Duration(TimeoutInSeconds) * time.Second,
+		Transport: &http.Transport{DialContext: (&net.Dialer{
+			Timeout:   time.Duration(TimeoutInSeconds) * time.Second,
+			DualStack: true,
+		}).DialContext}}
 )
 
 // Client is an http client that is configured for Exercism.
