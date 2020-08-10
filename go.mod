@@ -1,5 +1,7 @@
 module github.com/exercism/cli
 
+go 1.14
+
 require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/davecgh/go-spew v1.1.0
