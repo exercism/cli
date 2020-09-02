@@ -133,7 +133,7 @@ type download struct {
 	token, apibaseurl, workspace string
 
 	// optional
-	track, team string
+	track string
 
 	payload *downloadPayload
 }
@@ -153,10 +153,6 @@ func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
 	if err != nil {
 		return nil, err
 	}
-	d.team, err = flags.GetString("team")
-	if err != nil {
-		return nil, err
-	}
 
 	d.token = usrCfg.GetString("token")
 	d.apibaseurl = usrCfg.GetString("apibaseurl")
@@ -168,7 +164,7 @@ func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
 	if err = d.needsUserConfigValues(); err != nil {
 		return nil, err
 	}
-	if err = d.needsSlugWhenGivenTrackOrTeam(); err != nil {
+	if err = d.needsSlugWhenGivenTrack(); err != nil {
 		return nil, err
 	}
 
@@ -218,9 +214,6 @@ func (d download) buildQueryParams(url *netURL.URL) {
 		if d.track != "" {
 			query.Add("track_id", d.track)
 		}
-		if d.team != "" {
-			query.Add("team_id", d.team)
-		}
 	}
 	url.RawQuery = query.Encode()
 }
@@ -248,11 +241,11 @@ func (d download) needsUserConfigValues() error {
 	return nil
 }
 
-// needsSlugWhenGivenTrackOrTeam ensures that track/team arguments are also given with a slug.
-// (track/team meaningless when given a uuid).
-func (d download) needsSlugWhenGivenTrackOrTeam() error {
-	if (d.team != "" || d.track != "") && d.slug == "" {
-		return errors.New("--track or --team requires --exercise (not --uuid)")
+// needsSlugWhenGivenTrack ensures that track arguments are also given with a slug.
+// (track is meaningless when given a uuid).
+func (d download) needsSlugWhenGivenTrack() error {
+	if d.track != "" && d.slug == "" {
+		return errors.New("--track requires --exercise (not --uuid)")
 	}
 	return nil
 }
@@ -261,10 +254,6 @@ type downloadPayload struct {
 	Solution struct {
 		ID   string `json:"id"`
 		URL  string `json:"url"`
-		Team struct {
-			Name string `json:"name"`
-			Slug string `json:"slug"`
-		} `json:"team"`
 		User struct {
 			Handle      string `json:"handle"`
 			IsRequester bool   `json:"is_requester"`
@@ -295,7 +284,6 @@ func (dp downloadPayload) metadata() workspace.ExerciseMetadata {
 	return workspace.ExerciseMetadata{
 		AutoApprove:  dp.Solution.Exercise.AutoApprove,
 		Track:        dp.Solution.Exercise.Track.ID,
-		Team:         dp.Solution.Team.Slug,
 		ExerciseSlug: dp.Solution.Exercise.ID,
 		ID:           dp.Solution.ID,
 		URL:          dp.Solution.URL,
@@ -353,7 +341,6 @@ func setupDownloadFlags(flags *pflag.FlagSet) {
 	flags.StringP("uuid", "u", "", "the solution UUID")
 	flags.StringP("track", "t", "", "the track ID")
 	flags.StringP("exercise", "e", "", "the exercise slug")
-	flags.StringP("team", "T", "", "the team slug")
 }
 
 func init() {

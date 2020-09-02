@@ -20,16 +20,13 @@ func TestWorkspacePotentialExercises(t *testing.T) {
 	b1 := filepath.Join(tmpDir, "track-b", "exercise-one")
 	b2 := filepath.Join(tmpDir, "track-b", "exercise-two")
 
-	// It should find teams exercises
-	team := filepath.Join(tmpDir, "teams", "some-team", "track-c", "exercise-one")
-
 	// It should ignore other people's exercises.
 	alice := filepath.Join(tmpDir, "users", "alice", "track-a", "exercise-one")
 
 	// It should ignore nested dirs within exercises.
 	nested := filepath.Join(a1, "subdir", "deeper-dir", "another-deep-dir")
 
-	for _, path := range []string{a1, b1, b2, team, alice, nested} {
+	for _, path := range []string{a1, b1, b2, alice, nested} {
 		err := os.MkdirAll(path, os.FileMode(0755))
 		assert.NoError(t, err)
 	}
@@ -39,7 +36,7 @@ func TestWorkspacePotentialExercises(t *testing.T) {
 
 	exercises, err := ws.PotentialExercises()
 	assert.NoError(t, err)
-	if assert.Equal(t, 4, len(exercises)) {
+	if assert.Equal(t, 3, len(exercises)) {
 		paths := make([]string, len(exercises))
 		for i, e := range exercises {
 			paths[i] = e.Path()
@@ -49,7 +46,6 @@ func TestWorkspacePotentialExercises(t *testing.T) {
 		assert.Equal(t, paths[0], "track-a/exercise-one")
 		assert.Equal(t, paths[1], "track-b/exercise-one")
 		assert.Equal(t, paths[2], "track-b/exercise-two")
-		assert.Equal(t, paths[3], "track-c/exercise-one")
 	}
 }
 

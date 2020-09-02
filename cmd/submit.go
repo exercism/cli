@@ -286,7 +286,7 @@ func (s *submitCmdContext) printResult(metadata *workspace.ExerciseMetadata) {
     %s
 `
 	suffix := "View it at:\n\n    "
-	if metadata.AutoApprove && metadata.Team == "" {
+	if metadata.AutoApprove {
 		suffix = "You can complete the exercise and unlock the next core exercise at:\n"
 	}
 	fmt.Fprintf(Err, msg, suffix)

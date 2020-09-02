@@ -17,7 +17,7 @@ Make sure all the recent changes are reflected in the "next release" section of 
 You can view changes using the /compare/ view:
 https://github.com/exercism/cli/compare/$PREVIOUS_RELEASE...master
 
-GoReleaser supports the [auto generation of a changelog](https://goreleaser.com/customization/#customize-the-changelog) we will want to customize to meet our standards (not including refactors, test updates, etc). We should also consider using [the release notes feature](https://goreleaser.com/customization/#custom-release-notes).
+GoReleaser supports the [auto generation of a changelog](https://goreleaser.com/customization/#customize-the-changelog), however we would need to customize the output to meet our standards (not including refactors, test updates, etc). We should also consider using [the release notes feature](https://goreleaser.com/customization/#custom-release-notes).
 
 ## Bump the version
 
@@ -97,6 +97,6 @@ For more information see [How To Open a Homebrew Pull Request](https://docs.brew
 ## Update the docs site
 
 If there are any significant changes, we should describe them on
-[exercism.io/cli]([https://exercism.io/cli).
+[exercism.io/cli](https://exercism.io/cli).
 
 The codebase lives at [exercism/website-copy](https://github.com/exercism/website-copy) in `pages/cli.md`.

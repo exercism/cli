@@ -57,28 +57,6 @@ func (ws Workspace) PotentialExercises() ([]Exercise, error) {
 			continue
 		}
 
-		if topInfo.Name() == "teams" {
-			subInfos, err := ioutil.ReadDir(filepath.Join(ws.Dir, "teams"))
-			if err != nil {
-				return nil, err
-			}
-
-			for _, subInfo := range subInfos {
-				teamWs, err := New(filepath.Join(ws.Dir, "teams", subInfo.Name()))
-				if err != nil {
-					return nil, err
-				}
-
-				teamExercises, err := teamWs.PotentialExercises()
-				if err != nil {
-					return nil, err
-				}
-
-				exercises = append(exercises, teamExercises...)
-			}
-			continue
-		}
-
 		subInfos, err := ioutil.ReadDir(filepath.Join(ws.Dir, topInfo.Name()))
 		if err != nil {
 			return nil, err

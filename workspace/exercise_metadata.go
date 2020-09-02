@@ -21,7 +21,6 @@ type ExerciseMetadata struct {
 	Track        string     `json:"track"`
 	ExerciseSlug string     `json:"exercise"`
 	ID           string     `json:"id"`
-	Team         string     `json:"team,omitempty"`
 	URL          string     `json:"url"`
 	Handle       string     `json:"handle"`
 	IsRequester  bool       `json:"is_requester"`
@@ -99,9 +98,6 @@ func (em *ExerciseMetadata) Exercise(workspace string) Exercise {
 
 // root represents the root of the exercise.
 func (em *ExerciseMetadata) root(workspace string) string {
-	if em.Team != "" {
-		return filepath.Join(workspace, "teams", em.Team)
-	}
 	if !em.IsRequester {
 		return filepath.Join(workspace, "users", em.Handle)
 	}

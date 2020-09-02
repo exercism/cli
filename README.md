@@ -9,7 +9,7 @@ This CLI ships as a binary with no additional runtime requirements.
 
 ## Installing the CLI
 
-Instructions can be found at [exercism/cli/releases](https://github.com/exercism/cli/releases)
+Instructions can be found at [Cutting a CLI Release][release].
 
 ## Contributing
 
@@ -17,3 +17,4 @@ If you wish to help improve the CLI, please see the [Contributing guide][contrib
 
 [exercism]: http://exercism.io
 [contributing]: /CONTRIBUTING.md
+[release]: /RELEASE.md

@@ -9,7 +9,6 @@ complete -f -c exercism -n "__fish_seen_subcommand_from configure" -s s -l show 
 complete -f -c exercism -n "__fish_use_subcommand" -a "download" -d "Downloads and saves a specified submission into the local system"
 complete -f -c exercism -n "__fish_seen_subcommand_from download" -s e -l exercise -d "the exercise slug"
 complete -f -c exercism -n "__fish_seen_subcommand_from download" -s h -l help -d "help for download"
-complete -f -c exercism -n "__fish_seen_subcommand_from download" -s T -l team -d "the team slug"
 complete -f -c exercism -n "__fish_seen_subcommand_from download" -s t -l track -d "the track ID"
 complete -f -c exercism -n "__fish_seen_subcommand_from download" -s u -l uuid -d "the solution UUID"
 
