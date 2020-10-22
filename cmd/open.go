@@ -23,7 +23,8 @@ var openCmd = &cobra.Command{
 	Short:   "Open an exercise on the website.",
 	Long: `Open the specified exercise to the solution page on the Exercism website.
 
-Pass the path to the directory that contains the solution you want to see on the website.
+Find local exercises by slug or team. You can also check for remote exercises.
+Alternatively, you can pass a local exercise directory.
 	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.NewConfig()
@@ -68,10 +69,11 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		path = args[0]
 	}
 
+	if exerciseSlug == "" && path == "" {
+		return fmt.Errorf("must provide an --exercise slug or an exercise path")
+	}
+
 	if exerciseSlug == "" {
-		if path == "" {
-			return fmt.Errorf("must provide an --exercise slug or an exercise path")
-		}
 		// if no --exercise is given, use original functionality
 		metadata, err := workspace.NewExerciseMetadata(path)
 		if err != nil {
