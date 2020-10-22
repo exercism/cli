@@ -7,6 +7,20 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * **Your contribution here**
 
+## v3.0.13 (2019-10-23)
+* [#866](https://github.com/exercism/cli/pull/866) The API token outputted during verbose will now be masked by default - [@Jrank2013]
+* [#873](https://github.com/exercism/cli/pull/873) Make all errors in cmd package checked - [@avegner]
+* [#871](https://github.com/exercism/cli/pull/871) Error message returned if the track is locked - [@Jrank2013]
+* [#886](https://github.com/exercism/cli/pull/886) Added GoReleaser config, updated docs, made archive naming adjustments - [@ekingery]
+
+## v3.0.12 (2019-07-07)
+* [#770](https://github.com/exercism/cli/pull/770) Print API error messages in submit command - [@Smarticles101]
+* [#763](https://github.com/exercism/cli/pull/763) Add Fish shell tab completions - [@John-Goff]
+* [#806](https://github.com/exercism/cli/pull/806) Make Zsh shell tab completions work on $fpath - [@QuLogic]
+* [#797](https://github.com/exercism/cli/pull/797) Fix panic when submit command is not given args - [@jdsutherland]
+* [#828](https://github.com/exercism/cli/pull/828) Remove duplicate files before submitting - [@larson004]
+* [#793](https://github.com/exercism/cli/pull/793) Submit handles non 2xx responses - [@jdsutherland]
+
 ## v3.0.11 (2018-11-18)
 * [#752](https://github.com/exercism/cli/pull/752) Improve error message on upgrade command - [@farisj]
 * [#759](https://github.com/exercism/cli/pull/759) Update shell tab completion for bash and zsh - [@nywilken]
@@ -409,8 +423,12 @@ All changes by [@msgehard]
 * Build on Travis
 
 [@AlexWheeler]: https://github.com/AlexWheeler
+[@avegner]: https://github.com/avegner
 [@Dparker1990]: https://github.com/Dparker1990
+[@John-Goff]: https://github.com/John-Goff
 [@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
+[@QuLogic]: https://github.com/QuLogic
+[@Smarticles101]: https://github.com/Smarticles101
 [@Tonkpils]: https://github.com/Tonkpils
 [@TrevorBramble]: https://github.com/TrevorBramble
 [@alebaffa]: https://github.com/alebaffa
@@ -429,6 +447,7 @@ All changes by [@msgehard]
 [@dpritchett]: https://github.com/dpritchett
 [@eToThePiIPower]: https://github.com/eToThePiIPower
 [@ebautistabar]: https://github.com/ebautistabar
+[@ekingery]: https://github.com/ekingery
 [@elimisteve]: https://github.com/elimisteve
 [@ests]: https://github.com/ests
 [@farisj]: https://github.com/farisj
@@ -440,9 +459,11 @@ All changes by [@msgehard]
 [@jdsutherland]: https://github.com/jdsutherland
 [@jgsqware]: https://github.com/jgsqware
 [@jish]: https://github.com/jish
+[@Jrank2013]: https://github.com/Jrank2013
 [@jppunnett]: https://github.com/jppunnett
 [@katrinleinweber]: https://github.com/katrinleinweber
 [@kytrinyx]: https://github.com/kytrinyx
+[@larson004]: https://github.com/larson004
 [@lcowell]: https://github.com/lcowell
 [@manusajith]: https://github.com/manusajith
 [@morphatic]: https://github.com/morphatic
@@ -463,4 +484,3 @@ All changes by [@msgehard]
 [@srt32]: https://github.com/srt32
 [@williandrade]: https://github.com/williandrade
 [@zabawaba99]: https://github.com/zabawaba99
-[@Smarticles101]: https://github.com/Smarticles101

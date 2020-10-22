@@ -1,69 +1,71 @@
 # Cutting a CLI Release
 
-## Bootstrap Cross-Compilation for Go
+The Exercism CLI uses [GoReleaser](https://goreleaser.com) to automate the
+release process. 
 
-**This only has to be done once.**
+## Requirements
 
-Change directory to the go source. Then run the bootstrap command for
-each operating system and architecture.
+1. [Install GoReleaser](https://goreleaser.com/install/)
+1. [Install snapcraft](https://snapcraft.io/docs/snapcraft-overview)
+1. [Setup GitHub token](https://goreleaser.com/environment/#github-token)
+1. Have a gpg key installed on your machine - it is [used for signing the artifacts](https://goreleaser.com/sign/)
 
-```plain
-$ cd `which go`/../../src
-$ sudo GCO_ENABLED=0 GOOS=windows GOARCH=386 ./make.bash --no-clean
-$ sudo GCO_ENABLED=0 GOOS=darwin GOARCH=386 ./make.bash --no-clean
-$ sudo GCO_ENABLED=0 GOOS=linux GOARCH=386 ./make.bash --no-clean
-$ sudo GCO_ENABLED=0 GOOS=windows GOARCH=amd64 ./make.bash --no-clean
-$ sudo GCO_ENABLED=0 GOOS=darwin GOARCH=amd64 ./make.bash --no-clean
-$ sudo GCO_ENABLED=0 GOOS=linux GOARCH=amd64 ./make.bash --no-clean
-$ sudo GCO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=6 ./make.bash --no-clean
-$ sudo GCO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=5 ./make.bash --no-clean
-```
+## Confirm / Update the Changelog
 
-## Update the Changelog
-
-Make sure all the recent changes are reflected in the "next release" section
-of the Changelog. Make this a separate commit from bumping the version.
+Make sure all the recent changes are reflected in the "next release" section of the CHANGELOG.md file.  All the changes in the "next release" section should be moved to a new section that describes the version number, and gives it a date.
 
 You can view changes using the /compare/ view:
 https://github.com/exercism/cli/compare/$PREVIOUS_RELEASE...master
 
+GoReleaser supports the [auto generation of a changelog](https://goreleaser.com/customization/#customize-the-changelog) we will want to customize to meet our standards (not including refactors, test updates, etc). We should also consider using [the release notes feature](https://goreleaser.com/customization/#custom-release-notes).
+
 ## Bump the version
 
-Edit the `Version` constant in `cmd/version.go`, and edit the Changelog.
-
-All the changes in the "next release" section should be moved to a new section
-that describes the version number, and gives it a date.
-
-The "next release" section should contain only "Your contribution here".
+Edit the `Version` constant in `cmd/version.go`
 
 _Note: It's useful to add the version to the commit message when you bump it: e.g. `Bump version to v2.3.4`._
 
-## Generate the Binaries
+In the future we will probably want to replace the hardcoded `Version` constant with [main.version](https://goreleaser.com/environment/#using-the-main-version). Here is a [stack overflow post on injecting to cmd/version.go](https://stackoverflow.com/a/47510909).
 
-```plain
-$ rm release/*
-$ CGO_ENABLED=0 bin/build-all
+Commit this change on a branch along with the CHANGELOG updates in a single commit, and create a PR for merge to master.
+
+## Cut a release
+
+```bash
+# Test run
+goreleaser --skip-publish --snapshot --rm-dist
+
+# Create a new tag on the master branch and push it
+git tag -a v3.0.16 -m "Trying out GoReleaser"
+git push origin v3.0.16
+
+# Build and release
+goreleaser --rm-dist
+
+# You must be logged into snapcraft to publish a new snap
+snapcraft login
+
+# Push to snapcraft
+for f in `ls dist/*.snap`; do snapcraft push --release=stable $f; done
+
+# [TODO] Push to homebrew
 ```
 
 ## Cut Release on GitHub
 
-Go to [the exercism/cli "new release" page](https://github.com/exercism/cli/releases/new).
+Run [exercism-cp-archive-hack.sh](https://gist.github.com/ekingery/961650fca4e2233098c8320f32736836) which takes the new archive files and renames them to match the old naming scheme for backward compatibility. Until mid to late 2020, we will need to manually upload the backward-compatible archive files generated in `/tmp/exercism_tmp_upload`.
 
-Describe the release, select a specific commit to target, name the version `v{VERSION}`, where
-VERSION matches the value of the `Version` constant.
-
-Upload all the binaries from `release/*`.
-
-Paste the release text and describe the new changes.
+The generated archive files should be uploaded to the [draft release page created by GoReleaser](https://github.com/exercism/cli/releases). Describe the release, select a specific commit to target, paste the following release text, and describe the new changes.
 
 ```
 To install, follow the interactive installation instructions at https://exercism.io/cli-walkthrough
-
 ---
 
 [describe changes in this release]
-
 ```
+
+ Lastly, test and publish the draft
+
 
 ## Update Homebrew
 
@@ -90,7 +92,7 @@ brew update
 brew bump-formula-pr --strict exercism --url=https://github.com/exercism/cli/archive/vX.Y.Z.tar.gz --sha256=$SHA
 ```
 
-For more information see their [contribution guidelines](https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md#how-to-open-a-homebrew-pull-request-and-get-it-merged).
+For more information see [How To Open a Homebrew Pull Request](https://docs.brew.sh/How-To-Open-a-Homebrew-Pull-Request).
 
 ## Update the docs site
 

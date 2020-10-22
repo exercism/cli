@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	netURL "net/url"
 	"os"
@@ -75,15 +77,11 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	for _, file := range download.payload.Solution.Files {
-		unparsedURL := fmt.Sprintf("%s%s", download.payload.Solution.FileDownloadBaseURL, file)
-		parsedURL, err := netURL.ParseRequestURI(unparsedURL)
-
+	for _, sf := range download.payload.files() {
+		url, err := sf.url()
 		if err != nil {
 			return err
 		}
-
-		url := parsedURL.String()
 
 		req, err := client.NewRequest("GET", url, nil)
 		if err != nil {
@@ -105,26 +103,14 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 			continue
 		}
 
-		// TODO: if there's a collision, interactively resolve (show diff, ask if overwrite).
-		// TODO: handle --force flag to overwrite without asking.
-
-		// Work around a path bug due to an early design decision (later reversed) to
-		// allow numeric suffixes for exercise directories, allowing people to have
-		// multiple parallel versions of an exercise.
-		pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, metadata.ExerciseSlug)
-		rgxNumericSuffix := regexp.MustCompile(pattern)
-		if rgxNumericSuffix.MatchString(file) {
-			file = string(rgxNumericSuffix.ReplaceAll([]byte(file), []byte("")))
+		// TODO: handle collisions
+		path := sf.relativePath()
+		dir := filepath.Join(metadata.Dir, filepath.Dir(path))
+		if err = os.MkdirAll(dir, os.FileMode(0755)); err != nil {
+			return err
 		}
 
-		// Rewrite paths submitted with an older, buggy client where the Windows path is being treated as part of the filename.
-		file = strings.Replace(file, "\\", "/", -1)
-
-		relativePath := filepath.FromSlash(file)
-		dir := filepath.Join(metadata.Dir, filepath.Dir(relativePath))
-		os.MkdirAll(dir, os.FileMode(0755))
-
-		f, err := os.Create(filepath.Join(metadata.Dir, relativePath))
+		f, err := os.Create(filepath.Join(metadata.Dir, path))
 		if err != nil {
 			return err
 		}
@@ -203,7 +189,14 @@ func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
 	}
 	defer res.Body.Close()
 
-	if err := json.NewDecoder(res.Body).Decode(&d.payload); err != nil {
+	if res.StatusCode < 200 || res.StatusCode > 299 {
+		return nil, decodedAPIError(res)
+	}
+
+	body, _ := ioutil.ReadAll(res.Body)
+	res.Body = ioutil.NopCloser(bytes.NewReader(body))
+
+	if err := json.Unmarshal(body, &d.payload); err != nil {
 		return nil, decodedAPIError(res)
 	}
 
@@ -309,6 +302,51 @@ func (dp downloadPayload) metadata() workspace.ExerciseMetadata {
 		Handle:       dp.Solution.User.Handle,
 		IsRequester:  dp.Solution.User.IsRequester,
 	}
+}
+
+func (dp downloadPayload) files() []solutionFile {
+	fx := make([]solutionFile, 0, len(dp.Solution.Files))
+	for _, file := range dp.Solution.Files {
+		f := solutionFile{
+			path:    file,
+			baseURL: dp.Solution.FileDownloadBaseURL,
+			slug:    dp.Solution.Exercise.ID,
+		}
+		fx = append(fx, f)
+	}
+	return fx
+}
+
+type solutionFile struct {
+	path, baseURL, slug string
+}
+
+func (sf solutionFile) url() (string, error) {
+	url, err := netURL.ParseRequestURI(fmt.Sprintf("%s%s", sf.baseURL, sf.path))
+
+	if err != nil {
+		return "", err
+	}
+
+	return url.String(), nil
+}
+
+func (sf solutionFile) relativePath() string {
+	file := sf.path
+
+	// Work around a path bug due to an early design decision (later reversed) to
+	// allow numeric suffixes for exercise directories, letting people have
+	// multiple parallel versions of an exercise.
+	pattern := fmt.Sprintf(`\A.*[/\\]%s-\d*/`, sf.slug)
+	rgxNumericSuffix := regexp.MustCompile(pattern)
+	if rgxNumericSuffix.MatchString(sf.path) {
+		file = string(rgxNumericSuffix.ReplaceAll([]byte(sf.path), []byte("")))
+	}
+
+	// Rewrite paths submitted with an older, buggy client where the Windows path is being treated as part of the filename.
+	file = strings.Replace(file, "\\", "/", -1)
+
+	return filepath.FromSlash(file)
 }
 
 func setupDownloadFlags(flags *pflag.FlagSet) {

@@ -85,6 +85,8 @@ func (c *Client) TokenIsValid() (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	defer resp.Body.Close()
+
 	return resp.StatusCode == http.StatusOK, nil
 }
 
@@ -99,6 +101,8 @@ func (c *Client) IsPingable() error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("API returned %s", resp.Status)
 	}

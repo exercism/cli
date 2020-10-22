@@ -77,6 +77,65 @@ func TestDownloadWithoutFlags(t *testing.T) {
 	}
 }
 
+func TestSolutionFile(t *testing.T) {
+	testCases := []struct {
+		name, file, expectedPath, expectedURL string
+	}{
+		{
+			name:         "filename with special character",
+			file:         "special-char-filename#.txt",
+			expectedPath: "special-char-filename#.txt",
+			expectedURL:  "http://www.example.com/special-char-filename%23.txt",
+		},
+		{
+			name:         "filename with leading slash",
+			file:         "/with-leading-slash.txt",
+			expectedPath: fmt.Sprintf("%cwith-leading-slash.txt", os.PathSeparator),
+			expectedURL:  "http://www.example.com//with-leading-slash.txt",
+		},
+		{
+			name:         "filename with leading backslash",
+			file:         "\\with-leading-backslash.txt",
+			expectedPath: fmt.Sprintf("%cwith-leading-backslash.txt", os.PathSeparator),
+			expectedURL:  "http://www.example.com/%5Cwith-leading-backslash.txt",
+		},
+		{
+			name:         "filename with backslashes in path",
+			file:         "\\backslashes\\in-path.txt",
+			expectedPath: fmt.Sprintf("%[1]cbackslashes%[1]cin-path.txt", os.PathSeparator),
+			expectedURL:  "http://www.example.com/%5Cbackslashes%5Cin-path.txt",
+		},
+		{
+			name:         "path with a numeric suffix",
+			file:         "/bogus-exercise-12345/numeric.txt",
+			expectedPath: fmt.Sprintf("%[1]cbogus-exercise-12345%[1]cnumeric.txt", os.PathSeparator),
+			expectedURL:  "http://www.example.com//bogus-exercise-12345/numeric.txt",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			sf := solutionFile{
+				path:    tc.file,
+				baseURL: "http://www.example.com/",
+			}
+
+			if sf.relativePath() != tc.expectedPath {
+				t.Fatalf("Expected path '%s', got '%s'", tc.expectedPath, sf.relativePath())
+			}
+
+			url, err := sf.url()
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if url != tc.expectedURL {
+				t.Fatalf("Expected URL '%s', got '%s'", tc.expectedURL, url)
+			}
+		})
+	}
+}
+
 func TestDownload(t *testing.T) {
 	co := newCapturedOutput()
 	co.override()
@@ -139,6 +198,7 @@ func TestDownload(t *testing.T) {
 
 		dir := filepath.Join(targetDir, "bogus-track", "bogus-exercise")
 		b, err := ioutil.ReadFile(workspace.NewExerciseFromDir(dir).MetadataFilepath())
+		assert.NoError(t, err)
 		var metadata workspace.ExerciseMetadata
 		err = json.Unmarshal(b, &metadata)
 		assert.NoError(t, err)
@@ -159,25 +219,6 @@ func fakeDownloadServer(requestor, teamSlug string) *httptest.Server {
 
 	mux.HandleFunc("/subdir/file-2.txt", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "this is file 2")
-	})
-
-	mux.HandleFunc("/full/path/with/numeric-suffix/bogus-track/bogus-exercise-12345/subdir/numeric.txt", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "with numeric suffix")
-	})
-
-	mux.HandleFunc("/special-char-filename#.txt", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "this is a special file")
-	})
-
-	mux.HandleFunc("/\\with-leading-backslash.txt", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "with backslash in name")
-	})
-	mux.HandleFunc("/\\with\\backslashes\\in\\path.txt", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "with backslash in path")
-	})
-
-	mux.HandleFunc("/with-leading-slash.txt", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "this has a slash")
 	})
 
 	mux.HandleFunc("/file-3.txt", func(w http.ResponseWriter, r *http.Request) {
@@ -216,31 +257,6 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
 			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "subdir", "file-2.txt"),
 			contents: "this is file 2",
 		},
-		{
-			desc:     "a path with a numeric suffix",
-			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "subdir", "numeric.txt"),
-			contents: "with numeric suffix",
-		},
-		{
-			desc:     "a file that requires URL encoding",
-			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "special-char-filename#.txt"),
-			contents: "this is a special file",
-		},
-		{
-			desc:     "a file that has a leading slash",
-			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "with-leading-slash.txt"),
-			contents: "this has a slash",
-		},
-		{
-			desc:     "a file with a leading backslash",
-			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "with-leading-backslash.txt"),
-			contents: "with backslash in name",
-		},
-		{
-			desc:     "a file with backslashes in path",
-			path:     filepath.Join(targetDir, "bogus-track", "bogus-exercise", "with", "backslashes", "in", "path.txt"),
-			contents: "with backslash in path",
-		},
 	}
 
 	for _, file := range expectedFiles {
@@ -254,6 +270,40 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
 	path := filepath.Join(targetDir, "bogus-track", "bogus-exercise", "file-3.txt")
 	_, err := os.Lstat(path)
 	assert.True(t, os.IsNotExist(err), "It should not write the file if empty.")
+}
+
+func TestDownloadError(t *testing.T) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, `{"error": {"type": "error", "message": "test error"}}`)
+	})
+
+	ts := httptest.NewServer(handler)
+	defer ts.Close()
+
+	tmpDir, err := ioutil.TempDir("", "submit-err-tmp-dir")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+	v.Set("workspace", tmpDir)
+	v.Set("apibaseurl", ts.URL)
+
+	cfg := config.Config{
+		Persister:       config.InMemoryPersister{},
+		UserViperConfig: v,
+		DefaultBaseURL:  "http://example.com",
+	}
+
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	setupDownloadFlags(flags)
+	flags.Set("uuid", "value")
+
+	err = runDownload(cfg, flags, []string{})
+
+	assert.Equal(t, "test error", err.Error())
+
 }
 
 const payloadTemplate = `
@@ -278,12 +328,7 @@ const payloadTemplate = `
 		"files": [
 			"file-1.txt",
 			"subdir/file-2.txt",
-			"special-char-filename#.txt",
-			"/with-leading-slash.txt",
-			"\\with-leading-backslash.txt",
-			"\\with\\backslashes\\in\\path.txt",
-			"file-3.txt",
-			"/full/path/with/numeric-suffix/bogus-track/bogus-exercise-12345/subdir/numeric.txt"
+			"file-3.txt"
 		],
 		"iteration": {
 			"submitted_at": "2017-08-21t10:11:12.130z"

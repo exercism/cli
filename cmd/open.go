@@ -77,8 +77,7 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		if err != nil {
 			return err
 		}
-		browser.Open(metadata.URL)
-		return nil
+		return browser.Open(metadata.URL)
 	}
 
 	if remote {
@@ -126,8 +125,7 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 		url = payload.Solution.URL
 
-		browser.Open(url)
-		return nil
+		return browser.Open(url)
 	}
 
 	ws, err := workspace.New(usrCfg.GetString("workspace"))
@@ -177,8 +175,7 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return fmt.Errorf("Please specify a track ID: %s", strings.Join(tracks, ", "))
 	}
 
-	browser.Open(url)
-	return nil
+	return browser.Open(url)
 }
 
 type openPayload struct {
