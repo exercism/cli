@@ -23,8 +23,7 @@ var openCmd = &cobra.Command{
 	Short:   "Open an exercise on the website.",
 	Long: `Open the specified exercise to the solution page on the Exercism website.
 
-Find local exercises by slug or team. You can also check for remote exercises.
-Alternatively, you can pass a local exercise directory.
+Open local or remote exercises by slug. Alternatively, you can pass a local exercise directory.
 	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.NewConfig()
@@ -50,11 +49,6 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	exerciseSlug, err := flags.GetString("exercise")
-	if err != nil {
-		return err
-	}
-
-	teamID, err := flags.GetString("team")
 	if err != nil {
 		return err
 	}
@@ -99,9 +93,6 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		q.Add("exercise_id", exerciseSlug)
 		if trackID != "" {
 			q.Add("track_id", trackID)
-		}
-		if teamID != "" {
-			q.Add("team_id", teamID)
 		}
 		req.URL.RawQuery = q.Encode()
 
@@ -155,10 +146,6 @@ func runOpen(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 			continue
 		}
 
-		if meta.Team != teamID {
-			continue
-		}
-
 		matchingExerciseMeta = append(matchingExerciseMeta, meta)
 	}
 
@@ -196,7 +183,6 @@ func setupOpenFlags(flags *pflag.FlagSet) {
 	flags.BoolP("remote", "r", false, "checks for remote solutions")
 	flags.StringP("track", "t", "", "the track id")
 	flags.StringP("exercise", "e", "", "the exercise slug")
-	flags.StringP("team", "T", "", "the team slug")
 }
 
 func init() {
