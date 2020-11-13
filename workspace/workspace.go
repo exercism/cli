@@ -2,9 +2,11 @@ package workspace
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -121,7 +123,12 @@ func (ws Workspace) Exercises() ([]Exercise, error) {
 // This is the directory that contains the exercise metadata file.
 func (ws Workspace) ExerciseDir(s string) (string, error) {
 	if !strings.HasPrefix(s, ws.Dir) {
-		return "", errors.New("not in workspace")
+		var err = fmt.Errorf("not in workspace")
+		if runtime.GOOS == "darwin" {
+			err = fmt.Errorf("%w: directory location may be case sensitive: workspace directory: %s, " +
+				"submit path: %s", err, ws.Dir, s)
+		}
+		return "", err
 	}
 
 	path := s
