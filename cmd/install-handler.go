@@ -52,7 +52,8 @@ func registerHandler() error {
 	}
 
 	// TODO: Check if exercism is in PATH
-	commandk.SetStringValue("", `cmd /K exercism download --uuid=%1`)
+	// cmd.exe /k "C:\Users\WDAGUtilityAccount\Desktop\bin\exercism.exe handler-entrypoint %1" << registry
+	commandk.SetStringValue("", `iex exercism download --uuid=%1`)
 
 	defer commandk.Close()
 	defer openk.Close()
