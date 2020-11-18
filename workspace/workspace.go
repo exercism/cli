@@ -125,7 +125,7 @@ func (ws Workspace) ExerciseDir(s string) (string, error) {
 	if !strings.HasPrefix(s, ws.Dir) {
 		var err = fmt.Errorf("not in workspace")
 		if runtime.GOOS == "darwin" {
-			err = fmt.Errorf("%w: directory location may be case sensitive: workspace directory: %s, " +
+			err = fmt.Errorf("%w: directory location may be case sensitive: workspace directory: %s, "+
 				"submit path: %s", err, ws.Dir, s)
 		}
 		return "", err

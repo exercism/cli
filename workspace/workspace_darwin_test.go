@@ -20,7 +20,6 @@ func TestExerciseDir_case_insensitive(t *testing.T) {
 	_, err := configured.ExerciseDir(filepath.Join(userPath, "exercise", "file.txt"))
 
 	assert.Error(t, err)
-	assert.Equal(t, fmt.Sprintf("not in workspace: directory location may be case sensitive: " +
+	assert.Equal(t, fmt.Sprintf("not in workspace: directory location may be case sensitive: "+
 		"workspace directory: %s, submit path: %s/exercise/file.txt", configured.Dir, userPath), err.Error())
 }
-
