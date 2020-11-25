@@ -101,5 +101,4 @@ snapcrafts:
     plugs:
       personal-files:
         write:
-        - $HOME/.config/exercism/
-        - $HOME/exercism/
+        - $HOME/
