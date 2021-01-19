@@ -36,7 +36,7 @@ If you are using the popular [Oh My Zsh][oh-my-zsh] framework to manage your
 zsh plugins, you need to move the file `exercism_completion.zsh` to a new
 custom plugin:
 
-[oh-my-zsh]: https://github.com/robbyrussell/oh-my-zsh
+[oh-my-zsh]: https://github.com/ohmyzsh/ohmyzsh
 
     mkdir -p $ZSH_CUSTOM/plugins/exercism
     cp exercism_completion.zsh $ZSH_CUSTOM/plugins/exercism/_exercism
