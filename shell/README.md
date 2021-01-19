@@ -30,7 +30,7 @@ and then add the directory to your `$fpath` in your `.zshrc`, `.zsh_profile` or
     autoload -U compinit && compinit
 
 
-#### Oh my Zsh
+#### Oh My Zsh
 
 If you are using the popular [Oh My Zsh][oh-my-zsh] framework to manage your
 zsh plugins, you need to move the file `exercism_completion.zsh` to a new
