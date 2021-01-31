@@ -78,51 +78,56 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	for _, sf := range download.payload.files() {
-		url, err := sf.url()
-		if err != nil {
-			return err
-		}
-
-		req, err := client.NewRequest("GET", url, nil)
-		if err != nil {
-			return err
-		}
-
-		res, err := client.Do(req)
-		if err != nil {
-			return err
-		}
-		defer res.Body.Close()
-
-		if res.StatusCode != http.StatusOK {
-			// TODO: deal with it
-			continue
-		}
-		// Don't bother with empty files.
-		if res.Header.Get("Content-Length") == "0" {
-			continue
-		}
-
-		// TODO: handle collisions
-		path := sf.relativePath()
-		dir := filepath.Join(metadata.Dir, filepath.Dir(path))
-		if err = os.MkdirAll(dir, os.FileMode(0755)); err != nil {
-			return err
-		}
-
-		f, err := os.Create(filepath.Join(metadata.Dir, path))
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		_, err = io.Copy(f, res.Body)
-		if err != nil {
+		if err := downloadSolutionFile(client, sf, metadata.Dir); err != nil {
 			return err
 		}
 	}
+
 	fmt.Fprintf(Err, "\nDownloaded to\n")
 	fmt.Fprintf(Out, "%s\n", metadata.Dir)
 	return nil
+}
+
+func downloadSolutionFile(client *api.Client, sf solutionFile, destDir string) error {
+	url, err := sf.url()
+	if err != nil {
+		return err
+	}
+
+	req, err := client.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		// TODO: deal with it
+		return nil
+	}
+	// Don't bother with empty files.
+	if res.Header.Get("Content-Length") == "0" {
+		return nil
+	}
+
+	// TODO: handle collisions
+	path := sf.relativePath()
+	dir := filepath.Join(destDir, filepath.Dir(path))
+	if err = os.MkdirAll(dir, os.FileMode(0755)); err != nil {
+		return err
+	}
+
+	f, err := os.Create(filepath.Join(destDir, path))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = io.Copy(f, res.Body)
+	return err
 }
 
 type download struct {
