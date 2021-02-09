@@ -97,4 +97,8 @@ snapcrafts:
       386: i386
     apps:
       exercism:
-        plugs: ["home", "network", "removable-media"]
+        plugs: ["home", "network", "removable-media","personal-files"]
+    plugs:
+      personal-files:
+        write:
+        - $HOME/
