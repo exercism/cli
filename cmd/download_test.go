@@ -209,6 +209,108 @@ func TestDownload(t *testing.T) {
 	}
 }
 
+func TestDownloadToExistingDirectory(t *testing.T) {
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
+
+	testCases := []struct {
+		exerciseDir string
+		flags       map[string]string
+	}{
+		{
+			exerciseDir: filepath.Join("bogus-track", "bogus-exercise"),
+			flags:       map[string]string{"exercise": "bogus-exercise", "track": "bogus-track"},
+		},
+		{
+			exerciseDir: filepath.Join("teams", "bogus-team", "bogus-track", "bogus-exercise"),
+			flags:       map[string]string{"exercise": "bogus-exercise", "track": "bogus-track", "team": "bogus-team"},
+		},
+	}
+
+	for _, tc := range testCases {
+		tmpDir, err := ioutil.TempDir("", "download-cmd")
+		defer os.RemoveAll(tmpDir)
+		assert.NoError(t, err)
+
+		err = os.MkdirAll(filepath.Join(tmpDir, tc.exerciseDir), os.FileMode(0755))
+		assert.NoError(t, err)
+
+		ts := fakeDownloadServer("true", "")
+		defer ts.Close()
+
+		v := viper.New()
+		v.Set("workspace", tmpDir)
+		v.Set("apibaseurl", ts.URL)
+		v.Set("token", "abc123")
+
+		cfg := config.Config{
+			UserViperConfig: v,
+		}
+		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+		setupDownloadFlags(flags)
+		for name, value := range tc.flags {
+			flags.Set(name, value)
+		}
+
+		err = runDownload(cfg, flags, []string{})
+
+		if assert.Error(t, err) {
+			assert.Regexp(t, "directory '.+' already exists", err.Error())
+		}
+	}
+}
+
+func TestDownloadToExistingDirectoryWithForce(t *testing.T) {
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
+
+	testCases := []struct {
+		exerciseDir string
+		flags       map[string]string
+	}{
+		{
+			exerciseDir: filepath.Join("bogus-track", "bogus-exercise"),
+			flags:       map[string]string{"exercise": "bogus-exercise", "track": "bogus-track"},
+		},
+		{
+			exerciseDir: filepath.Join("teams", "bogus-team", "bogus-track", "bogus-exercise"),
+			flags:       map[string]string{"exercise": "bogus-exercise", "track": "bogus-track", "team": "bogus-team"},
+		},
+	}
+
+	for _, tc := range testCases {
+		tmpDir, err := ioutil.TempDir("", "download-cmd")
+		defer os.RemoveAll(tmpDir)
+		assert.NoError(t, err)
+
+		err = os.MkdirAll(filepath.Join(tmpDir, tc.exerciseDir), os.FileMode(0755))
+		assert.NoError(t, err)
+
+		ts := fakeDownloadServer("true", "")
+		defer ts.Close()
+
+		v := viper.New()
+		v.Set("workspace", tmpDir)
+		v.Set("apibaseurl", ts.URL)
+		v.Set("token", "abc123")
+
+		cfg := config.Config{
+			UserViperConfig: v,
+		}
+		flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+		setupDownloadFlags(flags)
+		for name, value := range tc.flags {
+			flags.Set(name, value)
+		}
+		flags.Set("force", "true")
+
+		err = runDownload(cfg, flags, []string{})
+		assert.NoError(t, err)
+	}
+}
+
 func fakeDownloadServer(requestor, teamSlug string) *httptest.Server {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
