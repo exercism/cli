@@ -187,6 +187,43 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 	// Configure the workspace.
 	cfg.Set("workspace", workspace)
 
+	// Determine the postprocess script.
+	postprocess, err := flags.GetString("postprocess")
+	if err != nil {
+		return err
+	}
+	if postprocess == "" {
+		postprocess = cfg.GetString("postprocess")
+	}
+	postprocess = config.Resolve(postprocess, configuration.Home)
+
+	// Allow removal (set to empty string) via --no-postprocess
+	noPostprocess, err := flags.GetBool("no-postprocess")
+	if err != nil {
+		return err
+	}
+	if noPostprocess {
+		postprocess = ""
+	}
+
+	if postprocess != "" {
+		// If the postprocess script does not exist, then we cannot proceed.
+		if _, err := os.Lstat(postprocess); os.IsNotExist(err) {
+			msg := `
+
+    The postprocess script does not exist:
+
+      %s
+
+    Please ensure the file exists and is executable.
+`
+
+			return fmt.Errorf(msg, postprocess)
+		}
+	}
+	// Configure the postprocess script.
+	cfg.Set("postprocess", postprocess)
+
 	// Persist the new configuration.
 	if err := configuration.Save("user"); err != nil {
 		return err
@@ -202,10 +239,15 @@ func printCurrentConfig(configuration config.Config) {
 
 	v := configuration.UserViperConfig
 
+	postprocessString := "not set"
+	if s := v.GetString("postprocess"); s != "" {
+		postprocessString = s
+	}
 	fmt.Fprintln(w, "")
 	fmt.Fprintln(w, fmt.Sprintf("Config dir:\t\t%s", configuration.Dir))
 	fmt.Fprintln(w, fmt.Sprintf("Token:\t(-t, --token)\t%s", v.GetString("token")))
 	fmt.Fprintln(w, fmt.Sprintf("Workspace:\t(-w, --workspace)\t%s", v.GetString("workspace")))
+	fmt.Fprintln(w, fmt.Sprintf("Post Process:\t(-p, --postprocess)\t%s", postprocessString))
 	fmt.Fprintln(w, fmt.Sprintf("API Base URL:\t(-a, --api)\t%s", v.GetString("apibaseurl")))
 	fmt.Fprintln(w, "")
 }
@@ -229,6 +271,8 @@ func initConfigureCmd() {
 func setupConfigureFlags(flags *pflag.FlagSet) {
 	flags.StringP("token", "t", "", "authentication token used to connect to the site")
 	flags.StringP("workspace", "w", "", "directory for exercism exercises")
+	flags.StringP("postprocess", "p", "", "path to postprocess script to run after download")
+	flags.BoolP("no-postprocess", "", false, "remove postprocess script from configuration")
 	flags.StringP("api", "a", "", "API base url")
 	flags.BoolP("show", "s", false, "show the current configuration")
 	flags.BoolP("no-verify", "", false, "skip online token authorization check")

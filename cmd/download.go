@@ -10,6 +10,7 @@ import (
 	"net/http"
 	netURL "net/url"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -125,6 +126,18 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 	fmt.Fprintf(Err, "\nDownloaded to\n")
 	fmt.Fprintf(Out, "%s\n", metadata.Dir)
+
+	// run postprocess script if one was configured
+	if usrCfg.GetString("postprocess") != "" {
+		cmd := exec.Command(usrCfg.GetString("postprocess"))
+		cmd.Dir = metadata.Dir
+		err := cmd.Run()
+		if err != nil {
+			fmt.Fprintf(Err, "\nThere was an error running the postprocess script: %v\n", err)
+		} else {
+			fmt.Fprintf(Err, "\nSuccessfully executed the postprocess script.\n")
+		}
+	}
 	return nil
 }
 
