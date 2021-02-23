@@ -132,10 +132,10 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		cmd := exec.Command(usrCfg.GetString("postprocess"))
 		cmd.Dir = metadata.Dir
 		err := cmd.Run()
-		if err != nil {
-			fmt.Fprintf(Err, "\nThere was an error running the postprocess script: %v\n", err)
-		} else {
+		if err == nil {
 			fmt.Fprintf(Err, "\nSuccessfully executed the postprocess script.\n")
+		} else {
+			fmt.Fprintf(Err, "\nThere was an error running the postprocess script: %v\n", err)
 		}
 	}
 	return nil
