@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/tabwriter"
 
@@ -143,9 +144,33 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 	workspace = config.Resolve(workspace, configuration.Home)
 
 	if workspace != "" {
-		// If there is a non-directory here, then we cannot proceed.
-		if info, err := os.Lstat(workspace); !os.IsNotExist(err) && !info.IsDir() {
-			msg := `
+		// If there is a non-directory here, then we cannot proceed,
+		// unless it's a symlink to an existing directory.
+		if _, err := os.Lstat(workspace); !os.IsNotExist(err) {
+			targetWorkspace, err := filepath.EvalSymlinks(workspace)
+			if err != nil && !os.IsNotExist(err) {
+				return err
+			}
+			if os.IsNotExist(err) {
+				targetPath := ""
+				if err, ok := err.(*os.PathError); ok {
+					targetPath = err.Path
+				}
+				msg := `
+
+    The symlink at the workspace location points to non-existent path.
+    Please remove or fix it:
+
+      %s -> %s
+     `
+				return fmt.Errorf(msg, workspace, targetPath)
+			}
+			targetInfo, err := os.Lstat(targetWorkspace)
+			if err != nil {
+				return err
+			}
+			if !targetInfo.IsDir() {
+				msg := `
 
     There is already something at the workspace location you are configuring:
 
@@ -156,7 +181,8 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
        %s configure %s --workspace=PATH_TO_DIFFERENT_FOLDER
      `
 
-			return fmt.Errorf(msg, workspace, BinaryName, commandify(flags))
+				return fmt.Errorf(msg, workspace, BinaryName, commandify(flags))
+			}
 		}
 	}
 

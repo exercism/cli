@@ -344,10 +344,6 @@ func TestConfigureWorkspace(t *testing.T) {
 }
 
 func TestConfigureDefaultWorkspaceWithoutClobbering(t *testing.T) {
-	co := newCapturedOutput()
-	co.override()
-	defer co.reset()
-
 	// Stub server to always be 200 OK
 	endpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 	ts := httptest.NewServer(endpoint)
@@ -383,11 +379,7 @@ func TestConfigureDefaultWorkspaceWithoutClobbering(t *testing.T) {
 	}
 }
 
-func TestConfigureExplicitWorkspaceWithoutClobberingNonDirectory(t *testing.T) {
-	co := newCapturedOutput()
-	co.override()
-	defer co.reset()
-
+func TestConfigureExplicitWorkspaceWithoutClobberingFile(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "no-clobber")
 	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
@@ -416,6 +408,109 @@ func TestConfigureExplicitWorkspaceWithoutClobberingNonDirectory(t *testing.T) {
 	err = runConfigure(cfg, flags)
 	if assert.Error(t, err) {
 		assert.Regexp(t, "set a different workspace", err.Error())
+	}
+}
+
+func TestConfigureExplicitWorkspaceWithSymlinkToDirectory(t *testing.T) {
+	co := newCapturedOutput()
+	co.override()
+	defer co.reset()
+
+	tmpDir, err := ioutil.TempDir("", "no-clobber")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	workspaceTarget, err := ioutil.TempDir(tmpDir, "workspace")
+	assert.NoError(t, err)
+	workspaceSymlink := filepath.Join(tmpDir, "workspace-symlink")
+	os.Symlink(workspaceTarget, workspaceSymlink)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+
+	cfg := config.Config{
+		OS:              "linux",
+		DefaultDirName:  "default-workspace",
+		Home:            tmpDir,
+		Dir:             tmpDir,
+		UserViperConfig: v,
+		Persister:       config.InMemoryPersister{},
+	}
+
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	setupConfigureFlags(flags)
+	err = flags.Parse([]string{"--no-verify", "--workspace", workspaceSymlink})
+	assert.NoError(t, err)
+
+	err = runConfigure(cfg, flags)
+	assert.NoError(t, err)
+}
+
+func TestConfigureExplicitWorkspaceWithoutClobberingSymlinkedFile(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "no-clobber")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	workspaceTarget := filepath.Join(tmpDir, "workspace")
+	workspaceSymlink := filepath.Join(tmpDir, "workspace-symlink")
+	os.Symlink(workspaceTarget, workspaceSymlink)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+
+	cfg := config.Config{
+		OS:              "linux",
+		DefaultDirName:  "default-workspace",
+		Home:            tmpDir,
+		Dir:             tmpDir,
+		UserViperConfig: v,
+		Persister:       config.InMemoryPersister{},
+	}
+
+	// Create a file at the location pointed to by the workspace symlink
+	err = ioutil.WriteFile(workspaceTarget, []byte("This is not a directory"), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	setupConfigureFlags(flags)
+	err = flags.Parse([]string{"--no-verify", "--workspace", workspaceSymlink})
+	assert.NoError(t, err)
+
+	err = runConfigure(cfg, flags)
+	if assert.Error(t, err) {
+		assert.Regexp(t, "set a different workspace", err.Error())
+	}
+}
+
+func TestConfigureExplicitWorkspaceWithBrokenSymlink(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "no-clobber")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	workspaceSymlink := filepath.Join(tmpDir, "workspace-symlink")
+	os.Symlink("missing-target", workspaceSymlink)
+
+	v := viper.New()
+	v.Set("token", "abc123")
+
+	cfg := config.Config{
+		OS:              "linux",
+		DefaultDirName:  "default-workspace",
+		Home:            tmpDir,
+		Dir:             tmpDir,
+		UserViperConfig: v,
+		Persister:       config.InMemoryPersister{},
+	}
+
+	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
+	setupConfigureFlags(flags)
+	err = flags.Parse([]string{"--no-verify", "--workspace", workspaceSymlink})
+	assert.NoError(t, err)
+
+	err = runConfigure(cfg, flags)
+	if assert.Error(t, err) {
+		assert.Regexp(t, "symlink at the workspace location points to non-existent path", err.Error())
+		assert.Regexp(t, "missing-target", err.Error())
 	}
 }
 
