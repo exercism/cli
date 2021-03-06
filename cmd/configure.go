@@ -144,70 +144,13 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 	workspace = config.Resolve(workspace, configuration.Home)
 
 	if workspace != "" {
-		// If there is a non-directory here, then we cannot proceed,
-		// unless it's a symlink to an existing directory.
-		if _, err := os.Lstat(workspace); !os.IsNotExist(err) {
-			targetWorkspace, err := filepath.EvalSymlinks(workspace)
-			if err != nil && !os.IsNotExist(err) {
-				return err
-			}
-			if os.IsNotExist(err) {
-				targetPath := ""
-				if err, ok := err.(*os.PathError); ok {
-					targetPath = err.Path
-				}
-				msg := `
-
-    The symlink at the workspace location points to non-existent path.
-    Please remove or fix it:
-
-      %s -> %s
-     `
-				return fmt.Errorf(msg, workspace, targetPath)
-			}
-			targetInfo, err := os.Lstat(targetWorkspace)
-			if err != nil {
-				return err
-			}
-			if !targetInfo.IsDir() {
-				msg := `
-
-    There is already something at the workspace location you are configuring:
-
-      %s
-
-     Please rename it, or set a different workspace location:
-
-       %s configure %s --workspace=PATH_TO_DIFFERENT_FOLDER
-     `
-
-				return fmt.Errorf(msg, workspace, BinaryName, commandify(flags))
-			}
+		if err := verifyExplicitWorkspacePath(workspace, flags); err != nil {
+			return err
 		}
-	}
-
-	if workspace == "" {
+	} else {
 		workspace = config.DefaultWorkspaceDir(configuration)
-
-		// If it already exists don't clobber it with the default.
-		if _, err := os.Lstat(workspace); !os.IsNotExist(err) {
-			msg := `
-    The default Exercism workspace is
-
-      %s
-
-    There is already something there.
-    If it's a directory, that might be fine.
-    If it's a file, you will need to move it first, or choose a
-    different location for the workspace.
-
-    You can choose the workspace location by rerunning this command
-    with the --workspace flag.
-
-      %s configure %s --workspace=%s
-    `
-
-			return fmt.Errorf(msg, workspace, BinaryName, commandify(flags), workspace)
+		if err := verifyDefaultWorkspacePath(workspace, flags); err != nil {
+			return err
 		}
 	}
 	// Configure the workspace.
@@ -220,6 +163,82 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 	fmt.Fprintln(Err, "\nYou have configured the Exercism command-line client:")
 	printCurrentConfig(configuration)
 	return nil
+}
+
+func verifyExplicitWorkspacePath(workspace string, flags *pflag.FlagSet) error {
+	_, err := os.Lstat(workspace)
+	if os.IsNotExist(err) {
+		return nil
+	}
+
+	// If there is a non-directory here, then we cannot proceed,
+	// unless it's a symlink to an existing directory.
+
+	targetWorkspace, err := filepath.EvalSymlinks(workspace)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	if os.IsNotExist(err) {
+		targetPath := ""
+		if err, ok := err.(*os.PathError); ok {
+			targetPath = err.Path
+		}
+		msg := `
+
+	The symlink at the workspace location points to non-existent path.
+	Please remove or fix it:
+
+	  %s -> %s
+`
+		return fmt.Errorf(msg, workspace, targetPath)
+	}
+
+	targetInfo, err := os.Lstat(targetWorkspace)
+	if err != nil {
+		return err
+	}
+	if targetInfo.IsDir() {
+		return nil
+	}
+
+	msg := `
+
+	There is already something at the workspace location you are configuring:
+
+	  %s
+
+	Please rename it, or set a different workspace location:
+
+	  %s configure %s --workspace=PATH_TO_DIFFERENT_FOLDER
+`
+
+	return fmt.Errorf(msg, workspace, BinaryName, commandify(flags))
+}
+
+func verifyDefaultWorkspacePath(workspace string, flags *pflag.FlagSet) error {
+	_, err := os.Lstat(workspace)
+	if os.IsNotExist(err) {
+		return nil
+	}
+
+	// If it already exists don't clobber it with the default.
+	msg := `
+	The default Exercism workspace is
+
+	  %s
+
+	There is already something there.
+	If it's a directory, that might be fine.
+	If it's a file, you will need to move it first, or choose a
+	different location for the workspace.
+
+	You can choose the workspace location by rerunning this command
+	with the --workspace flag.
+
+	  %s configure %s --workspace=%s
+	`
+
+	return fmt.Errorf(msg, workspace, BinaryName, commandify(flags), workspace)
 }
 
 func printCurrentConfig(configuration config.Config) {
