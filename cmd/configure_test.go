@@ -254,6 +254,10 @@ func TestConfigureWorkspace(t *testing.T) {
 	co.override()
 	defer co.reset()
 
+	tmpDir, err := ioutil.TempDir("", "existing-workspace")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
 	testCases := []struct {
 		desc       string
 		configured string
@@ -279,6 +283,12 @@ func TestConfigureWorkspace(t *testing.T) {
 			configured: "/configured-workspace",
 			args:       []string{"--no-verify", "--workspace", "/replacement-workspace"},
 			expected:   "/replacement-workspace",
+		},
+		{
+			desc:       "It writes a workspace when the target directory exists",
+			configured: "/configured-workspace",
+			args:       []string{"--no-verify", "--workspace", tmpDir},
+			expected:   tmpDir,
 		},
 		{
 			desc:       "It gets the default workspace when neither configured nor passed as a flag",
