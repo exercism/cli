@@ -64,6 +64,10 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	metadata := download.payload.metadata()
 	dir := metadata.Exercise(usrCfg.GetString("workspace")).MetadataDir()
 
+	if _, err = os.Stat(dir); !download.forceoverwrite && err == nil {
+		return fmt.Errorf("directory '%s' already exists, use --force to overwrite", dir)
+	}
+
 	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
 		return err
 	}
@@ -103,7 +107,6 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 			continue
 		}
 
-		// TODO: handle collisions
 		path := sf.relativePath()
 		dir := filepath.Join(metadata.Dir, filepath.Dir(path))
 		if err = os.MkdirAll(dir, os.FileMode(0755)); err != nil {
@@ -133,7 +136,8 @@ type download struct {
 	token, apibaseurl, workspace string
 
 	// optional
-	track, team string
+	track, team    string
+	forceoverwrite bool
 
 	payload *downloadPayload
 }
@@ -154,6 +158,11 @@ func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
 		return nil, err
 	}
 	d.team, err = flags.GetString("team")
+	if err != nil {
+		return nil, err
+	}
+
+	d.forceoverwrite, err = flags.GetBool("force")
 	if err != nil {
 		return nil, err
 	}
@@ -354,6 +363,7 @@ func setupDownloadFlags(flags *pflag.FlagSet) {
 	flags.StringP("track", "t", "", "the track ID")
 	flags.StringP("exercise", "e", "", "the exercise slug")
 	flags.StringP("team", "T", "", "the team slug")
+	flags.BoolP("force", "F", false, "overwrite existing exercise directory")
 }
 
 func init() {

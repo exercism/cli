@@ -44,10 +44,10 @@ func DumpRequest(req *http.Request) {
 	body := io.TeeReader(req.Body, &bodyCopy)
 	req.Body = ioutil.NopCloser(body)
 
-	temp := req.Header.Get("Authorization")
+	authHeader := req.Header.Get("Authorization")
 
-	if !UnmaskAPIKey {
-		if token := strings.Split(temp, " ")[1]; token != "" {
+	if authParts := strings.Split(authHeader, " "); len(authParts) > 1 && !UnmaskAPIKey {
+		if token := authParts[1]; token != "" {
 			req.Header.Set("Authorization", "Bearer "+Redact(token))
 		}
 	}
@@ -62,7 +62,7 @@ func DumpRequest(req *http.Request) {
 	Println("========================= END DumpRequest =========================")
 	Println("")
 
-	req.Header.Set("Authorization", temp)
+	req.Header.Set("Authorization", authHeader)
 	req.Body = ioutil.NopCloser(&bodyCopy)
 }
 
