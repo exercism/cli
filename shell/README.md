@@ -30,9 +30,22 @@ and then add the directory to your `$fpath` in your `.zshrc`, `.zsh_profile` or
     autoload -U compinit && compinit
 
 
-#### Oh my Zsh
+#### Oh My Zsh
 
-If you are using the popular [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) framework to manage your zsh plugins, move the file `exercism_completion.zsh` into `~/.oh-my-zsh/custom`.
+If you are using the popular [Oh My Zsh][oh-my-zsh] framework to manage your
+zsh plugins, you need to move the file `exercism_completion.zsh` to a new
+custom plugin:
+
+[oh-my-zsh]: https://github.com/ohmyzsh/ohmyzsh
+
+    mkdir -p $ZSH_CUSTOM/plugins/exercism
+    cp exercism_completion.zsh $ZSH_CUSTOM/plugins/exercism/_exercism
+
+Then edit the file `~/.zshrc` to include `exercism` in the list of plugins.
+Completions will be activated the next time you open a new shell. If the
+completions do not work, you should update Oh My Zsh to the latest version with
+`omz update`. Oh My Zsh now checks whether the plugin list has changed (more
+accurately, `$fpath`) and resets the `zcompdump` file.
 
 ### Fish
 
