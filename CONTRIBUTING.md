@@ -50,4 +50,4 @@ On Windows:
 - `testercism.exe —h`
 
 ### Releasing a new CLI version
-Consult the [release documentation](https://github.com/exercism/cli/master/RELEASE.md).
+Consult the [release documentation](RELEASE.md).
