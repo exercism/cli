@@ -227,7 +227,7 @@ Latest:  {{ with .Version.Latest }}{{ . }}{{ else }}<unknown>{{ end }}
 {{ end -}}
 {{ if not .Version.UpToDate }}
 Call 'exercism upgrade' to get the latest version.
-See the release notes at https://github.com/exercism/cli/releases/tag/{{ .Version.Latest }} for details.
+See the release notes at https://github.com/exercism/cli/releases/tags/{{ .Version.Latest }} for details.
 {{ end }}
 
 Operating System
