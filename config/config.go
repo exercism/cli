@@ -80,11 +80,11 @@ func Dir() string {
 func Dir() string {
 	var ev string
 	if runtime.GOOS == "windows" {
-		ev = os.Getenv ("APPDATA");
+		ev = os.Getenv("APPDATA")
 	} else {
-		if ev = os.Getenv ("EXERCISM_CONFIG_HOME");  ev == "" {
-			if ev = os.Getenv ("XDG_CONFIG_HOME"); ev == "" {
-				ev = os.Getenv ("HOME")
+		if ev = os.Getenv("EXERCISM_CONFIG_HOME"); ev == "" {
+			if ev = os.Getenv("XDG_CONFIG_HOME"); ev == "" {
+				ev = os.Getenv("HOME")
 			}
 		}
 	}
@@ -92,7 +92,7 @@ func Dir() string {
 		dir, _ := os.Getwd()
 		return dir
 	}
-	return filepath.Join (ev, DefaultDirName);
+	return filepath.Join(ev, DefaultDirName)
 }
 func userHome() string {
 	var dir string
