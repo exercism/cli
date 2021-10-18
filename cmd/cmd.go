@@ -55,7 +55,7 @@ const msgRerunConfigure = `
 const msgMissingMetadata = `
 
     The exercise you are submitting doesn't have the necessary metadata.
-    Please see https://exercism.io/cli-v1-to-v2 for instructions on how to fix it.
+    Please see https://github.com/exercism/website-copy/blob/main/pages/cli_v1_to_v2.md for instructions on how to fix it.
 
 `
 
