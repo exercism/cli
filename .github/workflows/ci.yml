@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Go ${{ matrix.go-version }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version: ["1.15"]
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    steps:
+      - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
+
+      - uses: actions/setup-go@bfdd3570ce990073878bf10f6b2d79082de49492
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Run Tests
+        run: |
+          go test -cover ./...
+        shell: bash
+
+  formatting:
+    name: Go Format
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
+    
+      - name: Check formatting
+        run: ./.gha.gofmt.sh
