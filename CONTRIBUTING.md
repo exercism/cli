@@ -40,7 +40,7 @@ damaging your real Exercism submissions, or test different tokens, etc.
 
 On Unices:
 
-- `cd /path/to/the/development/directory/cli && go build -o testercism main.go`
+- `cd /path/to/the/development/directory/cli && go build -o testercism ./exercism/main.go`
 - `./testercism -h`
 
 On Windows:
