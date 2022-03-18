@@ -58,11 +58,11 @@ func Dir() string {
 	} else {
 		if ev = os.Getenv("EXERCISM_CONFIG_HOME"); ev == "" {
 			if ev = os.Getenv("XDG_CONFIG_HOME"); ev == "" {
-				ev = os.Getenv("HOME")
+				ev = filepath.Join(os.Getenv("HOME"), ".config")
 			}
 		}
 	}
-	if ev == "" {
+	if ev == ".config" {
 		dir, _ := os.Getwd()
 		return dir
 	}
