@@ -62,7 +62,7 @@ func Dir() string {
 			}
 		}
 	}
-	if ev == ".config" {
+	if ev == ".config" || ev == "" {
 		dir, _ := os.Getwd()
 		return dir
 	}
