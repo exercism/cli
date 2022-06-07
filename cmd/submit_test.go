@@ -108,6 +108,45 @@ func TestSubmitExerciseWithoutMetadataFile(t *testing.T) {
 	}
 }
 
+func TestGetExerciseSolutionFiles(t *testing.T) {
+
+	tmpDir, err := ioutil.TempDir("", "dir-with-no-metadata")
+	defer os.RemoveAll(tmpDir)
+	assert.NoError(t, err)
+
+	_, err = getExerciseSolutionFiles(tmpDir)
+	if assert.Error(t, err) {
+		assert.Regexp(t, "no files to submit", err.Error())
+	}
+
+	validTmpDir, err := ioutil.TempDir("", "dir-with-valid-metadata")
+	defer os.RemoveAll(validTmpDir)
+	assert.NoError(t, err)
+
+	metadataDir := filepath.Join(validTmpDir, ".exercism")
+	err = os.MkdirAll(metadataDir, os.FileMode(0755))
+	assert.NoError(t, err)
+
+	err = ioutil.WriteFile(
+		filepath.Join(metadataDir, "config.json"),
+		[]byte(`
+{
+	"files": {
+		"solution": [
+		  "expenses.go"
+		]
+  	}
+}
+`), os.FileMode(0755))
+	assert.NoError(t, err)
+
+	files, err := getExerciseSolutionFiles(validTmpDir)
+	assert.NoError(t, err)
+	if assert.Equal(t, len(files), 1) {
+		assert.Equal(t, files[0], "expenses.go")
+	}
+}
+
 func TestSubmitFilesAndDir(t *testing.T) {
 	tmpDir, err := ioutil.TempDir("", "submit-no-such-file")
 	defer os.RemoveAll(tmpDir)
