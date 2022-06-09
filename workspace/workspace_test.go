@@ -12,9 +12,7 @@ import (
 )
 
 func TestWorkspacePotentialExercises(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "walk")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	a1 := filepath.Join(tmpDir, "track-a", "exercise-one")
 	b1 := filepath.Join(tmpDir, "track-b", "exercise-one")
@@ -54,9 +52,7 @@ func TestWorkspacePotentialExercises(t *testing.T) {
 }
 
 func TestWorkspaceExercises(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "walk-with-metadata")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	a1 := filepath.Join(tmpDir, "track-a", "exercise-one")
 	a2 := filepath.Join(tmpDir, "track-a", "exercise-two") // no metadata

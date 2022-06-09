@@ -48,9 +48,7 @@ func TestSubmitWithoutWorkspace(t *testing.T) {
 }
 
 func TestSubmitNonExistentFile(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "submit-no-such-file")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	v := viper.New()
 	v.Set("token", "abc123")
@@ -63,7 +61,7 @@ func TestSubmitNonExistentFile(t *testing.T) {
 		DefaultBaseURL:  "http://example.com",
 	}
 
-	err = ioutil.WriteFile(filepath.Join(tmpDir, "file-1.txt"), []byte("This is file 1"), os.FileMode(0755))
+	err := ioutil.WriteFile(filepath.Join(tmpDir, "file-1.txt"), []byte("This is file 1"), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	err = ioutil.WriteFile(filepath.Join(tmpDir, "file-2.txt"), []byte("This is file 2"), os.FileMode(0755))
@@ -80,15 +78,13 @@ func TestSubmitNonExistentFile(t *testing.T) {
 }
 
 func TestSubmitExerciseWithoutMetadataFile(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "no-metadata-file")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
 
 	file := filepath.Join(dir, "file.txt")
-	err = ioutil.WriteFile(file, []byte("This is a file."), os.FileMode(0755))
+	err := ioutil.WriteFile(file, []byte("This is a file."), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	v := viper.New()
@@ -109,19 +105,14 @@ func TestSubmitExerciseWithoutMetadataFile(t *testing.T) {
 }
 
 func TestGetExerciseSolutionFiles(t *testing.T) {
+	tmpDir := t.TempDir()
 
-	tmpDir, err := ioutil.TempDir("", "dir-with-no-metadata")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
-
-	_, err = getExerciseSolutionFiles(tmpDir)
+	_, err := getExerciseSolutionFiles(tmpDir)
 	if assert.Error(t, err) {
 		assert.Regexp(t, "no files to submit", err.Error())
 	}
 
-	validTmpDir, err := ioutil.TempDir("", "dir-with-valid-metadata")
-	defer os.RemoveAll(validTmpDir)
-	assert.NoError(t, err)
+	validTmpDir := t.TempDir()
 
 	metadataDir := filepath.Join(validTmpDir, ".exercism")
 	err = os.MkdirAll(metadataDir, os.FileMode(0755))
@@ -148,9 +139,7 @@ func TestGetExerciseSolutionFiles(t *testing.T) {
 }
 
 func TestSubmitFilesAndDir(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "submit-no-such-file")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	v := viper.New()
 	v.Set("token", "abc123")
@@ -163,7 +152,7 @@ func TestSubmitFilesAndDir(t *testing.T) {
 		DefaultBaseURL:  "http://example.com",
 	}
 
-	err = ioutil.WriteFile(filepath.Join(tmpDir, "file-1.txt"), []byte("This is file 1"), os.FileMode(0755))
+	err := ioutil.WriteFile(filepath.Join(tmpDir, "file-1.txt"), []byte("This is file 1"), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	err = ioutil.WriteFile(filepath.Join(tmpDir, "file-2.txt"), []byte("This is file 2"), os.FileMode(0755))
@@ -191,9 +180,7 @@ func TestDuplicateFiles(t *testing.T) {
 	ts := fakeSubmitServer(t, submittedFiles)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "duplicate-files")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
@@ -211,7 +198,7 @@ func TestDuplicateFiles(t *testing.T) {
 	}
 
 	file1 := filepath.Join(dir, "file-1.txt")
-	err = ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
+	err := ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
 
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file1, file1})
 	assert.NoError(t, err)
@@ -231,16 +218,14 @@ func TestSubmitFiles(t *testing.T) {
 	ts := fakeSubmitServer(t, submittedFiles)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "submit-files")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
 	writeFakeMetadata(t, dir, "bogus-track", "bogus-exercise")
 
 	file1 := filepath.Join(dir, "file-1.txt")
-	err = ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
+	err := ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	file2 := filepath.Join(dir, "subdir", "file-2.txt")
@@ -288,9 +273,7 @@ func TestLegacyMetadataMigration(t *testing.T) {
 	ts := fakeSubmitServer(t, submittedFiles)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "legacy-metadata-file")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
@@ -351,9 +334,7 @@ func TestSubmitWithEmptyFile(t *testing.T) {
 	ts := fakeSubmitServer(t, submittedFiles)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "empty-file")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
@@ -371,7 +352,7 @@ func TestSubmitWithEmptyFile(t *testing.T) {
 	}
 
 	file1 := filepath.Join(dir, "file-1.txt")
-	err = ioutil.WriteFile(file1, []byte(""), os.FileMode(0755))
+	err := ioutil.WriteFile(file1, []byte(""), os.FileMode(0755))
 	file2 := filepath.Join(dir, "file-2.txt")
 	err = ioutil.WriteFile(file2, []byte("This is file 2."), os.FileMode(0755))
 
@@ -392,9 +373,7 @@ func TestSubmitWithEnormousFile(t *testing.T) {
 	ts := fakeSubmitServer(t, submittedFiles)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "enormous-file")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
@@ -412,7 +391,7 @@ func TestSubmitWithEnormousFile(t *testing.T) {
 	}
 
 	file := filepath.Join(dir, "file.txt")
-	err = ioutil.WriteFile(file, make([]byte, 65535), os.FileMode(0755))
+	err := ioutil.WriteFile(file, make([]byte, 65535), os.FileMode(0755))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -434,15 +413,14 @@ func TestSubmitFilesForTeamExercise(t *testing.T) {
 	ts := fakeSubmitServer(t, submittedFiles)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "submit-files")
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	dir := filepath.Join(tmpDir, "teams", "bogus-team", "bogus-track", "bogus-exercise")
 	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
 	writeFakeMetadata(t, dir, "bogus-track", "bogus-exercise")
 
 	file1 := filepath.Join(dir, "file-1.txt")
-	err = ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
+	err := ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	file2 := filepath.Join(dir, "subdir", "file-2.txt")
@@ -476,9 +454,7 @@ func TestSubmitOnlyEmptyFile(t *testing.T) {
 	co.override()
 	defer co.reset()
 
-	tmpDir, err := ioutil.TempDir("", "just-an-empty-file")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
@@ -496,7 +472,7 @@ func TestSubmitOnlyEmptyFile(t *testing.T) {
 	}
 
 	file := filepath.Join(dir, "file.txt")
-	err = ioutil.WriteFile(file, []byte(""), os.FileMode(0755))
+	err := ioutil.WriteFile(file, []byte(""), os.FileMode(0755))
 
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{file})
 	if assert.Error(t, err) {
@@ -505,9 +481,7 @@ func TestSubmitOnlyEmptyFile(t *testing.T) {
 }
 
 func TestSubmitFilesFromDifferentSolutions(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "dir-1-submit")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	dir1 := filepath.Join(tmpDir, "bogus-track", "bogus-exercise-1")
 	os.MkdirAll(dir1, os.FileMode(0755))
@@ -518,7 +492,7 @@ func TestSubmitFilesFromDifferentSolutions(t *testing.T) {
 	writeFakeMetadata(t, dir2, "bogus-track", "bogus-exercise-2")
 
 	file1 := filepath.Join(dir1, "file-1.txt")
-	err = ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
+	err := ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	file2 := filepath.Join(dir2, "file-2.txt")
@@ -579,9 +553,7 @@ func TestSubmitRelativePath(t *testing.T) {
 	ts := fakeSubmitServer(t, submittedFiles)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "relative-path")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(dir, os.FileMode(0755))
@@ -598,7 +570,13 @@ func TestSubmitRelativePath(t *testing.T) {
 		UserViperConfig: v,
 	}
 
-	err = ioutil.WriteFile(filepath.Join(dir, "file.txt"), []byte("This is a file."), os.FileMode(0755))
+	err := ioutil.WriteFile(filepath.Join(dir, "file.txt"), []byte("This is a file."), os.FileMode(0755))
+
+	currentDir, err := os.Getwd()
+	assert.NoError(t, err)
+	t.Cleanup(func() {
+		assert.NoError(t, os.Chdir(currentDir))
+	})
 
 	err = os.Chdir(dir)
 	assert.NoError(t, err)
@@ -619,9 +597,7 @@ func TestSubmitServerErr(t *testing.T) {
 	ts := httptest.NewServer(handler)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "submit-err-tmp-dir")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	v := viper.New()
 	v.Set("token", "abc123")
@@ -638,7 +614,7 @@ func TestSubmitServerErr(t *testing.T) {
 	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
 	writeFakeMetadata(t, dir, "bogus-track", "bogus-exercise")
 
-	err = ioutil.WriteFile(filepath.Join(dir, "file-1.txt"), []byte("This is file 1"), os.FileMode(0755))
+	err := ioutil.WriteFile(filepath.Join(dir, "file-1.txt"), []byte("This is file 1"), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	files := []string{
@@ -658,9 +634,7 @@ func TestHandleErrorResponse(t *testing.T) {
 	ts := httptest.NewServer(handler)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "submit-nonsuccess")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	v := viper.New()
 	v.Set("token", "abc123")
@@ -677,7 +651,7 @@ func TestHandleErrorResponse(t *testing.T) {
 	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
 	writeFakeMetadata(t, dir, "bogus-track", "bogus-exercise")
 
-	err = ioutil.WriteFile(filepath.Join(dir, "file-1.txt"), []byte("This is file 1"), os.FileMode(0755))
+	err := ioutil.WriteFile(filepath.Join(dir, "file-1.txt"), []byte("This is file 1"), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	files := []string{
@@ -693,9 +667,7 @@ func TestSubmissionNotConnectedToRequesterAccount(t *testing.T) {
 	ts := fakeSubmitServer(t, submittedFiles)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "submit-files")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise")
 	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
@@ -707,7 +679,7 @@ func TestSubmissionNotConnectedToRequesterAccount(t *testing.T) {
 		URL:          "http://example.com/bogus-url",
 		IsRequester:  false,
 	}
-	err = metadata.Write(dir)
+	err := metadata.Write(dir)
 	assert.NoError(t, err)
 
 	file1 := filepath.Join(dir, "file-1.txt")
@@ -736,16 +708,14 @@ func TestExerciseDirnameMatchesMetadataSlug(t *testing.T) {
 	ts := fakeSubmitServer(t, submittedFiles)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "submit-files")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	dir := filepath.Join(tmpDir, "bogus-track", "bogus-exercise-doesnt-match-metadata-slug")
 	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
 	writeFakeMetadata(t, dir, "bogus-track", "bogus-exercise")
 
 	file1 := filepath.Join(dir, "file-1.txt")
-	err = ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
+	err := ioutil.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	v := viper.New()

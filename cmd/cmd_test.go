@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/assert"
 )
 
 const cfgHomeKey = "EXERCISM_CONFIG_HOME"
@@ -26,12 +25,14 @@ const cfgHomeKey = "EXERCISM_CONFIG_HOME"
 // test, call the command by calling Execute on the App.
 //
 // Example:
-// cmdTest := &CommandTest{
-// 	Cmd:    myCmd,
-// 	InitFn: initMyCmd,
-// 	Args:   []string{"fakeapp", "mycommand", "arg1", "--flag", "value"},
-// 	MockInteractiveResponse: "first-input\nsecond\n",
-// }
+//
+//	cmdTest := &CommandTest{
+//		Cmd:    myCmd,
+//		InitFn: initMyCmd,
+//		Args:   []string{"fakeapp", "mycommand", "arg1", "--flag", "value"},
+//		MockInteractiveResponse: "first-input\nsecond\n",
+//	}
+//
 // cmdTest.Setup(t)
 // defer cmdTest.Teardown(t)
 // ...
@@ -61,11 +62,7 @@ type CommandTest struct {
 // The method takes a *testing.T as an argument, that way the method can
 // fail the test if the creation of the temporary directory fails.
 func (test *CommandTest) Setup(t *testing.T) {
-	dir, err := ioutil.TempDir("", "command-test")
-	defer os.RemoveAll(dir)
-	assert.NoError(t, err)
-
-	test.TmpDir = dir
+	test.TmpDir = t.TempDir()
 	test.OriginalValues.ConfigHome = os.Getenv(cfgHomeKey)
 	test.OriginalValues.Args = os.Args
 

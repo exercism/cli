@@ -1,8 +1,6 @@
 package workspace
 
 import (
-	"io/ioutil"
-	"os"
 	"testing"
 	"time"
 
@@ -10,9 +8,7 @@ import (
 )
 
 func TestExerciseMetadata(t *testing.T) {
-	dir, err := ioutil.TempDir("", "solution")
-	assert.NoError(t, err)
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	em1 := &ExerciseMetadata{
 		Track:        "a-track",
@@ -23,7 +19,7 @@ func TestExerciseMetadata(t *testing.T) {
 		IsRequester:  true,
 		Dir:          dir,
 	}
-	err = em1.Write(dir)
+	err := em1.Write(dir)
 	assert.NoError(t, err)
 
 	em2, err := NewExerciseMetadata(dir)

@@ -169,9 +169,7 @@ func TestDownload(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tmpDir, err := ioutil.TempDir("", "download-cmd")
-		defer os.RemoveAll(tmpDir)
-		assert.NoError(t, err)
+		tmpDir := t.TempDir()
 
 		ts := fakeDownloadServer(strconv.FormatBool(tc.requester), tc.flags["team"])
 		defer ts.Close()
@@ -190,7 +188,7 @@ func TestDownload(t *testing.T) {
 			flags.Set(name, value)
 		}
 
-		err = runDownload(cfg, flags, []string{})
+		err := runDownload(cfg, flags, []string{})
 		assert.NoError(t, err)
 
 		targetDir := filepath.Join(tmpDir, tc.expectedDir)
@@ -229,11 +227,9 @@ func TestDownloadToExistingDirectory(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tmpDir, err := ioutil.TempDir("", "download-cmd")
-		defer os.RemoveAll(tmpDir)
-		assert.NoError(t, err)
+		tmpDir := t.TempDir()
 
-		err = os.MkdirAll(filepath.Join(tmpDir, tc.exerciseDir), os.FileMode(0755))
+		err := os.MkdirAll(filepath.Join(tmpDir, tc.exerciseDir), os.FileMode(0755))
 		assert.NoError(t, err)
 
 		ts := fakeDownloadServer("true", "")
@@ -281,11 +277,9 @@ func TestDownloadToExistingDirectoryWithForce(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tmpDir, err := ioutil.TempDir("", "download-cmd")
-		defer os.RemoveAll(tmpDir)
-		assert.NoError(t, err)
+		tmpDir := t.TempDir()
 
-		err = os.MkdirAll(filepath.Join(tmpDir, tc.exerciseDir), os.FileMode(0755))
+		err := os.MkdirAll(filepath.Join(tmpDir, tc.exerciseDir), os.FileMode(0755))
 		assert.NoError(t, err)
 
 		ts := fakeDownloadServer("true", "")
@@ -383,9 +377,7 @@ func TestDownloadError(t *testing.T) {
 	ts := httptest.NewServer(handler)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "submit-err-tmp-dir")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	v := viper.New()
 	v.Set("token", "abc123")
@@ -402,7 +394,7 @@ func TestDownloadError(t *testing.T) {
 	setupDownloadFlags(flags)
 	flags.Set("uuid", "value")
 
-	err = runDownload(cfg, flags, []string{})
+	err := runDownload(cfg, flags, []string{})
 
 	assert.Equal(t, "test error", err.Error())
 

@@ -10,11 +10,9 @@ import (
 )
 
 func TestNormalizedDocumentPath(t *testing.T) {
-	root, err := ioutil.TempDir("", "docpath")
-	assert.NoError(t, err)
-	defer os.RemoveAll(root)
+	root := t.TempDir()
 
-	err = os.MkdirAll(filepath.Join(root, "subdirectory"), os.FileMode(0755))
+	err := os.MkdirAll(filepath.Join(root, "subdirectory"), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	testCases := []struct {

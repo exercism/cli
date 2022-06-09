@@ -344,9 +344,7 @@ func TestConfigureDefaultWorkspaceWithoutClobbering(t *testing.T) {
 	ts := httptest.NewServer(endpoint)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "no-clobber")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	cfg := config.Config{
 		OS:              "linux",
@@ -360,7 +358,7 @@ func TestConfigureDefaultWorkspaceWithoutClobbering(t *testing.T) {
 
 	// Create a directory at the workspace directory's location
 	// so that it's already present.
-	err = os.MkdirAll(config.DefaultWorkspaceDir(cfg), os.FileMode(0755))
+	err := os.MkdirAll(config.DefaultWorkspaceDir(cfg), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
@@ -379,9 +377,7 @@ func TestConfigureExplicitWorkspaceWithoutClobberingNonDirectory(t *testing.T) {
 	co.override()
 	defer co.reset()
 
-	tmpDir, err := ioutil.TempDir("", "no-clobber")
-	defer os.RemoveAll(tmpDir)
-	assert.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	v := viper.New()
 	v.Set("token", "abc123")
@@ -396,7 +392,7 @@ func TestConfigureExplicitWorkspaceWithoutClobberingNonDirectory(t *testing.T) {
 	}
 
 	// Create a file at the workspace directory's location
-	err = ioutil.WriteFile(filepath.Join(tmpDir, "workspace"), []byte("This is not a directory"), os.FileMode(0755))
+	err := ioutil.WriteFile(filepath.Join(tmpDir, "workspace"), []byte("This is not a directory"), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)
