@@ -26,7 +26,6 @@ var submitCmd = &cobra.Command{
 
     Call the command with the list of files you want to submit.
 `,
-	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.NewConfig()
 
@@ -44,6 +43,14 @@ var submitCmd = &cobra.Command{
 		v.SetConfigType("json")
 		// Ignore error. If the file doesn't exist, that is fine.
 		_ = v.ReadInConfig()
+
+		if len(args) == 0 {
+			files, err := getExerciseSolutionFiles(".")
+			if err != nil {
+				return err
+			}
+			args = files
+		}
 
 		return runSubmit(cfg, cmd.Flags(), args)
 	},
@@ -112,6 +119,23 @@ func runSubmit(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 	ctx.printResult(metadata)
 	return nil
+}
+
+func getExerciseSolutionFiles(baseDir string) ([]string, error) {
+	v := viper.New()
+	v.AddConfigPath(filepath.Join(baseDir, ".exercism"))
+	v.SetConfigName("config")
+	v.SetConfigType("json")
+	err := v.ReadInConfig()
+	if err != nil {
+		return nil, errors.New("no files to submit")
+	}
+	solutionFiles := v.GetStringSlice("files.solution")
+	if len(solutionFiles) == 0 {
+		return nil, errors.New("no files to submit")
+	}
+
+	return solutionFiles, nil
 }
 
 type submitCmdContext struct {
