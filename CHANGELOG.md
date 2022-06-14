@@ -7,6 +7,16 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * **Your contribution here**
 
+## v3.0.14 (2022-06-14)
+* [#968](https://github.com/exercism/cli/pull/968) Improve error message 'not in workspace' for MacOS - [@fridgepoet]
+* [#980](https://github.com/exercism/cli/pull/980) Allow read-write access to configuration and download directories when installed as a Snap - [@ekingery]
+* [#979](https://github.com/exercism/cli/pull/979) Protect existing solutions from being overwritten by 'download' - [@haguro]
+* [#981](https://github.com/exercism/cli/pull/981) Check if authorisation header is set before attempting to extract token [@haguro]
+* [#881](https://github.com/exercism/cli/pull/881) Fix instructions for completion in Oh My Zsh [@Stigjb]
+* [#1011](https://github.com/exercism/cli/pull/1011) Fix broken link when metadata is missing [@johanneswerner]
+* [#1013](https://github.com/exercism/cli/pull/1013) Bump the printed version of Exercism to v3 [@siebenschlaefer]
+* [#1044](https://github.com/exercism/cli/pull/1044) Submit without specifying files [@andrerfcsantos]
+
 ## v3.0.13 (2019-10-23)
 * [#866](https://github.com/exercism/cli/pull/866) The API token outputted during verbose will now be masked by default - [@Jrank2013]
 * [#873](https://github.com/exercism/cli/pull/873) Make all errors in cmd package checked - [@avegner]
