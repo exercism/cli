@@ -123,8 +123,8 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 			return err
 		}
 	}
-	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", metadata.Dir)
+	fmt.Fprintf(Err, "\n    Exercise has been successfully downloaded to:\n\n")
+	fmt.Fprintf(Out, "    %s\n", metadata.Dir)
 	return nil
 }
 
