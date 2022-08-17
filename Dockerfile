@@ -9,4 +9,4 @@ RUN go mod download && go mod verify
 COPY ./ .
 RUN go build -v -o /usr/local/bin/exercism ./exercism
 
-CMD ["/usr/local/bin/exercism"]
+ENTRYPOINT ["exercism"]
