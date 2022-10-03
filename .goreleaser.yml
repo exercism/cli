@@ -83,7 +83,7 @@ snapcrafts:
     # Remember you need to `snapcraft login` first.
     # Defaults to false.
     # publish: true
-    summary: Command-line client for https://exercism.io
+    summary: Command-line client for https://exercism.org
     # https://snapcraft.io/docs/reference/confinement
     confinement: strict
     # A snap of type base to be used as the execution environment for this snap.
