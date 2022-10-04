@@ -25,7 +25,7 @@ Edit the `Version` constant in `cmd/version.go`
 
 _Note: It's useful to add the version to the commit message when you bump it: e.g. `Bump version to v2.3.4`._
 
-In the future we will probably want to replace the hardcoded `Version` constant with [main.version](https://goreleaser.com/environment/#using-the-main-version). Here is a [stack overflow post on injecting to cmd/version.go](https://stackoverflow.com/a/47510909).
+In the future we will probably want to replace the hardcoded `Version` constant with [main.version](https://goreleaser.com/cookbooks/using-main.version). Here is a [stack overflow post on injecting to cmd/version.go](https://stackoverflow.com/a/47510909).
 
 Commit this change on a branch along with the CHANGELOG updates in a single commit, and create a PR for merge to master.
 
