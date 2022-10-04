@@ -7,6 +7,11 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * **Your contribution here**
 
+## v3.1.0 (2022-10-04)
+* [#979](https://github.com/exercism/cli/pull/979) Protect existing solutions from being overwritten by 'download' - [@harugo]
+* [#981](https://github.com/exercism/cli/pull/981) Check if authorisation header is set before attempting to extract token - [@harugo]
+* [#1044](https://github.com/exercism/cli/pull/1044) Submit without specifying files - [@andrerfcsantos]
+
 ## v3.0.13 (2019-10-23)
 * [#866](https://github.com/exercism/cli/pull/866) The API token outputted during verbose will now be masked by default - [@Jrank2013]
 * [#873](https://github.com/exercism/cli/pull/873) Make all errors in cmd package checked - [@avegner]
@@ -423,6 +428,7 @@ All changes by [@msgehard]
 * Build on Travis
 
 [@AlexWheeler]: https://github.com/AlexWheeler
+[@andrerfcsantos]: https://github.com/andrerfcsantos
 [@avegner]: https://github.com/avegner
 [@Dparker1990]: https://github.com/Dparker1990
 [@John-Goff]: https://github.com/John-Goff
@@ -453,6 +459,7 @@ All changes by [@msgehard]
 [@farisj]: https://github.com/farisj
 [@glebedel]: https://github.com/glebedel
 [@harimp]: https://github.com/harimp
+[@harugo]: https://github.com/harugo
 [@hjljo]: https://github.com/hjljo
 [@isbadawi]: https://github.com/isbadawi
 [@jbaiter]: https://github.com/jbaiter
