@@ -15,7 +15,7 @@ release process.
 Make sure all the recent changes are reflected in the "next release" section of the CHANGELOG.md file.  All the changes in the "next release" section should be moved to a new section that describes the version number, and gives it a date.
 
 You can view changes using the /compare/ view:
-https://github.com/exercism/cli/compare/$PREVIOUS_RELEASE...master
+https://github.com/exercism/cli/compare/$PREVIOUS_RELEASE...main
 
 GoReleaser supports the [auto generation of a changelog](https://goreleaser.com/customization/#customize-the-changelog) we will want to customize to meet our standards (not including refactors, test updates, etc). We should also consider using [the release notes feature](https://goreleaser.com/customization/#custom-release-notes).
 
@@ -27,7 +27,7 @@ _Note: It's useful to add the version to the commit message when you bump it: e.
 
 In the future we will probably want to replace the hardcoded `Version` constant with [main.version](https://goreleaser.com/environment/#using-the-main-version). Here is a [stack overflow post on injecting to cmd/version.go](https://stackoverflow.com/a/47510909).
 
-Commit this change on a branch along with the CHANGELOG updates in a single commit, and create a PR for merge to master.
+Commit this change on a branch along with the CHANGELOG updates in a single commit, and create a PR for merge to main.
 
 ## Cut a release
 
@@ -35,7 +35,7 @@ Commit this change on a branch along with the CHANGELOG updates in a single comm
 # Test run
 goreleaser --skip-publish --snapshot --rm-dist
 
-# Create a new tag on the master branch and push it
+# Create a new tag on the main branch and push it
 git tag -a v3.0.16 -m "Trying out GoReleaser"
 git push origin v3.0.16
 
