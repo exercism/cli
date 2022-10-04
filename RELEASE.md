@@ -1,14 +1,14 @@
 # Cutting a CLI Release
 
 The Exercism CLI uses [GoReleaser](https://goreleaser.com) to automate the
-release process. 
+release process.
 
 ## Requirements
 
 1. [Install GoReleaser](https://goreleaser.com/install/)
 1. [Install snapcraft](https://snapcraft.io/docs/snapcraft-overview)
-1. [Setup GitHub token](https://goreleaser.com/environment/#github-token)
-1. Have a gpg key installed on your machine - it is [used for signing the artifacts](https://goreleaser.com/sign/)
+1. [Setup GitHub token](https://goreleaser.com/scm/github/)
+1. Have a gpg key installed on your machine - it is [used for signing the artifacts](https://goreleaser.com/customization/sign/)
 
 ## Confirm / Update the Changelog
 
