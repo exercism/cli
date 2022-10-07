@@ -5,8 +5,6 @@ Exercism would be impossible without people like you being willing to spend time
 
 ## Documentation
 * [Exercism Documentation Repository](https://github.com/exercism/docs)
-* [Exercism Glossary](https://github.com/exercism/docs/blob/master/about/glossary.md)
-* [Exercism Architecture](https://github.com/exercism/docs/blob/master/about/architecture.md)
 
 ## Dependencies
 
