@@ -19,12 +19,14 @@ import (
 
 // submitCmd lets people upload a solution to the website.
 var submitCmd = &cobra.Command{
-	Use:     "submit FILE1 [FILE2 ...]",
+	Use: "submit [FILE1	 ...]",
 	Aliases: []string{"s"},
 	Short:   "Submit your solution to an exercise.",
 	Long: `Submit your solution to an Exercism exercise.
 
     Call the command with the list of files you want to submit.
+    If you omit the list of files, the CLI will attempt to submit
+    automatically the appropriate solution files for the exercise.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.NewConfig()
