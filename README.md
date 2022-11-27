@@ -11,6 +11,14 @@ This CLI ships as a binary with no additional runtime requirements.
 
 Instructions can be found at [exercism/cli/releases](https://github.com/exercism/cli/releases)
 
+### Installing as go package
+
+If you have golang, you can install as go package into `~/go/bin` (by default)
+``` shell
+go install github.com/exercism/cli/exercism@latest
+```
+
+
 ## Contributing
 
 If you wish to help improve the CLI, please see the [Contributing guide][contributing].
