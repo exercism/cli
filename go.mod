@@ -22,7 +22,7 @@ require (
 	github.com/spf13/viper v0.0.0-20180507071007-15738813a09d
 	github.com/stretchr/testify v1.1.4
 	golang.org/x/net v0.0.0-20170726083632-f5079bd7f6f7
-	golang.org/x/sys v0.0.0-20170803140359-d8f5ea21b929
+	golang.org/x/sys v0.0.0-20201202213521-69691e467435
 	golang.org/x/text v0.0.0-20170730040918-3bd178b88a81
 	gopkg.in/yaml.v2 v2.0.0-20170721122051-25c4ec802a7d
 )
