@@ -14,9 +14,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blang/semver"
-	"github.com/exercism/cli/debug"
+	"github.com/blang/semver/v4"
 	update "github.com/inconshreveable/go-update"
+
+	"github.com/exercism/cli/debug"
 )
 
 var (

@@ -3,8 +3,9 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/exercism/cli/cli"
 	"github.com/spf13/cobra"
+
+	"github.com/exercism/cli/cli"
 )
 
 // upgradeCmd downloads and installs the most recent version of the CLI.

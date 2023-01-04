@@ -11,11 +11,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/workspace"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/exercism/cli/config"
+	"github.com/exercism/cli/workspace"
 )
 
 func TestSubmitWithoutToken(t *testing.T) {

@@ -5,11 +5,12 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/spf13/cobra"
+
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/cli"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/debug"
-	"github.com/spf13/cobra"
 )
 
 // RootCmd represents the base command when called without any subcommands.

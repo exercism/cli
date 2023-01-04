@@ -6,8 +6,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/exercism/cli/cli"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/exercism/cli/cli"
 )
 
 func TestCurrentVersion(t *testing.T) {

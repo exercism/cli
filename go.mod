@@ -1,9 +1,9 @@
 module github.com/exercism/cli
 
-go 1.15
+go 1.18
 
 require (
-	github.com/blang/semver v3.5.1+incompatible
+	github.com/blang/semver/v4 v4.0.0
 	github.com/davecgh/go-spew v1.1.0
 	github.com/fsnotify/fsnotify v1.4.2
 	github.com/hashicorp/hcl v0.0.0-20170509225359-392dba7d905e

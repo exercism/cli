@@ -3,8 +3,9 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/exercism/cli/cli"
 	"github.com/spf13/cobra"
+
+	"github.com/exercism/cli/cli"
 )
 
 // Version is the version of the current build.

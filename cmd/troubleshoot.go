@@ -8,11 +8,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/exercism/cli/cli"
 	"github.com/exercism/cli/config"
 	"github.com/exercism/cli/debug"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // fullAPIKey flag for troubleshoot command.

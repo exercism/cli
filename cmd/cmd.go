@@ -3,13 +3,13 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 
-	"io"
+	"github.com/spf13/viper"
 
 	"github.com/exercism/cli/config"
-	"github.com/spf13/viper"
 )
 
 var (
