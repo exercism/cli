@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -10,7 +9,7 @@ import (
 )
 
 func TestExerciseMetadata(t *testing.T) {
-	dir, err := ioutil.TempDir("", "solution")
+	dir, err := os.MkdirTemp("", "solution")
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
 

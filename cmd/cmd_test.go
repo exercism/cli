@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -63,7 +62,7 @@ type CommandTest struct {
 // The method takes a *testing.T as an argument, that way the method can
 // fail the test if the creation of the temporary directory fails.
 func (test *CommandTest) Setup(t *testing.T) {
-	dir, err := ioutil.TempDir("", "command-test")
+	dir, err := os.MkdirTemp("", "command-test")
 	defer os.RemoveAll(dir)
 	assert.NoError(t, err)
 
@@ -104,8 +103,8 @@ func newCapturedOutput() capturedOutput {
 	return capturedOutput{
 		oldOut: Out,
 		oldErr: Err,
-		newOut: ioutil.Discard,
-		newErr: ioutil.Discard,
+		newOut: io.Discard,
+		newErr: io.Discard,
 	}
 }
 
