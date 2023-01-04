@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/exercism/cli/cli"
+	"github.com/exercism/cli/v4/cli"
 )
 
 func TestCurrentVersion(t *testing.T) {

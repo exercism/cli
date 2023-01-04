@@ -17,7 +17,7 @@ import (
 	"github.com/blang/semver/v4"
 	update "github.com/inconshreveable/go-update"
 
-	"github.com/exercism/cli/debug"
+	"github.com/exercism/cli/v4/debug"
 )
 
 var (

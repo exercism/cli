@@ -3,8 +3,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/exercism/cli/browser"
-	"github.com/exercism/cli/workspace"
+	"github.com/exercism/cli/v4/browser"
+	"github.com/exercism/cli/v4/workspace"
 )
 
 // openCmd opens the designated exercise in the browser.

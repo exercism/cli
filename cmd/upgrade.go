@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/exercism/cli/cli"
+	"github.com/exercism/cli/v4/cli"
 )
 
 // upgradeCmd downloads and installs the most recent version of the CLI.

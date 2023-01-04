@@ -18,9 +18,9 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/workspace"
+	"github.com/exercism/cli/v4/api"
+	"github.com/exercism/cli/v4/config"
+	"github.com/exercism/cli/v4/workspace"
 )
 
 // downloadCmd represents the download command

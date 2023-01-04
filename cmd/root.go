@@ -7,10 +7,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/exercism/cli/api"
-	"github.com/exercism/cli/cli"
-	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/debug"
+	"github.com/exercism/cli/v4/api"
+	"github.com/exercism/cli/v4/cli"
+	"github.com/exercism/cli/v4/config"
+	"github.com/exercism/cli/v4/debug"
 )
 
 // RootCmd represents the base command when called without any subcommands.

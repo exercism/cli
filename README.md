@@ -15,7 +15,7 @@ Instructions can be found at [exercism/cli/releases](https://github.com/exercism
 
 If you have golang, you can install as go package into `~/go/bin` (by default)
 ``` shell
-go install github.com/exercism/cli/exercism@latest
+go install github.com/exercism/cli/v4/exercism@latest
 ```
 
 

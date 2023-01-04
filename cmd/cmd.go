@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/exercism/cli/config"
+	"github.com/exercism/cli/v4/config"
 )
 
 var (

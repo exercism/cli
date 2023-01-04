@@ -1,6 +1,6 @@
 package main
 
-import "github.com/exercism/cli/cmd"
+import "github.com/exercism/cli/v4/cmd"
 
 func main() {
 	cmd.Execute()

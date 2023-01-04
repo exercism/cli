@@ -15,8 +15,8 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/workspace"
+	"github.com/exercism/cli/v4/config"
+	"github.com/exercism/cli/v4/workspace"
 )
 
 func TestSubmitWithoutToken(t *testing.T) {

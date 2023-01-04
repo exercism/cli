@@ -1,4 +1,4 @@
-module github.com/exercism/cli
+module github.com/exercism/cli/v4
 
 go 1.18
 

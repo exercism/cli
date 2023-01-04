@@ -11,9 +11,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/exercism/cli/cli"
-	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/debug"
+	"github.com/exercism/cli/v4/cli"
+	"github.com/exercism/cli/v4/config"
+	"github.com/exercism/cli/v4/debug"
 )
 
 // fullAPIKey flag for troubleshoot command.
