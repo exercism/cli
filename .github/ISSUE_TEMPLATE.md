@@ -1,7 +1,4 @@
 <!--
-If you're having trouble, please open an issue in
-http://github.com/exercism/exercism/issues.
+Hello. Please do NOT open issues in this repository. Instead use the Exercism Community Forum: https://forum.exercism.org
 
-If necessary, we will open actionable issues here
-about what needs to change.
 -->
