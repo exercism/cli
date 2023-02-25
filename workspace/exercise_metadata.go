@@ -3,7 +3,6 @@ package workspace
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -32,7 +31,7 @@ type ExerciseMetadata struct {
 
 // NewExerciseMetadata reads exercise metadata from a file in the given directory.
 func NewExerciseMetadata(dir string) (*ExerciseMetadata, error) {
-	b, err := ioutil.ReadFile(filepath.Join(dir, metadataFilepath))
+	b, err := os.ReadFile(filepath.Join(dir, metadataFilepath))
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +71,7 @@ func (em *ExerciseMetadata) Write(dir string) error {
 	if err = os.MkdirAll(filepath.Dir(metadataAbsoluteFilepath), os.FileMode(0755)); err != nil {
 		return err
 	}
-	if err = ioutil.WriteFile(metadataAbsoluteFilepath, b, os.FileMode(0600)); err != nil {
+	if err = os.WriteFile(metadataAbsoluteFilepath, b, os.FileMode(0600)); err != nil {
 		return err
 	}
 	em.Dir = dir

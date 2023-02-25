@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/exercism/cli/debug"
+	"github.com/exercism/cli/v4/debug"
 )
 
 var (

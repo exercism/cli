@@ -2,11 +2,12 @@ package workspace
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestExerciseDir_case_insensitive(t *testing.T) {

@@ -7,6 +7,9 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * **Your contribution here**
 
+## v4.0.0 (2023-01-04)
+* [#1054](https://github.com/exercism/cli/pull/1054) Update to go 1.18 and to compatible with go modules - [@psydvl]
+
 ## v3.1.0 (2022-10-04)
 * [#979](https://github.com/exercism/cli/pull/979) Protect existing solutions from being overwritten by 'download' - [@harugo]
 * [#981](https://github.com/exercism/cli/pull/981) Check if authorisation header is set before attempting to extract token - [@harugo]

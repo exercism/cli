@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -10,7 +9,7 @@ import (
 )
 
 func TestNormalizedDocumentPath(t *testing.T) {
-	root, err := ioutil.TempDir("", "docpath")
+	root, err := os.MkdirTemp("", "docpath")
 	assert.NoError(t, err)
 	defer os.RemoveAll(root)
 
@@ -32,7 +31,7 @@ func TestNormalizedDocumentPath(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		err = ioutil.WriteFile(tc.filepath, []byte("a file"), os.FileMode(0600))
+		err = os.WriteFile(tc.filepath, []byte("a file"), os.FileMode(0600))
 		assert.NoError(t, err)
 
 		doc, err := NewDocument(root, tc.filepath)

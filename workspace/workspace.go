@@ -3,7 +3,6 @@ package workspace
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -46,7 +45,7 @@ func New(dir string) (Workspace, error) {
 func (ws Workspace) PotentialExercises() ([]Exercise, error) {
 	exercises := []Exercise{}
 
-	topInfos, err := ioutil.ReadDir(ws.Dir)
+	topInfos, err := os.ReadDir(ws.Dir)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +59,7 @@ func (ws Workspace) PotentialExercises() ([]Exercise, error) {
 		}
 
 		if topInfo.Name() == "teams" {
-			subInfos, err := ioutil.ReadDir(filepath.Join(ws.Dir, "teams"))
+			subInfos, err := os.ReadDir(filepath.Join(ws.Dir, "teams"))
 			if err != nil {
 				return nil, err
 			}
@@ -81,7 +80,7 @@ func (ws Workspace) PotentialExercises() ([]Exercise, error) {
 			continue
 		}
 
-		subInfos, err := ioutil.ReadDir(filepath.Join(ws.Dir, topInfo.Name()))
+		subInfos, err := os.ReadDir(filepath.Join(ws.Dir, topInfo.Name()))
 		if err != nil {
 			return nil, err
 		}

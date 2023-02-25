@@ -3,13 +3,14 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/exercism/cli/cli"
 	"github.com/spf13/cobra"
+
+	"github.com/exercism/cli/v4/cli"
 )
 
 // Version is the version of the current build.
 // It follows semantic versioning.
-const Version = "3.1.0"
+const Version = "4.0.0"
 
 // checkLatest flag for version command.
 var checkLatest bool

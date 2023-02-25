@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -42,7 +41,7 @@ func DumpRequest(req *http.Request) {
 
 	var bodyCopy bytes.Buffer
 	body := io.TeeReader(req.Body, &bodyCopy)
-	req.Body = ioutil.NopCloser(body)
+	req.Body = io.NopCloser(body)
 
 	authHeader := req.Header.Get("Authorization")
 
@@ -63,7 +62,7 @@ func DumpRequest(req *http.Request) {
 	Println("")
 
 	req.Header.Set("Authorization", authHeader)
-	req.Body = ioutil.NopCloser(&bodyCopy)
+	req.Body = io.NopCloser(&bodyCopy)
 }
 
 // DumpResponse dumps out the provided http.Response
@@ -74,7 +73,7 @@ func DumpResponse(res *http.Response) {
 
 	var bodyCopy bytes.Buffer
 	body := io.TeeReader(res.Body, &bodyCopy)
-	res.Body = ioutil.NopCloser(body)
+	res.Body = io.NopCloser(body)
 
 	dump, err := httputil.DumpResponse(res, res.ContentLength > 0)
 	if err != nil {
@@ -86,7 +85,7 @@ func DumpResponse(res *http.Response) {
 	Println("========================= END DumpResponse =========================")
 	Println("")
 
-	res.Body = ioutil.NopCloser(body)
+	res.Body = io.NopCloser(body)
 }
 
 // Redact masks the given token by replacing part of the string with *

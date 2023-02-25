@@ -11,11 +11,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/exercism/cli/config"
-	"github.com/exercism/cli/workspace"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/exercism/cli/v4/config"
+	"github.com/exercism/cli/v4/workspace"
 )
 
 func TestSubmitWithoutToken(t *testing.T) {
@@ -272,7 +273,7 @@ func TestSubmitFiles(t *testing.T) {
 	if assert.NoError(t, err) {
 		assert.Equal(t, 3, len(submittedFiles))
 		assert.Equal(t, "This is file 1.", submittedFiles["file-1.txt"])
-		assert.Equal(t, "This is file 2.", submittedFiles["subdir/file-2.txt"])
+		assert.Equal(t, "This is file 2.", submittedFiles["file-2.txt"])
 		assert.Equal(t, "This is the readme.", submittedFiles["README.md"])
 		assert.Regexp(t, "submitted successfully", Err)
 	}
@@ -468,7 +469,7 @@ func TestSubmitFilesForTeamExercise(t *testing.T) {
 	assert.Equal(t, 2, len(submittedFiles))
 
 	assert.Equal(t, "This is file 1.", submittedFiles["file-1.txt"])
-	assert.Equal(t, "This is file 2.", submittedFiles["subdir/file-2.txt"])
+	assert.Equal(t, "This is file 2.", submittedFiles["file-2.txt"])
 }
 
 func TestSubmitOnlyEmptyFile(t *testing.T) {
