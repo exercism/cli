@@ -91,6 +91,9 @@ func DumpResponse(res *http.Response) {
 
 // Redact masks the given token by replacing part of the string with *
 func Redact(token string) string {
+	if len(token) < 7 {
+		return "*******"
+	}
 	str := token[4 : len(token)-3]
 	redaction := strings.Repeat("*", len(str))
 	return string(token[:4]) + redaction + string(token[len(token)-3:])

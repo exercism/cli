@@ -73,7 +73,7 @@ func TestConfigureShow(t *testing.T) {
 	assert.Regexp(t, "configured.example", Err)
 	assert.NotRegexp(t, "override.example", Err)
 
-	assert.Regexp(t, "configured-token", Err)
+	assert.Regexp(t, `conf\*\*\*\*\*\*\*\*\*ken`, Err)
 	assert.NotRegexp(t, "token-override", Err)
 
 	assert.Regexp(t, "configured-workspace", Err)

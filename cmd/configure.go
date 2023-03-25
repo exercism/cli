@@ -8,6 +8,7 @@ import (
 
 	"github.com/exercism/cli/api"
 	"github.com/exercism/cli/config"
+	"github.com/exercism/cli/debug"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -202,9 +203,14 @@ func printCurrentConfig(configuration config.Config) {
 
 	v := configuration.UserViperConfig
 
+	token := v.GetString("token")
+	if !debug.UnmaskAPIKey {
+		token = debug.Redact(token)
+	}
+
 	fmt.Fprintln(w, "")
 	fmt.Fprintln(w, fmt.Sprintf("Config dir:\t\t%s", configuration.Dir))
-	fmt.Fprintln(w, fmt.Sprintf("Token:\t(-t, --token)\t%s", v.GetString("token")))
+	fmt.Fprintln(w, fmt.Sprintf("Token:\t(-t, --token)\t%s", token))
 	fmt.Fprintln(w, fmt.Sprintf("Workspace:\t(-w, --workspace)\t%s", v.GetString("workspace")))
 	fmt.Fprintln(w, fmt.Sprintf("API Base URL:\t(-a, --api)\t%s", v.GetString("apibaseurl")))
 	fmt.Fprintln(w, "")
