@@ -51,19 +51,20 @@ var testCmd = &cobra.Command{
 		testConf, ok := testConfigurations[track]
 
 		if !ok {
-			return fmt.Errorf("test handler for track `%s` not yet implemented. Please see HELP.md for testing instructions", track)
+			return fmt.Errorf("test handler for the `%s` track not yet implemented. Please see HELP.md for testing instructions", track)
 		}
 
 		cmdParts := strings.Split(testConf.command, " ")
 
 		if testConf.AppendTestFiles {
-			testFiles, err := workspace.NewExerciseConfig(".")
+			testFiles, err := getTestFiles()
 			if err != nil {
 				return err
 			}
-			cmdParts = append(cmdParts, testFiles.Files.Test...)
+			cmdParts = append(cmdParts, testFiles...)
 		}
 
+		// pass args/flags to this command down to the test handler
 		if len(args) > 0 {
 			if testConf.autoSeparateArgs {
 				cmdParts = append(cmdParts, "--")
@@ -99,6 +100,14 @@ func getTrack() (string, error) {
 	}
 
 	return metadata.Track, nil
+}
+
+func getTestFiles() ([]string, error) {
+	testFiles, err := workspace.NewExerciseConfig(".")
+	if err != nil {
+		return []string{}, err
+	}
+	return testFiles.Files.Test, nil
 }
 
 func init() {
