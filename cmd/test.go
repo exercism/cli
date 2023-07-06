@@ -42,55 +42,59 @@ var testCmd = &cobra.Command{
 
 	Run this command in an exercise's root directory.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		track, err := getTrack()
+		return runTest(args)
+	},
+}
 
+func runTest(args []string) error {
+	track, err := getTrack()
+
+	if err != nil {
+		return err
+	}
+
+	testConf, ok := testConfigurations[track]
+
+	if !ok {
+		return fmt.Errorf("test handler for the `%s` track not yet implemented. Please see HELP.md for testing instructions", track)
+	}
+
+	cmdParts := strings.Split(testConf.command, " ")
+
+	if testConf.AppendTestFiles {
+		testFiles, err := getTestFiles()
 		if err != nil {
 			return err
 		}
+		cmdParts = append(cmdParts, testFiles...)
+	}
 
-		testConf, ok := testConfigurations[track]
-
-		if !ok {
-			return fmt.Errorf("test handler for the `%s` track not yet implemented. Please see HELP.md for testing instructions", track)
+	// pass args/flags to this command down to the test handler
+	if len(args) > 0 {
+		if testConf.autoSeparateArgs {
+			cmdParts = append(cmdParts, "--")
 		}
+		cmdParts = append(cmdParts, args...)
+	}
 
-		cmdParts := strings.Split(testConf.command, " ")
+	exerciseTestCmd := exec.Command(cmdParts[0], cmdParts[1:]...)
 
-		if testConf.AppendTestFiles {
-			testFiles, err := getTestFiles()
-			if err != nil {
-				return err
-			}
-			cmdParts = append(cmdParts, testFiles...)
+	// pipe output directly out, preserving any color
+	exerciseTestCmd.Stdout = os.Stdout
+	exerciseTestCmd.Stderr = os.Stderr
+
+	err = exerciseTestCmd.Run()
+	if err != nil {
+		// unclear what other errors would pop up here, but it pays to be defensive
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			exitCode := exitErr.ExitCode()
+			// if subcommand returned a non-zero exit code, exit with the same
+			os.Exit(exitCode)
+		} else {
+			log.Fatalf("Failed to get error from failed subcommand: %v", err)
 		}
-
-		// pass args/flags to this command down to the test handler
-		if len(args) > 0 {
-			if testConf.autoSeparateArgs {
-				cmdParts = append(cmdParts, "--")
-			}
-			cmdParts = append(cmdParts, args...)
-		}
-
-		exerciseTestCmd := exec.Command(cmdParts[0], cmdParts[1:]...)
-
-		// pipe output directly out, preserving any color
-		exerciseTestCmd.Stdout = os.Stdout
-		exerciseTestCmd.Stderr = os.Stderr
-
-		err = exerciseTestCmd.Run()
-		if err != nil {
-			// unclear what other errors would pop up here, but it pays to be defensive
-			if exitErr, ok := err.(*exec.ExitError); ok {
-				exitCode := exitErr.ExitCode()
-				// if subcommand returned a non-zero exit code, exit with the same
-				os.Exit(exitCode)
-			} else {
-				log.Fatalf("Failed to get error from failed subcommand: %v", err)
-			}
-		}
-		return nil
-	},
+	}
+	return nil
 }
 
 func getTrack() (string, error) {
