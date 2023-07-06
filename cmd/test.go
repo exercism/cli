@@ -5,31 +5,66 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 
 	"github.com/exercism/cli/workspace"
 	"github.com/spf13/cobra"
 )
 
+type PlatformSpecificCommands struct {
+	Windows string
+	Darwin  string
+	Linux   string
+}
+
 type TestConfiguration struct {
-	// The static portion of the test command, which will be run for every test on this track. Examples include `cargo test` or `go test`
-	command string
-	// Some tracks test by running a specific file, such as `ruby lasagna_test.rb`. Set this to `true` to look up and include the name of the default test file.
+	// The static portion of the test Command, which will be run for every test on this track. Examples include `cargo test` or `go test`.
+	// Might be empty if there are platform-specific versions
+	Command string
+
+	// Platform-specific test commands. Mostly relevant for tests wrapped by shell invocations. Falls back to `Command` if platform isn't available.
+	PlatformSpecificCommands
+
+	// Some tracks test by running a specific file, such as `ruby lasagna_test.rb`. Set this to `true` to look up and include the name of the default test file(s).
 	AppendTestFiles bool
 	// All args after `--` aren't parsed and are passed to the test command. Some languages (especially `rust`) expect an additional `--` between _their_ args. So instead of requiring a user to call `exercism test -- -- --include-ingored` to run all `rust` tests, set this to `true` to separate the args passed to the test runner by a `--` automatically.
-	autoSeparateArgs bool
+	AutoSeparateArgs bool
+}
+
+func (c *TestConfiguration) getTestCommand() string {
+	if c.PlatformSpecificCommands == (PlatformSpecificCommands{}) {
+		return c.Command
+	}
+
+	switch runtime.GOOS {
+	case "windows":
+		if c.PlatformSpecificCommands.Windows != "" {
+			return c.PlatformSpecificCommands.Windows
+		}
+	case "darwin":
+		if c.PlatformSpecificCommands.Darwin != "" {
+			return c.PlatformSpecificCommands.Darwin
+		}
+	case "linux":
+		if c.PlatformSpecificCommands.Linux != "" {
+			return c.PlatformSpecificCommands.Linux
+		}
+	}
+
+	return c.Command
 }
 
 var testConfigurations = map[string]TestConfiguration{
 	"go": {
-		command: "go test",
+		Command: "go test",
 	},
 	"rust": {
-		command:          "cargo test",
-		autoSeparateArgs: true,
+		Command:          "cargo test",
+		AutoSeparateArgs: true,
 	},
 	"ruby": {
-		command:         "ruby",
+		Command:         "ruby",
 		AppendTestFiles: true,
 	},
 }
@@ -59,7 +94,7 @@ func runTest(args []string) error {
 		return fmt.Errorf("test handler for the `%s` track not yet implemented. Please see HELP.md for testing instructions", track)
 	}
 
-	cmdParts := strings.Split(testConf.command, " ")
+	cmdParts := strings.Split(testConf.getTestCommand(), " ")
 
 	if testConf.AppendTestFiles {
 		testFiles, err := getTestFiles()
@@ -71,7 +106,7 @@ func runTest(args []string) error {
 
 	// pass args/flags to this command down to the test handler
 	if len(args) > 0 {
-		if testConf.autoSeparateArgs {
+		if testConf.AutoSeparateArgs {
 			cmdParts = append(cmdParts, "--")
 		}
 		cmdParts = append(cmdParts, args...)
