@@ -1,6 +1,9 @@
 package workspace
 
-import "runtime"
+import (
+	"runtime"
+	"strings"
+)
 
 type TestConfiguration struct {
 	// The static portion of the test Command, which will be run for every test on this track. Examples include `cargo test` or `go test`.
@@ -9,16 +12,25 @@ type TestConfiguration struct {
 
 	// Windows-specific test command. Mostly relevant for tests wrapped by shell invocations. Falls back to `Command` if we're not running windows or this is empty.
 	WindowsCommand string
-
-	// Some tracks test by running a specific file, such as `ruby lasagna_test.rb`. Set this to `true` to look up and include the name of the default test file(s).
-	AppendTestFiles bool
 }
 
-func (c *TestConfiguration) GetTestCommand() string {
+func (c *TestConfiguration) GetTestCommand() (string, error) {
+	var cmd string
 	if runtime.GOOS == "windows" && c.WindowsCommand != "" {
-		return c.WindowsCommand
+		cmd = c.WindowsCommand
+	} else {
+		cmd = c.Command
 	}
-	return c.Command
+
+	if strings.Contains(cmd, "{{test_files}}") {
+		testFiles, err := getTestFiles()
+		if err != nil {
+			return "", err
+		}
+		cmd = strings.ReplaceAll(cmd, "{{test_files}}", strings.Join(testFiles, " "))
+	}
+
+	return cmd, nil
 }
 
 var TestConfigurations = map[string]TestConfiguration{
@@ -40,8 +52,7 @@ var TestConfigurations = map[string]TestConfiguration{
 		WindowsCommand: "test.ps1",
 	},
 	"coffeescript": {
-		Command:         "jasmine-node --coffee",
-		AppendTestFiles: true,
+		Command: "jasmine-node --coffee {{test_files}}",
 	},
 	"crystal": {
 		Command: "crystal spec",
@@ -65,7 +76,14 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: "cargo test --",
 	},
 	"ruby": {
-		Command:         "ruby",
-		AppendTestFiles: true,
+		Command: "ruby {{test_files}}",
 	},
+}
+
+func getTestFiles() ([]string, error) {
+	testFiles, err := NewExerciseConfig(".")
+	if err != nil {
+		return []string{}, err
+	}
+	return testFiles.Files.Test, nil
 }

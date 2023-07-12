@@ -36,15 +36,11 @@ func runTest(args []string) error {
 		return fmt.Errorf("test handler for the `%s` track not yet implemented. Please see HELP.md for testing instructions", track)
 	}
 
-	cmdParts := strings.Split(testConf.GetTestCommand(), " ")
-
-	if testConf.AppendTestFiles {
-		testFiles, err := getTestFiles()
-		if err != nil {
-			return err
-		}
-		cmdParts = append(cmdParts, testFiles...)
+	command, err := testConf.GetTestCommand()
+	if err != nil {
+		return err
 	}
+	cmdParts := strings.Split(command, " ")
 
 	// pass args/flags to this command down to the test handler
 	if len(args) > 0 {
@@ -79,14 +75,6 @@ func getTrack() (string, error) {
 	}
 
 	return metadata.Track, nil
-}
-
-func getTestFiles() ([]string, error) {
-	testFiles, err := workspace.NewExerciseConfig(".")
-	if err != nil {
-		return []string{}, err
-	}
-	return testFiles.Files.Test, nil
 }
 
 func init() {
