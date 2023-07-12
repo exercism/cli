@@ -12,8 +12,6 @@ type TestConfiguration struct {
 
 	// Some tracks test by running a specific file, such as `ruby lasagna_test.rb`. Set this to `true` to look up and include the name of the default test file(s).
 	AppendTestFiles bool
-	// All args after `--` aren't parsed and are passed to the test command. Some languages (especially `rust`) expect an additional `--` between _their_ args. So instead of requiring a user to call `exercism test -- -- --include-ingored` to run all `rust` tests, set this to `true` to separate the args passed to the test runner by a `--` automatically.
-	AutoSeparateArgs bool
 }
 
 func (c *TestConfiguration) GetTestCommand() string {
@@ -64,8 +62,7 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: "go test",
 	},
 	"rust": {
-		Command:          "cargo test",
-		AutoSeparateArgs: true,
+		Command: "cargo test --",
 	},
 	"ruby": {
 		Command:         "ruby",

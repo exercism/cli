@@ -49,5 +49,3 @@ On Windows:
 
 ### Releasing a new CLI version
 Consult the [release documentation](RELEASE.md).
-
-[fork]: https://docs.github.com/en/get-started/quickstart/fork-a-repo

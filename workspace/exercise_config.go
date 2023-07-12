@@ -10,15 +10,15 @@ const configFilename = "config.json"
 
 var configFilepath = filepath.Join(ignoreSubdir, configFilename)
 
-// ExerciseConfig contains metadata about the problem.
-// It's got a bunch more fields, but we don't need to read them
+// ExerciseConfig contains exercise metadata.
+// Note: we only use a subset of its fields
 type ExerciseConfig struct {
 	Files struct {
 		Test []string `json:"test"`
 	} `json:"files"`
 }
 
-// NewExerciseMetadata reads exercise metadata from a file in the given directory.
+// NewExerciseConfig reads exercise metadata from a file in the given directory.
 func NewExerciseConfig(dir string) (*ExerciseConfig, error) {
 	b, err := ioutil.ReadFile(filepath.Join(dir, configFilepath))
 	if err != nil {

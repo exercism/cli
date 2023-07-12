@@ -14,8 +14,8 @@ import (
 var testCmd = &cobra.Command{
 	Use:     "test",
 	Aliases: []string{"t"},
-	Short:   "Infer and run the test command for an exercise.",
-	Long: `Infer and run the test command for an exercise.
+	Short:   "Run the exercise's tests.",
+	Long: `Run the exercise's tests.
 
 	Run this command in an exercise's root directory.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -48,9 +48,7 @@ func runTest(args []string) error {
 
 	// pass args/flags to this command down to the test handler
 	if len(args) > 0 {
-		if testConf.AutoSeparateArgs {
-			cmdParts = append(cmdParts, "--")
-		}
+
 		cmdParts = append(cmdParts, args...)
 	}
 
