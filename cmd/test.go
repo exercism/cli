@@ -47,6 +47,7 @@ func runTest(args []string) error {
 		cmdParts = append(cmdParts, args...)
 	}
 
+	fmt.Printf("--> %s\n", strings.Join(cmdParts, " "))
 	exerciseTestCmd := exec.Command(cmdParts[0], cmdParts[1:]...)
 
 	// pipe output directly out, preserving any color
