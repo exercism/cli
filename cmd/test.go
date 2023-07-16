@@ -44,7 +44,6 @@ func runTest(args []string) error {
 
 	// pass args/flags to this command down to the test handler
 	if len(args) > 0 {
-
 		cmdParts = append(cmdParts, args...)
 	}
 

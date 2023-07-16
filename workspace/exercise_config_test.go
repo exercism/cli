@@ -1,0 +1,82 @@
+package workspace
+
+import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestExerciseConfig(t *testing.T) {
+	dir, err := ioutil.TempDir("", "exercise_config")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	err = os.Mkdir(filepath.Join(dir, ".exercism"), os.ModePerm)
+	assert.NoError(t, err)
+
+	f, err := os.Create(filepath.Join(dir, ".exercism", "config.json"))
+	assert.NoError(t, err)
+
+	_, err = f.WriteString(`{ "blurb": "Learn about the basics of Ruby by following a lasagna recipe.", "authors": ["iHiD", "pvcarrera"], "files": { "solution": ["lasagna.rb"], "test": ["lasagna_test.rb"], "exemplar": [".meta/exemplar.rb"] } } `)
+	assert.NoError(t, err)
+
+	ec, err := NewExerciseConfig(dir)
+	assert.NoError(t, err)
+
+	assert.Equal(t, ec.Files.Test, []string{"lasagna_test.rb"})
+}
+
+func TestMissingExerciseConfig(t *testing.T) {
+	dir, err := ioutil.TempDir("", "exercise_config")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	_, err = NewExerciseConfig(dir)
+	assert.True(t, strings.Contains(err.Error(), ".exercism/config.json: no such file or directory"))
+}
+
+func TestExerciseConfigMissingKey(t *testing.T) {
+	dir, err := ioutil.TempDir("", "exercise_config")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	err = os.Mkdir(filepath.Join(dir, ".exercism"), os.ModePerm)
+	assert.NoError(t, err)
+
+	f, err := os.Create(filepath.Join(dir, ".exercism", "config.json"))
+	assert.NoError(t, err)
+
+	// valid json, but missing an expected key
+	_, err = f.WriteString(`{ "blurb": "Learn about the basics of Ruby by following a lasagna recipe.", "authors": ["iHiD", "pvcarrera"] } `)
+	assert.NoError(t, err)
+
+	ec, err := NewExerciseConfig(dir)
+	assert.NoError(t, err)
+
+	// parses but is nil, which is handled in getTestFiles
+	assert.Nil(t, ec.Files.Test)
+}
+
+func TestInvalidExerciseConfig(t *testing.T) {
+	dir, err := ioutil.TempDir("", "exercise_config")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	err = os.Mkdir(filepath.Join(dir, ".exercism"), os.ModePerm)
+	assert.NoError(t, err)
+
+	f, err := os.Create(filepath.Join(dir, ".exercism", "config.json"))
+	assert.NoError(t, err)
+
+	// invalid
+	_, err = f.WriteString(`{ "blurb": "Learn about the basics of Ruby by following a lasagna recipe.", "authors": ["iHiD", "pvcarr `)
+	assert.NoError(t, err)
+
+	_, err = NewExerciseConfig(dir)
+	assert.Error(t, err)
+	assert.True(t, strings.Contains(err.Error(), "unexpected end of JSON input"))
+}

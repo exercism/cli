@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"errors"
 	"runtime"
 	"strings"
 )
@@ -35,7 +36,7 @@ func (c *TestConfiguration) GetTestCommand() (string, error) {
 
 var TestConfigurations = map[string]TestConfiguration{
 	"8th": {
-		Command:        "tester.sh",
+		Command:        "bash tester.sh",
 		WindowsCommand: "tester.bat",
 	},
 	"ballerina": {
@@ -48,8 +49,8 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: "box task run TestRunner",
 	},
 	"cobol": {
-		Command:        "test.sh",
-		WindowsCommand: "test.ps1",
+		Command:        "bash test.sh",
+		WindowsCommand: "pwsh test.ps1",
 	},
 	"coffeescript": {
 		Command: "jasmine-node --coffee {{test_files}}",
@@ -85,5 +86,12 @@ func getTestFiles() ([]string, error) {
 	if err != nil {
 		return []string{}, err
 	}
+
+	if testFiles.Files.Test == nil {
+		// test files key was missing in config json,
+		// we only call this when we actually need the test files, so error out
+		return []string{}, errors.New("no files.test key in your config.json, but required to run the test")
+	}
+
 	return testFiles.Files.Test, nil
 }
