@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"path/filepath"
 )
@@ -30,4 +31,14 @@ func NewExerciseConfig(dir string) (*ExerciseConfig, error) {
 	}
 
 	return &config, nil
+}
+
+// GetTestFiles finds returns the names of the files that hold unit tests for this exercise, if any
+func (c *ExerciseConfig) GetTestFiles() ([]string, error) {
+	if c.Files.Test == nil {
+		// test files key was missing in config json, which is an error when calling this fuction
+		return []string{}, errors.New("no `files.test` key in your `config.json`. Was it removed by mistake?")
+	}
+
+	return c.Files.Test, nil
 }

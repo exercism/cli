@@ -28,18 +28,12 @@ func TestExerciseConfig(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, ec.Files.Test, []string{"lasagna_test.rb"})
-}
-
-func TestMissingExerciseConfig(t *testing.T) {
-	dir, err := ioutil.TempDir("", "exercise_config")
+	testFiles, err := ec.GetTestFiles()
 	assert.NoError(t, err)
-	defer os.RemoveAll(dir)
-
-	_, err = NewExerciseConfig(dir)
-	assert.True(t, strings.Contains(err.Error(), ".exercism/config.json: no such file or directory"))
+	assert.Equal(t, testFiles, []string{"lasagna_test.rb"})
 }
 
-func TestExerciseConfigMissingKey(t *testing.T) {
+func TestExerciseConfigNoTestKey(t *testing.T) {
 	dir, err := ioutil.TempDir("", "exercise_config")
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
@@ -50,15 +44,23 @@ func TestExerciseConfigMissingKey(t *testing.T) {
 	f, err := os.Create(filepath.Join(dir, ".exercism", "config.json"))
 	assert.NoError(t, err)
 
-	// valid json, but missing an expected key
-	_, err = f.WriteString(`{ "blurb": "Learn about the basics of Ruby by following a lasagna recipe.", "authors": ["iHiD", "pvcarrera"] } `)
+	_, err = f.WriteString(`{ "blurb": "Learn about the basics of Ruby by following a lasagna recipe.", "authors": ["iHiD", "pvcarrera"], "files": { "solution": ["lasagna.rb"], "exemplar": [".meta/exemplar.rb"] } } `)
 	assert.NoError(t, err)
 
 	ec, err := NewExerciseConfig(dir)
 	assert.NoError(t, err)
 
-	// parses but is nil, which is handled in getTestFiles
-	assert.Nil(t, ec.Files.Test)
+	_, err = ec.GetTestFiles()
+	assert.Error(t, err, "no `files.test` key in your `config.json`")
+}
+
+func TestMissingExerciseConfig(t *testing.T) {
+	dir, err := ioutil.TempDir("", "exercise_config")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	_, err = NewExerciseConfig(dir)
+	assert.True(t, strings.Contains(err.Error(), ".exercism/config.json: no such file or directory"))
 }
 
 func TestInvalidExerciseConfig(t *testing.T) {
@@ -72,7 +74,7 @@ func TestInvalidExerciseConfig(t *testing.T) {
 	f, err := os.Create(filepath.Join(dir, ".exercism", "config.json"))
 	assert.NoError(t, err)
 
-	// invalid
+	// invalid JSON
 	_, err = f.WriteString(`{ "blurb": "Learn about the basics of Ruby by following a lasagna recipe.", "authors": ["iHiD", "pvcarr `)
 	assert.NoError(t, err)
 

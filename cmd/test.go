@@ -25,7 +25,6 @@ var testCmd = &cobra.Command{
 
 func runTest(args []string) error {
 	track, err := getTrack()
-
 	if err != nil {
 		return err
 	}
@@ -72,6 +71,9 @@ func getTrack() (string, error) {
 	metadata, err := workspace.NewExerciseMetadata(".")
 	if err != nil {
 		return "", err
+	}
+	if metadata.Track == "" {
+		return "", fmt.Errorf("no track found in exercise metadata")
 	}
 
 	return metadata.Track, nil
