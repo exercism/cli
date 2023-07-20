@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -41,8 +42,11 @@ func TestGetCommandMissingConfig(t *testing.T) {
 	assert.True(t, ok, "unexpectedly unable to find ruby test config")
 
 	_, err := testConfig.GetTestCommand()
-	assert.NotNil(t, err)
-	assert.Contains(t, err.Error(), ".exercism/config.json: no such file or directory")
+	assert.Error(t, err)
+	// any assertions about this error message have to work across all platforms, so be vague
+	// unix: ".exercism/config.json: no such file or directory"
+	// windows: "open .exercism\config.json: The system cannot find the path specified."
+	assert.Contains(t, err.Error(), path.Join(".exercism", "config.json:"))
 }
 
 func TestIncludesTestFilesInCommand(t *testing.T) {
