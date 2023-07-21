@@ -74,13 +74,116 @@ var TestConfigurations = map[string]TestConfiguration{
 	"elm": {
 		Command: "elm-test",
 	},
+	"emacs-lisp": {
+		Command: "emacs -batch -l ert -l *-test.el -f ert-run-tests-batch-and-exit",
+	},
+	"erlang": {
+		Command: "rebar3 eunit",
+	},
+	"fsharp": {
+		Command: "dotnet test",
+	},
+	"gleam": {
+		Command: "gleam test",
+	},
 	"go": {
 		Command: "go test",
+	},
+	"groovy": {
+		Command: "gradle test",
+	},
+	"haskell": {
+		Command: "stack test",
+	},
+	"java": {
+		Command: "gradle test",
+	},
+	"javascript": {
+		Command: "npm run test",
+	},
+	"julia": {
+		Command: "julia runtests.jl",
+	},
+	"kotlin": {
+		Command:        "./gradlew test",
+		WindowsCommand: "gradlew.bat test",
+	},
+	"lfe": {
+		Command: "make test",
+	},
+	"lua": {
+		Command: "busted",
+	},
+	"mips": {
+		Command: "java -jar /path/to/mars.jar nc runner.mips impl.mips",
+	},
+	"nim": {
+		Command: "nim r {{test_files}}",
+	},
+	"ocaml": {
+		Command: "make",
+	},
+	"perl5": {
+		Command: "prove .",
+	},
+	"php": {
+		Command: "phpunit {{test_files}}",
+	},
+	"purescript": {
+		Command: "spago test",
+	},
+	"python": {
+		Command: "python3 -m pytest -o markers=task {{test_files}}",
+	},
+	"racket": {
+		Command: "raco test {{test_files}}",
+	},
+	"raku": {
+		Command: "prove6 {{test_files}}",
+	},
+	"reasonml": {
+		Command: "npm run test",
+	},
+	"red": {
+		Command: "red {{test_files}}",
+	},
+	"ruby": {
+		Command: "ruby {{test_files}}",
 	},
 	"rust": {
 		Command: "cargo test --",
 	},
-	"ruby": {
-		Command: "ruby {{test_files}}",
+	"scala": {
+		Command: "sbt test",
+	},
+	"sml": {
+		Command: "poly -q --use {{test_files}}",
+	},
+	"swift": {
+		Command: "swift test",
+	},
+	"tcl": {
+		Command: "tclsh {{test_files}}",
+	},
+	"typescript": {
+		Command: "yarn test",
+	},
+	"vbnet": {
+		Command: "dotnet test",
+	},
+	"vlang": {
+		Command: "v -stats test run_test.v",
+	},
+	"wasm": {
+		Command: "npm run test",
+	},
+	"wren": {
+		Command: "wrenc {{test_files}}",
+	},
+	"x86-64-assembly": {
+		Command: "make",
+	},
+	"zig": {
+		Command: "zig test {{test_files}}",
 	},
 }

@@ -62,7 +62,7 @@ func TestMissingExerciseConfig(t *testing.T) {
 
 	_, err = NewExerciseConfig(dir)
 	assert.Error(t, err)
-	// this error message has to show up across all platforms, so be vague
+	// any assertions about this error message have to work across all platforms, so be vague
 	// unix: ".exercism/config.json: no such file or directory"
 	// windows: "open .exercism\config.json: The system cannot find the path specified."
 	assert.Contains(t, err.Error(), path.Join(".exercism", "config.json:"))
