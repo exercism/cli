@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"fmt"
 	"runtime"
 	"strings"
 )
@@ -22,12 +23,32 @@ func (c *TestConfiguration) GetTestCommand() (string, error) {
 		cmd = c.Command
 	}
 
-	if strings.Contains(cmd, "{{test_files}}") {
-		exerciseConfig, err := NewExerciseConfig(".")
+	// pre-declare these so we can conditionally initialize them
+	var exerciseConfig *ExerciseConfig
+	var err error
+
+	if strings.Contains(cmd, "{{") {
+		// only read exercise's config.json if we need it
+		exerciseConfig, err = NewExerciseConfig(".")
 		if err != nil {
 			return "", err
 		}
+	}
 
+	if strings.Contains(cmd, "{{solution_files}}") {
+		if exerciseConfig == nil {
+			return "", fmt.Errorf("exerciseConfig not initialize before use")
+		}
+		solutionFiles, err := exerciseConfig.GetSolutionFiles()
+		if err != nil {
+			return "", err
+		}
+		cmd = strings.ReplaceAll(cmd, "{{solution_files}}", strings.Join(solutionFiles, " "))
+	}
+	if strings.Contains(cmd, "{{test_files}}") {
+		if exerciseConfig == nil {
+			return "", fmt.Errorf("exerciseConfig not initialize before use")
+		}
 		testFiles, err := exerciseConfig.GetTestFiles()
 		if err != nil {
 			return "", err
@@ -145,6 +166,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	},
 	"php": {
 		Command: "phpunit {{test_files}}",
+	},
+	"prolog": {
+		Command: "swipl -f {{solution_files}} -s {{test_files}} -g run_tests,halt -t 'halt(1)'",
 	},
 	"purescript": {
 		Command: "spago test",

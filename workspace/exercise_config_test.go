@@ -28,6 +28,11 @@ func TestExerciseConfig(t *testing.T) {
 	ec, err := NewExerciseConfig(dir)
 	assert.NoError(t, err)
 
+	assert.Equal(t, ec.Files.Solution, []string{"lasagna.rb"})
+	solutionFiles, err := ec.GetSolutionFiles()
+	assert.NoError(t, err)
+	assert.Equal(t, solutionFiles, []string{"lasagna.rb"})
+
 	assert.Equal(t, ec.Files.Test, []string{"lasagna_test.rb"})
 	testFiles, err := ec.GetTestFiles()
 	assert.NoError(t, err)
@@ -45,12 +50,14 @@ func TestExerciseConfigNoTestKey(t *testing.T) {
 	f, err := os.Create(filepath.Join(dir, ".exercism", "config.json"))
 	assert.NoError(t, err)
 
-	_, err = f.WriteString(`{ "blurb": "Learn about the basics of Ruby by following a lasagna recipe.", "authors": ["iHiD", "pvcarrera"], "files": { "solution": ["lasagna.rb"], "exemplar": [".meta/exemplar.rb"] } } `)
+	_, err = f.WriteString(`{ "blurb": "Learn about the basics of Ruby by following a lasagna recipe.", "authors": ["iHiD", "pvcarrera"], "files": { "exemplar": [".meta/exemplar.rb"] } } `)
 	assert.NoError(t, err)
 
 	ec, err := NewExerciseConfig(dir)
 	assert.NoError(t, err)
 
+	_, err = ec.GetSolutionFiles()
+	assert.Error(t, err, "no `files.solution` key in your `config.json`")
 	_, err = ec.GetTestFiles()
 	assert.Error(t, err, "no `files.test` key in your `config.json`")
 }

@@ -49,6 +49,27 @@ func TestGetCommandMissingConfig(t *testing.T) {
 	assert.Contains(t, err.Error(), path.Join(".exercism", "config.json:"))
 }
 
+func TestIncludesSolutionAndTestFilesInCommand(t *testing.T) {
+	testConfig, ok := TestConfigurations["prolog"]
+	assert.True(t, ok, "unexpectedly unable to find prolog test config")
+
+	// this creates a config file in the test directory and removes it
+	dir := filepath.Join(".", ".exercism")
+	err := os.Mkdir(dir, os.ModePerm)
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	f, err := os.Create(filepath.Join(dir, "config.json"))
+	assert.NoError(t, err)
+
+	_, err = f.WriteString(`{ "blurb": "Learn about the basics of Prolog by following a lasagna recipe.", "authors": ["iHiD", "pvcarrera"], "files": { "solution": ["lasagna.pl"], "test": ["lasagna_tests.plt"] } } `)
+	assert.NoError(t, err)
+
+	cmd, err := testConfig.GetTestCommand()
+	assert.NoError(t, err)
+	assert.Equal(t, cmd, "swipl -f lasagna.pl -s lasagna_tests.plt -g run_tests,halt -t 'halt(1)'")
+}
+
 func TestIncludesTestFilesInCommand(t *testing.T) {
 	testConfig, ok := TestConfigurations["ruby"]
 	assert.True(t, ok, "unexpectedly unable to find ruby test config")
