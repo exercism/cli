@@ -43,14 +43,24 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command:        "bash tester.sh",
 		WindowsCommand: "tester.bat",
 	},
+	"awk": {
+		Command: "bats {{test_files}}",
+	},
 	"ballerina": {
 		Command: "bal test",
+	},
+	"bash": {
+		Command: "bats {{test_files}}",
 	},
 	"c": {
 		Command: "make",
 	},
 	"cfml": {
 		Command: "box task run TestRunner",
+	},
+	"clojure": {
+		// chosen because the docs recommend `clj` by default and `lein` as optional
+		Command: "clj -X:test",
 	},
 	"cobol": {
 		Command:        "bash test.sh",
@@ -64,6 +74,10 @@ var TestConfigurations = map[string]TestConfiguration{
 	},
 	"csharp": {
 		Command: "dotnet test",
+	},
+	"d": {
+		// this always works even if the user installed DUB
+		Command: "dmd source/*.d -de -w -main -unittest",
 	},
 	"dart": {
 		Command: "dart test",
@@ -100,6 +114,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	},
 	"javascript": {
 		Command: "npm run test",
+	},
+	"jq": {
+		Command: "bats {{test_files}}",
 	},
 	"julia": {
 		Command: "julia runtests.jl",
