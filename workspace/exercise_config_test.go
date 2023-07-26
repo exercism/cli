@@ -20,6 +20,7 @@ func TestExerciseConfig(t *testing.T) {
 
 	f, err := os.Create(filepath.Join(dir, ".exercism", "config.json"))
 	assert.NoError(t, err)
+	defer f.Close()
 
 	_, err = f.WriteString(`{ "blurb": "Learn about the basics of Ruby by following a lasagna recipe.", "authors": ["iHiD", "pvcarrera"], "files": { "solution": ["lasagna.rb"], "test": ["lasagna_test.rb"], "exemplar": [".meta/exemplar.rb"] } } `)
 	assert.NoError(t, err)
@@ -48,6 +49,7 @@ func TestExerciseConfigNoTestKey(t *testing.T) {
 
 	f, err := os.Create(filepath.Join(dir, ".exercism", "config.json"))
 	assert.NoError(t, err)
+	defer f.Close()
 
 	_, err = f.WriteString(`{ "blurb": "Learn about the basics of Ruby by following a lasagna recipe.", "authors": ["iHiD", "pvcarrera"], "files": { "exemplar": [".meta/exemplar.rb"] } } `)
 	assert.NoError(t, err)
@@ -84,6 +86,7 @@ func TestInvalidExerciseConfig(t *testing.T) {
 
 	f, err := os.Create(filepath.Join(dir, ".exercism", "config.json"))
 	assert.NoError(t, err)
+	defer f.Close()
 
 	// invalid JSON
 	_, err = f.WriteString(`{ "blurb": "Learn about the basics of Ruby by following a lasagna recipe.", "authors": ["iHiD", "pvcarr `)
