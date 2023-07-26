@@ -59,11 +59,13 @@ func (c *TestConfiguration) GetTestCommand() (string, error) {
 	return cmd, nil
 }
 
+// some tracks aren't (or won't be) implemented; every track is listed either way
 var TestConfigurations = map[string]TestConfiguration{
 	"8th": {
 		Command:        "bash tester.sh",
 		WindowsCommand: "tester.bat",
 	},
+	// abap: tests are run via "ABAP Development Tools", not the CLI
 	"awk": {
 		Command: "bats {{test_files}}",
 	},
@@ -90,6 +92,8 @@ var TestConfigurations = map[string]TestConfiguration{
 	"coffeescript": {
 		Command: "jasmine-node --coffee {{test_files}}",
 	},
+	// common-lisp: tests are loaded into a "running Lisp implementation", not the CLI directly
+	// cpp: tests are mostly run via IDE; only linux seems to support `make`. There's also a more complex test creation process (using `CMake`)
 	"crystal": {
 		Command: "crystal spec",
 	},
@@ -103,6 +107,7 @@ var TestConfigurations = map[string]TestConfiguration{
 	"dart": {
 		Command: "dart test",
 	},
+	// delphi: tests are run via IDE
 	"elixir": {
 		Command: "mix test",
 	},
@@ -115,6 +120,7 @@ var TestConfigurations = map[string]TestConfiguration{
 	"erlang": {
 		Command: "rebar3 eunit",
 	},
+	// fortran: tests are mostly run via IDE; macOS/linux seem to support `make`, but there's also a more complex test creation process (using `CMake`)
 	"fsharp": {
 		Command: "dotnet test",
 	},
@@ -158,15 +164,18 @@ var TestConfigurations = map[string]TestConfiguration{
 	"nim": {
 		Command: "nim r {{test_files}}",
 	},
+	// objective-c: tests are run via XCode. There's a CLI option (ruby gem `objc`), but the docs note that this is an inferior experience
 	"ocaml": {
 		Command: "make",
 	},
 	"perl5": {
 		Command: "prove .",
 	},
+	// pharo-smalltalk: tests are run via IDE
 	"php": {
 		Command: "phpunit {{test_files}}",
 	},
+	// plsql: test are run via a "mounted oracle db"
 	"prolog": {
 		Command: "swipl -f {{solution_files}} -s {{test_files}} -g run_tests,halt -t 'halt(1)'",
 	},
@@ -176,6 +185,7 @@ var TestConfigurations = map[string]TestConfiguration{
 	"python": {
 		Command: "python3 -m pytest -o markers=task {{test_files}}",
 	},
+	// r: test are run via the IDE
 	"racket": {
 		Command: "raco test {{test_files}}",
 	},
@@ -197,6 +207,7 @@ var TestConfigurations = map[string]TestConfiguration{
 	"scala": {
 		Command: "sbt test",
 	},
+	// scheme: docs present 2 equally valid test methods (`make chez` and `make guile`). So I wasn't sure which to pick
 	"sml": {
 		Command: "poly -q --use {{test_files}}",
 	},
@@ -209,9 +220,11 @@ var TestConfigurations = map[string]TestConfiguration{
 	"typescript": {
 		Command: "yarn test",
 	},
+	// unison: tests are run from an active UCM session
 	"vbnet": {
 		Command: "dotnet test",
 	},
+	// vimscript: tests are run from inside a vim session
 	"vlang": {
 		Command: "v -stats test run_test.v",
 	},
