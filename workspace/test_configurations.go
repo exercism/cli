@@ -176,6 +176,9 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: "phpunit {{test_files}}",
 	},
 	// plsql: test are run via a "mounted oracle db"
+	"powershell": {
+		Command: "Invoke-Pester",
+	},
 	"prolog": {
 		Command: "swipl -f {{solution_files}} -s {{test_files}} -g run_tests,halt -t 'halt(1)'",
 	},
