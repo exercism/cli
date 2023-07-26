@@ -2,7 +2,6 @@ package workspace
 
 import (
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -46,7 +45,7 @@ func TestGetCommandMissingConfig(t *testing.T) {
 	// any assertions about this error message have to work across all platforms, so be vague
 	// unix: ".exercism/config.json: no such file or directory"
 	// windows: "open .exercism\config.json: The system cannot find the path specified."
-	assert.Contains(t, err.Error(), path.Join(".exercism", "config.json:"))
+	assert.Contains(t, err.Error(), filepath.Join(".exercism", "config.json:"))
 }
 
 func TestIncludesSolutionAndTestFilesInCommand(t *testing.T) {
@@ -55,12 +54,13 @@ func TestIncludesSolutionAndTestFilesInCommand(t *testing.T) {
 
 	// this creates a config file in the test directory and removes it
 	dir := filepath.Join(".", ".exercism")
+	defer os.RemoveAll(dir)
 	err := os.Mkdir(dir, os.ModePerm)
 	assert.NoError(t, err)
-	defer os.RemoveAll(dir)
 
 	f, err := os.Create(filepath.Join(dir, "config.json"))
 	assert.NoError(t, err)
+	defer f.Close()
 
 	_, err = f.WriteString(`{ "blurb": "Learn about the basics of Prolog by following a lasagna recipe.", "authors": ["iHiD", "pvcarrera"], "files": { "solution": ["lasagna.pl"], "test": ["lasagna_tests.plt"] } } `)
 	assert.NoError(t, err)
@@ -76,12 +76,13 @@ func TestIncludesTestFilesInCommand(t *testing.T) {
 
 	// this creates a config file in the test directory and removes it
 	dir := filepath.Join(".", ".exercism")
+	defer os.RemoveAll(dir)
 	err := os.Mkdir(dir, os.ModePerm)
 	assert.NoError(t, err)
-	defer os.RemoveAll(dir)
 
 	f, err := os.Create(filepath.Join(dir, "config.json"))
 	assert.NoError(t, err)
+	defer f.Close()
 
 	_, err = f.WriteString(`{ "blurb": "Learn about the basics of Ruby by following a lasagna recipe.", "authors": ["iHiD", "pvcarrera"], "files": { "solution": ["lasagna.rb"], "test": ["lasagna_test.rb", "some_other_file.rb"], "exemplar": [".meta/exemplar.rb"] } } `)
 	assert.NoError(t, err)

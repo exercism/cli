@@ -3,7 +3,6 @@ package workspace
 import (
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -72,7 +71,7 @@ func TestMissingExerciseConfig(t *testing.T) {
 	// any assertions about this error message have to work across all platforms, so be vague
 	// unix: ".exercism/config.json: no such file or directory"
 	// windows: "open .exercism\config.json: The system cannot find the path specified."
-	assert.Contains(t, err.Error(), path.Join(".exercism", "config.json:"))
+	assert.Contains(t, err.Error(), filepath.Join(".exercism", "config.json:"))
 }
 
 func TestInvalidExerciseConfig(t *testing.T) {
