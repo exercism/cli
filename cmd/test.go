@@ -32,7 +32,7 @@ func runTest(args []string) error {
 	testConf, ok := workspace.TestConfigurations[track]
 
 	if !ok {
-		return fmt.Errorf("test handler for the `%s` track not yet implemented. Please see HELP.md for testing instructions", track)
+		return fmt.Errorf("the \"%s\" track does not yet support running tests using the Exercism CLI. Please see HELP.md for testing instructions", track)
 	}
 
 	command, err := testConf.GetTestCommand()
@@ -46,7 +46,7 @@ func runTest(args []string) error {
 		cmdParts = append(cmdParts, args...)
 	}
 
-	fmt.Printf("--> %s\n", strings.Join(cmdParts, " "))
+	fmt.Printf("Running tests via `%s`\n\n", strings.Join(cmdParts, " "))
 	exerciseTestCmd := exec.Command(cmdParts[0], cmdParts[1:]...)
 
 	// pipe output directly out, preserving any color
