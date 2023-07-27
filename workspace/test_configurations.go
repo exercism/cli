@@ -188,7 +188,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"python": {
 		Command: "python3 -m pytest -o markers=task {{test_files}}",
 	},
-	// r: test are run via the IDE
+	"r": {
+		Command: "Rscript {{test_files}}",
+	},
 	"racket": {
 		Command: "raco test {{test_files}}",
 	},
