@@ -5,8 +5,11 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ----------------
 
 ## Next Release
-* [#1092](https://github.com/exercism/cli/pull/1092) Add `exercism test` command to run the unit tests for nearly any track (inspired by [universal-test-runner](https://github.com/xavdid/universal-test-runner)) - [@xavdid]
 * **Your contribution here**
+
+## v3.2.0 (2023-07-28)
+* [#1092](https://github.com/exercism/cli/pull/1092) Add `exercism test` command to run the unit tests for nearly any track (inspired by [universal-test-runner](https://github.com/xavdid/universal-test-runner)) - [@xavdid]
+* [#1073](https://github.com/exercism/cli/pull/1073) Add `arm64` build for each OS
 
 ## v3.1.0 (2022-10-04)
 * [#979](https://github.com/exercism/cli/pull/979) Protect existing solutions from being overwritten by 'download' - [@harugo]
