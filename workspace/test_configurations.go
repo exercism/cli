@@ -93,7 +93,9 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: "jasmine-node --coffee {{test_files}}",
 	},
 	// common-lisp: tests are loaded into a "running Lisp implementation", not the CLI directly
-	// cpp: tests are mostly run via IDE; only linux seems to support `make`. There's also a more complex test creation process (using `CMake`)
+	"cpp": {
+		Command: "make",
+	},
 	"crystal": {
 		Command: "crystal spec",
 	},
@@ -120,7 +122,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"erlang": {
 		Command: "rebar3 eunit",
 	},
-	// fortran: tests are mostly run via IDE; macOS/linux seem to support `make`, but there's also a more complex test creation process (using `CMake`)
+	"fortran": {
+		Command: "make",
+	},
 	"fsharp": {
 		Command: "dotnet test",
 	},
