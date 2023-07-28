@@ -33,7 +33,7 @@ Commit this change on a branch along with the CHANGELOG updates in a single comm
 
 ```bash
 # Test run
-goreleaser --skip-publish --snapshot --rm-dist
+goreleaser --skip-publish --snapshot --clean
 
 # Create a new tag on the main branch and push it
 git tag -a v3.0.16 -m "Trying out GoReleaser"
