@@ -6,7 +6,6 @@ release process.
 ## Requirements
 
 1. [Install GoReleaser](https://goreleaser.com/install/)
-1. [Install snapcraft](https://snapcraft.io/docs/snapcraft-overview)
 1. [Setup GitHub token](https://goreleaser.com/scm/github/)
 1. Have a gpg key installed on your machine - it is [used for signing the artifacts](https://goreleaser.com/customization/sign/)
 
@@ -41,12 +40,6 @@ git push origin v3.0.16
 
 # Build and release
 goreleaser --clean
-
-# You must be logged into snapcraft to publish a new snap
-snapcraft login
-
-# Push to snapcraft
-for f in `ls dist/*.snap`; do snapcraft push --release=stable $f; done
 
 # [TODO] Push to homebrew
 ```
