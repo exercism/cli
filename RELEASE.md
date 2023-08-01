@@ -20,23 +20,27 @@ GoReleaser supports the [auto generation of a changelog](https://goreleaser.com/
 
 ## Bump the version
 
-Edit the `Version` constant in `cmd/version.go`
+1. Create a branch for the new version
+1. Edit the `Version` constant in `cmd/version.go`
+1. Update the `CHANGELOG.md` file
+1. Commit the updated version
+1. Create a PR
 
 _Note: It's useful to add the version to the commit message when you bump it: e.g. `Bump version to v2.3.4`._
 
-In the future we will probably want to replace the hardcoded `Version` constant with [main.version](https://goreleaser.com/cookbooks/using-main.version). Here is a [stack overflow post on injecting to cmd/version.go](https://stackoverflow.com/a/47510909).
-
-Commit this change on a branch along with the CHANGELOG updates in a single commit, and create a PR for merge to main.
-
 ## Cut a release
 
+Once the version bump PR has been merged, run the following commands:
+
 ```bash
+VERSION=$(sed -n -E 's/^const Version = "([0-9]+\.[0-9]+\.[0-9]+)"$/v\1/p' cmd/version.go)
+
 # Test run
 goreleaser --skip-publish --snapshot --clean
 
 # Create a new tag on the main branch and push it
-git tag -a v3.0.16 -m "Trying out GoReleaser"
-git push origin v3.0.16
+git tag -a "${VERSION}" -m "Trying out GoReleaser"
+git push origin "${VERSION}"
 
 # Build and release
 goreleaser --clean
