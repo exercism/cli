@@ -37,10 +37,14 @@ changelog:
     - '^test:'
 
 archives:
-  - name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
-    replacements:
-      amd64: x86_64
-      386: i386
+  - name_template: >-
+      {{- .ProjectName }}-
+      {{- .Version }}-
+      {{- .Os }}-
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{- .Arch }}{{ end }}
+      {{- if .Arm }}v{{- .Arm }}{{ end }}
     format_overrides:
     - goos: windows
       format: zip
@@ -92,10 +96,14 @@ snapcrafts:
     # https://snapcraft.io/docs/reference/channels
     grade: stable
     description: Exercism is an online platform designed to help you improve your coding skills through practice and mentorship. Exercism provides you with thousands of exercises spread across numerous language tracks. Each one is a fun and interesting challenge designed to teach you a little more about the features of a language.
-    name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
-    replacements:
-      amd64: x86_64
-      386: i386
+    name_template: >-
+      {{- .ProjectName }}-
+      {{- .Version }}-
+      {{- .Os }}-
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{- .Arch }}{{ end }}
+      {{- if .Arm }}v{{- .Arm }}{{ end }}
     apps:
       exercism:
         plugs: ["home", "network", "removable-media","personal-files"]
