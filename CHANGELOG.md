@@ -7,6 +7,10 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * **Your contribution here**
 
+## v3.2.0 (2023-07-28)
+* [#1092](https://github.com/exercism/cli/pull/1092) Add `exercism test` command to run the unit tests for nearly any track (inspired by [universal-test-runner](https://github.com/xavdid/universal-test-runner)) - [@xavdid]
+* [#1073](https://github.com/exercism/cli/pull/1073) Add `arm64` build for each OS
+
 ## v3.1.0 (2022-10-04)
 * [#979](https://github.com/exercism/cli/pull/979) Protect existing solutions from being overwritten by 'download' - [@harugo]
 * [#981](https://github.com/exercism/cli/pull/981) Check if authorisation header is set before attempting to extract token - [@harugo]
@@ -489,5 +493,6 @@ All changes by [@msgehard]
 [@sfairchild]: https://github.com/sfairchild
 [@simonjefford]: https://github.com/simonjefford
 [@srt32]: https://github.com/srt32
+[@xavdid]: https://github.com/xavdid
 [@williandrade]: https://github.com/williandrade
 [@zabawaba99]: https://github.com/zabawaba99

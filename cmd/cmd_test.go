@@ -26,12 +26,14 @@ const cfgHomeKey = "EXERCISM_CONFIG_HOME"
 // test, call the command by calling Execute on the App.
 //
 // Example:
-// cmdTest := &CommandTest{
-// 	Cmd:    myCmd,
-// 	InitFn: initMyCmd,
-// 	Args:   []string{"fakeapp", "mycommand", "arg1", "--flag", "value"},
-// 	MockInteractiveResponse: "first-input\nsecond\n",
-// }
+//
+//	cmdTest := &CommandTest{
+//		Cmd:    myCmd,
+//		InitFn: initMyCmd,
+//		Args:   []string{"fakeapp", "mycommand", "arg1", "--flag", "value"},
+//		MockInteractiveResponse: "first-input\nsecond\n",
+//	}
+//
 // cmdTest.Setup(t)
 // defer cmdTest.Teardown(t)
 // ...
