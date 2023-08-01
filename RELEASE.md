@@ -12,7 +12,7 @@ release process.
 
 ## Confirm / Update the Changelog
 
-Make sure all the recent changes are reflected in the "next release" section of the CHANGELOG.md file.  All the changes in the "next release" section should be moved to a new section that describes the version number, and gives it a date.
+Make sure all the recent changes are reflected in the "next release" section of the CHANGELOG.md file. All the changes in the "next release" section should be moved to a new section that describes the version number, and gives it a date.
 
 You can view changes using the /compare/ view:
 https://github.com/exercism/cli/compare/$PREVIOUS_RELEASE...main
@@ -40,7 +40,7 @@ git tag -a v3.0.16 -m "Trying out GoReleaser"
 git push origin v3.0.16
 
 # Build and release
-goreleaser --rm-dist
+goreleaser --clean
 
 # You must be logged into snapcraft to publish a new snap
 snapcraft login
@@ -53,9 +53,8 @@ for f in `ls dist/*.snap`; do snapcraft push --release=stable $f; done
 
 ## Cut Release on GitHub
 
-Run [exercism-cp-archive-hack.sh](https://gist.github.com/ekingery/961650fca4e2233098c8320f32736836) which takes the new archive files and renames them to match the old naming scheme for backward compatibility. Until mid to late 2020, we will need to manually upload the backward-compatible archive files generated in `/tmp/exercism_tmp_upload`.
-
-The generated archive files should be uploaded to the [draft release page created by GoReleaser](https://github.com/exercism/cli/releases). Describe the release, select a specific commit to target, paste the following release text, and describe the new changes.
+At this point, Goreleaser will a created a draft PR at https://github.com/exercism/cli/releases/tag/vX.Y.Z.
+On that page, update the release description to:
 
 ```
 To install, follow the interactive installation instructions at https://exercism.io/cli-walkthrough
@@ -64,32 +63,18 @@ To install, follow the interactive installation instructions at https://exercism
 [describe changes in this release]
 ```
 
- Lastly, test and publish the draft
-
+Lastly, test and publish the draft
 
 ## Update Homebrew
 
-This is helpful for the (many) Mac OS X users.
-
-First, get a copy of the latest tarball of the source code:
+Next, we'll submit a PR to Homebrew to update the Exercism formula (which is how macOS users usually download the CLI):
 
 ```
-cd ~/tmp && wget https://github.com/exercism/cli/archive/vX.Y.Z.tar.gz
-```
-
-Get the SHA256 of the tarball:
-
-```
-shasum -a 256 vX.Y.Z.tar.gz
-```
-
-Update the homebrew formula:
-
-```
+cd /tmp && curl -O https://github.com/exercism/cli/archive/vX.Y.Z.tar.gz
 cd $(brew --repository)
 git checkout master
 brew update
-brew bump-formula-pr --strict exercism --url=https://github.com/exercism/cli/archive/vX.Y.Z.tar.gz --sha256=$SHA
+brew bump-formula-pr --strict exercism --url=https://github.com/exercism/cli/archive/vX.Y.Z.tar.gz --sha256=$(shasum -a 256 /tmp/vX.Y.Z.tar.gz)
 ```
 
 For more information see [How To Open a Homebrew Pull Request](https://docs.brew.sh/How-To-Open-a-Homebrew-Pull-Request).
