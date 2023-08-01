@@ -97,6 +97,6 @@ For more information see [How To Open a Homebrew Pull Request](https://docs.brew
 ## Update the docs site
 
 If there are any significant changes, we should describe them on
-[exercism.io/cli]([https://exercism.io/cli).
+[exercism.io/cli](https://exercism.io/cli).
 
 The codebase lives at [exercism/website-copy](https://github.com/exercism/website-copy) in `pages/cli.md`.
