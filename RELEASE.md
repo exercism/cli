@@ -33,24 +33,31 @@ _Note: It's useful to add the version to the commit message when you bump it: e.
 Once the version bump PR has been merged, run the following commands:
 
 ```bash
-VERSION=$(sed -n -E 's/^const Version = "([0-9]+\.[0-9]+\.[0-9]+)"$/v\1/p' cmd/version.go)
+VERSION=$(sed -n -E 's/^const Version = "([0-9]+\.[0-9]+\.[0-9]+)"$/\1/p' cmd/version.go)
+TAG_NAME="v${VERSION}"
 
 # Test run
 goreleaser --skip-publish --snapshot --clean
 
 # Create a new tag on the main branch and push it
-git tag -a "${VERSION}" -m "Trying out GoReleaser"
-git push origin "${VERSION}"
+git tag -a "${TAG_NAME}" -m "Trying out GoReleaser"
+git push origin "${TAG_NAME}"
 
 # Build and release
 goreleaser --clean
+
+# Upload copies of the Windows files for use by the Exercism Windows installer
+cp "dist/exercism-${VERSION}-windows-i386.zip" dist/exercism-windows-32bit.zip
+cp "dist/exercism-${VERSION}-windows-x86_64.zip" dist/exercism-windows-64bit.zip
+gh release upload "${TAG_NAME}" dist/exercism-windows-32bit.zip
+gh release upload "${TAG_NAME}" dist/exercism-windows-64bit.zip
 
 # [TODO] Push to homebrew
 ```
 
 ## Cut Release on GitHub
 
-At this point, Goreleaser will a created a draft PR at https://github.com/exercism/cli/releases/tag/vX.Y.Z.
+At this point, Goreleaser will have created a draft PR at https://github.com/exercism/cli/releases/tag/vX.Y.Z.
 On that page, update the release description to:
 
 ```
