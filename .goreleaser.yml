@@ -1,33 +1,48 @@
 # You can find the GoReleaser documentation at http://goreleaser.com
 project_name: exercism
 
+env:
+  - CGO_ENABLED=0
 builds:
-- env:
-    - CGO_ENABLED=0
-  main: ./exercism/main.go
-  goos:
-    - darwin
-    - linux
-    - windows
-    - freebsd
-    - openbsd
-  goarch:
-    - amd64
-    - 386
-    - arm
-    - arm64
-    - ppc64
-  goarm:
-    - 5
-    - 6
-  ignore:
-    - goos: openbsd
-      goarch: arm
-    - goos: freebsd
-      goarch: arm
-
-checksum:
-  name_template: '{{ .ProjectName }}_checksums.txt'
+  - id: release-build
+    main: ./exercism/main.go
+    mod_timestamp: '{{ .CommitTimestamp  }}'
+    flags:
+      - -trimpath # removes file system paths from compiled executable
+    ldflags:
+      - '-s -w' # strip debug symbols and DWARF debugging info
+    goos:
+      - darwin
+      - linux
+      - windows
+      - freebsd
+      - openbsd
+    goarch:
+      - amd64
+      - 386
+      - arm
+      - arm64
+      - ppc64
+    goarm:
+      - 5
+      - 6
+    ignore:
+      - goos: openbsd
+        goarch: arm
+      - goos: freebsd
+        goarch: arm
+  - id: installer-build
+    main: ./exercism/main.go
+    mod_timestamp: '{{ .CommitTimestamp  }}'
+    flags:
+      - -trimpath # removes file system paths from compiled executable
+    ldflags:
+      - '-s -w' # strip debug symbols and DWARF debugging info
+    goos:
+      - windows
+    goarch:
+      - amd64
+      - 386
 
 changelog:
   sort: asc
@@ -37,7 +52,10 @@ changelog:
     - '^test:'
 
 archives:
-  - name_template: >-
+  - id: release-archives
+    builds:
+      - release-build
+    name_template: >-
       {{- .ProjectName }}-
       {{- .Version }}-
       {{- .Os }}-
@@ -49,12 +67,37 @@ archives:
     - goos: windows
       format: zip
     files:
-      - shell/**/*
+      - shell/**
+      - LICENSE
+      - README.md
+  - id: installer-archives
+    builds:
+      - installer-build
+    name_template: >-
+      {{- .ProjectName }}-
+      {{- .Version }}-
+      {{- .Os }}-
+      {{- if eq .Arch "amd64" }}64bit
+      {{- else if eq .Arch "386" }}32bit
+      {{- else }}{{- .Arch }}{{ end }}
+      {{- if .Arm }}v{{- .Arm }}{{ end }}
+    format_overrides:
+    - goos: windows
+      format: zip
+    files:
+      - shell/**
       - LICENSE
       - README.md
 
+checksum:
+  name_template: '{{ .ProjectName }}_checksums.txt'
+  ids:
+    - release-archives
+    - installer-archives
+
 signs:
-- artifacts: checksum
+  - artifacts: checksum
+    args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
 
 release:
   # Repo in which the release will be created.
