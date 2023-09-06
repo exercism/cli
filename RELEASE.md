@@ -1,7 +1,6 @@
 # Cutting a CLI Release
 
-The Exercism CLI uses [GoReleaser](https://goreleaser.com) to automate the
-release process.
+The Exercism CLI uses [GoReleaser](https://goreleaser.com) to automate the release process.
 
 ## Requirements
 
@@ -11,12 +10,11 @@ release process.
 
 ## Confirm / Update the Changelog
 
-Make sure all the recent changes are reflected in the "next release" section of the CHANGELOG.md file. All the changes in the "next release" section should be moved to a new section that describes the version number, and gives it a date.
+Make sure all the recent changes are reflected in the "next release" section of the CHANGELOG.md file. 
+All the changes in the "next release" section should be moved to a new section that describes the version number, and gives it a date.
 
 You can view changes using the /compare/ view:
 https://github.com/exercism/cli/compare/$PREVIOUS_RELEASE...main
-
-GoReleaser supports the [auto generation of a changelog](https://goreleaser.com/customization/#customize-the-changelog) we will want to customize to meet our standards (not including refactors, test updates, etc). We should also consider using [the release notes feature](https://goreleaser.com/customization/#custom-release-notes).
 
 ## Bump the version
 
@@ -43,28 +41,19 @@ goreleaser --skip-publish --snapshot --clean
 git tag -a "${TAG_NAME}" -m "Trying out GoReleaser"
 git push origin "${TAG_NAME}"
 
-# Build and release
-goreleaser --clean
-
-# Upload copies of the Windows files for use by the Exercism Windows installer
-cp "dist/exercism-${VERSION}-windows-i386.zip" dist/exercism-windows-32bit.zip
-cp "dist/exercism-${VERSION}-windows-x86_64.zip" dist/exercism-windows-64bit.zip
-gh release upload "${TAG_NAME}" dist/exercism-windows-32bit.zip
-gh release upload "${TAG_NAME}" dist/exercism-windows-64bit.zip
-
 # [TODO] Push to homebrew
 ```
 
 ## Cut Release on GitHub
 
-At this point, Goreleaser will have created a draft PR at https://github.com/exercism/cli/releases/tag/vX.Y.Z.
+At this point, Goreleaser will have created a draft release at https://github.com/exercism/cli/releases/tag/vX.Y.Z.
 On that page, update the release description to:
 
 ```
 To install, follow the interactive installation instructions at https://exercism.io/cli-walkthrough
 ---
 
-[describe changes in this release]
+[modify the generated release-notes to describe changes in this release]
 ```
 
 Lastly, test and publish the draft
