@@ -31,17 +31,25 @@ places.
 You can also override certain default settings to suit your preferences.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		configuration := config.NewConfig()
-
-		viperConfig.AddConfigPath(configuration.Dir)
-		viperConfig.SetConfigName("user")
-		viperConfig.SetConfigType("json")
-		// Ignore error. If the file doesn't exist, that is fine.
-		_ = viperConfig.ReadInConfig()
-		configuration.UserViperConfig = viperConfig
-
+		configuration := LoadUserConfig()
 		return runConfigure(configuration, cmd.Flags())
 	},
+}
+
+func LoadUserConfig() config.Config {
+	cfg := config.NewConfig()
+	viperConfig.AddConfigPath(cfg.Dir)
+	viperConfig.SetConfigName("user")
+	viperConfig.SetConfigType("json")
+	// Ignore error. If the file doesn't exist, that is fine.
+	_ = viperConfig.ReadInConfig()
+	cfg.UserViperConfig = viperConfig
+
+	if err := validateUserConfig(cfg.UserViperConfig); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	return cfg
 }
 
 func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
@@ -116,7 +124,7 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 
 	// Verify that the token is valid.
 	if !skipVerification {
-		client, err := api.NewClient(token, baseURL)
+		client, err := api.NewClient("", baseURL)
 		if err != nil {
 			return err
 		}

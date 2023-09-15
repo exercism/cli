@@ -25,9 +25,7 @@ func TestDownloadWithoutToken(t *testing.T) {
 
 	err := runDownload(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
 	if assert.Error(t, err) {
-		assert.Regexp(t, "Welcome to Exercism", err.Error())
-		// It uses the default base API url to infer the host
-		assert.Regexp(t, "exercism.io/my/settings", err.Error())
+		assert.Regexp(t, "there is no token configured", err.Error())
 	}
 }
 
@@ -40,7 +38,7 @@ func TestDownloadWithoutWorkspace(t *testing.T) {
 
 	err := runDownload(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
 	if assert.Error(t, err) {
-		assert.Regexp(t, "re-run the configure", err.Error())
+		assert.Regexp(t, "need an --exercise name or a solution --uuid", err.Error())
 	}
 }
 
@@ -54,7 +52,7 @@ func TestDownloadWithoutBaseURL(t *testing.T) {
 
 	err := runDownload(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
 	if assert.Error(t, err) {
-		assert.Regexp(t, "re-run the configure", err.Error())
+		assert.Regexp(t, "need an --exercise name or a solution --uuid", err.Error())
 	}
 }
 
@@ -116,21 +114,12 @@ func TestSolutionFile(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			sf := solutionFile{
-				path:    tc.file,
-				baseURL: "http://www.example.com/",
+				path:      tc.file,
+				sourceURL: "http://www.example.com/",
 			}
 
 			if sf.relativePath() != tc.expectedPath {
 				t.Fatalf("Expected path '%s', got '%s'", tc.expectedPath, sf.relativePath())
-			}
-
-			url, err := sf.url()
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			if url != tc.expectedURL {
-				t.Fatalf("Expected URL '%s', got '%s'", tc.expectedURL, url)
 			}
 		})
 	}
