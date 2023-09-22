@@ -10,6 +10,11 @@ github.com/inconshreveable/go-update v0.0.0-20160112193335-8152e7eb6ccf h1:WfD7V
 github.com/inconshreveable/go-update v0.0.0-20160112193335-8152e7eb6ccf/go.mod h1:hyb9oH7vZsitZCiBt0ZvifOrB+qc8PS5IiilCIb87rg=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
+github.com/kr/pretty v0.2.1 h1:Fmg33tUaq4/8ym9TJN1x7sLJnHVwhP33CNkpYV/7rwI=
+github.com/kr/pretty v0.2.1/go.mod h1:ipq/a2n7PKx3OHsz4KJII5eveXtPO4qwEXGdVfWzfnI=
+github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
+github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
+github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/magiconair/properties v1.7.3 h1:6AOjgCKyZFMG/1yfReDPDz3CJZPxnYk7DGmj2HtyF24=
 github.com/magiconair/properties v1.7.3/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/mitchellh/mapstructure v0.0.0-20170523030023-d0303fe80992 h1:W7VHAEVflA5/eTyRvQ53Lz5j8bhRd1myHZlI/IZFvbU=
@@ -36,11 +41,11 @@ github.com/stretchr/testify v1.1.4 h1:ToftOQTytwshuOSj6bDSolVUa3GINfJP/fg3OkkOzQ
 github.com/stretchr/testify v1.1.4/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 golang.org/x/net v0.0.0-20170726083632-f5079bd7f6f7 h1:1Pw+ZX4dmGORIwGkTwnUr7RFuMhfpCYHXRZNF04XPYs=
 golang.org/x/net v0.0.0-20170726083632-f5079bd7f6f7/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
-golang.org/x/sys v0.0.0-20170803140359-d8f5ea21b929 h1:M4VPQYSW/nB4Bcg1XMD4yW2sprnwerD3Kb6apRphtZw=
-golang.org/x/sys v0.0.0-20170803140359-d8f5ea21b929/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/sys v0.0.0-20201202213521-69691e467435 h1:25AvDqqB9PrNqj1FLf2/70I4W0L19qqoaFq3gjNwbKk=
 golang.org/x/sys v0.0.0-20201202213521-69691e467435/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.0.0-20170730040918-3bd178b88a81 h1:7aXI3TQ9sZ4JdDoIDGjxL6G2mQxlsPy9dySnJaL6Bdk=
 golang.org/x/text v0.0.0-20170730040918-3bd178b88a81/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
+gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntNwaWcugrBjAiHlqqRiVk=
+gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c/go.mod h1:JHkPIbrfpd72SG/EVd6muEfDQjcINNoR0C8j2r3qZ4Q=
 gopkg.in/yaml.v2 v2.0.0-20170721122051-25c4ec802a7d h1:2DX7x6HUDGZUyuEDAhUsQQNqkb1zvDyKTjVoTdzaEzo=
 gopkg.in/yaml.v2 v2.0.0-20170721122051-25c4ec802a7d/go.mod h1:JAlM8MvJe8wmxCU4Bli9HhUf9+ttbYbLASfIpnQbh74=
