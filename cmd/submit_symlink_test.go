@@ -3,7 +3,6 @@
 package cmd
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -24,12 +23,12 @@ func TestSubmitFilesInSymlinkedPath(t *testing.T) {
 	ts := fakeSubmitServer(t, submittedFiles)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "symlink-destination")
+	tmpDir, err := os.MkdirTemp("", "symlink-destination")
 	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 	dstDir := filepath.Join(tmpDir, "workspace")
 
-	srcDir, err := ioutil.TempDir("", "symlink-source")
+	srcDir, err := os.MkdirTemp("", "symlink-source")
 	defer os.RemoveAll(srcDir)
 	assert.NoError(t, err)
 
@@ -52,7 +51,7 @@ func TestSubmitFilesInSymlinkedPath(t *testing.T) {
 	}
 
 	file := filepath.Join(dir, "file.txt")
-	err = ioutil.WriteFile(filepath.Join(dir, "file.txt"), []byte("This is a file."), os.FileMode(0755))
+	err = os.WriteFile(filepath.Join(dir, "file.txt"), []byte("This is a file."), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	err = runSubmit(cfg, pflag.NewFlagSet("symlinks", pflag.PanicOnError), []string{file})

@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,7 +10,7 @@ import (
 )
 
 func TestExerciseConfig(t *testing.T) {
-	dir, err := ioutil.TempDir("", "exercise_config")
+	dir, err := os.MkdirTemp("", "exercise_config")
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
 
@@ -40,7 +39,7 @@ func TestExerciseConfig(t *testing.T) {
 }
 
 func TestExerciseConfigNoTestKey(t *testing.T) {
-	dir, err := ioutil.TempDir("", "exercise_config")
+	dir, err := os.MkdirTemp("", "exercise_config")
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
 
@@ -64,7 +63,7 @@ func TestExerciseConfigNoTestKey(t *testing.T) {
 }
 
 func TestMissingExerciseConfig(t *testing.T) {
-	dir, err := ioutil.TempDir("", "exercise_config")
+	dir, err := os.MkdirTemp("", "exercise_config")
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
 
@@ -77,7 +76,7 @@ func TestMissingExerciseConfig(t *testing.T) {
 }
 
 func TestInvalidExerciseConfig(t *testing.T) {
-	dir, err := ioutil.TempDir("", "exercise_config")
+	dir, err := os.MkdirTemp("", "exercise_config")
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
 
