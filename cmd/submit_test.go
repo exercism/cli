@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"mime"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -561,7 +562,16 @@ func fakeSubmitServer(t *testing.T, submittedFiles map[string]string) *httptest.
 			if err != nil {
 				t.Fatal(err)
 			}
-			submittedFiles[fileHeader.Filename] = string(body)
+			// Following RFC 7578, Go 1.17+ strips the directory information in fileHeader.Filename.
+			// Validating the submitted files directory tree is important so Content-Disposition is used for
+			// obtaining the unmodified filename.
+			v := fileHeader.Header.Get("Content-Disposition")
+			_, dispositionParams, err := mime.ParseMediaType(v)
+			if err != nil {
+				t.Fatalf("failed to obtain submitted filename from multipart header: %s", err.Error())
+			}
+			filename := dispositionParams["filename"]
+			submittedFiles[filename] = string(body)
 		}
 
 		fmt.Fprint(w, "{}")
