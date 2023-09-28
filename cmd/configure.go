@@ -31,17 +31,26 @@ places.
 You can also override certain default settings to suit your preferences.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		configuration := config.NewConfig()
-
-		viperConfig.AddConfigPath(configuration.Dir)
-		viperConfig.SetConfigName("user")
-		viperConfig.SetConfigType("json")
-		// Ignore error. If the file doesn't exist, that is fine.
-		_ = viperConfig.ReadInConfig()
-		configuration.UserViperConfig = viperConfig
-
+		configuration := LoadUserConfig()
 		return runConfigure(configuration, cmd.Flags())
 	},
+}
+
+// LoadUserConfig wraps the logic for loading the user config
+func LoadUserConfig() config.Config {
+	cfg := config.NewConfig()
+	viperConfig.AddConfigPath(cfg.Dir)
+	viperConfig.SetConfigName("user")
+	viperConfig.SetConfigType("json")
+	// Ignore error. If the file doesn't exist, that is fine.
+	_ = viperConfig.ReadInConfig()
+	cfg.UserViperConfig = viperConfig
+
+	if err := validateUserConfig(cfg.UserViperConfig); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	return cfg
 }
 
 func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
@@ -76,7 +85,7 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 		baseURL = configuration.DefaultBaseURL
 	}
 
-	// By default we verify that
+	// By default, we verify that
 	// - the configured API URL is reachable.
 	// - the configured token is valid.
 	skipVerification, err := flags.GetBool("no-verify")
@@ -111,7 +120,7 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 
 	// If we don't have a token then explain how to set it and bail.
 	if token == "" {
-		return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
+		return fmt.Errorf("there is no token configured. Find your token on %s, and call this command again with --token=<your-token>", tokenURL)
 	}
 
 	// Verify that the token is valid.
@@ -125,7 +134,7 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 			return err
 		}
 		if !ok {
-			return fmt.Errorf("The token '%s' is invalid. Find your token on %s.", token, tokenURL)
+			return fmt.Errorf("the token '%s' is invalid. Find your token on %s", token, tokenURL)
 		}
 	}
 
