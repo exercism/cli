@@ -21,251 +21,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-// downloadCmd represents the download command
-var downloadCmd = &cobra.Command{
-	Use:     "download",
-	Aliases: []string{"d"},
-	Short:   "Download an exercise.",
-	Long: `Download an exercise.
-
-You may download an exercise to work on. If you've already
-started working on it, the command will also download your
-latest solution.
-
-Download other people's solutions by providing the UUID.
-`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg := config.NewConfig()
-
-		v := viper.New()
-		v.AddConfigPath(cfg.Dir)
-		v.SetConfigName("user")
-		v.SetConfigType("json")
-		// Ignore error. If the file doesn't exist, that is fine.
-		_ = v.ReadInConfig()
-		cfg.UserViperConfig = v
-
-		return runDownload(cfg, cmd.Flags(), args)
-	},
-}
-
-func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
-	usrCfg := cfg.UserViperConfig
-	if err := validateUserConfig(usrCfg); err != nil {
-		return err
-	}
-
-	download, err := newDownload(flags, usrCfg)
-	if err != nil {
-		return err
-	}
-
-	metadata := download.payload.metadata()
-	dir := metadata.Exercise(usrCfg.GetString("workspace")).MetadataDir()
-
-	if _, err = os.Stat(dir); !download.forceoverwrite && err == nil {
-		return fmt.Errorf("directory '%s' already exists, use --force to overwrite", dir)
-	}
-
-	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
-		return err
-	}
-
-	if err := metadata.Write(dir); err != nil {
-		return err
-	}
-
-	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
-	if err != nil {
-		return err
-	}
-
-	for _, sf := range download.payload.files() {
-		url, err := sf.url()
-		if err != nil {
-			return err
-		}
-
-		req, err := client.NewRequest("GET", url, nil)
-		if err != nil {
-			return err
-		}
-
-		res, err := client.Do(req)
-		if err != nil {
-			return err
-		}
-		defer res.Body.Close()
-
-		if res.StatusCode != http.StatusOK {
-			// TODO: deal with it
-			continue
-		}
-		// Don't bother with empty files.
-		if res.Header.Get("Content-Length") == "0" {
-			continue
-		}
-
-		path := sf.relativePath()
-		dir := filepath.Join(metadata.Dir, filepath.Dir(path))
-		if err = os.MkdirAll(dir, os.FileMode(0755)); err != nil {
-			return err
-		}
-
-		f, err := os.Create(filepath.Join(metadata.Dir, path))
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		_, err = io.Copy(f, res.Body)
-		if err != nil {
-			return err
-		}
-	}
-	fmt.Fprintf(Err, "\nDownloaded to\n")
-	fmt.Fprintf(Out, "%s\n", metadata.Dir)
-	return nil
-}
-
-type download struct {
-	// either/or
-	slug, uuid string
-
-	// user config
-	token, apibaseurl, workspace string
-
-	// optional
-	track, team    string
-	forceoverwrite bool
-
-	payload *downloadPayload
-}
-
-func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
-	var err error
-	d := &download{}
-	d.uuid, err = flags.GetString("uuid")
-	if err != nil {
-		return nil, err
-	}
-	d.slug, err = flags.GetString("exercise")
-	if err != nil {
-		return nil, err
-	}
-	d.track, err = flags.GetString("track")
-	if err != nil {
-		return nil, err
-	}
-	d.team, err = flags.GetString("team")
-	if err != nil {
-		return nil, err
-	}
-
-	d.forceoverwrite, err = flags.GetBool("force")
-	if err != nil {
-		return nil, err
-	}
-
-	d.token = usrCfg.GetString("token")
-	d.apibaseurl = usrCfg.GetString("apibaseurl")
-	d.workspace = usrCfg.GetString("workspace")
-
-	if err = d.needsSlugXorUUID(); err != nil {
-		return nil, err
-	}
-	if err = d.needsUserConfigValues(); err != nil {
-		return nil, err
-	}
-	if err = d.needsSlugWhenGivenTrackOrTeam(); err != nil {
-		return nil, err
-	}
-
-	client, err := api.NewClient(d.token, d.apibaseurl)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := client.NewRequest("GET", d.url(), nil)
-	if err != nil {
-		return nil, err
-	}
-	d.buildQueryParams(req.URL)
-
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode < 200 || res.StatusCode > 299 {
-		return nil, decodedAPIError(res)
-	}
-
-	body, _ := io.ReadAll(res.Body)
-	res.Body = io.NopCloser(bytes.NewReader(body))
-
-	if err := json.Unmarshal(body, &d.payload); err != nil {
-		return nil, decodedAPIError(res)
-	}
-
-	return d, nil
-}
-
-func (d download) url() string {
-	id := "latest"
-	if d.uuid != "" {
-		id = d.uuid
-	}
-	return fmt.Sprintf("%s/solutions/%s", d.apibaseurl, id)
-}
-
-func (d download) buildQueryParams(url *netURL.URL) {
-	query := url.Query()
-	if d.slug != "" {
-		query.Add("exercise_id", d.slug)
-		if d.track != "" {
-			query.Add("track_id", d.track)
-		}
-		if d.team != "" {
-			query.Add("team_id", d.team)
-		}
-	}
-	url.RawQuery = query.Encode()
-}
-
-// needsSlugXorUUID checks the presence of slug XOR uuid.
-func (d download) needsSlugXorUUID() error {
-	if d.slug != "" && d.uuid != "" || d.uuid == d.slug {
-		return errors.New("need an --exercise name or a solution --uuid")
-	}
-	return nil
-}
-
-// needsUserConfigValues checks the presence of required values from the user config.
-func (d download) needsUserConfigValues() error {
-	errMsg := "missing required user config: '%s'"
-	if d.token == "" {
-		return fmt.Errorf(errMsg, "token")
-	}
-	if d.apibaseurl == "" {
-		return fmt.Errorf(errMsg, "apibaseurl")
-	}
-	if d.workspace == "" {
-		return fmt.Errorf(errMsg, "workspace")
-	}
-	return nil
-}
-
-// needsSlugWhenGivenTrackOrTeam ensures that track/team arguments are also given with a slug.
-// (track/team meaningless when given a uuid).
-func (d download) needsSlugWhenGivenTrackOrTeam() error {
-	if (d.team != "" || d.track != "") && d.slug == "" {
-		return errors.New("--track or --team requires --exercise (not --uuid)")
-	}
-	return nil
-}
-
-type downloadPayload struct {
+// ExerciseSolution is the container for the exercise solution API response.
+type ExerciseSolution struct {
 	Solution struct {
 		ID   string `json:"id"`
 		URL  string `json:"url"`
@@ -299,37 +56,313 @@ type downloadPayload struct {
 	} `json:"error,omitempty"`
 }
 
-func (dp downloadPayload) metadata() workspace.ExerciseMetadata {
-	return workspace.ExerciseMetadata{
-		AutoApprove:  dp.Solution.Exercise.AutoApprove,
-		Track:        dp.Solution.Exercise.Track.ID,
-		Team:         dp.Solution.Team.Slug,
-		ExerciseSlug: dp.Solution.Exercise.ID,
-		ID:           dp.Solution.ID,
-		URL:          dp.Solution.URL,
-		Handle:       dp.Solution.User.Handle,
-		IsRequester:  dp.Solution.User.IsRequester,
-	}
+// solutionDownload is a helper container for managing the download process.
+type solutionDownload struct {
+	// either/or
+	slug string
+	uuid string
+	// optional
+	track string
+	team  string
+
+	solutionURL string
+
+	solution *ExerciseSolution
 }
 
-func (dp downloadPayload) files() []solutionFile {
-	fx := make([]solutionFile, 0, len(dp.Solution.Files))
-	for _, file := range dp.Solution.Files {
-		f := solutionFile{
-			path:    file,
-			baseURL: dp.Solution.FileDownloadBaseURL,
-			slug:    dp.Solution.Exercise.ID,
-		}
-		fx = append(fx, f)
-	}
-	return fx
-}
-
+// solutionFile is a helper container that holds the information needed to download the exercise files.
 type solutionFile struct {
-	path, baseURL, slug string
+	path    string
+	baseURL string
+	slug    string
 }
 
-func (sf solutionFile) url() (string, error) {
+// downloadCmd represents the download command
+var downloadCmd = &cobra.Command{
+	Use:     "download",
+	Aliases: []string{"d"},
+	Short:   "Download an exercise.",
+	Long: `Download an exercise.
+
+You may download an exercise to work on. If you've already
+started working on it, the command will also download your
+latest solution.
+
+Download other people's solutions by providing the UUID.
+`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cfg := LoadUserConfig()
+		return runDownload(cfg, cmd.Flags(), args)
+	},
+}
+
+func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
+	usrCfg := cfg.UserViperConfig
+	if err := validateUserConfig(usrCfg); err != nil {
+		return err
+	}
+
+	token := usrCfg.GetString("token")
+	apiURL := usrCfg.GetString("apibaseurl")
+	usrWorkspace := usrCfg.GetString("workspace")
+
+	isForceDownload, err := flags.GetBool("force")
+	if err != nil {
+		return err
+	}
+
+	client, err := api.NewClient(token, apiURL)
+	if err != nil {
+		return err
+	}
+
+	download, err := newDownload(client, flags, usrCfg)
+	if err != nil {
+		return err
+	}
+
+	metadata := download.solution.metadata()
+	exerciseDir := metadata.Exercise(usrWorkspace).MetadataDir()
+
+	if err := createExerciseDir(exerciseDir, isForceDownload); err != nil {
+		return err
+	}
+	// This writes the metadata file to the exercise directory.
+	if err := metadata.Write(exerciseDir); err != nil {
+		return err
+	}
+
+	if err := download.getFiles(client, exerciseDir); err != nil {
+		return err
+	}
+
+	fmt.Printf("\nDownloaded to %s\n", exerciseDir)
+	return nil
+}
+
+// createExerciseDir is a helper that creates the exercise directory and checks if it already exists.
+func createExerciseDir(dirName string, force bool) error {
+	if _, err := os.Stat(dirName); !force && err == nil {
+		return fmt.Errorf("directory '%s' already exists, use --force to overwrite", dirName)
+	}
+	if err := os.MkdirAll(dirName, os.FileMode(0755)); err != nil {
+		return err
+	}
+	return nil
+}
+
+// newDownload creates a new solutionDownload object, which is a container for the exercise solution.
+func newDownload(client *api.Client, flags *pflag.FlagSet, usrCfg *viper.Viper) (*solutionDownload, error) {
+	var err error
+
+	d := &solutionDownload{}
+	d.set(flags)
+	if err = d.validate(); err != nil {
+		return nil, err
+	}
+	d.buildSolutionURL(usrCfg.GetString("apibaseurl"))
+
+	res, err := client.MakeRequest(d.solutionURL, true)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode < 200 || res.StatusCode > 299 {
+		return nil, decodedAPIError(res)
+	}
+
+	body, _ := io.ReadAll(res.Body)
+	res.Body = io.NopCloser(bytes.NewReader(body))
+
+	if err := json.Unmarshal(body, &d.solution); err != nil {
+		return nil, decodedAPIError(res)
+	}
+
+	return d, nil
+}
+
+// getFiles wraps the main logic for preparing and downloading the exercise files.
+func (sd *solutionDownload) getFiles(client *api.Client, exerciseDir string) error {
+	for _, exerciseFile := range sd.solution.collectSolutionFiles() {
+		if err := exerciseFile.fetchExerciseFiles(client, exerciseDir); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// set sets the flags for the solutionDownload object.
+func (sd *solutionDownload) set(flags *pflag.FlagSet) {
+	var err error
+	sd.uuid, err = flags.GetString("uuid")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %s\n", err)
+	}
+	sd.slug, err = flags.GetString("exercise")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %s\n", err)
+	}
+	sd.track, err = flags.GetString("track")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %s\n", err)
+	}
+	sd.team, err = flags.GetString("team")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %s\n", err)
+	}
+}
+
+// validate validates the flags for the solutionDownload object
+func (sd *solutionDownload) validate() error {
+	var err error
+	if err = sd.needsSlugXorUUID(); err != nil {
+		return err
+	}
+	if err = sd.needsSlugWhenGivenTrackOrTeam(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// buildSolutionURL builds the solution URL.
+func (sd *solutionDownload) buildSolutionURL(apiURL string) {
+	// buildSolutionURL
+	id := "latest"
+	if sd.uuid != "" {
+		id = sd.uuid
+	}
+	sd.solutionURL = fmt.Sprintf("%s/solutions/%s", apiURL, id)
+
+	// create new URL object
+	url, err := netURL.Parse(sd.solutionURL)
+	if err != nil {
+		panic(err)
+	}
+
+	// buildQueryParams
+	query := url.Query()
+	if sd.slug != "" {
+		query.Add("exercise_id", sd.slug)
+		if sd.track != "" {
+			query.Add("track_id", sd.track)
+		}
+		if sd.team != "" {
+			query.Add("team_id", sd.team)
+		}
+	}
+	url.RawQuery = query.Encode()
+
+	sd.solutionURL = url.String()
+}
+
+// needsSlugXorUUID checks the presence of slug XOR uuid.
+func (sd *solutionDownload) needsSlugXorUUID() error {
+	if sd.slug != "" && sd.uuid != "" || sd.uuid == sd.slug {
+		return errors.New("need an --exercise name or a solution --uuid")
+	}
+	return nil
+}
+
+// needsSlugWhenGivenTrackOrTeam ensures that track/team arguments are also given with a slug.
+// (track/team meaningless when given a uuid).
+func (sd *solutionDownload) needsSlugWhenGivenTrackOrTeam() error {
+	if (sd.team != "" || sd.track != "") && sd.slug == "" {
+		return errors.New("--track or --team requires --exercise (not --uuid)")
+	}
+	return nil
+}
+
+// metadata returns the metadata for the solutionDownload object.
+func (es ExerciseSolution) metadata() workspace.ExerciseMetadata {
+	return workspace.ExerciseMetadata{
+		AutoApprove:  es.Solution.Exercise.AutoApprove,
+		Track:        es.Solution.Exercise.Track.ID,
+		Team:         es.Solution.Team.Slug,
+		ExerciseSlug: es.Solution.Exercise.ID,
+		ID:           es.Solution.ID,
+		URL:          es.Solution.URL,
+		Handle:       es.Solution.User.Handle,
+		IsRequester:  es.Solution.User.IsRequester,
+	}
+}
+
+// collectSolutionFiles returns a slice of solutionFile objects that are used to download the exercise files.
+func (es ExerciseSolution) collectSolutionFiles() []solutionFile {
+	files := make([]solutionFile, 0, len(es.Solution.Files))
+	for _, file := range es.Solution.Files {
+		sf := solutionFile{
+			path:    file,
+			baseURL: es.Solution.FileDownloadBaseURL,
+			slug:    es.Solution.Exercise.ID,
+		}
+		files = append(files, sf)
+	}
+	return files
+}
+
+// fetchExerciseFiles downloads the exercise files and saves them to the exercise directory.
+func (sf solutionFile) fetchExerciseFiles(client *api.Client, targetDir string) error {
+	url, err := sf.createDownloadURL()
+	if err != nil {
+		return err
+	}
+
+	exerciseFilePath := sf.relativePath()
+
+	res, err := client.MakeRequest(url, true)
+	if err != nil {
+		return err
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %s\n", err)
+			return // ignore
+		}
+	}(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf(
+			"error downloading %s: %s",
+			exerciseFilePath,
+			res.Status,
+		)
+	}
+
+	// Don't bother with empty files.
+	if res.Header.Get("Content-Length") == "0" {
+		return nil
+	}
+
+	targetExerciseDir := filepath.Join(targetDir, filepath.Dir(exerciseFilePath))
+	if err = os.MkdirAll(targetExerciseDir, os.FileMode(0755)); err != nil {
+		return err
+	}
+
+	exerciseFile, err := os.Create(filepath.Join(targetDir, exerciseFilePath))
+	if err != nil {
+		return err
+	}
+
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %s\n", err)
+			return // ignore
+		}
+	}(exerciseFile)
+
+	_, err = io.Copy(exerciseFile, res.Body)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// createDownloadURL creates the download URL for the solutionFile object.
+func (sf solutionFile) createDownloadURL() (string, error) {
 	url, err := netURL.ParseRequestURI(fmt.Sprintf("%s%s", sf.baseURL, sf.path))
 
 	if err != nil {
@@ -339,6 +372,7 @@ func (sf solutionFile) url() (string, error) {
 	return url.String(), nil
 }
 
+// relativePath returns the relative path for the solutionFile object.
 func (sf solutionFile) relativePath() string {
 	file := sf.path
 
