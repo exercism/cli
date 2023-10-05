@@ -8,8 +8,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"runtime"
 	"strings"
 	"time"
@@ -161,8 +161,8 @@ func (c *CLI) fetchLatestRelease() error {
 	return nil
 }
 
-func extractBinary(source *bytes.Reader, os string) (binary io.ReadCloser, err error) {
-	if os == "windows" {
+func extractBinary(source *bytes.Reader, platform string) (binary io.ReadCloser, err error) {
+	if platform == "windows" {
 		zr, err := zip.NewReader(source, int64(source.Len()))
 		if err != nil {
 			return nil, err
@@ -191,7 +191,7 @@ func extractBinary(source *bytes.Reader, os string) (binary io.ReadCloser, err e
 			if err != nil {
 				return nil, err
 			}
-			tmpfile, err := ioutil.TempFile("", "temp-exercism")
+			tmpfile, err := os.CreateTemp("", "temp-exercism")
 			if err != nil {
 				return nil, err
 			}

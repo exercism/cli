@@ -3,7 +3,7 @@ package workspace
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 )
 
@@ -22,7 +22,7 @@ type ExerciseConfig struct {
 
 // NewExerciseConfig reads exercise metadata from a file in the given directory.
 func NewExerciseConfig(dir string) (*ExerciseConfig, error) {
-	b, err := ioutil.ReadFile(filepath.Join(dir, configFilepath))
+	b, err := os.ReadFile(filepath.Join(dir, configFilepath))
 	if err != nil {
 		return nil, err
 	}

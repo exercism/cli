@@ -2,7 +2,7 @@ package api
 
 import (
 	"bytes"
-	"io/ioutil"
+	"os"
 
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/transform"
@@ -17,7 +17,7 @@ var (
 )
 
 func readFileAsUTF8String(filename string) (*string, error) {
-	b, err := ioutil.ReadFile(filename)
+	b, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}

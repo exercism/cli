@@ -8,7 +8,7 @@ Exercism would be impossible without people like you being willing to spend time
 
 ## Dependencies
 
-You'll need Go version 1.11 or higher. Follow the directions on http://golang.org/doc/install
+You'll need Go version 1.20 or higher. Follow the directions on http://golang.org/doc/install
 
 ## Development
 
