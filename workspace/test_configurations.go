@@ -62,7 +62,7 @@ func (c *TestConfiguration) GetTestCommand() (string, error) {
 // some tracks aren't (or won't be) implemented; every track is listed either way
 var TestConfigurations = map[string]TestConfiguration{
 	"8th": {
-		Command: "8th test.8th",
+		Command: "8th -f test.8th",
 	},
 	// abap: tests are run via "ABAP Development Tools", not the CLI
 	"awk": {
