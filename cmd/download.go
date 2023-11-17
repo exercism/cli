@@ -58,13 +58,9 @@ type ExerciseSolution struct {
 
 // solutionDownload is a helper container for managing the download process.
 type solutionDownload struct {
-	// either/or
-	slug string
-	uuid string
-	// optional
-	track string
-	team  string
-
+	slug, uuid  string // slug and uuid are mutually exclusive and only one can be specified either one at run time
+	track       string
+	team        string
 	solutionURL string
 
 	solution *ExerciseSolution
@@ -91,7 +87,11 @@ latest solution.
 Download other people's solutions by providing the UUID.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg := LoadUserConfig()
+		cfg, err := LoadUserConfigFile()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Invalid user config: %v\n", err)
+			return err
+		}
 		return runDownload(cfg, cmd.Flags(), args)
 	},
 }
@@ -102,16 +102,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	token := usrCfg.GetString("token")
-	apiURL := usrCfg.GetString("apibaseurl")
-	usrWorkspace := usrCfg.GetString("workspace")
-
-	isForceDownload, err := flags.GetBool("force")
-	if err != nil {
-		return err
-	}
-
-	client, err := api.NewClient(token, apiURL)
+	client, err := api.NewClient(usrCfg.GetString("token"), usrCfg.GetString("apibaseurl"))
 	if err != nil {
 		return err
 	}
@@ -122,9 +113,14 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	}
 
 	metadata := download.solution.metadata()
-	exerciseDir := metadata.Exercise(usrWorkspace).MetadataDir()
+	exerciseDir := metadata.Exercise(usrCfg.GetString("workspace")).MetadataDir()
 
-	if err := createExerciseDir(exerciseDir, isForceDownload); err != nil {
+	forceDownload, err := flags.GetBool("force")
+	if err != nil {
+		return err
+	}
+
+	if err := createExerciseDir(exerciseDir, forceDownload); err != nil {
 		return err
 	}
 	// This writes the metadata file to the exercise directory.
@@ -140,7 +136,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 	return nil
 }
 
-// createExerciseDir is a helper that creates the exercise directory and checks if it already exists.
+// // createExerciseDir creates the exercise directory and checks if it already exists.
 func createExerciseDir(dirName string, force bool) error {
 	if _, err := os.Stat(dirName); !force && err == nil {
 		return fmt.Errorf("directory '%s' already exists, use --force to overwrite", dirName)
@@ -162,7 +158,7 @@ func newDownload(client *api.Client, flags *pflag.FlagSet, usrCfg *viper.Viper) 
 	}
 	d.buildSolutionURL(usrCfg.GetString("apibaseurl"))
 
-	res, err := client.MakeRequest(d.solutionURL, true)
+	res, err := client.MakeRequest("GET", d.solutionURL, true)
 	if err != nil {
 		return nil, err
 	}
@@ -310,7 +306,7 @@ func (sf solutionFile) fetchExerciseFiles(client *api.Client, targetDir string) 
 
 	exerciseFilePath := sf.relativePath()
 
-	res, err := client.MakeRequest(url, true)
+	res, err := client.MakeRequest("GET", url, true)
 	if err != nil {
 		return err
 	}

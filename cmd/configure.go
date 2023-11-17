@@ -31,26 +31,31 @@ places.
 You can also override certain default settings to suit your preferences.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		configuration := LoadUserConfig()
-		return runConfigure(configuration, cmd.Flags())
+		cfg, err := LoadUserConfigFile()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error loading user config: %v\n", err)
+			return err
+		}
+		return runConfigure(cfg, cmd.Flags())
 	},
 }
 
-// LoadUserConfig wraps the logic for loading the user config
-func LoadUserConfig() config.Config {
+// LoadUserConfigFile creates a new configuration and loads the user config data into it.
+func LoadUserConfigFile() (config.Config, error) {
 	cfg := config.NewConfig()
+	viperConfig := viper.New()
 	viperConfig.AddConfigPath(cfg.Dir)
 	viperConfig.SetConfigName("user")
 	viperConfig.SetConfigType("json")
 	// Ignore error. If the file doesn't exist, that is fine.
 	_ = viperConfig.ReadInConfig()
 	cfg.UserViperConfig = viperConfig
-
 	if err := validateUserConfig(cfg.UserViperConfig); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		fmt.Fprintf(os.Stderr, "Invalid user config: %v\n", err)
+		return cfg, err
+
 	}
-	return cfg
+	return cfg, nil
 }
 
 func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {

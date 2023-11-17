@@ -76,7 +76,7 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 
 // TokenIsValid calls the API to determine whether the token is valid.
 func (c *Client) TokenIsValid() (bool, error) {
-	resp, err := c.MakeRequest("/validate_token", false)
+	resp, err := c.MakeRequest("GET", "/validate_token", false)
 	if err != nil {
 		return false, err
 	}
@@ -86,7 +86,7 @@ func (c *Client) TokenIsValid() (bool, error) {
 
 // IsPingable calls the API /ping to determine whether the API can be reached.
 func (c *Client) IsPingable() error {
-	resp, err := c.MakeRequest("/ping", false)
+	resp, err := c.MakeRequest("GET", "/ping", false)
 	if err != nil {
 		return err
 	}
@@ -97,8 +97,11 @@ func (c *Client) IsPingable() error {
 	return nil
 }
 
-// MakeRequest makes a http request to the given path (which may be a full URL).
-func (c *Client) MakeRequest(path string, isFullURL bool) (*http.Response, error) {
+// MakeRequest makes a http request to the given path. 
+// If isFullURL is true, the function treats the path as a full URL. 
+// If isFullURL is false, the function treats the path as a relative path and prepends the API base URL.
+// The method parameter allows for different HTTP methods (e.g., "GET", "POST").
+func (c *Client) MakeRequest(method string, path string, isFullURL bool) (*http.Response, error) {
 	var url string
 
 	if isFullURL {
@@ -107,7 +110,7 @@ func (c *Client) MakeRequest(path string, isFullURL bool) (*http.Response, error
 		url = fmt.Sprintf("%s%s", c.APIBaseURL, path)
 	}
 
-	req, err := c.NewRequest("GET", url, nil)
+	req, err := c.NewRequest(method, url, nil)
 	if err != nil {
 		return nil, err
 	}
