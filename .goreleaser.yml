@@ -120,5 +120,17 @@ release:
   # Default is `{{.Tag}}`
   name_template: "{{.ProjectName}}-v{{.Version}} {{.Env.USER}}"
 
-# brews:
-# We do not use the brew config, which is for taps, not core forumulas. 
+brews:
+  -
+    name: exercism
+    tap:
+      owner: exercism
+      name: homebrew-exercism
+    commit_author:
+      name: goreleaserbot
+      email: goreleaserbot@exercism.org
+    folder: Formula
+    homepage: "https://exercism.org/"
+    description: "Command-line tool to interact with exercism.io"
+    test: |
+      system "exercism version"
