@@ -40,9 +40,11 @@ goreleaser --skip-publish --snapshot --clean
 # Create a new tag on the main branch and push it
 git tag -a "${TAG_NAME}" -m "Trying out GoReleaser"
 git push origin "${TAG_NAME}"
-
-# [TODO] Push to homebrew
 ```
+Brew tap is now managed by `.goreleaser.yml` so no need to update it manually.
+GoReleaser can generate and publish a homebrew-tap recipe into a repository
+automatically. See [GoReleaser docs](https://goreleaser.com/customization/homebrew/)
+for more details.
 
 ## Cut Release on GitHub
 
