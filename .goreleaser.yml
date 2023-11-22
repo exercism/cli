@@ -127,8 +127,8 @@ brews:
       owner: exercism
       name: homebrew-exercism
     commit_author:
-      name: goreleaserbot
-      email: goreleaserbot@exercism.org
+      name: Exercism Bot
+      email: 66069679+exercism-bot@users.noreply.github.com
     folder: Formula
     homepage: "https://exercism.org/"
     description: "Command-line tool to interact with exercism.io"
