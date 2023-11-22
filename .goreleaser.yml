@@ -123,7 +123,7 @@ release:
 brews:
   -
     name: exercism
-    tap:
+    repository:
       owner: exercism
       name: homebrew-exercism
     commit_author:
