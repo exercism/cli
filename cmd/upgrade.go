@@ -32,7 +32,7 @@ We were not able to upgrade the cli because we encountered an error:
 
 Please check the FAQ for solutions to common upgrading issues.
 
-https://exercism.io/faqs`, err)
+https://exercism.org/faqs`, err)
 		}
 		return nil
 	},
