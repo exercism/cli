@@ -141,7 +141,8 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: "stack test",
 	},
 	"java": {
-		Command: "gradle test",
+		Command:        "./gradlew test",
+		WindowsCommand: "gradlew.bat test",
 	},
 	"javascript": {
 		Command: "npm run test",
