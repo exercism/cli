@@ -52,30 +52,22 @@ func SetDefaultDirName(binaryName string) {
 // Dir is the configured config home directory.
 // All the cli-related config files live in this directory.
 func Dir() string {
-	var dir string
+	var ev string
 	if runtime.GOOS == "windows" {
-		dir = os.Getenv("APPDATA")
-		if dir != "" {
-			return filepath.Join(dir, DefaultDirName)
-		}
+		ev = os.Getenv("APPDATA")
 	} else {
-		dir := os.Getenv("EXERCISM_CONFIG_HOME")
-		if dir != "" {
-			return dir
-		}
-		dir = os.Getenv("XDG_CONFIG_HOME")
-		if dir == "" {
-			dir = filepath.Join(os.Getenv("HOME"), ".config")
-		}
-		if dir != "" {
-			return filepath.Join(dir, DefaultDirName)
+		if ev = os.Getenv("EXERCISM_CONFIG_HOME"); ev == "" {
+			if ev = os.Getenv("XDG_CONFIG_HOME"); ev == "" {
+				ev = filepath.Join(os.Getenv("HOME"), ".config")
+			}
 		}
 	}
-	// If all else fails, use the current directory.
-	dir, _ = os.Getwd()
-	return dir
+	if ev == ".config" || ev == "" {
+		dir, _ := os.Getwd()
+		return dir
+	}
+	return filepath.Join(ev, DefaultDirName)
 }
-
 func userHome() string {
 	var dir string
 	if runtime.GOOS == "windows" {
