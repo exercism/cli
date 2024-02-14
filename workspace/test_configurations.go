@@ -62,8 +62,7 @@ func (c *TestConfiguration) GetTestCommand() (string, error) {
 // some tracks aren't (or won't be) implemented; every track is listed either way
 var TestConfigurations = map[string]TestConfiguration{
 	"8th": {
-		Command:        "bash tester.sh",
-		WindowsCommand: "tester.bat",
+		Command: "8th -f test.8th",
 	},
 	// abap: tests are run via "ABAP Development Tools", not the CLI
 	"awk": {
@@ -117,7 +116,7 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: "elm-test",
 	},
 	"emacs-lisp": {
-		Command: "emacs -batch -l ert -l *-test.el -f ert-run-tests-batch-and-exit",
+		Command: "emacs -batch -l ert -l {{test_files}} -f ert-run-tests-batch-and-exit",
 	},
 	"erlang": {
 		Command: "rebar3 eunit",
