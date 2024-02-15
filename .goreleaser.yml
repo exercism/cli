@@ -6,11 +6,11 @@ env:
 builds:
   - id: release-build
     main: ./exercism/main.go
-    mod_timestamp: '{{ .CommitTimestamp  }}'
+    mod_timestamp: "{{ .CommitTimestamp  }}"
     flags:
       - -trimpath # removes file system paths from compiled executable
     ldflags:
-      - '-s -w' # strip debug symbols and DWARF debugging info
+      - "-s -w" # strip debug symbols and DWARF debugging info
     goos:
       - darwin
       - linux
@@ -33,11 +33,11 @@ builds:
         goarch: arm
   - id: installer-build
     main: ./exercism/main.go
-    mod_timestamp: '{{ .CommitTimestamp  }}'
+    mod_timestamp: "{{ .CommitTimestamp  }}"
     flags:
       - -trimpath # removes file system paths from compiled executable
     ldflags:
-      - '-s -w' # strip debug symbols and DWARF debugging info
+      - "-s -w" # strip debug symbols and DWARF debugging info
     goos:
       - windows
     goarch:
@@ -48,8 +48,8 @@ changelog:
   sort: asc
   filters:
     exclude:
-    - '^docs:'
-    - '^test:'
+      - "^docs:"
+      - "^test:"
 
 archives:
   - id: release-archives
@@ -64,8 +64,8 @@ archives:
       {{- else }}{{- .Arch }}{{ end }}
       {{- if .Arm }}v{{- .Arm }}{{ end }}
     format_overrides:
-    - goos: windows
-      format: zip
+      - goos: windows
+        format: zip
     files:
       - shell/**
       - LICENSE
@@ -82,22 +82,31 @@ archives:
       {{- else }}{{- .Arch }}{{ end }}
       {{- if .Arm }}v{{- .Arm }}{{ end }}
     format_overrides:
-    - goos: windows
-      format: zip
+      - goos: windows
+        format: zip
     files:
       - shell/**
       - LICENSE
       - README.md
 
 checksum:
-  name_template: '{{ .ProjectName }}_checksums.txt'
+  name_template: "{{ .ProjectName }}_checksums.txt"
   ids:
     - release-archives
     - installer-archives
 
 signs:
   - artifacts: checksum
-    args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
+    args:
+      [
+        "--batch",
+        "-u",
+        "{{ .Env.GPG_FINGERPRINT }}",
+        "--output",
+        "${signature}",
+        "--detach-sign",
+        "${artifact}",
+      ]
 
 release:
   # Repo in which the release will be created.
@@ -121,8 +130,7 @@ release:
   name_template: "{{.ProjectName}}-v{{.Version}} {{.Env.USER}}"
 
 brews:
-  -
-    name: exercism
+  - name: exercism
     repository:
       owner: exercism
       name: homebrew-exercism
