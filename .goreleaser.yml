@@ -133,7 +133,7 @@ brews:
   - name: exercism
     repository:
       owner: exercism
-      name: homebrew-exercism
+      name: homebrew-core
     commit_author:
       name: Exercism Bot
       email: 66069679+exercism-bot@users.noreply.github.com
