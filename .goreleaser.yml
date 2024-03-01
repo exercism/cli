@@ -139,6 +139,6 @@ brews:
       email: 66069679+exercism-bot@users.noreply.github.com
     folder: Formula
     homepage: "https://exercism.org/"
-    description: "Command-line tool to interact with exercism.io"
+    description: "Command-line tool to interact with exercism.org"
     test: |
       system "exercism version"
