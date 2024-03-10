@@ -76,35 +76,48 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 
 // TokenIsValid calls the API to determine whether the token is valid.
 func (c *Client) TokenIsValid() (bool, error) {
-	url := fmt.Sprintf("%s/validate_token", c.APIBaseURL)
-	req, err := c.NewRequest("GET", url, nil)
-	if err != nil {
-		return false, err
-	}
-	resp, err := c.Do(req)
+	resp, err := c.MakeRequest("GET", "/validate_token", false)
 	if err != nil {
 		return false, err
 	}
 	defer resp.Body.Close()
-
 	return resp.StatusCode == http.StatusOK, nil
 }
 
 // IsPingable calls the API /ping to determine whether the API can be reached.
 func (c *Client) IsPingable() error {
-	url := fmt.Sprintf("%s/ping", c.APIBaseURL)
-	req, err := c.NewRequest("GET", url, nil)
-	if err != nil {
-		return err
-	}
-	resp, err := c.Do(req)
+	resp, err := c.MakeRequest("GET", "/ping", false)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
-
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("API returned %s", resp.Status)
 	}
 	return nil
+}
+
+// MakeRequest makes a http request to the given path. 
+// If isFullURL is true, the function treats the path as a full URL. 
+// If isFullURL is false, the function treats the path as a relative path and prepends the API base URL.
+// The method parameter allows for different HTTP methods (e.g., "GET", "POST").
+func (c *Client) MakeRequest(method string, path string, isFullURL bool) (*http.Response, error) {
+	var url string
+
+	if isFullURL {
+		url = path
+	} else {
+		url = fmt.Sprintf("%s%s", c.APIBaseURL, path)
+	}
+
+	req, err := c.NewRequest(method, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }

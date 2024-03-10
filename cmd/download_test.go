@@ -123,7 +123,7 @@ func TestSolutionFile(t *testing.T) {
 				t.Fatalf("Expected path '%s', got '%s'", tc.expectedPath, sf.relativePath())
 			}
 
-			url, err := sf.url()
+			url, err := sf.createDownloadURL()
 			if err != nil {
 				t.Fatal(err)
 			}
