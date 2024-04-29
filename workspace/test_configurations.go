@@ -140,7 +140,7 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: "stack test",
 	},
 	"j": {
-		Command: "jconsole -js \"exit echo unittest {{test_files}} [ load {{solution_files}}\""
+		Command: `jconsole -js "exit echo unittest {{test_files}} [ load {{solution_files}}"`
 	},
 	"java": {
 		Command: "gradle test",
