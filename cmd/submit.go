@@ -26,7 +26,7 @@ var submitCmd = &cobra.Command{
 
     Call the command with the list of files you want to submit.
     If you omit the list of files, the CLI will attempt to submit
-    automatically the appropriate solution files for the exercise.
+    the appropriate solution files for the exercise.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.NewConfig()
