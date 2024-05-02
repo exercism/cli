@@ -26,6 +26,7 @@ _testmain.go
 out/
 release/
 go-exercism
+testercism
 
 # Intellij
 /.idea
