@@ -10,7 +10,7 @@ The Exercism CLI uses [GoReleaser](https://goreleaser.com) to automate the relea
 
 ## Confirm / Update the Changelog
 
-Make sure all the recent changes are reflected in the "next release" section of the CHANGELOG.md file. 
+Make sure all the recent changes are reflected in the "next release" section of the CHANGELOG.md file.
 All the changes in the "next release" section should be moved to a new section that describes the version number, and gives it a date.
 
 You can view changes using the /compare/ view:
@@ -33,6 +33,7 @@ Once the version bump PR has been merged, run the following commands:
 ```bash
 VERSION=$(sed -n -E 's/^const Version = "([0-9]+\.[0-9]+\.[0-9]+)"$/\1/p' cmd/version.go)
 TAG_NAME="v${VERSION}"
+GPG_FINGERPRINT="<GPG FINGERPRINT>"
 
 # Test run
 goreleaser --skip-publish --snapshot --clean
@@ -41,6 +42,7 @@ goreleaser --skip-publish --snapshot --clean
 git tag -a "${TAG_NAME}" -m "Trying out GoReleaser"
 git push origin "${TAG_NAME}"
 ```
+
 Brew tap is now managed by `.goreleaser.yml` so no need to update it manually.
 GoReleaser can generate and publish a homebrew-tap recipe into a repository
 automatically. See [GoReleaser docs](https://goreleaser.com/customization/homebrew/)
