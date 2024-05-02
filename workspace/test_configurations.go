@@ -222,6 +222,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"sml": {
 		Command: "poly -q --use {{test_files}}",
 	},
+	"sqlite": {
+		Command: "sqlite3 -bail < {{test_files}}",
+	},
 	"swift": {
 		Command: "swift test",
 	},
