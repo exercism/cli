@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -26,12 +25,14 @@ const cfgHomeKey = "EXERCISM_CONFIG_HOME"
 // test, call the command by calling Execute on the App.
 //
 // Example:
-// cmdTest := &CommandTest{
-// 	Cmd:    myCmd,
-// 	InitFn: initMyCmd,
-// 	Args:   []string{"fakeapp", "mycommand", "arg1", "--flag", "value"},
-// 	MockInteractiveResponse: "first-input\nsecond\n",
-// }
+//
+//	cmdTest := &CommandTest{
+//		Cmd:    myCmd,
+//		InitFn: initMyCmd,
+//		Args:   []string{"fakeapp", "mycommand", "arg1", "--flag", "value"},
+//		MockInteractiveResponse: "first-input\nsecond\n",
+//	}
+//
 // cmdTest.Setup(t)
 // defer cmdTest.Teardown(t)
 // ...
@@ -61,7 +62,7 @@ type CommandTest struct {
 // The method takes a *testing.T as an argument, that way the method can
 // fail the test if the creation of the temporary directory fails.
 func (test *CommandTest) Setup(t *testing.T) {
-	dir, err := ioutil.TempDir("", "command-test")
+	dir, err := os.MkdirTemp("", "command-test")
 	defer os.RemoveAll(dir)
 	assert.NoError(t, err)
 
@@ -102,8 +103,8 @@ func newCapturedOutput() capturedOutput {
 	return capturedOutput{
 		oldOut: Out,
 		oldErr: Err,
-		newOut: ioutil.Discard,
-		newErr: ioutil.Discard,
+		newOut: io.Discard,
+		newErr: io.Discard,
 	}
 }
 
