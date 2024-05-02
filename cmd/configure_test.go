@@ -1,11 +1,9 @@
 //go:build !windows
-// +build !windows
 
 package cmd
 
 import (
 	"bytes"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -344,7 +342,7 @@ func TestConfigureDefaultWorkspaceWithoutClobbering(t *testing.T) {
 	ts := httptest.NewServer(endpoint)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "no-clobber")
+	tmpDir, err := os.MkdirTemp("", "no-clobber")
 	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
@@ -379,7 +377,7 @@ func TestConfigureExplicitWorkspaceWithoutClobberingNonDirectory(t *testing.T) {
 	co.override()
 	defer co.reset()
 
-	tmpDir, err := ioutil.TempDir("", "no-clobber")
+	tmpDir, err := os.MkdirTemp("", "no-clobber")
 	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
@@ -396,7 +394,7 @@ func TestConfigureExplicitWorkspaceWithoutClobberingNonDirectory(t *testing.T) {
 	}
 
 	// Create a file at the workspace directory's location
-	err = ioutil.WriteFile(filepath.Join(tmpDir, "workspace"), []byte("This is not a directory"), os.FileMode(0755))
+	err = os.WriteFile(filepath.Join(tmpDir, "workspace"), []byte("This is not a directory"), os.FileMode(0755))
 	assert.NoError(t, err)
 
 	flags := pflag.NewFlagSet("fake", pflag.PanicOnError)

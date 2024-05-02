@@ -1,55 +1,112 @@
 # You can find the GoReleaser documentation at http://goreleaser.com
 project_name: exercism
 
+env:
+  - CGO_ENABLED=0
 builds:
-- env:
-    - CGO_ENABLED=0
-  main: ./exercism/main.go
-  goos:
-    - darwin
-    - linux
-    - windows
-    - freebsd
-    - openbsd
-  goarch:
-    - amd64
-    - 386
-    - arm
-    - ppc64
-  goarm:
-    - 5
-    - 6
-  ignore:
-    - goos: openbsd
-      goarch: arm
-    - goos: freebsd
-      goarch: arm
-
-checksum:
-  name_template: '{{ .ProjectName }}_checksums.txt'
+  - id: release-build
+    main: ./exercism/main.go
+    mod_timestamp: "{{ .CommitTimestamp  }}"
+    flags:
+      - -trimpath # removes file system paths from compiled executable
+    ldflags:
+      - "-s -w" # strip debug symbols and DWARF debugging info
+    goos:
+      - darwin
+      - linux
+      - windows
+      - freebsd
+      - openbsd
+    goarch:
+      - amd64
+      - 386
+      - arm
+      - arm64
+      - ppc64
+    goarm:
+      - 5
+      - 6
+    ignore:
+      - goos: openbsd
+        goarch: arm
+      - goos: freebsd
+        goarch: arm
+  - id: installer-build
+    main: ./exercism/main.go
+    mod_timestamp: "{{ .CommitTimestamp  }}"
+    flags:
+      - -trimpath # removes file system paths from compiled executable
+    ldflags:
+      - "-s -w" # strip debug symbols and DWARF debugging info
+    goos:
+      - windows
+    goarch:
+      - amd64
+      - 386
 
 changelog:
   sort: asc
   filters:
     exclude:
-    - '^docs:'
-    - '^test:'
+      - "^docs:"
+      - "^test:"
 
 archives:
-  - name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
-    replacements:
-      amd64: x86_64
-      386: i386
+  - id: release-archives
+    builds:
+      - release-build
+    name_template: >-
+      {{- .ProjectName }}-
+      {{- .Version }}-
+      {{- .Os }}-
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{- .Arch }}{{ end }}
+      {{- if .Arm }}v{{- .Arm }}{{ end }}
     format_overrides:
-    - goos: windows
-      format: zip
+      - goos: windows
+        format: zip
     files:
-      - shell/**/*
+      - shell/**
+      - LICENSE
+      - README.md
+  - id: installer-archives
+    builds:
+      - installer-build
+    name_template: >-
+      {{- .ProjectName }}-
+      {{- .Version }}-
+      {{- .Os }}-
+      {{- if eq .Arch "amd64" }}64bit
+      {{- else if eq .Arch "386" }}32bit
+      {{- else }}{{- .Arch }}{{ end }}
+      {{- if .Arm }}v{{- .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - shell/**
       - LICENSE
       - README.md
 
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
+  ids:
+    - release-archives
+    - installer-archives
+
 signs:
-- artifacts: checksum
+  - artifacts: checksum
+    args:
+      [
+        "--batch",
+        "-u",
+        "{{ .Env.GPG_FINGERPRINT }}",
+        "--output",
+        "${signature}",
+        "--detach-sign",
+        "${artifact}",
+      ]
 
 release:
   # Repo in which the release will be created.
@@ -72,33 +129,16 @@ release:
   # Default is `{{.Tag}}`
   name_template: "{{.ProjectName}}-v{{.Version}} {{.Env.USER}}"
 
-# brews:
-# We do not use the brew config, which is for taps, not core forumulas. 
-
-snapcrafts:
-  -
-    name: exercism
-    license: MIT
-    # Whether to publish the snap to the snapcraft store.
-    # Remember you need to `snapcraft login` first.
-    # Defaults to false.
-    # publish: true
-    summary: Command-line client for https://exercism.org
-    # https://snapcraft.io/docs/reference/confinement
-    confinement: strict
-    # A snap of type base to be used as the execution environment for this snap.
-    base: core18
-    # https://snapcraft.io/docs/reference/channels
-    grade: stable
-    description: Exercism is an online platform designed to help you improve your coding skills through practice and mentorship. Exercism provides you with thousands of exercises spread across numerous language tracks. Each one is a fun and interesting challenge designed to teach you a little more about the features of a language.
-    name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
-    replacements:
-      amd64: x86_64
-      386: i386
-    apps:
-      exercism:
-        plugs: ["home", "network", "removable-media","personal-files"]
-    plugs:
-      personal-files:
-        write:
-        - $HOME/
+brews:
+  - name: exercism
+    repository:
+      owner: exercism
+      name: homebrew-core
+    commit_author:
+      name: Exercism Bot
+      email: 66069679+exercism-bot@users.noreply.github.com
+    folder: Formula
+    homepage: "https://exercism.org/"
+    description: "Command-line tool to interact with exercism.org"
+    test: |
+      system "exercism version"

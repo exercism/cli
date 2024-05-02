@@ -3,7 +3,6 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -169,7 +168,7 @@ func TestDownload(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tmpDir, err := ioutil.TempDir("", "download-cmd")
+		tmpDir, err := os.MkdirTemp("", "download-cmd")
 		defer os.RemoveAll(tmpDir)
 		assert.NoError(t, err)
 
@@ -197,7 +196,7 @@ func TestDownload(t *testing.T) {
 		assertDownloadedCorrectFiles(t, targetDir)
 
 		dir := filepath.Join(targetDir, "bogus-track", "bogus-exercise")
-		b, err := ioutil.ReadFile(workspace.NewExerciseFromDir(dir).MetadataFilepath())
+		b, err := os.ReadFile(workspace.NewExerciseFromDir(dir).MetadataFilepath())
 		assert.NoError(t, err)
 		var metadata workspace.ExerciseMetadata
 		err = json.Unmarshal(b, &metadata)
@@ -229,7 +228,7 @@ func TestDownloadToExistingDirectory(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tmpDir, err := ioutil.TempDir("", "download-cmd")
+		tmpDir, err := os.MkdirTemp("", "download-cmd")
 		defer os.RemoveAll(tmpDir)
 		assert.NoError(t, err)
 
@@ -281,7 +280,7 @@ func TestDownloadToExistingDirectoryWithForce(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tmpDir, err := ioutil.TempDir("", "download-cmd")
+		tmpDir, err := os.MkdirTemp("", "download-cmd")
 		defer os.RemoveAll(tmpDir)
 		assert.NoError(t, err)
 
@@ -363,7 +362,7 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
 
 	for _, file := range expectedFiles {
 		t.Run(file.desc, func(t *testing.T) {
-			b, err := ioutil.ReadFile(file.path)
+			b, err := os.ReadFile(file.path)
 			assert.NoError(t, err)
 			assert.Equal(t, file.contents, string(b))
 		})
@@ -383,7 +382,7 @@ func TestDownloadError(t *testing.T) {
 	ts := httptest.NewServer(handler)
 	defer ts.Close()
 
-	tmpDir, err := ioutil.TempDir("", "submit-err-tmp-dir")
+	tmpDir, err := os.MkdirTemp("", "submit-err-tmp-dir")
 	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 

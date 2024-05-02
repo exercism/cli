@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -10,7 +9,7 @@ import (
 )
 
 func TestHasMetadata(t *testing.T) {
-	ws, err := ioutil.TempDir("", "fake-workspace")
+	ws, err := os.MkdirTemp("", "fake-workspace")
 	defer os.RemoveAll(ws)
 	assert.NoError(t, err)
 
@@ -22,7 +21,7 @@ func TestHasMetadata(t *testing.T) {
 	err = os.MkdirAll(filepath.Dir(exerciseB.MetadataFilepath()), os.FileMode(0755))
 	assert.NoError(t, err)
 
-	err = ioutil.WriteFile(exerciseA.MetadataFilepath(), []byte{}, os.FileMode(0600))
+	err = os.WriteFile(exerciseA.MetadataFilepath(), []byte{}, os.FileMode(0600))
 	assert.NoError(t, err)
 
 	ok, err := exerciseA.HasMetadata()
@@ -35,7 +34,7 @@ func TestHasMetadata(t *testing.T) {
 }
 
 func TestHasLegacyMetadata(t *testing.T) {
-	ws, err := ioutil.TempDir("", "fake-workspace")
+	ws, err := os.MkdirTemp("", "fake-workspace")
 	defer os.RemoveAll(ws)
 	assert.NoError(t, err)
 
@@ -47,7 +46,7 @@ func TestHasLegacyMetadata(t *testing.T) {
 	err = os.MkdirAll(filepath.Dir(exerciseB.LegacyMetadataFilepath()), os.FileMode(0755))
 	assert.NoError(t, err)
 
-	err = ioutil.WriteFile(exerciseA.LegacyMetadataFilepath(), []byte{}, os.FileMode(0600))
+	err = os.WriteFile(exerciseA.LegacyMetadataFilepath(), []byte{}, os.FileMode(0600))
 	assert.NoError(t, err)
 
 	ok, err := exerciseA.HasLegacyMetadata()
@@ -76,7 +75,7 @@ func TestMigrationStatusString(t *testing.T) {
 }
 
 func TestMigrateLegacyMetadataFileWithoutLegacy(t *testing.T) {
-	ws, err := ioutil.TempDir("", "fake-workspace")
+	ws, err := os.MkdirTemp("", "fake-workspace")
 	defer os.RemoveAll(ws)
 	assert.NoError(t, err)
 
@@ -85,7 +84,7 @@ func TestMigrateLegacyMetadataFileWithoutLegacy(t *testing.T) {
 	err = os.MkdirAll(filepath.Dir(metadataFilepath), os.FileMode(0755))
 	assert.NoError(t, err)
 
-	err = ioutil.WriteFile(metadataFilepath, []byte{}, os.FileMode(0600))
+	err = os.WriteFile(metadataFilepath, []byte{}, os.FileMode(0600))
 	assert.NoError(t, err)
 
 	ok, _ := exercise.HasLegacyMetadata()
@@ -104,7 +103,7 @@ func TestMigrateLegacyMetadataFileWithoutLegacy(t *testing.T) {
 }
 
 func TestMigrateLegacyMetadataFileWithLegacy(t *testing.T) {
-	ws, err := ioutil.TempDir("", "fake-workspace")
+	ws, err := os.MkdirTemp("", "fake-workspace")
 	defer os.RemoveAll(ws)
 	assert.NoError(t, err)
 
@@ -113,7 +112,7 @@ func TestMigrateLegacyMetadataFileWithLegacy(t *testing.T) {
 	err = os.MkdirAll(filepath.Dir(legacyMetadataFilepath), os.FileMode(0755))
 	assert.NoError(t, err)
 
-	err = ioutil.WriteFile(legacyMetadataFilepath, []byte{}, os.FileMode(0600))
+	err = os.WriteFile(legacyMetadataFilepath, []byte{}, os.FileMode(0600))
 	assert.NoError(t, err)
 
 	ok, _ := exercise.HasLegacyMetadata()
@@ -132,7 +131,7 @@ func TestMigrateLegacyMetadataFileWithLegacy(t *testing.T) {
 }
 
 func TestMigrateLegacyMetadataFileWithLegacyAndModern(t *testing.T) {
-	ws, err := ioutil.TempDir("", "fake-workspace")
+	ws, err := os.MkdirTemp("", "fake-workspace")
 	defer os.RemoveAll(ws)
 	assert.NoError(t, err)
 
@@ -144,9 +143,9 @@ func TestMigrateLegacyMetadataFileWithLegacyAndModern(t *testing.T) {
 	err = os.MkdirAll(filepath.Dir(metadataFilepath), os.FileMode(0755))
 	assert.NoError(t, err)
 
-	err = ioutil.WriteFile(legacyMetadataFilepath, []byte{}, os.FileMode(0600))
+	err = os.WriteFile(legacyMetadataFilepath, []byte{}, os.FileMode(0600))
 	assert.NoError(t, err)
-	err = ioutil.WriteFile(metadataFilepath, []byte{}, os.FileMode(0600))
+	err = os.WriteFile(metadataFilepath, []byte{}, os.FileMode(0600))
 	assert.NoError(t, err)
 
 	ok, _ := exercise.HasLegacyMetadata()

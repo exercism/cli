@@ -17,13 +17,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go-version: ["1.15"]
+        go-version:
+          - '1.20.x'
+          - '1.21.x'
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
-      - uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
 
-      - uses: actions/setup-go@bfdd3570ce990073878bf10f6b2d79082de49492
+      - uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe
         with:
           go-version: ${{ matrix.go-version }}
 
@@ -37,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
     
       - name: Check formatting
         run: ./.gha.gofmt.sh

@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -12,7 +11,7 @@ import (
 )
 
 func TestWorkspacePotentialExercises(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "walk")
+	tmpDir, err := os.MkdirTemp("", "walk")
 	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
@@ -54,7 +53,7 @@ func TestWorkspacePotentialExercises(t *testing.T) {
 }
 
 func TestWorkspaceExercises(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "walk-with-metadata")
+	tmpDir, err := os.MkdirTemp("", "walk-with-metadata")
 	defer os.RemoveAll(tmpDir)
 	assert.NoError(t, err)
 
@@ -69,7 +68,7 @@ func TestWorkspaceExercises(t *testing.T) {
 		assert.NoError(t, err)
 
 		if path != a2 {
-			err = ioutil.WriteFile(metadataAbsoluteFilepath, []byte{}, os.FileMode(0600))
+			err = os.WriteFile(metadataAbsoluteFilepath, []byte{}, os.FileMode(0600))
 			assert.NoError(t, err)
 		}
 	}
