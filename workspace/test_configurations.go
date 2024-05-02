@@ -191,6 +191,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"purescript": {
 		Command: "spago test",
 	},
+	"pyret": {
+		Command: "pyret {{test_files}}",
+	},
 	"python": {
 		Command: "python3 -m pytest -o markers=task {{test_files}}",
 	},
