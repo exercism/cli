@@ -19,7 +19,7 @@ import (
 
 // submitCmd lets people upload a solution to the website.
 var submitCmd = &cobra.Command{
-	Use: "submit [FILE1	 ...]",
+	Use: "submit [<FILE> ...]",
 	Aliases: []string{"s"},
 	Short:   "Submit your solution to an exercise.",
 	Long: `Submit your solution to an Exercism exercise.
