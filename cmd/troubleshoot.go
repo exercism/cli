@@ -26,7 +26,7 @@ var troubleshootCmd = &cobra.Command{
 	Long: `Provides output to help with troubleshooting.
 
 If you're running into trouble, copy and paste the output from the troubleshoot
-command into a GitHub issue so we can help figure out what's going on.
+command into a topic on the Exercism forum so we can help figure out what's going on.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cli.TimeoutInSeconds = cli.TimeoutInSeconds * 2
@@ -227,7 +227,7 @@ Latest:  {{ with .Version.Latest }}{{ . }}{{ else }}<unknown>{{ end }}
 {{ end -}}
 {{ if not .Version.UpToDate }}
 Call 'exercism upgrade' to get the latest version.
-See the release notes at https://github.com/exercism/cli/releases/tag/{{ .Version.Latest }} for details.
+See the release notes at https://github.com/exercism/cli/releases/tag/v{{ .Version.Latest }} for details.
 {{ end }}
 
 Operating System
@@ -255,8 +255,8 @@ API Reachability
     * {{ .Latency }}
 {{ end }}
 
-If you are having trouble please file a GitHub issue at
-https://github.com/exercism/exercism.io/issues and include
+If you are having trouble, please create a new topic in the Exercism forum
+at https://forum.exercism.org/c/support/cli/10 and include
 this information.
 {{ if not .Censor }}
 Don't share your API key. Keep that private.

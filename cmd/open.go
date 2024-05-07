@@ -15,9 +15,13 @@ var openCmd = &cobra.Command{
 
 Pass the path to the directory that contains the solution you want to see on the website.
 	`,
-	Args: cobra.ExactArgs(1),
+	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		metadata, err := workspace.NewExerciseMetadata(args[0])
+		path := "."
+		if len(args) == 1 {
+			path = args[0]
+		}
+		metadata, err := workspace.NewExerciseMetadata(path)
 		if err != nil {
 			return err
 		}
