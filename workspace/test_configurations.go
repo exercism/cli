@@ -143,7 +143,8 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: `jconsole -js "exit echo unittest {{test_files}} [ load {{solution_files}}"`,
 	},
 	"java": {
-		Command: "gradle test",
+		Command:        "./gradlew test",
+		WindowsCommand: "gradlew.bat test",
 	},
 	"javascript": {
 		Command: "npm run test",
