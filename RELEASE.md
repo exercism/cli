@@ -8,19 +8,12 @@ The Exercism CLI uses [GoReleaser](https://goreleaser.com) to automate the relea
 1. [Setup GitHub token](https://goreleaser.com/scm/github/)
 1. Have a gpg key installed on your machine - it is [used for signing the artifacts](https://goreleaser.com/customization/sign/)
 
-## Confirm / Update the Changelog
-
-Make sure all the recent changes are reflected in the "next release" section of the CHANGELOG.md file.
-All the changes in the "next release" section should be moved to a new section that describes the version number, and gives it a date.
-
-You can view changes using the /compare/ view:
-https://github.com/exercism/cli/compare/$PREVIOUS_RELEASE...main
-
 ## Bump the version
 
 1. Create a branch for the new version
-1. Edit the `Version` constant in `cmd/version.go`
-1. Update the `CHANGELOG.md` file
+1. Bump the `Version` constant in `cmd/version.go`
+1. Update the `CHANGELOG.md` file to include a section for the new version and its changes.
+   Hint: you can view changes using the compare view: https://github.com/exercism/cli/compare/$PREVIOUS_RELEASE...main.
 1. Commit the updated version
 1. Create a PR
 
