@@ -29,7 +29,7 @@ TAG_NAME="v${VERSION}"
 GPG_FINGERPRINT="<GPG FINGERPRINT>"
 
 # Test run
-goreleaser --skip-publish --snapshot --clean
+goreleaser --skip=publish --snapshot --clean
 
 # Create a new tag on the main branch and push it
 git tag -a "${TAG_NAME}" -m "Trying out GoReleaser"
