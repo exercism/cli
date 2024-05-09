@@ -14,32 +14,18 @@ The Exercism CLI uses [GoReleaser](https://goreleaser.com) to automate the relea
 1. Bump the `Version` constant in `cmd/version.go`
 1. Update the `CHANGELOG.md` file to include a section for the new version and its changes.
    Hint: you can view changes using the compare view: https://github.com/exercism/cli/compare/$PREVIOUS_RELEASE...main.
-1. Commit the updated version
+1. Commit the updated files
 1. Create a PR
 
 _Note: It's useful to add the version to the commit message when you bump it: e.g. `Bump version to v2.3.4`._
 
 ## Cut a release
 
-Once the version bump PR has been merged, run the following commands:
+Once the version bump PR has been merged, run the following command to cut a release:
 
-```bash
-VERSION=$(sed -n -E 's/^const Version = "([0-9]+\.[0-9]+\.[0-9]+)"$/\1/p' cmd/version.go)
-TAG_NAME="v${VERSION}"
-GPG_FINGERPRINT="<GPG FINGERPRINT>"
-
-# Test run
-goreleaser --skip=publish --snapshot --clean
-
-# Create a new tag on the main branch and push it
-git tag -a "${TAG_NAME}" -m "Trying out GoReleaser"
-git push origin "${TAG_NAME}"
+```shell
+GPG_FINGERPINT="<THE_GPG_FINGERPRINT>" ./bin/release.sh
 ```
-
-Brew tap is now managed by `.goreleaser.yml` so no need to update it manually.
-GoReleaser can generate and publish a homebrew-tap recipe into a repository
-automatically. See [GoReleaser docs](https://goreleaser.com/customization/homebrew/)
-for more details.
 
 ## Cut Release on GitHub
 
@@ -54,20 +40,6 @@ To install, follow the interactive installation instructions at https://exercism
 ```
 
 Lastly, test and publish the draft
-
-## Update Homebrew
-
-Next, we'll submit a PR to Homebrew to update the Exercism formula (which is how macOS users usually download the CLI):
-
-```
-cd /tmp && curl -O https://github.com/exercism/cli/archive/vX.Y.Z.tar.gz
-cd $(brew --repository)
-git checkout master
-brew update
-brew bump-formula-pr --strict exercism --url=https://github.com/exercism/cli/archive/vX.Y.Z.tar.gz --sha256=$(shasum -a 256 /tmp/vX.Y.Z.tar.gz)
-```
-
-For more information see [How To Open a Homebrew Pull Request](https://docs.brew.sh/How-To-Open-a-Homebrew-Pull-Request).
 
 ## Update the docs site
 
