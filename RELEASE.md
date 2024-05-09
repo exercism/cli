@@ -39,7 +39,11 @@ To install, follow the interactive installation instructions at https://exercism
 [modify the generated release-notes to describe changes in this release]
 ```
 
-Lastly, test and publish the draft
+Lastly, test and then publish the draft.
+
+## Homebrew
+
+Homebrew will automatically bump the version, no manual action is required.
 
 ## Update the docs site
 

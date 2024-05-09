@@ -128,17 +128,3 @@ release:
   # You can change the name of the GitHub release.
   # Default is `{{.Tag}}`
   name_template: "{{.ProjectName}}-v{{.Version}} {{.Env.USER}}"
-
-brews:
-  - name: exercism
-    repository:
-      owner: exercism
-      name: homebrew-core
-    commit_author:
-      name: Exercism Bot
-      email: 66069679+exercism-bot@users.noreply.github.com
-    directory: Formula
-    homepage: "https://exercism.org/"
-    description: "Command-line tool to interact with exercism.org"
-    test: |
-      system "exercism version"
