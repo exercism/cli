@@ -7,6 +7,15 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 ## Next Release
 * **Your contribution here**
 
+## v3.4.0 (2024-05-09)
+* [#1126](https://github.com/exercism/cli/pull/1126) Update `exercism test` to use Gradle wrapper to test Java exercise - [@sanderploegsma]
+* [#1139](https://github.com/exercism/cli/pull/1139) Add support for Pyret to `exercism test`
+* [#1136](https://github.com/exercism/cli/pull/1136) Add support for J to `exercism test` - [@enascimento178]
+* [#1070](https://github.com/exercism/cli/pull/1070) `exercism open` does not require specifying the directory (defaults to current directory) - [@halfdan]
+* [#1122](https://github.com/exercism/cli/pull/1122) Troubleshoot command suggest to open forum post instead of GitHub issue - [@glennj]
+* [#1065](https://github.com/exercism/cli/pull/1065) Update help text for `exercism submit` to indicate specifying files is optional - [@andrerfcsantos]
+* [#1140](https://github.com/exercism/cli/pull/1140) Fix release notes link
+
 ## v3.3.0 (2024-02-15)
 * [#1128](https://github.com/exercism/cli/pull/1128) Fix `exercism test` command not working for the `8th` and `emacs-lisp` tracks - [@glennj]
 * [#1125](https://github.com/exercism/cli/pull/1125) Simplify root command description
