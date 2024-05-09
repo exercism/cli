@@ -137,7 +137,7 @@ brews:
     commit_author:
       name: Exercism Bot
       email: 66069679+exercism-bot@users.noreply.github.com
-    folder: Formula
+    directory: Formula
     homepage: "https://exercism.org/"
     description: "Command-line tool to interact with exercism.org"
     test: |
