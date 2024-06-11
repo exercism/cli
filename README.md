@@ -11,6 +11,18 @@ This CLI ships as a binary with no additional runtime requirements.
 
 Instructions can be found at [exercism/cli/releases](https://github.com/exercism/cli/releases)
 
+- If you already setup your porject by following [Go Module](https://go.dev/doc/modules/layout)
+
+
+```
+git install github.com/exercism/cli/exercism@latest
+```
+
+## Tips: 
+
+```
+git mod tidy -go=1.20 -compat=1.20  # make sure the version change with this git mod tidy this will update the version of go if required.
+```
 ## Contributing
 
 If you wish to help improve the CLI, please see the [Contributing guide][contributing].
