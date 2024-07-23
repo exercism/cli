@@ -80,6 +80,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"c": {
 		Command: "make",
 	},
+	"cairo": {
+		Command: "scarb cairo-test",
+	},
 	"cfml": {
 		Command: "box task run TestRunner",
 	},
