@@ -61,6 +61,9 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 	// If the command is run 'bare' and we have no token,
 	// prompt the user to provide the token.
 	if flags.NFlag() == 0 && cfg.GetString("token") == "" {
+		tokenURL := config.SettingsURL(cfg.GetString("apibaseurl"))
+		fmt.Println("Find your token on", tokenURL)
+
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Enter your token: ")
 		token, err := reader.ReadString('\n')
