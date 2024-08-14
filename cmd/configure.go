@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strings"
@@ -58,10 +59,25 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 	}
 
 	// If the command is run 'bare' and we have no token,
-	// explain how to set the token.
+	// prompt the user to provide the token.
 	if flags.NFlag() == 0 && cfg.GetString("token") == "" {
-		tokenURL := config.SettingsURL(cfg.GetString("apibaseurl"))
-		return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Enter your token: ")
+		token, err := reader.ReadString('\n')
+		token = strings.TrimSpace(token)
+
+		// If we got an EOF print a new line, so that the
+		// next print can be on a new line.
+		if err != nil {
+			fmt.Println()
+		}
+
+		if err != nil || token == "" {
+			tokenURL := config.SettingsURL(cfg.GetString("apibaseurl"))
+			return fmt.Errorf("There is no token provided. Find your token on %s, and call this command again.", tokenURL)
+		}
+
+		flags.Set("token", token)
 	}
 
 	// Determine the base API URL.
