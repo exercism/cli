@@ -1,4 +1,5 @@
 # You can find the GoReleaser documentation at http://goreleaser.com
+version: 2
 project_name: exercism
 
 env:
