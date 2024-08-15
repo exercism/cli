@@ -32,7 +32,7 @@ func TestBareConfigure(t *testing.T) {
 
 	err = runConfigure(cfg, flags)
 	if assert.Error(t, err) {
-		assert.Regexp(t, "no token provided", err.Error())
+		assert.Regexp(t, "no token configured", err.Error())
 	}
 }
 

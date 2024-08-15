@@ -58,9 +58,12 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 		return nil
 	}
 
-	// If the command is run 'bare' and we have no token,
-	// prompt the user to provide the token.
-	if flags.NFlag() == 0 && cfg.GetString("token") == "" {
+	// Interactive configuration.
+	interactive, err := flags.GetBool("interactive")
+	if err != nil {
+		return err
+	}
+	if interactive {
 		tokenURL := config.SettingsURL(cfg.GetString("apibaseurl"))
 		fmt.Println("Find your token on", tokenURL)
 
@@ -81,6 +84,13 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 		}
 
 		flags.Set("token", token)
+	}
+
+	// If the command is run 'bare' and we have no token,
+	// explain how to set the token.
+	if flags.NFlag() == 0 && cfg.GetString("token") == "" {
+		tokenURL := config.SettingsURL(cfg.GetString("apibaseurl"))
+		return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
 	}
 
 	// Determine the base API URL.
@@ -250,6 +260,7 @@ func setupConfigureFlags(flags *pflag.FlagSet) {
 	flags.StringP("workspace", "w", "", "directory for exercism exercises")
 	flags.StringP("api", "a", "", "API base url")
 	flags.BoolP("show", "s", false, "show the current configuration")
+	flags.BoolP("interactive", "i", false, "set configuration values with interactive prompts")
 	flags.BoolP("no-verify", "", false, "skip online token authorization check")
 }
 
