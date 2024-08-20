@@ -74,6 +74,7 @@ var TestConfigurations = map[string]TestConfiguration{
 	"ballerina": {
 		Command: "bal test",
 	},
+	// batch: batch test-runner disabled and focus solely on Windows.
 	"bash": {
 		Command: "bats {{test_files}}",
 	},
