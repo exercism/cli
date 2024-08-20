@@ -24,7 +24,7 @@ _Note: It's useful to add the version to the commit message when you bump it: e.
 Once the version bump PR has been merged, run the following command to cut a release:
 
 ```shell
-GPG_FINGERPINT="<THE_GPG_FINGERPRINT>" ./bin/release.sh
+GPG_FINGERPRINT="<THE_GPG_FINGERPRINT>" ./bin/release.sh
 ```
 
 ## Cut Release on GitHub
