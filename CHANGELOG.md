@@ -8,6 +8,11 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 - **Your contribution here**
 
+## v3.4.2 (2024-08-20)
+
+- [#1156](https://github.com/exercism/cli/pull/1156) Add `test` command to Shell completions -
+  [@muzimuzhi]
+
 ## v3.4.1 (2024-08-15)
 
 - [#1152](https://github.com/exercism/cli/pull/1152) Add support for Idris to `exercism test` -
