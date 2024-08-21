@@ -74,6 +74,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"ballerina": {
 		Command: "bal test",
 	},
+	"batch": {
+		WindowsCommand: "call {{test_files}}",
+	},
 	"bash": {
 		Command: "bats {{test_files}}",
 	},

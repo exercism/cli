@@ -7,7 +7,7 @@ _exercism () {
   opts="--verbose --timeout"
 
   commands="configure download open
-  submit troubleshoot upgrade version workspace help"
+  submit test troubleshoot upgrade version workspace help"
   config_opts="--show"
   version_opts="--latest"
 
