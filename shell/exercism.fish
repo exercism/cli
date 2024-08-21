@@ -15,7 +15,7 @@ complete -f -c exercism -n "__fish_seen_subcommand_from download" -s u -l uuid -
 
 # Help
 complete -f -c exercism -n "__fish_use_subcommand" -a "help" -d "Shows a list of commands or help for one command"
-complete -f -c exercism -n "__fish_seen_subcommand_from help" -a "configure download help open submit troubleshoot upgrade version workspace"
+complete -f -c exercism -n "__fish_seen_subcommand_from help" -a "configure download help open submit test troubleshoot upgrade version workspace"
 
 # Open
 complete -f -c exercism -n "__fish_use_subcommand" -a "open" -d "Opens a browser to exercism.io for the specified submission."
@@ -24,6 +24,10 @@ complete -f -c exercism -n "__fish_seen_subcommand_from open" -s h -l help -d "h
 # Submit
 complete -f -c exercism -n "__fish_use_subcommand" -a "submit" -d "Submits a new iteration to a problem on exercism.io."
 complete -f -c exercism -n "__fish_seen_subcommand_from submit" -s h -l help -d "help for submit"
+
+# Test
+complete -f -c exercism -n "__fish_use_subcommand" -a "test" -d "Run the exercise's tests."
+complete -f -c exercism -n "__fish_seen_subcommand_from submit" -s h -l help -d "help for test"
 
 # Troubleshoot
 complete -f -c exercism -n "__fish_use_subcommand" -a "troubleshoot" -d "Outputs useful debug information."
