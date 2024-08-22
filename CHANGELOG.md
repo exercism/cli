@@ -8,6 +8,12 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 - **Your contribution here**
 
+## v3.5.0 (2024-08-22)
+
+- [#1157](https://github.com/exercism/cli/pull/1157) Add support for Batch to `exercism test` - [@GroophyLifefor]
+- [#1159](https://github.com/exercism/cli/pull/1159) Fix duplicated `t` alias -
+  [@muzimuzhi]
+
 ## v3.4.2 (2024-08-20)
 
 - [#1156](https://github.com/exercism/cli/pull/1156) Add `test` command to Shell completions -
@@ -543,3 +549,12 @@ All changes by [@msgehard]
 [@xavdid]: https://github.com/xavdid
 [@williandrade]: https://github.com/williandrade
 [@zabawaba99]: https://github.com/zabawaba99
+[@GroophyLifefor]: https://github.com/GroophyLifefor
+[@muzimuzhi]: https://github.com/muzimuzhi
+[@isberg]: https://github.com/isberg
+[@erikschierboom]: https://github.com/erikschierboom
+[@sanderploegsma]: https://github.com/sanderploegsma
+[@enascimento178]: https://github.com/enascimento178
+[@halfdan]: https://github.com/halfdan
+[@glennj]: https://github.com/glennj
+[@tomasnorre]: https://github.com/tomasnorre
