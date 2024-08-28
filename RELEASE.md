@@ -29,8 +29,9 @@ GPG_FINGERPRINT="<THE_GPG_FINGERPRINT>" ./bin/release.sh
 
 ## Cut Release on GitHub
 
-At this point, Goreleaser will have created a draft release at https://github.com/exercism/cli/releases/tag/vX.Y.Z.
-On that page, update the release description to:
+Once the `./bin/release.sh` command finishes, the [release workflow](https://github.com/exercism/cli/actions/workflows/release.yml) will automatically run.
+This workflow will create a draft release at https://github.com/exercism/cli/releases/tag/vX.Y.Z.
+Once created, go that page to update the release description to:
 
 ```
 To install, follow the interactive installation instructions at https://exercism.io/cli-walkthrough
