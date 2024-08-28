@@ -8,6 +8,10 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 - **Your contribution here**
 
+## v3.5.1 (2024-08-28)
+
+- [#1162](https://github.com/exercism/cli/pull/1162) Add support for Roc to `exercism test` - [@ageron]
+
 ## v3.5.0 (2024-08-22)
 
 - [#1157](https://github.com/exercism/cli/pull/1157) Add support for Batch to `exercism test` - [@GroophyLifefor]
@@ -558,3 +562,4 @@ All changes by [@msgehard]
 [@halfdan]: https://github.com/halfdan
 [@glennj]: https://github.com/glennj
 [@tomasnorre]: https://github.com/tomasnorre
+[@ageron]: https://github.com/ageron
