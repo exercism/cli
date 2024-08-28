@@ -225,6 +225,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"red": {
 		Command: "red {{test_files}}",
 	},
+	"roc": {
+		Command: "roc test {{test_files}}",
+	},
 	"ruby": {
 		Command: "ruby {{test_files}}",
 	},
