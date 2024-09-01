@@ -170,6 +170,19 @@ func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
 	d.apibaseurl = usrCfg.GetString("apibaseurl")
 	d.workspace = usrCfg.GetString("workspace")
 
+	if d.uuid == "" {
+		if d.slug == "" {
+			if _, slug, ok := trackAndSlugFromCwd(d.workspace); ok && slug != "" {
+				d.slug = slug
+			}
+		}
+		if d.track == "" && d.team == "" {
+			if track, _, ok := trackAndSlugFromCwd(d.workspace); ok {
+				d.track = track
+			}
+		}
+	}
+
 	if err = d.needsSlugXorUUID(); err != nil {
 		return nil, err
 	}
@@ -355,6 +368,46 @@ func (sf solutionFile) relativePath() string {
 	file = strings.Replace(file, "\\", "/", -1)
 
 	return filepath.FromSlash(file)
+}
+
+// trackAndSlugFromCwd infers track and slug from current working directory,
+// by finding the two path components coming immediately after the workspace.
+func trackAndSlugFromCwd(workspace string) (string, string, bool) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", "", false
+	}
+
+	if !strings.HasPrefix(cwd, workspace) {
+		return "", "", false
+	}
+
+	afterWorkspace := strings.TrimPrefix(cwd, workspace)
+	separator := string([]rune{os.PathSeparator})
+	afterWorkspace = strings.TrimPrefix(afterWorkspace, separator)
+
+	components := strings.Split(afterWorkspace, separator)
+	if len(components) == 0 {
+		return "", "", false
+	}
+
+	// We have at least one component, possibly more.
+	// First is presumably the track, but check whether it actually is one.
+	track := components[0]
+	if !isTrack(track) {
+		return "", "", false
+	}
+
+	slug := ""
+	if len(components) >= 2 {
+		slug = components[1]
+	}
+
+	return track, slug, true
+}
+
+func isTrack(dir string) bool {
+	return dir != "users" && dir != "teams"
 }
 
 func setupDownloadFlags(flags *pflag.FlagSet) {
