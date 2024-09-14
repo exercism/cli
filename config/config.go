@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	defaultBaseURL = "https://api.exercism.io/v1"
+	defaultBaseURL = "https://exercism.org"
 
 	// DefaultDirName is the default name used for config and workspace directories.
 	DefaultDirName string
