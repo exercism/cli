@@ -26,7 +26,7 @@ func TestDownloadWithoutToken(t *testing.T) {
 	if assert.Error(t, err) {
 		assert.Regexp(t, "Welcome to Exercism", err.Error())
 		// It uses the default base API url to infer the host
-		assert.Regexp(t, "exercism.io/my/settings", err.Error())
+		assert.Regexp(t, "exercism.org/settings/api_cli", err.Error())
 	}
 }
 
