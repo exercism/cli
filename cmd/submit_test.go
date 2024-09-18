@@ -28,7 +28,7 @@ func TestSubmitWithoutToken(t *testing.T) {
 	err := runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
 	if assert.Error(t, err) {
 		assert.Regexp(t, "Welcome to Exercism", err.Error())
-		assert.Regexp(t, "exercism.org/settings/api_cli", err.Error())
+		assert.Regexp(t, "exercism.io/my/settings", err.Error())
 	}
 }
 
