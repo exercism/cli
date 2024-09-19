@@ -23,7 +23,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
-      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
 
       - uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32
         with:
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
     
       - name: Check formatting
         run: ./.gha.gofmt.sh
