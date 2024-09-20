@@ -75,7 +75,7 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: "bal test",
 	},
 	"batch": {
-		WindowsCommand: "call {{test_files}}",
+		WindowsCommand: "cmd /c {{test_files}}",
 	},
 	"bash": {
 		Command: "bats {{test_files}}",
