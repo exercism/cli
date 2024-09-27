@@ -14,7 +14,7 @@ import (
 
 // RootCmd represents the base command when called without any subcommands.
 var RootCmd = &cobra.Command{
-	Use:   BinaryName,
+	Use:   getCommandName(),
 	Short: "A friendly command-line interface to Exercism.",
 	Long: `A command-line interface for Exercism.
 
@@ -41,8 +41,12 @@ func Execute() {
 	}
 }
 
+func getCommandName() string {
+	return os.Args[0]
+}
+
 func init() {
-	BinaryName = os.Args[0]
+	BinaryName = getCommandName()
 	config.SetDefaultDirName(BinaryName)
 	Out = os.Stdout
 	Err = os.Stderr
