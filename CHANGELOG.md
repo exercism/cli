@@ -8,6 +8,11 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 - **Your contribution here**
 
+## v3.5.2 (2024-10-09)
+
+- [#1174](https://github.com/exercism/cli/pull/1174) Fix an issue with `exercism completion bash` where the command name is not present in the completion output. - [@petrem]
+- [#1172](https://github.com/exercism/cli/pull/1172) Fix `exercism test` command for Batch track - [@bnandras]
+
 ## v3.5.1 (2024-08-28)
 
 - [#1162](https://github.com/exercism/cli/pull/1162) Add support for Roc to `exercism test` - [@ageron]
@@ -563,3 +568,5 @@ All changes by [@msgehard]
 [@glennj]: https://github.com/glennj
 [@tomasnorre]: https://github.com/tomasnorre
 [@ageron]: https://github.com/ageron
+[@petrem]: https://github.com/petrem
+[@bnandras]: https://github.com/bnandras
