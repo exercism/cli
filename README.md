@@ -15,5 +15,5 @@ Instructions can be found at [exercism/cli/releases](https://github.com/exercism
 
 If you wish to help improve the CLI, please see the [Contributing guide][contributing].
 
-[exercism]: http://exercism.io
+[exercism]: http://exercism.org
 [contributing]: /CONTRIBUTING.md

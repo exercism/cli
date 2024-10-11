@@ -6,8 +6,8 @@ typeset -A opt_args
 local -a options
 options=(configure:"Writes config values to a JSON file."
          download:"Downloads and saves a specified submission into the local system"
-         open:"Opens a browser to exercism.io for the specified submission."
-         submit:"Submits a new iteration to a problem on exercism.io."
+         open:"Opens a browser to exercism.org for the specified submission."
+         submit:"Submits a new iteration to a problem on exercism.org."
          test:"Run the exercise's tests."
          troubleshoot:"Outputs useful debug information."
          upgrade:"Upgrades to the latest available version."
