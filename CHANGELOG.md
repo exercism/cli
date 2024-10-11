@@ -153,7 +153,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## v3.0.0 (2018-07-13)
 
-This is a complete rewrite from the ground up to work against the new https://exercism.io site.
+This is a complete rewrite from the ground up to work against the new https://exercism.org site.
 
 ## v2.4.1 (2017-07-01)
 
