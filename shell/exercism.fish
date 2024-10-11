@@ -18,11 +18,11 @@ complete -f -c exercism -n "__fish_use_subcommand" -a "help" -d "Shows a list of
 complete -f -c exercism -n "__fish_seen_subcommand_from help" -a "configure download help open submit test troubleshoot upgrade version workspace"
 
 # Open
-complete -f -c exercism -n "__fish_use_subcommand" -a "open" -d "Opens a browser to exercism.io for the specified submission."
+complete -f -c exercism -n "__fish_use_subcommand" -a "open" -d "Opens a browser to exercism.org for the specified submission."
 complete -f -c exercism -n "__fish_seen_subcommand_from open" -s h -l help -d "help for open"
 
 # Submit
-complete -f -c exercism -n "__fish_use_subcommand" -a "submit" -d "Submits a new iteration to a problem on exercism.io."
+complete -f -c exercism -n "__fish_use_subcommand" -a "submit" -d "Submits a new iteration to a problem on exercism.org."
 complete -f -c exercism -n "__fish_seen_subcommand_from submit" -s h -l help -d "help for submit"
 
 # Test
