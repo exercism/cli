@@ -270,6 +270,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"x86-64-assembly": {
 		Command: "make",
 	},
+	"yamlscript": {
+		Command: "make test",
+	},
 	"zig": {
 		Command: "zig test {{test_files}}",
 	},
