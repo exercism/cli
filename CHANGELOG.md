@@ -153,7 +153,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## v3.0.0 (2018-07-13)
 
-This is a complete rewrite from the ground up to work against the new https://exercism.io site.
+This is a complete rewrite from the ground up to work against the new https://exercism.org site.
 
 ## v2.4.1 (2017-07-01)
 
@@ -299,7 +299,7 @@ Tweaked:
 
 ## v1.9.2 (2015-01-11)
 
-- [exercism.io#2155](https://github.com/exercism/exercism.io/issues/2155): Fixed problem with passed in config file being ignored.
+- [exercism#2155](https://github.com/exercism/exercism/issues/2155): Fixed problem with passed in config file being ignored.
 - Added first version of changelog
 
 ## v1.9.1 (2015-01-10)
@@ -419,7 +419,7 @@ Tweaked:
 
 ## v1.3.1 (2013-12-01)
 
-- [exercism.io#1039](https://github.com/exercism/exercism.io/issues/1039): Stopped clobbering existing files on fetch
+- [exercism#1039](https://github.com/exercism/exercism/issues/1039): Stopped clobbering existing files on fetch
 
 ## v1.3.0 (2013-11-16)
 
@@ -427,7 +427,7 @@ Tweaked:
 
 ## v1.2.3 (2013-11-13)
 
-- [exercism.io#998](https://github.com/exercism/exercism.io/issues/998): Fix problem with writing an empty config file under certain circumstances.
+- [exercism#998](https://github.com/exercism/exercism/issues/998): Fix problem with writing an empty config file under certain circumstances.
 
 ## v1.2.2 (2013-11-12)
 
