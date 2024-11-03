@@ -65,6 +65,9 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: "8th -f test.8th",
 	},
 	// abap: tests are run via "ABAP Development Tools", not the CLI
+	"arm64-assembly": {
+		Command: "make",
+	},
 	"arturo": {
 		Command: "arturo tester.art",
 	},
@@ -75,7 +78,7 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: "bal test",
 	},
 	"batch": {
-		WindowsCommand: "call {{test_files}}",
+		WindowsCommand: "cmd /c {{test_files}}",
 	},
 	"bash": {
 		Command: "bats {{test_files}}",
