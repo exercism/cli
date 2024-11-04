@@ -8,6 +8,12 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 - **Your contribution here**
 
+## v3.5.3 (2024-11-03)
+
+- [#1178](https://github.com/exercism/cli/pull/1178) Add arm64-assembly test configuration [@keiravillekode]
+- [#1177](https://github.com/exercism/cli/pull/1177) refactored exercism.io links to exercism.org [@ladokp] 
+- [#1165](https://github.com/exercism/cli/pull/1165) Add support for the YAMLScript language [@ingydotnet] 
+
 ## v3.5.2 (2024-10-09)
 
 - [#1174](https://github.com/exercism/cli/pull/1174) Fix an issue with `exercism completion bash` where the command name is not present in the completion output. - [@petrem]
