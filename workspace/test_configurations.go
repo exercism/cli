@@ -253,6 +253,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"typescript": {
 		Command: "yarn test",
 	},
+	"uiua": {
+		Command: "uiua test {{test_files}}",
+	},
 	// unison: tests are run from an active UCM session
 	"vbnet": {
 		Command: "dotnet test",
