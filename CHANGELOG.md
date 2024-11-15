@@ -8,11 +8,15 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 - **Your contribution here**
 
+## v3.5.4 (2024-11-15)
+
+- [#1183](https://github.com/exercism/cli/pull/1183) Add support for Uiua track to `exercism test` - [@vaeng]
+
 ## v3.5.3 (2024-11-03)
 
 - [#1178](https://github.com/exercism/cli/pull/1178) Add arm64-assembly test configuration [@keiravillekode]
-- [#1177](https://github.com/exercism/cli/pull/1177) refactored exercism.io links to exercism.org [@ladokp] 
-- [#1165](https://github.com/exercism/cli/pull/1165) Add support for the YAMLScript language [@ingydotnet] 
+- [#1177](https://github.com/exercism/cli/pull/1177) refactored exercism.io links to exercism.org [@ladokp]
+- [#1165](https://github.com/exercism/cli/pull/1165) Add support for the YAMLScript language [@ingydotnet]
 
 ## v3.5.2 (2024-10-09)
 
@@ -576,3 +580,4 @@ All changes by [@msgehard]
 [@ageron]: https://github.com/ageron
 [@petrem]: https://github.com/petrem
 [@bnandras]: https://github.com/bnandras
+[@vaeng]: https://github.com/vaeng
