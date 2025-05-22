@@ -2,6 +2,8 @@ package workspace
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 )
@@ -54,6 +56,13 @@ func (c *TestConfiguration) GetTestCommand() (string, error) {
 			return "", err
 		}
 		cmd = strings.ReplaceAll(cmd, "{{test_files}}", strings.Join(testFiles, " "))
+	}
+	if strings.Contains(cmd, "{{slug}}") {
+		currentDir, err := os.Getwd()
+		if err != nil {
+			return "", fmt.Errorf("current directory invalid")
+		}
+		cmd = strings.ReplaceAll(cmd, "{{slug}}", filepath.Base(currentDir))
 	}
 
 	return cmd, nil
@@ -152,7 +161,7 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: "stack test",
 	},
 	"idris": {
-		Command: "pack test `basename *.ipkg .ipkg`",
+		Command: "pack test {{slug}}",
 	},
 	"j": {
 		Command: `jconsole -js "exit echo unittest {{test_files}} [ load {{solution_files}}"`,
