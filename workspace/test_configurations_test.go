@@ -106,24 +106,32 @@ func TestIdrisUsesCurrentDirectory(t *testing.T) {
 	currentDir, err := os.Getwd()
 	assert.NoError(t, err)
 
-	exerciseDir := filepath.Join(currentDir, "hello-world")
-	defer os.RemoveAll(exerciseDir)
-	err = os.Mkdir(exerciseDir, os.ModePerm)
+	tmpDir, err := os.MkdirTemp("", "solution")
+	assert.NoError(t, err)
+	defer os.RemoveAll(tmpDir)
+
+	em := &ExerciseMetadata{
+		Track:        "idris",
+		ExerciseSlug: "bogus-exercise",
+		ID:           "abc",
+		URL:          "http://example.com",
+		Handle:       "alice",
+		IsRequester:  true,
+		Dir:          tmpDir,
+	}
+	err = em.Write(tmpDir)
 	assert.NoError(t, err)
 
 	defer os.Chdir(currentDir)
-	err = os.Chdir(exerciseDir)
+	err = os.Chdir(tmpDir)
 	assert.NoError(t, err)
 
 	exercismDir := filepath.Join(".", ".exercism")
-	err = os.Mkdir(exercismDir, os.ModePerm)
-	assert.NoError(t, err)
-
 	f, err := os.Create(filepath.Join(exercismDir, "config.json"))
 	assert.NoError(t, err)
 	defer f.Close()
 
-	_, err = f.WriteString(`{ "files": { "solution": [ "src/HelloWorld.idr" ], "test": [ "test/src/Main.idr" ] } }`)
+	_, err = f.WriteString(`{ "files": { "solution": [ "src/BogusExercise.idr" ], "test": [ "test/src/Main.idr" ] } }`)
 	assert.NoError(t, err)
 
 	testConfig, ok := TestConfigurations["idris"]
@@ -131,5 +139,5 @@ func TestIdrisUsesCurrentDirectory(t *testing.T) {
 
 	cmd, err := testConfig.GetTestCommand()
 	assert.NoError(t, err)
-	assert.Equal(t, cmd, "pack test hello-world")
+	assert.Equal(t, cmd, "pack test bogus-exercise")
 }

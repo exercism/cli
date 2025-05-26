@@ -2,8 +2,6 @@ package workspace
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"runtime"
 	"strings"
 )
@@ -58,11 +56,11 @@ func (c *TestConfiguration) GetTestCommand() (string, error) {
 		cmd = strings.ReplaceAll(cmd, "{{test_files}}", strings.Join(testFiles, " "))
 	}
 	if strings.Contains(cmd, "{{slug}}") {
-		currentDir, err := os.Getwd()
+		metadata, err := NewExerciseMetadata(".")
 		if err != nil {
-			return "", fmt.Errorf("current directory invalid")
+			return "", err
 		}
-		cmd = strings.ReplaceAll(cmd, "{{slug}}", filepath.Base(currentDir))
+		cmd = strings.ReplaceAll(cmd, "{{slug}}", metadata.ExerciseSlug)
 	}
 
 	return cmd, nil
