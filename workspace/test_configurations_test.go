@@ -102,7 +102,7 @@ func TestRustHasTrailingDashes(t *testing.T) {
 	assert.True(t, strings.HasSuffix(cmd, "--"), "rust's test command should have trailing dashes")
 }
 
-func TestIdrisUsesCurrentDirectory(t *testing.T) {
+func TestIdrisUsesExerciseSlug(t *testing.T) {
 	currentDir, err := os.Getwd()
 	assert.NoError(t, err)
 
