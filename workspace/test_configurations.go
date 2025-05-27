@@ -55,6 +55,13 @@ func (c *TestConfiguration) GetTestCommand() (string, error) {
 		}
 		cmd = strings.ReplaceAll(cmd, "{{test_files}}", strings.Join(testFiles, " "))
 	}
+	if strings.Contains(cmd, "{{slug}}") {
+		metadata, err := NewExerciseMetadata(".")
+		if err != nil {
+			return "", err
+		}
+		cmd = strings.ReplaceAll(cmd, "{{slug}}", metadata.ExerciseSlug)
+	}
 
 	return cmd, nil
 }
@@ -152,7 +159,7 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: "stack test",
 	},
 	"idris": {
-		Command: "pack test `basename *.ipkg .ipkg`",
+		Command: "pack test {{slug}}",
 	},
 	"j": {
 		Command: `jconsole -js "exit echo unittest {{test_files}} [ load {{solution_files}}"`,
