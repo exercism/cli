@@ -8,6 +8,10 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 - **Your contribution here**
 
+## v3.5.5 (2025-05-30)
+
+- [#1192](https://github.com/exercism/cli/pull/1192) Change Idris test command to use slug - [@keiravillekode]
+
 ## v3.5.4 (2024-11-15)
 
 - [#1183](https://github.com/exercism/cli/pull/1183) Add support for Uiua track to `exercism test` - [@vaeng]
@@ -581,3 +585,4 @@ All changes by [@msgehard]
 [@petrem]: https://github.com/petrem
 [@bnandras]: https://github.com/bnandras
 [@vaeng]: https://github.com/vaeng
+[@keiravillekode]: https://github.com/keiravillekode
