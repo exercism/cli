@@ -157,11 +157,18 @@ func TestDecodeErrorResponse(t *testing.T) {
 			wantMessage: "message",
 		},
 		{
+			response:    errorResponse("application/problem+json", `{"error": {"message": "new json format"}}`),
+			wantMessage: "new json format",
+		},
+		{
 			response:    errorResponse("application/json", `{"error": {}}`),
 			wantMessage: "unexpected API response: 418",
 		},
 	}
-	for _, tc := range testCases {
+	tc := testCases[0]
+	got := decodedAPIError(tc.response)
+	assert.Equal(t, tc.wantMessage, got.Error())
+	for _, tc = range testCases {
 		got := decodedAPIError(tc.response)
 		assert.Equal(t, tc.wantMessage, got.Error())
 	}
