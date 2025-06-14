@@ -657,7 +657,7 @@ func TestSubmitServerErr(t *testing.T) {
 
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
 
-	assert.Regexp(t, "test error", err.Error())
+	assert.Regexp(t, `expected response with Content-Type "application/json" but got status "400 Bad Request" with Content-Type "text/plain; charset=utf-8"`, err.Error())
 }
 
 func TestHandleErrorResponse(t *testing.T) {

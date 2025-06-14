@@ -2,7 +2,10 @@ package cmd
 
 import (
 	"io"
+	"io/ioutil"
+	"net/http"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -118,4 +121,55 @@ func (co capturedOutput) override() {
 func (co capturedOutput) reset() {
 	Out = co.oldOut
 	Err = co.oldErr
+}
+
+func errorResponse(contentType string, body string) *http.Response {
+	response := &http.Response{
+		Status:        "418 I'm a teapot",
+		StatusCode:    418,
+		Header:        make(http.Header),
+		Body:          ioutil.NopCloser(strings.NewReader(body)),
+		ContentLength: int64(len(body)),
+	}
+	response.Header.Set("Content-Type", contentType)
+	return response
+}
+
+func TestDecodeErrorResponse(t *testing.T) {
+	testCases := []struct {
+		response    *http.Response
+		wantMessage string
+	}{
+		{
+			response:    errorResponse("text/html", "Time for tea"),
+			wantMessage: `expected response with Content-Type "application/json" but got status "418 I'm a teapot" with Content-Type "text/html"`,
+		},
+		{
+			response:    errorResponse("application/json", `{"error": {"type": "json", "valid": no}}`),
+			wantMessage: "failed to parse API error response: invalid character 'o' in literal null (expecting 'u')",
+		},
+		{
+			response:    errorResponse("application/json", `{"error": {"type": "track_ambiguous", "message": "message", "possible_track_ids": ["a", "b"]}}`),
+			wantMessage: "message: a, b",
+		},
+		{
+			response:    errorResponse("application/json", `{"error": {"message": "message"}}`),
+			wantMessage: "message",
+		},
+		{
+			response:    errorResponse("application/problem+json", `{"error": {"message": "new json format"}}`),
+			wantMessage: "new json format",
+		},
+		{
+			response:    errorResponse("application/json", `{"error": {}}`),
+			wantMessage: "unexpected API response: 418",
+		},
+	}
+	tc := testCases[0]
+	got := decodedAPIError(tc.response)
+	assert.Equal(t, tc.wantMessage, got.Error())
+	for _, tc = range testCases {
+		got := decodedAPIError(tc.response)
+		assert.Equal(t, tc.wantMessage, got.Error())
+	}
 }

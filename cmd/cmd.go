@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"io"
@@ -23,6 +24,8 @@ var (
 	Out io.Writer
 	// Err is used to write errors.
 	Err io.Writer
+	// jsonContentTypeRe is used to match Content-Type which contains JSON.
+	jsonContentTypeRe = regexp.MustCompile(`^application/([[:alpha:]]+\+)?json$`)
 )
 
 const msgWelcomePleaseConfigure = `
@@ -77,6 +80,13 @@ func validateUserConfig(cfg *viper.Viper) error {
 // decodedAPIError decodes and returns the error message from the API response.
 // If the message is blank, it returns a fallback message with the status code.
 func decodedAPIError(resp *http.Response) error {
+	if contentType := resp.Header.Get("Content-Type"); !jsonContentTypeRe.MatchString(contentType) {
+		return fmt.Errorf(
+			"expected response with Content-Type \"application/json\" but got status %q with Content-Type %q",
+			resp.Status,
+			contentType,
+		)
+	}
 	var apiError struct {
 		Error struct {
 			Type             string   `json:"type"`

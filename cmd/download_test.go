@@ -403,7 +403,7 @@ func TestDownloadError(t *testing.T) {
 
 	err = runDownload(cfg, flags, []string{})
 
-	assert.Equal(t, "test error", err.Error())
+	assert.Equal(t, `expected response with Content-Type "application/json" but got status "400 Bad Request" with Content-Type "text/plain; charset=utf-8"`, err.Error())
 
 }
 
