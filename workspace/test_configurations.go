@@ -146,6 +146,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"fsharp": {
 		Command: "dotnet test",
 	},
+	"futhark": {
+		Command: "futhark test test.fut",
+	},
 	"gleam": {
 		Command: "gleam test",
 	},
