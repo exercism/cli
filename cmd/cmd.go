@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -26,7 +27,7 @@ var (
 	// Err is used to write errors.
 	Err io.Writer
 	// jsonContentTypeRe is used to match Content-Type which contains JSON.
-	jsonContentTypeRe = regexp.MustCompile(`^application/([[:alpha:]]+\+)?json$`)
+	jsonContentTypeRe = regexp.MustCompile(`^application/([[:alpha:]]+\+)?json($|;)`)
 )
 
 const msgWelcomePleaseConfigure = `
@@ -122,7 +123,7 @@ func decodedAPIError(resp *http.Response) error {
 				strings.Join(apiError.Error.PossibleTrackIDs, ", "),
 			)
 		}
-		return fmt.Errorf(apiError.Error.Message)
+		return errors.New(apiError.Error.Message)
 	}
 	return fmt.Errorf("unexpected API response: %d", resp.StatusCode)
 }

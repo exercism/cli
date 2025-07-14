@@ -163,6 +163,10 @@ func TestDecodeErrorResponse(t *testing.T) {
 			wantMessage: "failed to parse API error response: invalid character 'o' in literal null (expecting 'u')",
 		},
 		{
+			response:    errorResponse418("application/json; charset=utf-8", `{"error": {"type": "track_ambiguous", "message": "message", "possible_track_ids": ["a", "b"]}}`),
+			wantMessage: "message: a, b",
+		},
+		{
 			response:    errorResponse418("application/json", `{"error": {"type": "track_ambiguous", "message": "message", "possible_track_ids": ["a", "b"]}}`),
 			wantMessage: "message: a, b",
 		},
