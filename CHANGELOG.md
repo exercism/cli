@@ -8,6 +8,11 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 - **Your contribution here**
 
+## v3.5.7 (2025-07-14)
+
+- [#1202](https://github.com/exercism/cli/pull/1202) Add error decoding support for content type parameters such as charset - [@isaacg]
+- [#1201](https://github.com/exercism/cli/pull/1201) Fix goreleaser deprecations - [@erikschierboom]
+
 ## v3.5.6 (2025-07-06)
 
 - [#1199](https://github.com/exercism/cli/pull/1199) Support for Futhark in exercism test - [@erikschierboom]
