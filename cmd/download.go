@@ -101,10 +101,6 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 			// TODO: deal with it
 			continue
 		}
-		// Don't bother with empty files.
-		if res.Header.Get("Content-Length") == "0" {
-			continue
-		}
 
 		path := sf.relativePath()
 		dir := filepath.Join(metadata.Dir, filepath.Dir(path))
