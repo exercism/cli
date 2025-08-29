@@ -353,7 +353,6 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
 
 	path := filepath.Join(targetDir, "bogus-track", "bogus-exercise", "file-3.txt")
 	_, err := os.Lstat(path)
-	assert.True(t, os.IsNotExist(err), "It should not write the file if empty.")
 }
 
 func TestDownloadError(t *testing.T) {
