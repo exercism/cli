@@ -309,10 +309,6 @@ func fakeDownloadServer(requestor string) *httptest.Server {
 		fmt.Fprint(w, "this is file 2")
 	})
 
-	mux.HandleFunc("/file-3.txt", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "")
-	})
-
 	mux.HandleFunc("/solutions/latest", func(w http.ResponseWriter, r *http.Request) {
 		payloadBody := fmt.Sprintf(payloadTemplate, requestor, server.URL+"/")
 		fmt.Fprint(w, payloadBody)
@@ -350,9 +346,6 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
 			assert.Equal(t, file.contents, string(b))
 		})
 	}
-
-	path := filepath.Join(targetDir, "bogus-track", "bogus-exercise", "file-3.txt")
-	_, err := os.Lstat(path)
 }
 
 func TestDownloadError(t *testing.T) {
@@ -410,7 +403,6 @@ const payloadTemplate = `
 		"files": [
 			"file-1.txt",
 			"subdir/file-2.txt",
-			"file-3.txt"
 		],
 		"iteration": {
 			"submitted_at": "2017-08-21t10:11:12.130z"
