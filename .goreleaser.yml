@@ -72,7 +72,7 @@ archives:
       - LICENSE
       - README.md
   - id: installer-archives
-    builds:
+    ids:
       - installer-build
     name_template: >-
       {{- .ProjectName }}-
