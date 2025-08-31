@@ -25,7 +25,7 @@ func (p FilePersister) Save(v *viper.Viper, basename string) error {
 	v.SetConfigName(basename)
 
 	if _, err := os.Stat(p.Dir); os.IsNotExist(err) {
-		if err := os.MkdirAll(p.Dir, os.FileMode(0755)); err != nil {
+		if err := os.MkdirAll(p.Dir, os.FileMode(0700)); err != nil {
 			return err
 		}
 	}
