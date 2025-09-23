@@ -69,7 +69,7 @@ func validateUserConfig(cfg *viper.Viper) error {
 	if cfg.GetString("token") == "" {
 		return fmt.Errorf(
 			msgWelcomePleaseConfigure,
-			config.SettingsURL(cfg.GetString("apibaseurl")),
+			config.TokenURL(cfg.GetString("apibaseurl")),
 			BinaryName,
 		)
 	}

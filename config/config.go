@@ -128,7 +128,7 @@ func InferSiteURL(apiURL string) string {
 	return re.ReplaceAllString(apiURL, "$1")
 }
 
-// SettingsURL provides a link to where the user can find their API token.
-func SettingsURL(apiURL string) string {
-	return fmt.Sprintf("%s%s", InferSiteURL(apiURL), "/my/settings")
+// TokenURL provides a link to where the user can find their API token.
+func TokenURL(apiURL string) string {
+	return fmt.Sprintf("%s%s", InferSiteURL(apiURL), "/my/settings/api_cli")
 }
