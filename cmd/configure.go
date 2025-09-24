@@ -60,7 +60,7 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 	// If the command is run 'bare' and we have no token,
 	// explain how to set the token.
 	if flags.NFlag() == 0 && cfg.GetString("token") == "" {
-		tokenURL := config.SettingsURL(cfg.GetString("apibaseurl"))
+		tokenURL := config.TokenURL(cfg.GetString("apibaseurl"))
 		return fmt.Errorf("There is no token configured. Find your token on %s, and call this command again with --token=<your-token>.", tokenURL)
 	}
 
@@ -107,7 +107,7 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 		token = cfg.GetString("token")
 	}
 
-	tokenURL := config.SettingsURL(cfg.GetString("apibaseurl"))
+	tokenURL := config.TokenURL(cfg.GetString("apibaseurl"))
 
 	// If we don't have a token then explain how to set it and bail.
 	if token == "" {
