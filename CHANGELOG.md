@@ -8,6 +8,14 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 - **Your contribution here**
 
+## v3.5.8 (2025-09-24)
+
+- [#1215](https://github.com/exercism/cli/pull/1215) Update the token URL to point to the API settings page [@isaacg]
+- [#1210](https://github.com/exercism/cli/pull/1210) Use mode 0700 for the config dir, not 0755; other users should not have access to the config [@isaacg]
+- [#1205](https://github.com/exercism/cli/pull/1205) goreleaser: update deprecated archives.builds to new archives.ids [@isaacg]
+- [#1213](https://github.com/exercism/cli/pull/1213) Include empty files in downloads [@isaacg]
+- [#1206](https://github.com/exercism/cli/pull/1206) Drop team-specific logic from the CLI [@isaacg]
+
 ## v3.5.7 (2025-07-14)
 
 - [#1202](https://github.com/exercism/cli/pull/1202) Add error decoding support for content type parameters such as charset - [@isaacg]
