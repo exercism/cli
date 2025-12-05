@@ -200,6 +200,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"ocaml": {
 		Command: "make",
 	},
+	"odin": {
+		Command: "odin test .",
+	},
 	"perl5": {
 		Command: "prove .",
 	},
