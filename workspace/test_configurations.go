@@ -143,6 +143,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"fortran": {
 		Command: "make",
 	},
+	"free-pascal": {
+		Command: "make test=all",
+	},
 	"fsharp": {
 		Command: "dotnet test",
 	},
