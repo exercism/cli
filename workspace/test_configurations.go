@@ -196,6 +196,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"mips": {
 		Command: "java -jar /path/to/mars.jar nc runner.mips impl.mips",
 	},
+	"moonscript": {
+		Command: "busted",
+	},
 	"nim": {
 		Command: "nim r {{test_files}}",
 	},
