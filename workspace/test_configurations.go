@@ -187,6 +187,9 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command:        "./gradlew test",
 		WindowsCommand: "gradlew.bat test",
 	},
+	"lean": {
+		Command: "lake test",
+	},
 	"lfe": {
 		Command: "make test",
 	},
