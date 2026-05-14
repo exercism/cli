@@ -101,3 +101,43 @@ func TestRustHasTrailingDashes(t *testing.T) {
 
 	assert.True(t, strings.HasSuffix(cmd, "--"), "rust's test command should have trailing dashes")
 }
+
+func TestIdrisUsesExerciseSlug(t *testing.T) {
+	currentDir, err := os.Getwd()
+	assert.NoError(t, err)
+
+	tmpDir, err := os.MkdirTemp("", "solution")
+	assert.NoError(t, err)
+	defer os.RemoveAll(tmpDir)
+
+	em := &ExerciseMetadata{
+		Track:        "idris",
+		ExerciseSlug: "bogus-exercise",
+		ID:           "abc",
+		URL:          "http://example.com",
+		Handle:       "alice",
+		IsRequester:  true,
+		Dir:          tmpDir,
+	}
+	err = em.Write(tmpDir)
+	assert.NoError(t, err)
+
+	defer os.Chdir(currentDir)
+	err = os.Chdir(tmpDir)
+	assert.NoError(t, err)
+
+	exercismDir := filepath.Join(".", ".exercism")
+	f, err := os.Create(filepath.Join(exercismDir, "config.json"))
+	assert.NoError(t, err)
+	defer f.Close()
+
+	_, err = f.WriteString(`{ "files": { "solution": [ "src/BogusExercise.idr" ], "test": [ "test/src/Main.idr" ] } }`)
+	assert.NoError(t, err)
+
+	testConfig, ok := TestConfigurations["idris"]
+	assert.True(t, ok, "unexpectedly unable to find idris test config")
+
+	cmd, err := testConfig.GetTestCommand()
+	assert.NoError(t, err)
+	assert.Equal(t, cmd, "pack test bogus-exercise")
+}

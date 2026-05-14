@@ -2,7 +2,10 @@ package cmd
 
 import (
 	"io"
+	"io/ioutil"
+	"net/http"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -118,4 +121,81 @@ func (co capturedOutput) override() {
 func (co capturedOutput) reset() {
 	Out = co.oldOut
 	Err = co.oldErr
+}
+
+func errorResponse418(contentType string, body string) *http.Response {
+	response := &http.Response{
+		Status:        "418 I'm a teapot",
+		StatusCode:    418,
+		Header:        make(http.Header),
+		Body:          ioutil.NopCloser(strings.NewReader(body)),
+		ContentLength: int64(len(body)),
+	}
+	response.Header.Set("Content-Type", contentType)
+	return response
+}
+
+func errorResponse429(retryAfter string) *http.Response {
+	body := ""
+	response := &http.Response{
+		Status:        "429 Too Many Requests",
+		StatusCode:    429,
+		Header:        make(http.Header),
+		Body:          ioutil.NopCloser(strings.NewReader(body)),
+		ContentLength: int64(len(body)),
+	}
+	response.Header.Set("Content-Type", "text/plain")
+	response.Header.Set("Retry-After", retryAfter)
+	return response
+}
+
+func TestDecodeErrorResponse(t *testing.T) {
+	testCases := []struct {
+		response    *http.Response
+		wantMessage string
+	}{
+		{
+			response:    errorResponse418("text/html", "Time for tea"),
+			wantMessage: `expected response with Content-Type "application/json" but got status "418 I'm a teapot" with Content-Type "text/html"`,
+		},
+		{
+			response:    errorResponse418("application/json", `{"error": {"type": "json", "valid": no}}`),
+			wantMessage: "failed to parse API error response: invalid character 'o' in literal null (expecting 'u')",
+		},
+		{
+			response:    errorResponse418("application/json; charset=utf-8", `{"error": {"type": "track_ambiguous", "message": "message", "possible_track_ids": ["a", "b"]}}`),
+			wantMessage: "message: a, b",
+		},
+		{
+			response:    errorResponse418("application/json", `{"error": {"type": "track_ambiguous", "message": "message", "possible_track_ids": ["a", "b"]}}`),
+			wantMessage: "message: a, b",
+		},
+		{
+			response:    errorResponse418("application/json", `{"error": {"message": "message"}}`),
+			wantMessage: "message",
+		},
+		{
+			response:    errorResponse418("application/problem+json", `{"error": {"message": "new json format"}}`),
+			wantMessage: "new json format",
+		},
+		{
+			response:    errorResponse418("application/json", `{"error": {}}`),
+			wantMessage: "unexpected API response: 418",
+		},
+		{
+			response:    errorResponse429("30"),
+			wantMessage: "request failed with status 429 Too Many Requests; please try again after 30 seconds",
+		},
+		{
+			response:    errorResponse429("Wed, 21 Oct 2015 07:28:00 GMT"),
+			wantMessage: "request failed with status 429 Too Many Requests; please try again after Wed, 21 Oct 2015 07:28:00 GMT",
+		},
+	}
+	tc := testCases[0]
+	got := decodedAPIError(tc.response)
+	assert.Equal(t, tc.wantMessage, got.Error())
+	for _, tc = range testCases {
+		got := decodedAPIError(tc.response)
+		assert.Equal(t, tc.wantMessage, got.Error())
+	}
 }
