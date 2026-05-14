@@ -191,7 +191,7 @@ func newConfigurationStatus(status *Status) configurationStatus {
 		Workspace: workspace,
 		Dir:       status.cfg.Dir,
 		Token:     v.GetString("token"),
-		TokenURL:  config.SettingsURL(v.GetString("apibaseurl")),
+		TokenURL:  config.TokenURL(v.GetString("apibaseurl")),
 	}
 	if status.Censor && cs.Token != "" {
 		cs.Token = debug.Redact(cs.Token)

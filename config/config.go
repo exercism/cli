@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	defaultBaseURL = "https://api.exercism.io/v1"
+	defaultBaseURL = "https://api.exercism.org/v1"
 
 	// DefaultDirName is the default name used for config and workspace directories.
 	DefaultDirName string
@@ -121,14 +121,14 @@ func InferSiteURL(apiURL string) string {
 	if apiURL == "" {
 		apiURL = defaultBaseURL
 	}
-	if apiURL == "https://api.exercism.io/v1" {
-		return "https://exercism.io"
+	if apiURL == "https://api.exercism.org/v1" {
+		return "https://exercism.org"
 	}
 	re := regexp.MustCompile("^(https?://[^/]*).*")
 	return re.ReplaceAllString(apiURL, "$1")
 }
 
-// SettingsURL provides a link to where the user can find their API token.
-func SettingsURL(apiURL string) string {
-	return fmt.Sprintf("%s%s", InferSiteURL(apiURL), "/my/settings")
+// TokenURL provides a link to where the user can find their API token.
+func TokenURL(apiURL string) string {
+	return fmt.Sprintf("%s%s", InferSiteURL(apiURL), "/settings/api_cli")
 }

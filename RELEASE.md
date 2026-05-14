@@ -17,7 +17,7 @@ The Exercism CLI uses [GoReleaser](https://goreleaser.com) to automate the relea
 1. Commit the updated files
 1. Create a PR
 
-_Note: It's useful to add the version to the commit message when you bump it: e.g. `Bump version to v2.3.4`._
+_Note: It's useful to add the version to the commit message when you bump it: e.g. `Bump version to v3.5.9`._
 
 ## Cut a release
 
@@ -34,7 +34,7 @@ This workflow will create a draft release at https://github.com/exercism/cli/rel
 Once created, go that page to update the release description to:
 
 ```
-To install, follow the interactive installation instructions at https://exercism.io/cli-walkthrough
+To install, follow the interactive installation instructions at https://exercism.org/cli-walkthrough
 ---
 
 [modify the generated release-notes to describe changes in this release]
@@ -49,6 +49,6 @@ Homebrew will automatically bump the version, no manual action is required.
 ## Update the docs site
 
 If there are any significant changes, we should describe them on
-[exercism.io/cli](https://exercism.io/cli).
+[exercism.org/cli](https://exercism.org/cli).
 
 The codebase lives at [exercism/website-copy](https://github.com/exercism/website-copy) in `pages/cli.md`.

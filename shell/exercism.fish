@@ -9,7 +9,6 @@ complete -f -c exercism -n "__fish_seen_subcommand_from configure" -s s -l show 
 complete -f -c exercism -n "__fish_use_subcommand" -a "download" -d "Downloads and saves a specified submission into the local system"
 complete -f -c exercism -n "__fish_seen_subcommand_from download" -s e -l exercise -d "the exercise slug"
 complete -f -c exercism -n "__fish_seen_subcommand_from download" -s h -l help -d "help for download"
-complete -f -c exercism -n "__fish_seen_subcommand_from download" -s T -l team -d "the team slug"
 complete -f -c exercism -n "__fish_seen_subcommand_from download" -s t -l track -d "the track ID"
 complete -f -c exercism -n "__fish_seen_subcommand_from download" -s u -l uuid -d "the solution UUID"
 
@@ -18,11 +17,11 @@ complete -f -c exercism -n "__fish_use_subcommand" -a "help" -d "Shows a list of
 complete -f -c exercism -n "__fish_seen_subcommand_from help" -a "configure download help open submit test troubleshoot upgrade version workspace"
 
 # Open
-complete -f -c exercism -n "__fish_use_subcommand" -a "open" -d "Opens a browser to exercism.io for the specified submission."
+complete -f -c exercism -n "__fish_use_subcommand" -a "open" -d "Opens a browser to exercism.org for the specified submission."
 complete -f -c exercism -n "__fish_seen_subcommand_from open" -s h -l help -d "help for open"
 
 # Submit
-complete -f -c exercism -n "__fish_use_subcommand" -a "submit" -d "Submits a new iteration to a problem on exercism.io."
+complete -f -c exercism -n "__fish_use_subcommand" -a "submit" -d "Submits a new iteration to a problem on exercism.org."
 complete -f -c exercism -n "__fish_seen_subcommand_from submit" -s h -l help -d "help for submit"
 
 # Test

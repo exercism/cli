@@ -8,6 +8,39 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 - **Your contribution here**
 
+## v3.5.8 (2025-09-24)
+
+- [#1215](https://github.com/exercism/cli/pull/1215) Update the token URL to point to the API settings page [@isaacg]
+- [#1210](https://github.com/exercism/cli/pull/1210) Use mode 0700 for the config dir, not 0755; other users should not have access to the config [@isaacg]
+- [#1205](https://github.com/exercism/cli/pull/1205) goreleaser: update deprecated archives.builds to new archives.ids [@isaacg]
+- [#1213](https://github.com/exercism/cli/pull/1213) Include empty files in downloads [@isaacg]
+- [#1206](https://github.com/exercism/cli/pull/1206) Drop team-specific logic from the CLI [@isaacg]
+
+## v3.5.7 (2025-07-14)
+
+- [#1202](https://github.com/exercism/cli/pull/1202) Add error decoding support for content type parameters such as charset - [@isaacg]
+- [#1201](https://github.com/exercism/cli/pull/1201) Fix goreleaser deprecations - [@erikschierboom]
+
+## v3.5.6 (2025-07-06)
+
+- [#1199](https://github.com/exercism/cli/pull/1199) Support for Futhark in exercism test - [@erikschierboom]
+- [#1198](https://github.com/exercism/cli/pull/1198) Show a "try again after" message when a response sets a Retry-After header - [@isaacg]
+- [#1196](https://github.com/exercism/cli/pull/1196) Check HTTP response content type before trying to decode it as JSON - [@isaacg]
+
+## v3.5.5 (2025-05-30)
+
+- [#1192](https://github.com/exercism/cli/pull/1192) Change Idris test command to use slug - [@keiravillekode]
+
+## v3.5.4 (2024-11-15)
+
+- [#1183](https://github.com/exercism/cli/pull/1183) Add support for Uiua track to `exercism test` - [@vaeng]
+
+## v3.5.3 (2024-11-03)
+
+- [#1178](https://github.com/exercism/cli/pull/1178) Add arm64-assembly test configuration [@keiravillekode]
+- [#1177](https://github.com/exercism/cli/pull/1177) refactored exercism.io links to exercism.org [@ladokp]
+- [#1165](https://github.com/exercism/cli/pull/1165) Add support for the YAMLScript language [@ingydotnet]
+
 ## v3.5.2 (2024-10-09)
 
 - [#1174](https://github.com/exercism/cli/pull/1174) Fix an issue with `exercism completion bash` where the command name is not present in the completion output. - [@petrem]
@@ -153,7 +186,7 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 ## v3.0.0 (2018-07-13)
 
-This is a complete rewrite from the ground up to work against the new https://exercism.io site.
+This is a complete rewrite from the ground up to work against the new https://exercism.org site.
 
 ## v2.4.1 (2017-07-01)
 
@@ -299,7 +332,7 @@ Tweaked:
 
 ## v1.9.2 (2015-01-11)
 
-- [exercism.io#2155](https://github.com/exercism/exercism.io/issues/2155): Fixed problem with passed in config file being ignored.
+- [exercism#2155](https://github.com/exercism/exercism/issues/2155): Fixed problem with passed in config file being ignored.
 - Added first version of changelog
 
 ## v1.9.1 (2015-01-10)
@@ -419,7 +452,7 @@ Tweaked:
 
 ## v1.3.1 (2013-12-01)
 
-- [exercism.io#1039](https://github.com/exercism/exercism.io/issues/1039): Stopped clobbering existing files on fetch
+- [exercism#1039](https://github.com/exercism/exercism/issues/1039): Stopped clobbering existing files on fetch
 
 ## v1.3.0 (2013-11-16)
 
@@ -427,7 +460,7 @@ Tweaked:
 
 ## v1.2.3 (2013-11-13)
 
-- [exercism.io#998](https://github.com/exercism/exercism.io/issues/998): Fix problem with writing an empty config file under certain circumstances.
+- [exercism#998](https://github.com/exercism/exercism/issues/998): Fix problem with writing an empty config file under certain circumstances.
 
 ## v1.2.2 (2013-11-12)
 
@@ -493,16 +526,16 @@ All changes by [@msgehard]
 - Implement login and logout
 - Build on Travis
 
-[@AlexWheeler]: https://github.com/AlexWheeler
+[@alexwheeler]: https://github.com/AlexWheeler
 [@andrerfcsantos]: https://github.com/andrerfcsantos
 [@avegner]: https://github.com/avegner
-[@Dparker1990]: https://github.com/Dparker1990
-[@John-Goff]: https://github.com/John-Goff
-[@LegalizeAdulthood]: https://github.com/LegalizeAdulthood
-[@QuLogic]: https://github.com/QuLogic
-[@Smarticles101]: https://github.com/Smarticles101
-[@Tonkpils]: https://github.com/Tonkpils
-[@TrevorBramble]: https://github.com/TrevorBramble
+[@dparker1990]: https://github.com/Dparker1990
+[@john-goff]: https://github.com/John-Goff
+[@legalizeadulthood]: https://github.com/LegalizeAdulthood
+[@qulogic]: https://github.com/QuLogic
+[@smarticles101]: https://github.com/Smarticles101
+[@tonkpils]: https://github.com/Tonkpils
+[@trevorbramble]: https://github.com/TrevorBramble
 [@alebaffa]: https://github.com/alebaffa
 [@ambroff]: https://github.com/ambroff
 [@andrewsardone]: https://github.com/andrewsardone
@@ -517,22 +550,24 @@ All changes by [@msgehard]
 [@djquan]: https://github.com/djquan
 [@dmmulroy]: https://github.com/dmmulroy
 [@dpritchett]: https://github.com/dpritchett
-[@eToThePiIPower]: https://github.com/eToThePiIPower
+[@etothepiipower]: https://github.com/eToThePiIPower
 [@ebautistabar]: https://github.com/ebautistabar
 [@ekingery]: https://github.com/ekingery
 [@elimisteve]: https://github.com/elimisteve
+[@erikschierboom]: https://github.com/erikschierboom
 [@ests]: https://github.com/ests
 [@farisj]: https://github.com/farisj
 [@glebedel]: https://github.com/glebedel
 [@harimp]: https://github.com/harimp
 [@harugo]: https://github.com/harugo
 [@hjljo]: https://github.com/hjljo
+[@isaacg]: https://github.com/isaacg
 [@isbadawi]: https://github.com/isbadawi
 [@jbaiter]: https://github.com/jbaiter
 [@jdsutherland]: https://github.com/jdsutherland
 [@jgsqware]: https://github.com/jgsqware
 [@jish]: https://github.com/jish
-[@Jrank2013]: https://github.com/Jrank2013
+[@jrank2013]: https://github.com/Jrank2013
 [@jppunnett]: https://github.com/jppunnett
 [@katrinleinweber]: https://github.com/katrinleinweber
 [@kytrinyx]: https://github.com/kytrinyx
@@ -558,7 +593,7 @@ All changes by [@msgehard]
 [@xavdid]: https://github.com/xavdid
 [@williandrade]: https://github.com/williandrade
 [@zabawaba99]: https://github.com/zabawaba99
-[@GroophyLifefor]: https://github.com/GroophyLifefor
+[@groophylifefor]: https://github.com/GroophyLifefor
 [@muzimuzhi]: https://github.com/muzimuzhi
 [@isberg]: https://github.com/isberg
 [@erikschierboom]: https://github.com/erikschierboom
@@ -570,3 +605,5 @@ All changes by [@msgehard]
 [@ageron]: https://github.com/ageron
 [@petrem]: https://github.com/petrem
 [@bnandras]: https://github.com/bnandras
+[@vaeng]: https://github.com/vaeng
+[@keiravillekode]: https://github.com/keiravillekode

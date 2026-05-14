@@ -55,6 +55,13 @@ func (c *TestConfiguration) GetTestCommand() (string, error) {
 		}
 		cmd = strings.ReplaceAll(cmd, "{{test_files}}", strings.Join(testFiles, " "))
 	}
+	if strings.Contains(cmd, "{{slug}}") {
+		metadata, err := NewExerciseMetadata(".")
+		if err != nil {
+			return "", err
+		}
+		cmd = strings.ReplaceAll(cmd, "{{slug}}", metadata.ExerciseSlug)
+	}
 
 	return cmd, nil
 }
@@ -133,11 +140,20 @@ var TestConfigurations = map[string]TestConfiguration{
 	"erlang": {
 		Command: "rebar3 eunit",
 	},
+	"factor": {
+		Command: "factor -roots=. -run=exercism-tools {{slug}}",
+	},
 	"fortran": {
 		Command: "make",
 	},
+	"free-pascal": {
+		Command: "make test=all",
+	},
 	"fsharp": {
 		Command: "dotnet test",
+	},
+	"futhark": {
+		Command: "futhark test test.fut",
 	},
 	"gleam": {
 		Command: "gleam test",
@@ -152,7 +168,7 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command: "stack test",
 	},
 	"idris": {
-		Command: "pack test `basename *.ipkg .ipkg`",
+		Command: "pack test {{slug}}",
 	},
 	"j": {
 		Command: `jconsole -js "exit echo unittest {{test_files}} [ load {{solution_files}}"`,
@@ -174,6 +190,9 @@ var TestConfigurations = map[string]TestConfiguration{
 		Command:        "./gradlew test",
 		WindowsCommand: "gradlew.bat test",
 	},
+	"lean": {
+		Command: "lake test",
+	},
 	"lfe": {
 		Command: "make test",
 	},
@@ -183,12 +202,18 @@ var TestConfigurations = map[string]TestConfiguration{
 	"mips": {
 		Command: "java -jar /path/to/mars.jar nc runner.mips impl.mips",
 	},
+	"moonscript": {
+		Command: "busted",
+	},
 	"nim": {
 		Command: "nim r {{test_files}}",
 	},
 	// objective-c: tests are run via XCode. There's a CLI option (ruby gem `objc`), but the docs note that this is an inferior experience
 	"ocaml": {
 		Command: "make",
+	},
+	"odin": {
+		Command: "odin test .",
 	},
 	"perl5": {
 		Command: "prove .",
@@ -253,6 +278,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"typescript": {
 		Command: "yarn test",
 	},
+	"uiua": {
+		Command: "uiua test {{test_files}}",
+	},
 	// unison: tests are run from an active UCM session
 	"vbnet": {
 		Command: "dotnet test",
@@ -269,6 +297,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	},
 	"x86-64-assembly": {
 		Command: "make",
+	},
+	"yamlscript": {
+		Command: "make test",
 	},
 	"zig": {
 		Command: "zig test {{test_files}}",
