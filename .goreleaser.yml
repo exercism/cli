@@ -54,7 +54,7 @@ changelog:
 
 archives:
   - id: release-archives
-    builds:
+    ids:
       - release-build
     name_template: >-
       {{- .ProjectName }}-
@@ -66,13 +66,13 @@ archives:
       {{- if .Arm }}v{{- .Arm }}{{ end }}
     format_overrides:
       - goos: windows
-        format: zip
+        formats: ["zip"]
     files:
       - shell/**
       - LICENSE
       - README.md
   - id: installer-archives
-    builds:
+    ids:
       - installer-build
     name_template: >-
       {{- .ProjectName }}-
@@ -84,7 +84,7 @@ archives:
       {{- if .Arm }}v{{- .Arm }}{{ end }}
     format_overrides:
       - goos: windows
-        format: zip
+        formats: ["zip"]
     files:
       - shell/**
       - LICENSE

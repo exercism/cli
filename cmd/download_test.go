@@ -26,7 +26,7 @@ func TestDownloadWithoutToken(t *testing.T) {
 	if assert.Error(t, err) {
 		assert.Regexp(t, "Welcome to Exercism", err.Error())
 		// It uses the default base API url to infer the host
-		assert.Regexp(t, "exercism.org/my/settings", err.Error())
+		assert.Regexp(t, "exercism.org/settings", err.Error())
 	}
 }
 
@@ -160,11 +160,6 @@ func TestDownload(t *testing.T) {
 			expectedDir: filepath.Join("users", "alice"),
 			flags:       map[string]string{"uuid": "bogus-id"},
 		},
-		{
-			requester:   true,
-			expectedDir: filepath.Join("teams", "bogus-team"),
-			flags:       map[string]string{"exercise": "bogus-exercise", "track": "bogus-track", "team": "bogus-team"},
-		},
 	}
 
 	for _, tc := range testCases {
@@ -172,7 +167,7 @@ func TestDownload(t *testing.T) {
 		defer os.RemoveAll(tmpDir)
 		assert.NoError(t, err)
 
-		ts := fakeDownloadServer(strconv.FormatBool(tc.requester), tc.flags["team"])
+		ts := fakeDownloadServer(strconv.FormatBool(tc.requester))
 		defer ts.Close()
 
 		v := viper.New()
@@ -221,10 +216,6 @@ func TestDownloadToExistingDirectory(t *testing.T) {
 			exerciseDir: filepath.Join("bogus-track", "bogus-exercise"),
 			flags:       map[string]string{"exercise": "bogus-exercise", "track": "bogus-track"},
 		},
-		{
-			exerciseDir: filepath.Join("teams", "bogus-team", "bogus-track", "bogus-exercise"),
-			flags:       map[string]string{"exercise": "bogus-exercise", "track": "bogus-track", "team": "bogus-team"},
-		},
 	}
 
 	for _, tc := range testCases {
@@ -235,7 +226,7 @@ func TestDownloadToExistingDirectory(t *testing.T) {
 		err = os.MkdirAll(filepath.Join(tmpDir, tc.exerciseDir), os.FileMode(0755))
 		assert.NoError(t, err)
 
-		ts := fakeDownloadServer("true", "")
+		ts := fakeDownloadServer("true")
 		defer ts.Close()
 
 		v := viper.New()
@@ -273,10 +264,6 @@ func TestDownloadToExistingDirectoryWithForce(t *testing.T) {
 			exerciseDir: filepath.Join("bogus-track", "bogus-exercise"),
 			flags:       map[string]string{"exercise": "bogus-exercise", "track": "bogus-track"},
 		},
-		{
-			exerciseDir: filepath.Join("teams", "bogus-team", "bogus-track", "bogus-exercise"),
-			flags:       map[string]string{"exercise": "bogus-exercise", "track": "bogus-track", "team": "bogus-team"},
-		},
 	}
 
 	for _, tc := range testCases {
@@ -287,7 +274,7 @@ func TestDownloadToExistingDirectoryWithForce(t *testing.T) {
 		err = os.MkdirAll(filepath.Join(tmpDir, tc.exerciseDir), os.FileMode(0755))
 		assert.NoError(t, err)
 
-		ts := fakeDownloadServer("true", "")
+		ts := fakeDownloadServer("true")
 		defer ts.Close()
 
 		v := viper.New()
@@ -310,7 +297,7 @@ func TestDownloadToExistingDirectoryWithForce(t *testing.T) {
 	}
 }
 
-func fakeDownloadServer(requestor, teamSlug string) *httptest.Server {
+func fakeDownloadServer(requestor string) *httptest.Server {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 
@@ -327,15 +314,11 @@ func fakeDownloadServer(requestor, teamSlug string) *httptest.Server {
 	})
 
 	mux.HandleFunc("/solutions/latest", func(w http.ResponseWriter, r *http.Request) {
-		team := "null"
-		if teamSlug := r.FormValue("team_id"); teamSlug != "" {
-			team = fmt.Sprintf(`{"name": "Bogus Team", "slug": "%s"}`, teamSlug)
-		}
-		payloadBody := fmt.Sprintf(payloadTemplate, requestor, team, server.URL+"/")
+		payloadBody := fmt.Sprintf(payloadTemplate, requestor, server.URL+"/")
 		fmt.Fprint(w, payloadBody)
 	})
 	mux.HandleFunc("/solutions/bogus-id", func(w http.ResponseWriter, r *http.Request) {
-		payloadBody := fmt.Sprintf(payloadTemplate, requestor, "null", server.URL+"/")
+		payloadBody := fmt.Sprintf(payloadTemplate, requestor, server.URL+"/")
 		fmt.Fprint(w, payloadBody)
 	})
 
@@ -370,7 +353,7 @@ func assertDownloadedCorrectFiles(t *testing.T, targetDir string) {
 
 	path := filepath.Join(targetDir, "bogus-track", "bogus-exercise", "file-3.txt")
 	_, err := os.Lstat(path)
-	assert.True(t, os.IsNotExist(err), "It should not write the file if empty.")
+	assert.NoError(t, err)
 }
 
 func TestDownloadError(t *testing.T) {
@@ -403,7 +386,7 @@ func TestDownloadError(t *testing.T) {
 
 	err = runDownload(cfg, flags, []string{})
 
-	assert.Equal(t, "test error", err.Error())
+	assert.Equal(t, `expected response with Content-Type "application/json" but got status "400 Bad Request" with Content-Type "text/plain; charset=utf-8"`, err.Error())
 
 }
 
@@ -415,7 +398,6 @@ const payloadTemplate = `
 			"handle": "alice",
 			"is_requester": %s
 		},
-		"team": %s,
 		"exercise": {
 			"id": "bogus-exercise",
 			"instructions_url": "http://example.com/bogus-exercise",
