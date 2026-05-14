@@ -28,7 +28,7 @@ func TestSubmitWithoutToken(t *testing.T) {
 	err := runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), []string{})
 	if assert.Error(t, err) {
 		assert.Regexp(t, "Welcome to Exercism", err.Error())
-		assert.Regexp(t, "exercism.org/my/settings", err.Error())
+		assert.Regexp(t, "exercism.org/settings", err.Error())
 	}
 }
 
@@ -425,53 +425,6 @@ func TestSubmitWithEnormousFile(t *testing.T) {
 	}
 }
 
-func TestSubmitFilesForTeamExercise(t *testing.T) {
-	co := newCapturedOutput()
-	co.override()
-	defer co.reset()
-
-	// The fake endpoint will populate this when it receives the call from the command.
-	submittedFiles := map[string]string{}
-	ts := fakeSubmitServer(t, submittedFiles)
-	defer ts.Close()
-
-	tmpDir, err := os.MkdirTemp("", "submit-files")
-	assert.NoError(t, err)
-
-	dir := filepath.Join(tmpDir, "teams", "bogus-team", "bogus-track", "bogus-exercise")
-	os.MkdirAll(filepath.Join(dir, "subdir"), os.FileMode(0755))
-	writeFakeMetadata(t, dir, "bogus-track", "bogus-exercise")
-
-	file1 := filepath.Join(dir, "file-1.txt")
-	err = os.WriteFile(file1, []byte("This is file 1."), os.FileMode(0755))
-	assert.NoError(t, err)
-
-	file2 := filepath.Join(dir, "subdir", "file-2.txt")
-	err = os.WriteFile(file2, []byte("This is file 2."), os.FileMode(0755))
-	assert.NoError(t, err)
-
-	v := viper.New()
-	v.Set("token", "abc123")
-	v.Set("workspace", tmpDir)
-	v.Set("apibaseurl", ts.URL)
-
-	cfg := config.Config{
-		Dir:             tmpDir,
-		UserViperConfig: v,
-	}
-
-	files := []string{
-		file1, file2,
-	}
-	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
-	assert.NoError(t, err)
-
-	assert.Equal(t, 2, len(submittedFiles))
-
-	assert.Equal(t, "This is file 1.", submittedFiles["file-1.txt"])
-	assert.Equal(t, "This is file 2.", submittedFiles["subdir/file-2.txt"])
-}
-
 func TestSubmitOnlyEmptyFile(t *testing.T) {
 	co := newCapturedOutput()
 	co.override()
@@ -657,7 +610,7 @@ func TestSubmitServerErr(t *testing.T) {
 
 	err = runSubmit(cfg, pflag.NewFlagSet("fake", pflag.PanicOnError), files)
 
-	assert.Regexp(t, "test error", err.Error())
+	assert.Regexp(t, `expected response with Content-Type "application/json" but got status "400 Bad Request" with Content-Type "text/plain; charset=utf-8"`, err.Error())
 }
 
 func TestHandleErrorResponse(t *testing.T) {

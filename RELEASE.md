@@ -17,7 +17,7 @@ The Exercism CLI uses [GoReleaser](https://goreleaser.com) to automate the relea
 1. Commit the updated files
 1. Create a PR
 
-_Note: It's useful to add the version to the commit message when you bump it: e.g. `Bump version to v2.3.4`._
+_Note: It's useful to add the version to the commit message when you bump it: e.g. `Bump version to v3.5.9`._
 
 ## Cut a release
 

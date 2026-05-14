@@ -2,8 +2,11 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"io"
@@ -23,6 +26,8 @@ var (
 	Out io.Writer
 	// Err is used to write errors.
 	Err io.Writer
+	// jsonContentTypeRe is used to match Content-Type which contains JSON.
+	jsonContentTypeRe = regexp.MustCompile(`^application/([[:alpha:]]+\+)?json($|;)`)
 )
 
 const msgWelcomePleaseConfigure = `
@@ -64,7 +69,7 @@ func validateUserConfig(cfg *viper.Viper) error {
 	if cfg.GetString("token") == "" {
 		return fmt.Errorf(
 			msgWelcomePleaseConfigure,
-			config.SettingsURL(cfg.GetString("apibaseurl")),
+			config.TokenURL(cfg.GetString("apibaseurl")),
 			BinaryName,
 		)
 	}
@@ -77,6 +82,29 @@ func validateUserConfig(cfg *viper.Viper) error {
 // decodedAPIError decodes and returns the error message from the API response.
 // If the message is blank, it returns a fallback message with the status code.
 func decodedAPIError(resp *http.Response) error {
+	// First and foremost, handle Retry-After headers; if set, show this to the user.
+	if retryAfter := resp.Header.Get("Retry-After"); retryAfter != "" {
+		// The Retry-After header can be an HTTP Date or delay seconds.
+		// The date can be used as-is. The delay seconds should have "seconds" appended.
+		if delay, err := strconv.Atoi(retryAfter); err == nil {
+			retryAfter = fmt.Sprintf("%d seconds", delay)
+		}
+		return fmt.Errorf(
+			"request failed with status %s; please try again after %s",
+			resp.Status,
+			retryAfter,
+		)
+	}
+
+	// Check for JSON data. On non-JSON data, show the status and content type then bail.
+	// Otherwise, extract the message details from the JSON.
+	if contentType := resp.Header.Get("Content-Type"); !jsonContentTypeRe.MatchString(contentType) {
+		return fmt.Errorf(
+			"expected response with Content-Type \"application/json\" but got status %q with Content-Type %q",
+			resp.Status,
+			contentType,
+		)
+	}
 	var apiError struct {
 		Error struct {
 			Type             string   `json:"type"`
@@ -95,7 +123,7 @@ func decodedAPIError(resp *http.Response) error {
 				strings.Join(apiError.Error.PossibleTrackIDs, ", "),
 			)
 		}
-		return fmt.Errorf(apiError.Error.Message)
+		return errors.New(apiError.Error.Message)
 	}
 	return fmt.Errorf("unexpected API response: %d", resp.StatusCode)
 }
