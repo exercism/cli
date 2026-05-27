@@ -1,6 +1,6 @@
 module github.com/exercism/cli
 
-go 1.23
+go 1.26.0
 
 require (
 	github.com/blang/semver v3.5.1+incompatible
