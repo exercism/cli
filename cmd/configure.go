@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strings"
@@ -55,6 +56,34 @@ func runConfigure(configuration config.Config, flags *pflag.FlagSet) error {
 	if show {
 		printCurrentConfig(configuration)
 		return nil
+	}
+
+	// Interactive configuration.
+	interactive, err := flags.GetBool("interactive")
+	if err != nil {
+		return err
+	}
+	if interactive {
+		tokenURL := config.SettingsURL(cfg.GetString("apibaseurl"))
+		fmt.Println("Find your token on", tokenURL)
+
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Enter your token: ")
+		token, err := reader.ReadString('\n')
+		token = strings.TrimSpace(token)
+
+		// If we got an EOF print a new line, so that the
+		// next print can be on a new line.
+		if err != nil {
+			fmt.Println()
+		}
+
+		if err != nil || token == "" {
+			tokenURL := config.SettingsURL(cfg.GetString("apibaseurl"))
+			return fmt.Errorf("There is no token provided. Find your token on %s, and call this command again.", tokenURL)
+		}
+
+		flags.Set("token", token)
 	}
 
 	// If the command is run 'bare' and we have no token,
@@ -231,6 +260,7 @@ func setupConfigureFlags(flags *pflag.FlagSet) {
 	flags.StringP("workspace", "w", "", "directory for exercism exercises")
 	flags.StringP("api", "a", "", "API base url")
 	flags.BoolP("show", "s", false, "show the current configuration")
+	flags.BoolP("interactive", "i", false, "set configuration values with interactive prompts")
 	flags.BoolP("no-verify", "", false, "skip online token authorization check")
 }
 
