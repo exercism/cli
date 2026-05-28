@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blang/semver"
+	semver "github.com/blang/semver/v4"
 	"github.com/exercism/cli/debug"
 	update "github.com/inconshreveable/go-update"
 )
