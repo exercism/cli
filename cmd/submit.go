@@ -208,7 +208,7 @@ func (s *submitCmdContext) migrateLegacyMetadata(exercise workspace.Exercise) er
 		return err
 	}
 	if verbose, _ := s.flags.GetBool("verbose"); verbose {
-		fmt.Fprintf(Err, migrationStatus.String())
+		Err.Write([]byte(migrationStatus.String()))
 	}
 	return nil
 }

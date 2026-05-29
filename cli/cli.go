@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blang/semver"
+	semver "github.com/blang/semver/v4"
 	"github.com/exercism/cli/debug"
 	update "github.com/inconshreveable/go-update"
 )
@@ -150,7 +151,7 @@ func (c *CLI) fetchLatestRelease() error {
 		for k, v := range resp.Header {
 			msg += fmt.Sprintf("\n  %s:\n    %s", k, v)
 		}
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 
 	var rel Release
