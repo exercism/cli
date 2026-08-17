@@ -208,6 +208,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"nim": {
 		Command: "nim r {{test_files}}",
 	},
+	"nushell": {
+		Command: "nu {{test_files}}",
+	},
 	// objective-c: tests are run via XCode. There's a CLI option (ruby gem `objc`), but the docs note that this is an inferior experience
 	"ocaml": {
 		Command: "make",
