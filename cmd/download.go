@@ -100,7 +100,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 
 		if res.StatusCode != http.StatusOK {
 			if successes > 0 {
-				fmt.Fprintf(Err, "Downloaded %d/%d files", successes, len(download.payload.files()))
+				fmt.Fprintf(Err, "Downloaded %d/%d files\n", successes, len(download.payload.files()))
 			}
 			return fmt.Errorf("received HTTP/%d when fetching %#v", res.StatusCode, url)
 		}
