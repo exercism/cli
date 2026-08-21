@@ -120,6 +120,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		if err != nil {
 			return err
 		}
+		successes++
 	}
 	fmt.Fprintf(Err, "\nDownloaded to\n")
 	fmt.Fprintf(Out, "%s\n", metadata.Dir)
