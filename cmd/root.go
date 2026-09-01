@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/exercism/cli/api"
@@ -42,7 +43,7 @@ func Execute() {
 }
 
 func getCommandName() string {
-	return os.Args[0]
+	return filepath.Base(os.Args[0])
 }
 
 func init() {
