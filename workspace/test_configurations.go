@@ -155,6 +155,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"futhark": {
 		Command: "futhark test test.fut",
 	},
+	"gdscript": {
+		Command: "bash run_tests",
+	},
 	"gleam": {
 		Command: "gleam test",
 	},
