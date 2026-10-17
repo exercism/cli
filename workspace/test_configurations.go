@@ -259,6 +259,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"red": {
 		Command: "red {{test_files}}",
 	},
+	"rescript": {
+		Command: "npm run test",
+	},
 	"risc-v": {
 		Command: "make",
 	},
