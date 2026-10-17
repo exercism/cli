@@ -8,24 +8,39 @@ The exercism CLI follows [semantic versioning](http://semver.org/).
 
 - **Your contribution here**
 
+## v3.5.9 (2026-10-16)
+
+- [#1253](https://github.com/exercism/cli/pull/1253) Add scheme test configuration [@keiravillekode]
+- [#1227](https://github.com/exercism/cli/pull/1227) Add `rescript` support [@bnandras]
+- [#1251](https://github.com/exercism/cli/pull/1251) Add GDScript support to `exercism test` [@IsaacG]
+- [#1193](https://github.com/exercism/cli/pull/1193) Add risc-v test configuration [@keiravillekode]
+- [#1244](https://github.com/exercism/cli/pull/1244) add nushell to tests [@YanniPapandreou]]
+- [#1246](https://github.com/exercism/cli/pull/1246) Handle receiving HTTP error codes (non-200) when downloading files. [@IsaacG]
+- [#1228](https://github.com/exercism/cli/pull/1228) Add factor support to `exercism test` [@keiravillekode]
+- [#1224](https://github.com/exercism/cli/pull/1224) Add Lean test command to test configurations [@tim-br]
+- [#1222](https://github.com/exercism/cli/pull/1222) Add moonscript for `exercism test` [@glennj]
+- [#1220](https://github.com/exercism/cli/pull/1220) Add Odin support to `exercism test` [@glennj]
+- [#1219](https://github.com/exercism/cli/pull/1219) Support for Free Pascal in `exercism test` [@keiravillekode]
+- [#1217](https://github.com/exercism/cli/pull/1217) Fix the API settings URL: remove the `/my/` prefix [@IsaacG]
+
 ## v3.5.8 (2025-09-24)
 
-- [#1215](https://github.com/exercism/cli/pull/1215) Update the token URL to point to the API settings page [@isaacg]
-- [#1210](https://github.com/exercism/cli/pull/1210) Use mode 0700 for the config dir, not 0755; other users should not have access to the config [@isaacg]
-- [#1205](https://github.com/exercism/cli/pull/1205) goreleaser: update deprecated archives.builds to new archives.ids [@isaacg]
-- [#1213](https://github.com/exercism/cli/pull/1213) Include empty files in downloads [@isaacg]
-- [#1206](https://github.com/exercism/cli/pull/1206) Drop team-specific logic from the CLI [@isaacg]
+- [#1215](https://github.com/exercism/cli/pull/1215) Update the token URL to point to the API settings page [@IsaacG]
+- [#1210](https://github.com/exercism/cli/pull/1210) Use mode 0700 for the config dir, not 0755; other users should not have access to the config [@IsaacG]
+- [#1205](https://github.com/exercism/cli/pull/1205) goreleaser: update deprecated archives.builds to new archives.ids [@IsaacG]
+- [#1213](https://github.com/exercism/cli/pull/1213) Include empty files in downloads [@IsaacG]
+- [#1206](https://github.com/exercism/cli/pull/1206) Drop team-specific logic from the CLI [@IsaacG]
 
 ## v3.5.7 (2025-07-14)
 
-- [#1202](https://github.com/exercism/cli/pull/1202) Add error decoding support for content type parameters such as charset - [@isaacg]
+- [#1202](https://github.com/exercism/cli/pull/1202) Add error decoding support for content type parameters such as charset - [@IsaacG]
 - [#1201](https://github.com/exercism/cli/pull/1201) Fix goreleaser deprecations - [@erikschierboom]
 
 ## v3.5.6 (2025-07-06)
 
 - [#1199](https://github.com/exercism/cli/pull/1199) Support for Futhark in exercism test - [@erikschierboom]
-- [#1198](https://github.com/exercism/cli/pull/1198) Show a "try again after" message when a response sets a Retry-After header - [@isaacg]
-- [#1196](https://github.com/exercism/cli/pull/1196) Check HTTP response content type before trying to decode it as JSON - [@isaacg]
+- [#1198](https://github.com/exercism/cli/pull/1198) Show a "try again after" message when a response sets a Retry-After header - [@IsaacG]
+- [#1196](https://github.com/exercism/cli/pull/1196) Check HTTP response content type before trying to decode it as JSON - [@IsaacG]
 
 ## v3.5.5 (2025-05-30)
 
@@ -526,22 +541,17 @@ All changes by [@msgehard]
 - Implement login and logout
 - Build on Travis
 
-[@alexwheeler]: https://github.com/AlexWheeler
-[@andrerfcsantos]: https://github.com/andrerfcsantos
-[@avegner]: https://github.com/avegner
-[@dparker1990]: https://github.com/Dparker1990
-[@john-goff]: https://github.com/John-Goff
-[@legalizeadulthood]: https://github.com/LegalizeAdulthood
-[@qulogic]: https://github.com/QuLogic
-[@smarticles101]: https://github.com/Smarticles101
-[@tonkpils]: https://github.com/Tonkpils
-[@trevorbramble]: https://github.com/TrevorBramble
+[@ageron]: https://github.com/ageron
 [@alebaffa]: https://github.com/alebaffa
+[@alexwheeler]: https://github.com/AlexWheeler
 [@ambroff]: https://github.com/ambroff
+[@andrerfcsantos]: https://github.com/andrerfcsantos
 [@andrewsardone]: https://github.com/andrewsardone
 [@anxiousmodernman]: https://github.com/anxiousmodernman
+[@avegner]: https://github.com/avegner
 [@beanieboi]: https://github.com/beanieboi
 [@blackerby]: https://github.com/blackerby
+[@bnandras]: https://github.com/bnandras
 [@broady]: https://github.com/broady
 [@ccnp123]: https://github.com/ccnp123
 [@cookrn]: https://github.com/cookrn
@@ -549,61 +559,68 @@ All changes by [@msgehard]
 [@devonestes]: https://github.com/devonestes
 [@djquan]: https://github.com/djquan
 [@dmmulroy]: https://github.com/dmmulroy
+[@dparker1990]: https://github.com/Dparker1990
 [@dpritchett]: https://github.com/dpritchett
-[@etothepiipower]: https://github.com/eToThePiIPower
 [@ebautistabar]: https://github.com/ebautistabar
 [@ekingery]: https://github.com/ekingery
 [@elimisteve]: https://github.com/elimisteve
+[@enascimento178]: https://github.com/enascimento178
+[@erikschierboom]: https://github.com/erikschierboom
 [@erikschierboom]: https://github.com/erikschierboom
 [@ests]: https://github.com/ests
+[@etothepiipower]: https://github.com/eToThePiIPower
 [@farisj]: https://github.com/farisj
 [@glebedel]: https://github.com/glebedel
+[@glennj]: https://github.com/glennj
+[@groophylifefor]: https://github.com/GroophyLifefor
+[@halfdan]: https://github.com/halfdan
 [@harimp]: https://github.com/harimp
 [@harugo]: https://github.com/harugo
 [@hjljo]: https://github.com/hjljo
-[@isaacg]: https://github.com/isaacg
+[@IsaacG]: https://github.com/IsaacG
 [@isbadawi]: https://github.com/isbadawi
+[@isberg]: https://github.com/isberg
 [@jbaiter]: https://github.com/jbaiter
 [@jdsutherland]: https://github.com/jdsutherland
 [@jgsqware]: https://github.com/jgsqware
 [@jish]: https://github.com/jish
-[@jrank2013]: https://github.com/Jrank2013
+[@john-goff]: https://github.com/John-Goff
 [@jppunnett]: https://github.com/jppunnett
+[@jrank2013]: https://github.com/Jrank2013
 [@katrinleinweber]: https://github.com/katrinleinweber
+[@keiravillekode]: https://github.com/keiravillekode
 [@kytrinyx]: https://github.com/kytrinyx
 [@larson004]: https://github.com/larson004
 [@lcowell]: https://github.com/lcowell
+[@legalizeadulthood]: https://github.com/LegalizeAdulthood
 [@manusajith]: https://github.com/manusajith
 [@morphatic]: https://github.com/morphatic
 [@mrageh]: https://github.com/mrageh
 [@msgehard]: https://github.com/msgehard
+[@muzimuzhi]: https://github.com/muzimuzhi
 [@narqo]: https://github.com/narqo
 [@neslom]: https://github.com/neslom
 [@nf]: https://github.com/nf
 [@nilbus]: https://github.com/nilbus
 [@nywilken]: https://github.com/nywilken
 [@petertseng]: https://github.com/petertseng
+[@petrem]: https://github.com/petrem
 [@pminten]: https://github.com/pminten
 [@queuebit]: https://github.com/queuebit
+[@qulogic]: https://github.com/QuLogic
 [@rcode5]: https://github.com/rcode5
 [@rprouse]: https://github.com/rprouse
+[@sanderploegsma]: https://github.com/sanderploegsma
 [@sfairchild]: https://github.com/sfairchild
 [@simonjefford]: https://github.com/simonjefford
+[@smarticles101]: https://github.com/Smarticles101
 [@srt32]: https://github.com/srt32
-[@xavdid]: https://github.com/xavdid
-[@williandrade]: https://github.com/williandrade
-[@zabawaba99]: https://github.com/zabawaba99
-[@groophylifefor]: https://github.com/GroophyLifefor
-[@muzimuzhi]: https://github.com/muzimuzhi
-[@isberg]: https://github.com/isberg
-[@erikschierboom]: https://github.com/erikschierboom
-[@sanderploegsma]: https://github.com/sanderploegsma
-[@enascimento178]: https://github.com/enascimento178
-[@halfdan]: https://github.com/halfdan
-[@glennj]: https://github.com/glennj
+[@tim-br]: https://github.com/tim-br
 [@tomasnorre]: https://github.com/tomasnorre
-[@ageron]: https://github.com/ageron
-[@petrem]: https://github.com/petrem
-[@bnandras]: https://github.com/bnandras
+[@tonkpils]: https://github.com/Tonkpils
+[@trevorbramble]: https://github.com/TrevorBramble
 [@vaeng]: https://github.com/vaeng
-[@keiravillekode]: https://github.com/keiravillekode
+[@williandrade]: https://github.com/williandrade
+[@xavdid]: https://github.com/xavdid
+[@YanniPapandreou]: https://github.com/YanniPapandreou
+[@zabawaba99]: https://github.com/zabawaba99
