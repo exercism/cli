@@ -277,7 +277,9 @@ var TestConfigurations = map[string]TestConfiguration{
 	"scala": {
 		Command: "sbt test",
 	},
-	// scheme: docs present 2 equally valid test methods (`make chez` and `make guile`). So I wasn't sure which to pick
+	"scheme": {
+		Command: "make guile",
+	},
 	"sml": {
 		Command: "poly -q --use {{test_files}}",
 	},
