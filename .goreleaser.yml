@@ -32,6 +32,8 @@ builds:
         goarch: arm
       - goos: freebsd
         goarch: arm
+      - goos: windows
+        goarch: arm
   - id: installer-build
     main: ./exercism/main.go
     mod_timestamp: "{{ .CommitTimestamp  }}"
